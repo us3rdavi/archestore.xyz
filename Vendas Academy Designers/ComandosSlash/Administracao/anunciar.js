@@ -3,7 +3,7 @@ const { getPermissions } = require("../../Functions/PermissionsCache.js");
 
 module.exports = {
     name: "anunciar",
-    description: "[🤖] Envie um anúncio no servidor.",
+    description:"Envie um anúncio no servidor.",
 
     run: async (client, interaction) => {
 

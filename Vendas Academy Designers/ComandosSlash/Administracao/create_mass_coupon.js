@@ -6,54 +6,54 @@ const { getPermissions } = require("../../Functions/PermissionsCache.js");
 
 module.exports = {
   name: "cupom",
-  description: "[🤖] Use para configurar minhas funções",
+  description:"Use para configurar minhas funções",
   type: ApplicationCommandType.ChatInput,
   options: [
     {
       name: "name",
-      description: "-",
+      description:"-",
       type: Discord.ApplicationCommandOptionType.String,
       required: true,
     },
     {
       name: "discount",
-      description: "-",
+      description:"-",
       type: Discord.ApplicationCommandOptionType.Number,
       required: true,
     },
     {
       name: "days",
-      description: "-",
+      description:"-",
       type: Discord.ApplicationCommandOptionType.Number,
       required: false,
     },
     {
       name: "max_uses",
-      description: "-",
+      description:"-",
       type: Discord.ApplicationCommandOptionType.Number,
       required: false,
     },
     {
       name: "amount",
-      description: "-",
+      description:"-",
       type: Discord.ApplicationCommandOptionType.Number,
       required: false,
     },
     {
       name: "role",
-      description: "-",
+      description:"-",
       type: Discord.ApplicationCommandOptionType.Role,
       required: false,
     },
     {
       name: "buy_amount_max",
-      description: "-",
+      description:"-",
       type: Discord.ApplicationCommandOptionType.Number,
       required: false,
     },
     {
       name: "buy_amount",
-      description: "-",
+      description:"-",
       type: Discord.ApplicationCommandOptionType.Number,
       required: false,
     },

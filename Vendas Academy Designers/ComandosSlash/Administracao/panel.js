@@ -162,7 +162,7 @@ async function executeBotConfig(client, interaction) {
 
 module.exports = {
     name: "botconfig",
-    description: "[👷] Comece a configurar o sistema do seu Epro",
+    description:"Comece a configurar o sistema do seu Epro",
     type: ApplicationCommandType.ChatInput,
     default_member_permissions: PermissionFlagsBits.Administrator,
     run: executeBotConfig

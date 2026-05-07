@@ -6,12 +6,12 @@ const { getPermissions } = require("../../Functions/PermissionsCache.js");
 
 module.exports = {
     name: "remover_cupons",
-    description: "[🤖] Use para configurar minhas funções",
+    description:"Use para configurar minhas funções",
     type: ApplicationCommandType.ChatInput,
     options: [
         {
             name: "name",
-            description: "-",
+            description:"-",
             type: Discord.ApplicationCommandOptionType.String,
             required: true,
         },

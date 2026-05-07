@@ -11,7 +11,7 @@ const Emojis = {
 
 module.exports = {
   name: "ver_perms",
-  description: "[⭐️] ver todos os usuários que têm permissão",
+  description:"ver todos os usuários que têm permissão",
   type: Discord.ApplicationCommandType.ChatInput,
 
   run: async (client, interaction) => {

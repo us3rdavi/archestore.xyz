@@ -5,12 +5,12 @@ const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
     name: "say",
-    description: "[🤖] Enviar Mensagem",
+    description:"Enviar Mensagem",
     type: Discord.ApplicationCommandType.ChatInput,
     options: [
         {
             name: 'texto',
-            description: 'O que deseja enviar?',
+            description:'O que deseja enviar?',
             type: Discord.ApplicationCommandOptionType.String,
             required: true,
         }

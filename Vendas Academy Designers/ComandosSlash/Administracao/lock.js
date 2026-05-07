@@ -4,7 +4,7 @@ const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
     name: `lock`,
-    description: `[🔒] Use para trancar o canal`,
+    description:`Use para trancar o canal`,
     type: ApplicationCommandType.ChatInput,
     default_member_permissions: PermissionFlagsBits.Administrator,
 

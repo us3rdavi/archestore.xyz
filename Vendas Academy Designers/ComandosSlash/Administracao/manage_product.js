@@ -5,9 +5,9 @@ const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
   name: "gerenciar_produto",
-  description: "[🤖] Use para configurar minhas funções",
+  description:"Use para configurar minhas funções",
   type: ApplicationCommandType.ChatInput,
-  options: [{ name: "product", description: "-", type: 3, required: true, autocomplete: true }],
+  options: [{ name: "product", description:"-", type: 3, required: true, autocomplete: true }],
   default_member_permissions: PermissionFlagsBits.Administrator,
 
   run: async (client, interaction) => {

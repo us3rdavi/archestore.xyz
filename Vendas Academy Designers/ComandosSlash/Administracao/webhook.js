@@ -2,12 +2,12 @@ const { ApplicationCommandType, PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
     name: "criarwebhook",
-    description: "[🤖] Crie um Webhook no canal atual",
+    description:"Crie um Webhook no canal atual",
     type: ApplicationCommandType.ChatInput,
     options: [
         {
             name: "nome",
-            description: "Nome do webhook",
+            description:"Nome do webhook",
             type: 3, // Tipo String
             required: true,
         },

@@ -3,7 +3,7 @@ const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
     name: "deletealltickets",
-    description: "[🎫] Deleta todos os tickets",
+    description:"Deleta todos os tickets",
     type: ApplicationCommandType.ChatInput,
     run: async(client, interaction) => {
         if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {

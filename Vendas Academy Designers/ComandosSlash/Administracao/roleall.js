@@ -8,12 +8,12 @@ const Emojis = {
 
 module.exports = {
     name: "cargo-all",
-    description: "[🤖] Atribuir um cargo específico a todos os membros do servidor",
+    description:"Atribuir um cargo específico a todos os membros do servidor",
     type: Discord.ApplicationCommandType.ChatInput,
     options: [
         {
             name: 'cargo',
-            description: 'Selecione o cargo que deseja atribuir a todos os membros',
+            description:'Selecione o cargo que deseja atribuir a todos os membros',
             type: Discord.ApplicationCommandOptionType.Role,
             required: true,
         }

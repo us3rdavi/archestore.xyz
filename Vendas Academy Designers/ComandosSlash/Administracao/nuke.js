@@ -14,11 +14,11 @@ const Emojis = {
 
 module.exports = {
   name: 'nuke',
-  description: '[🤖] Nuke a channel',
+  description:'Nuke a channel',
   options: [
     {
       name: 'channel',
-      description: 'The channel to nuke',
+      description:'The channel to nuke',
       type: ApplicationCommandOptionType.Channel,
       required: false,
       channelTypes: [ChannelType.GuildText],

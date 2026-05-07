@@ -2,7 +2,7 @@ const Discord = require("discord.js");
 
 module.exports = {
     name: "lockall",
-    description: "[🔒] da Lock Em Todos os Canais.",
+    description:"da Lock Em Todos os Canais.",
     type: Discord.ApplicationCommandType.ChatInput,
     run: async (client, interaction) => {
         // Verifica se o membro tem permissão de Administrador

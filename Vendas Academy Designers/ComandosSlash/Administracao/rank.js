@@ -11,7 +11,7 @@ const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
   name: "rank",
-  description: "[💻] Use para ver a classificação de gastos do servidor",
+  description:"Use para ver a classificação de gastos do servidor",
   type: ApplicationCommandType.ChatInput,
 
   run: async (client, interaction, message) => {

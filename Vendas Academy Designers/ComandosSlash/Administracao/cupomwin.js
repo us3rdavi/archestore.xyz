@@ -4,24 +4,24 @@ const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
   name: "set_cupom",
-  description: "[🤖] Envia um cupom de desconto",
+  description:"Envia um cupom de desconto",
   type: Discord.ApplicationCommandType.ChatInput,
   options: [
     {
       name: "user",
-      description: "Usuário a quem enviar o cupom",
+      description:"Usuário a quem enviar o cupom",
       type: Discord.ApplicationCommandOptionType.User,
       required: true,
     },
     {
       name: "cupom",
-      description: "Código do cupom de desconto",
+      description:"Código do cupom de desconto",
       type: Discord.ApplicationCommandOptionType.String,
       required: true,
     },
     {
       name: "canal",
-      description: "Canal do produto para direcionar ao clicar em 'Comprar agora'",
+      description:"Canal do produto para direcionar ao clicar em'Comprar agora'",
       type: Discord.ApplicationCommandOptionType.Channel,
       required: true,
     },

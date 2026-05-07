@@ -4,7 +4,7 @@ const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
   name: "vendas",
-  description: "[💰] Use para ver suas vendas.",
+  description:"Use para ver suas vendas.",
   type: ApplicationCommandType.ChatInput,
   default_member_permissions: PermissionFlagsBits.Administrator,
 

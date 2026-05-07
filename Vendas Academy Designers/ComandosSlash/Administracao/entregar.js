@@ -11,7 +11,7 @@ const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
   name: "aprovar",
-  description: "[🤖] Use para aprovar um pagamento",
+  description:"Use para aprovar um pagamento",
   type: ApplicationCommandType.ChatInput,
   default_member_permissions: PermissionFlagsBits.Administrator,
 

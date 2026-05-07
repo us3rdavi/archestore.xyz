@@ -11,12 +11,12 @@ const Emojis = {
 
 module.exports = {
   name: "add_perm",
-  description: "[⭐️] conceder permissão a um usuário",
+  description:"conceder permissão a um usuário",
   type: Discord.ApplicationCommandType.ChatInput,
   options: [
     {
       name: "user",
-      description: "Usuário que vai receber a permissão",
+      description:"Usuário que vai receber a permissão",
       type: Discord.ApplicationCommandOptionType.User,
       required: true,
     },

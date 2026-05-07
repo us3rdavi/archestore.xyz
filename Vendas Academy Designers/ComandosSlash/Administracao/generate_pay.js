@@ -8,31 +8,31 @@ const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
     name: "payments",
-    description: "[💰] Gere um pagamento",
+    description:"Gere um pagamento",
     type: ApplicationCommandType.ChatInput,
     default_member_permissions: PermissionFlagsBits.Administrator,
     options: [
         {
             name: "price",
-            description: `-`,
+            description:`-`,
             type: Discord.ApplicationCommandOptionType.Number,
             required: true,
         },
         {
             name: "description",
-            description: `-`,
+            description:`-`,
             type: Discord.ApplicationCommandOptionType.String,
             required: true,
         },
         {
             name: `user`,
-            description: `-`,
+            description:`-`,
             type: Discord.ApplicationCommandOptionType.User,
             required: true,
         },
         {
             name: `method`,
-            description: `-`,
+            description:`-`,
             type: Discord.ApplicationCommandOptionType.String,
             required: true,
             choices: [
@@ -73,7 +73,7 @@ module.exports = {
 
             var payment_data = {
                 transaction_amount: Number(price),
-                description: `Pagamento - ${interaction.user.username}`,
+                description:`Pagamento - ${interaction.user.username}`,
                 date_of_expiration: `${novaDataFormatada}`,
                 payment_method_id: 'pix',
                 payer: {

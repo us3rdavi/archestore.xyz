@@ -11,12 +11,12 @@ const Emojis = {
 
 module.exports = {
   name: "remove_perm",
-  description: "[⭐️] remover a permissão de um usuário",
+  description:"remover a permissão de um usuário",
   type: Discord.ApplicationCommandType.ChatInput,
   options: [
     {
       name: "user",
-      description: "Usuário que terá a permissão removida",
+      description:"Usuário que terá a permissão removida",
       type: Discord.ApplicationCommandOptionType.User,
       required: true,
     },

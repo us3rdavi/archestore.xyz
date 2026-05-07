@@ -6,7 +6,7 @@ const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
     name: "emojis",
-    description: "[🤖] Criar emojis",
+    description:"Criar emojis",
     type: ApplicationCommandType.ChatInput,
     default_member_permissions: PermissionFlagsBits.Administrator,
 

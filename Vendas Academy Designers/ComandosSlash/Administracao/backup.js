@@ -4,7 +4,7 @@ const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
     name: "realizar_backup",
-    description: "[🤖 Moderação] Guild backup options.",
+    description:"Moderação - Guild backup options.",
     type: ApplicationCommandType.ChatInput,
     default_member_permissions: PermissionFlagsBits.Administrator,
     BackupFunction,

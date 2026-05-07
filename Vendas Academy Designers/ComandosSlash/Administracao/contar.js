@@ -2,12 +2,12 @@ const Discord = require("discord.js");
 
 module.exports = {
     name: "contar",
-    description: "[🤖] Conta o número de mensagens em um canal específico.",
+    description:"Conta o número de mensagens em um canal específico.",
     type: Discord.ApplicationCommandType.ChatInput,
     options: [
         {
             name: 'canal',
-            description: 'Selecione o canal no qual deseja contar as mensagens.',
+            description:'Selecione o canal no qual deseja contar as mensagens.',
             type: Discord.ApplicationCommandOptionType.Channel,
             required: true,
         }

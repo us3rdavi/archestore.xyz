@@ -7,12 +7,12 @@ const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
     name: "arquivar_ticket",
-    description: "[🎫] Use para arquivar um ticket",
+    description:"Use para arquivar um ticket",
     type: ApplicationCommandType.ChatInput,
     options: [
         {
             name: "reason",
-            description: "-",
+            description:"-",
             type: Discord.ApplicationCommandOptionType.String,
             required: false,
         },

@@ -6,12 +6,12 @@ const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
   name: "fechar_ticket",
-  description: "[🎫] Use para fechar um ticket",
+  description:"Use para fechar um ticket",
   type: ApplicationCommandType.ChatInput,
   options: [
     {
       name: "reason",
-      description: "-",
+      description:"-",
       type: Discord.ApplicationCommandOptionType.String,
       required: false,
     },
