@@ -37,7 +37,16 @@ module.exports = {
     client.on("ready", async () => {
       csl()
       console.log(`${colors.cyan(`[COMMANDS]`)} ${SlashsArray.length} slash commands were loaded.\n`);
-      await client.application.commands.set(SlashsArray);
+
+      // Registra por servidor para aparecer imediatamente
+      for (const guild of client.guilds.cache.values()) {
+        try {
+          await guild.commands.set(SlashsArray);
+          console.log(`${colors.green(`[COMMANDS]`)} Comandos registrados em: ${guild.name}`);
+        } catch (err) {
+          console.warn(`${colors.red(`[COMMANDS]`)} Erro em ${guild.name}: ${err.message}`);
+        }
+      }
     });
   }
 }

@@ -16,10 +16,26 @@ const rest = new REST({ version: "10" }).setToken(token);
         const clientId = app.id;
         console.log(`Bot ID: ${clientId}`);
 
-        console.log("Apagando todos os comandos slash antigos...");
+        console.log("Apagando comandos globais...");
         await rest.put(Routes.applicationCommands(clientId), { body: [] });
-        console.log("Comandos globais apagados com sucesso!");
+        console.log("Comandos globais apagados!");
+
+        console.log("Buscando servidores do bot...");
+        const guilds = await rest.get(`/users/@me/guilds`);
+        console.log(`Bot está em ${guilds.length} servidor(es).`);
+
+        for (const guild of guilds) {
+            try {
+                await rest.put(Routes.applicationGuildCommands(clientId, guild.id), { body: [] });
+                console.log(`Comandos apagados no servidor: ${guild.name}`);
+            } catch (err) {
+                console.warn(`Erro ao apagar comandos em ${guild.name}: ${err.message}`);
+            }
+        }
+
+        console.log("\nTodos os comandos foram apagados com sucesso!");
+        console.log("Reinicie o bot para registrar os novos comandos.");
     } catch (error) {
-        console.error("Erro ao apagar comandos:", error.message);
+        console.error("Erro:", error.message);
     }
 })();
