@@ -11,6 +11,8 @@ const {
     TextInputStyle,
     MessageFlags,
     AttachmentBuilder,
+    MediaGalleryBuilder,
+    MediaGalleryItemBuilder,
 } = require('discord.js');
 const { QuickDB } = require('quick.db');
 const { configuracao, tickets, Emojis, painelCards } = require('../../DataBaseJson');
@@ -202,15 +204,24 @@ async function processarCompra(interaction, dadosCompra) {
         result.addTextDisplayComponents(new TextDisplayBuilder().setContent(
             `**${Emojis.get('pix_stamp_emoji')} Código PIX — Copia e Cola:**\n\`\`\`\n${pixCode}\n\`\`\``
         ));
+
         if (qrBase64) {
             try {
                 const qrBuffer = Buffer.from(qrBase64, 'base64');
                 extraFiles.push(new AttachmentBuilder(qrBuffer, { name: 'qrcode.png' }));
-                result.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${Emojis.get('information_emoji')} Escaneie o QR Code abaixo para pagar.`));
+                result.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                    `-# ${Emojis.get('information_emoji')} Escaneie o QR Code para pagar:`
+                ));
+                result.addMediaGalleryComponents(
+                    new MediaGalleryBuilder().addItems(
+                        new MediaGalleryItemBuilder().setURL('attachment://qrcode.png')
+                    )
+                );
             } catch (e) {
-                console.log('[Checkout] Erro ao converter QR base64:', e.message);
+                console.log('[Checkout] Erro ao gerar QR Code:', e.message);
             }
         }
+
         result.addSeparatorComponents(new SeparatorBuilder());
         result.addActionRowComponents(
             new ActionRowBuilder().addComponents(
@@ -489,13 +500,8 @@ module.exports = {
         // ── [USUÁRIO] Copiar código PIX ───────────────────────────────────────
         if (interaction.isButton() && interaction.customId === 'ap_copiar_pix') {
             const pixCode = await db.get(`ap_pixcode_${interaction.user.id}`);
-            if (!pixCode) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Código PIX não encontrado. Gere um novo pedido.`, ephemeral: true });
-
-            const c = new ContainerBuilder().setAccentColor(getAccentColor());
-            c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-                `**${Emojis.get('pix_stamp_emoji')} Seu código PIX:**\n\`\`\`\n${pixCode}\n\`\`\`\n-# Selecione o texto acima e copie.`
-            ));
-            await interaction.reply({ components: [c], flags: MessageFlags.IsComponentsV2, embeds: [], content: '', ephemeral: true });
+            if (!pixCode) return interaction.reply({ content: `Código PIX não encontrado. Gere um novo pedido.`, flags: MessageFlags.Ephemeral });
+            await interaction.reply({ content: pixCode, flags: MessageFlags.Ephemeral });
         }
 
         // ── [USUÁRIO] Confirmou compra ────────────────────────────────────────
