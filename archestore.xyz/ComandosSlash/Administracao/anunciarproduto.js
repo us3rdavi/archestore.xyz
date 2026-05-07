@@ -19,7 +19,7 @@ function getAccentColor() {
 
 module.exports = {
     name: 'anunciarproduto',
-    description: 'Publica uma mensagem de loja com seleção de produtos da CentralCart.',
+    description: 'Configura e posta um card de compra no canal (somente staff).',
     type: ApplicationCommandType.ChatInput,
     default_member_permissions: PermissionFlagsBits.Administrator,
 
@@ -32,11 +32,11 @@ module.exports = {
             });
         }
 
-        await interaction.deferReply({ ephemeral: false });
+        await interaction.deferReply({ ephemeral: true });
 
         const loadingContainer = new ContainerBuilder().setAccentColor(getAccentColor());
         loadingContainer.addTextDisplayComponents(
-            new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando produtos da loja...`)
+            new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando produtos da CentralCart...`)
         );
         await interaction.editReply({
             components: [loadingContainer],
@@ -50,7 +50,7 @@ module.exports = {
             const pacotes = (res.data || res || []).filter(p => p.enabled !== false);
 
             if (!pacotes.length) {
-                const vazio = new ContainerBuilder().setAccentColor(getAccentColor());
+                const vazio = new ContainerBuilder().setAccentColor(0xED4245);
                 vazio.addTextDisplayComponents(
                     new TextDisplayBuilder().setContent(
                         `${Emojis.get('negative_emoji')} Nenhum produto disponível na loja no momento.`
@@ -68,12 +68,18 @@ module.exports = {
 
             container.addTextDisplayComponents(
                 new TextDisplayBuilder().setContent(
-                    `## ${Emojis.get('store_emoji')} Loja\n` +
-                    `-# Selecione um produto abaixo para iniciar sua compra.`
+                    `## ${Emojis.get('_settings_emoji')} Configuração — Anunciar Produto\n` +
+                    `-# Selecione o produto ou package que deseja postar no canal.`
                 )
             );
 
             container.addSeparatorComponents(new SeparatorBuilder());
+
+            container.addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    `-# Esta mensagem é visível apenas para você. Após configurar, o card de compra será postado publicamente.`
+                )
+            );
 
             const chunks = [];
             for (let i = 0; i < pacotes.length; i += 25) {
@@ -83,12 +89,12 @@ module.exports = {
             for (let idx = 0; idx < Math.min(chunks.length, 5); idx++) {
                 const chunk = chunks[idx];
                 const select = new StringSelectMenuBuilder()
-                    .setCustomId(`ap_selecionar_${idx}`)
-                    .setPlaceholder(chunks.length > 1 ? `[${idx + 1}] Selecione um produto` : 'Selecione um produto')
+                    .setCustomId(`ap_cfg_select_${idx}`)
+                    .setPlaceholder(chunks.length > 1 ? `[${idx + 1}] Selecione um produto` : 'Selecione um produto para anunciar')
                     .addOptions(
                         chunk.map(p => ({
                             label: (p.name || 'Produto').slice(0, 100),
-                            description: (p.formatted_price || `R$ ${p.price}`).slice(0, 100),
+                            description: (p.formatted_price || (p.price != null ? `R$ ${p.price}` : 'Ver detalhes')).slice(0, 100),
                             value: String(p.id),
                         }))
                     );
@@ -106,7 +112,7 @@ module.exports = {
             });
 
         } catch (err) {
-            const errContainer = new ContainerBuilder().setAccentColor(getAccentColor());
+            const errContainer = new ContainerBuilder().setAccentColor(0xED4245);
             errContainer.addTextDisplayComponents(
                 new TextDisplayBuilder().setContent(
                     `${Emojis.get('negative_emoji')} Erro ao carregar produtos: \`${err.message}\``
