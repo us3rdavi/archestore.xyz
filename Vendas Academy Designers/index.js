@@ -34,6 +34,7 @@ const { sendMessage } = require('./Functions/MsgAutomatics');
 AtivarIntents();
 
 const config = require("./config.json");
+if (process.env.DISCORD_BOT_TOKEN) config.token = process.env.DISCORD_BOT_TOKEN;
 const events = require('./Handler/events');
 const slash = require('./Handler/slash');
 
