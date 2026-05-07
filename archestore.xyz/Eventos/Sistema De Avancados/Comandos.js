@@ -97,7 +97,7 @@ module.exports = {
         } catch (error) {
             console.error('Erro ao processar interação:', error);
             if (!interaction.replied) {
-                await interaction.reply({ content: '❌ Ocorreu um erro ao processar a interação!', ephemeral: true });
+                await interaction.reply({ content: 'Ocorreu um erro ao processar a interação.', ephemeral: true });
             }
         }
     }

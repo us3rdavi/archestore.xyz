@@ -22,9 +22,9 @@ module.exports = {
                 let qtd = interaction.fields.getTextInputValue('tokenMP2');
                 let dias = interaction.fields.getTextInputValue('tokenMP3');
 
-                if (Number.isInteger(qtd)) return interaction.reply({ content: `❌ O número de desconto inserio é inválido \`${qtd}\``, ephemeral: true })
+                if (Number.isInteger(qtd)) return interaction.reply({ content: `O número de desconto inserido é inválido \`${qtd}\``, ephemeral: true })
                 if (dias !== '') {
-                    if (Number.isInteger(dias)) return interaction.reply({ content: `❌ O número de dias inserio é inválido \`${dias}\``, ephemeral: true })
+                    if (Number.isInteger(dias)) return interaction.reply({ content: `O número de dias inserido é inválido \`${dias}\``, ephemeral: true })
 
 
                 }
@@ -32,7 +32,7 @@ module.exports = {
                     .filter(produto => produto.data.Cupom)
                     .some(produto => produto.data.Cupom.some(campo => campo.Nome === name));
 
-                if (produtoExistente) return interaction.reply({ ephemeral: true, content: `❌ Nome do cupom já existente.` })
+                if (produtoExistente) return interaction.reply({ ephemeral: true, content: `Nome do cupom já existente.` })
 
                 if (dias !== '') {
                     const dataAtual = new Date();
@@ -69,7 +69,7 @@ module.exports = {
                             .setStyle(2),
                     )
 
-                interaction.followUp({ components: [row3], content: `✅ Cupom criado.`, ephemeral: true }).then(async msgg => {
+                interaction.followUp({ components: [row3], content: `Cupom criado.`, ephemeral: true }).then(async msgg => {
                     await db.set(`${interaction.user.id}.editephemeral`, { cupom: name, produto: ggg.name, webhookID: interaction.token, applicationid: interaction.applicationId, msgid: interaction.message.id })
 
 
@@ -118,7 +118,7 @@ module.exports = {
 
                 if (cargospodeusar !== '') {
                     const ddd = await interaction.guild.roles.fetch(cargospodeusar)
-                    if (ddd == null) return interaction.reply({ ephemeral: true, content: `❌ Cargo inserido \`${cargospodeusar}\` inválido.` })
+                    if (ddd == null) return interaction.reply({ ephemeral: true, content: `Cargo inserido \`${cargospodeusar}\` inválido.` })
                     gggaaa.condicoes.cargospodeusar = cargospodeusar;
                 }
 
@@ -131,7 +131,7 @@ module.exports = {
                 } catch (error) {
                 }
 
-                interaction.update({ content: `✅ Alterações bem sucedida` })
+                interaction.update({ content: `Alterações bem sucedidas.` })
 
 
             }
@@ -139,7 +139,7 @@ module.exports = {
 
             if (interaction.customId === 'wdawdwdawdwadawdwdwwdaw') {
                 let confirm = interaction.fields.getTextInputValue('tokenMP');
-                if (confirm !== 'sim') return interaction.reply({ content: `❌ Confirmação não validada.`, ephemeral: true })
+                if (confirm !== 'sim') return interaction.reply({ content: `Confirmação não validada.`, ephemeral: true })
 
                 const ggg22 = await db.get(`${interaction.message.id}.delcupons`)
                 const ggg = await db.get(`${interaction.message.id}`)
@@ -201,7 +201,7 @@ module.exports = {
                 const ggg = produtos.get(`${ggg2.name}.Cupom`)
 
                 if (ggg == 0) {
-                    interaction.reply({ ephemeral: true, content: `❌ Esse produto ainda não possuí nenhum cupom.` })
+                    interaction.reply({ ephemeral: true, content: `Esse produto ainda não possui nenhum cupom.` })
                     return
                 }
 
@@ -223,7 +223,7 @@ module.exports = {
                 try {
 
 
-                    await interaction.update({ components: [style2row], content: `❓ Quais cupons de \`${ggg22.Config.name}\` deseja remover?`, embeds: [] })
+                    await interaction.update({ components: [style2row], content: `Quais cupons de \`${ggg22.Config.name}\` deseja remover?`, embeds: [] })
                 } catch (error) {
                 }
             }

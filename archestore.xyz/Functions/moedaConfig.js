@@ -19,7 +19,7 @@ async function moedaConfig(interaction, client) {
                         },
                         {
                             value: `dolarUSD`,
-                            label: `Dólar Americano (🚫)`,
+                            label: `Dólar Americano (indisponível)`,
                             emoji: `<:_money_emoji:1371605504601882664>`
                         }
                     )

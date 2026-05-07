@@ -1,4 +1,6 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const emojis = require('../DataBaseJson/Emojis.json');
+const Emojis = { get: (name) => emojis[name] || "" };
 
 async function handleDeletedMessage(message, logChannelId, client) {
     if (message.author.bot) return;
@@ -8,7 +10,7 @@ async function handleDeletedMessage(message, logChannelId, client) {
         if (!logChannel) return;
 
         const deleteEmbed = new EmbedBuilder()
-            .setTitle('🗑️ Mensagem Apagada')
+            .setTitle(`${Emojis.get('_trash_emoji')} Mensagem Apagada`)
             .setColor(0xDD2E44)
             .addFields(
                 { name: 'Canal', value: `${message.channel}`, inline: true },
@@ -21,7 +23,8 @@ async function handleDeletedMessage(message, logChannelId, client) {
         const row = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
-                    .setLabel('📂 Ir ao Canal')
+                    .setLabel('Ir ao Canal')
+                    .setEmoji({ id: '1501804010049634426' })
                     .setStyle(ButtonStyle.Link)
                     .setURL(message.channel.url)
             );
@@ -40,7 +43,7 @@ async function handleUpdatedMessage(oldMessage, newMessage, logChannelId, client
         if (!logChannel) return;
 
         const updateEmbed = new EmbedBuilder()
-            .setTitle('✏️ Mensagem Editada')
+            .setTitle(`${Emojis.get('_lapis_emoji')} Mensagem Editada`)
             .setColor(0xFFCC4D)
             .addFields(
                 { name: 'Canal', value: `${oldMessage.channel}`, inline: true },
@@ -54,11 +57,13 @@ async function handleUpdatedMessage(oldMessage, newMessage, logChannelId, client
         const row = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
-                    .setLabel('👁️ Ver Mensagem Editada')
+                    .setLabel('Ver Mensagem Editada')
+                    .setEmoji({ id: '1501803928973476023' })
                     .setStyle(ButtonStyle.Link)
                     .setURL(newMessage.url),
                 new ButtonBuilder()
-                    .setLabel('📂 Ir ao Canal')
+                    .setLabel('Ir ao Canal')
+                    .setEmoji({ id: '1501804010049634426' })
                     .setStyle(ButtonStyle.Link)
                     .setURL(newMessage.channel.url)
             );

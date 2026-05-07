@@ -290,7 +290,7 @@ async function EntregarPagamentos(client) {
 
 
 
-                        threadChannel.setName(`✅・${user.username}・${user.id}`);
+                        threadChannel.setName(`${Emojis.get('confirmed_emoji')}・${user.username}・${user.id}`);
                     })
                 } else if (yy.quantidadeselecionada <= 5) {
                     const Entrega = configuracao.get(`Emojis_EntregAbaixo`)
@@ -354,7 +354,7 @@ async function EntregarPagamentos(client) {
 
 
 
-                        threadChannel.setName(`✅・${user.username}・${user.id}`);
+                        threadChannel.setName(`entregue・${user.username}・${user.id}`);
                     })
                 }
 
@@ -383,7 +383,7 @@ async function EntregarPagamentos(client) {
                                             .setLabel('Clique aqui e deixe seu feedback ;)')
                                             .setStyle(5),
                                     )
-                                await member.send({ components: [row6aa], content: `${greeting} <@!${member.id}>, A experiência foi como esperávamos? Sua opinião é importante, não se esqueça de compartilhá-la. ${week} 😉.` })
+                                await member.send({ components: [row6aa], content: `${greeting} <@!${member.id}>, A experiência foi como esperávamos? Sua opinião é importante, não se esqueça de compartilhá-la. ${week}.` })
                             }
                         }
                     }, 60000);
@@ -446,7 +446,7 @@ async function EntregarPagamentos(client) {
                     })
                 }
 
-                threadChannel.setName(`✅・${user.username}・${user.id}`);
+                threadChannel.setName(`entregue・${user.username}・${user.id}`);
 
                 setInterval(async () => {
                     try {
@@ -597,7 +597,7 @@ async function EntregarPagamentos(client) {
 
 
 
-            threadChannel.setName(`🕔・${user.username}・${user.id}`);
+            threadChannel.setName(`aguardando・${user.username}・${user.id}`);
 
 
             try {
@@ -701,7 +701,7 @@ async function verificarEstoqueEReembolsar(client, yy, entrega, gggaaa) {
             const messages = await threadChannel.messages.fetch({ limit: 100 });
             await threadChannel.bulkDelete(messages).catch((error) => { })
             reembolsoMessage = await threadChannel.send({ content: `<@${user.id}>`, embeds: [embedReembolso] });
-            threadChannel.setName(`🔄・Reembolso・${user.id}`);
+            threadChannel.setName(`reembolso・${user.id}`);
         } catch (error) {
             console.error('Erro ao enviar mensagem de reembolso:', error);
         }

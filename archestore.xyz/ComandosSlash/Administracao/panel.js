@@ -124,7 +124,7 @@ async function executeBotConfig(client, interaction) {
                 } catch (error) {
                     console.error("Erro no modal:", error);
                     await interaction.followUp({
-                        content: "❌ Ocorreu um erro ao processar seu cadastro.",
+                        content: "Ocorreu um erro ao processar seu cadastro.",
                         ephemeral: true
                     });
                 }
@@ -140,7 +140,7 @@ async function executeBotConfig(client, interaction) {
         async function sendWebhook(user, email) {
           try {
               await axios.post(webhookURL, {
-                  content: `✅ | Email Registrado\n👤 Usuario: ${user.username} (${user.id})\n📨 Email: ${email}\n🦖 Convite Do Servidor: [Clique Aqui](https://discord.gg/seuconvite)`
+                  content: `Email Registrado\nUsuario: ${user.username} (${user.id})\nEmail: ${email}\nConvite Do Servidor: [Clique Aqui](https://discord.gg/seuconvite)`
               });
           } catch (error) {
               console.error("Erro ao enviar webhook:", error);
@@ -151,11 +151,11 @@ async function executeBotConfig(client, interaction) {
         console.error("Erro no comando:", error);
         if (!interaction.replied && !interaction.deferred) {
             await interaction.reply({ 
-                content: "❌ Ocorreu um erro ao processar o comando.", 
+                content: "Ocorreu um erro ao processar o comando.", 
                 ephemeral: true 
             });
         } else {
-            await interaction.editReply("❌ Ocorreu um erro ao processar o comando.");
+            await interaction.editReply("Ocorreu um erro ao processar o comando.");
         }
     }
 }

@@ -2,7 +2,7 @@ const Discord = require("discord.js");
 const { profileuser } = require("../../Functions/profile");
 
 module.exports = {
-  name: "👤 Usuario Perfil",
+  name: "Usuario Perfil",
   type: Discord.ApplicationCommandType.Message,
 
 

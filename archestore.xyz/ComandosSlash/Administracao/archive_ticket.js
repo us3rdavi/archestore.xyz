@@ -33,7 +33,7 @@ module.exports = {
                 const user = await client.users.fetch(ultimosNumeros);
                 await user.send({
                     content: `Olá <@!${ultimosNumeros}> seu ticket foi arquivado por ${interaction.user}.\n**Motivo:**\n${
-                        reasonaaa == null ? `\`\😫\` Nenhum motivo declarado!` : reasonaaa
+                        reasonaaa == null ? `Nenhum motivo declarado!` : reasonaaa
                     }`,
                 });
             } catch (error) {}

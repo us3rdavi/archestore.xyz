@@ -39,11 +39,11 @@ module.exports = {
 
     const embed = new Discord.EmbedBuilder()
       .setColor('#8b008b')
-      .setTitle('`🎉` **Parabéns!** Você ganhou um cupom de **desconto!** `🎉`')
-      .setDescription(`${user} Você foi **selecionado(a)** automáticamente pelo sistema para receber um cupom **exclusivo!** \`\🌟\`\n\n\`\💸\` **Cupom:** \`${cupom}\`\n**Aproveite para realizar sua compra agora mesmo!**`)
-      .addFields({ name: '`📦` Válido somente para o produto:', value: `<#${channel.id}>` })
+      .setTitle('**Parabéns!** Você ganhou um cupom de **desconto!**')
+      .setDescription(`${user} Você foi **selecionado(a)** automáticamente pelo sistema para receber um cupom **exclusivo!**\n\n**Cupom:** \`${cupom}\`\n**Aproveite para realizar sua compra agora mesmo!**`)
+      .addFields({ name: 'Válido somente para o produto:', value: `<#${channel.id}>` })
       .setTimestamp()
-      .setFooter({ text: 'Aproveite seu cupom antes que expire! 😋' });
+      .setFooter({ text: 'Aproveite seu cupom antes que expire!' });
 
     const row = new Discord.ActionRowBuilder()
       .addComponents(

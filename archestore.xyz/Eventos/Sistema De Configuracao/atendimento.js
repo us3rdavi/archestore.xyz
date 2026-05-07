@@ -57,7 +57,7 @@ module.exports = {
 
                 if (!validotime24(abertura) || !validotime24(fechamento)) {
                     await interaction.reply({
-                        content: "**⚠️ | O formato do horário está incorreto. Por favor, insira no formato HH:mm (ex: __\`08:00\`__ ou __\`18:30\`__).**",
+                        content: "**O formato do horário está incorreto. Por favor, insira no formato HH:mm (ex: __\`08:00\`__ ou __\`18:30\`__).**",
                         ephemeral: true
                     });
                     return;

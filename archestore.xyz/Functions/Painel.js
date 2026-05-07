@@ -79,7 +79,7 @@ async function Painel(interaction, client, config = { email: "" }) {  // Valor p
 
   } catch (error) {
     console.error("Erro na função Painel:", error);
-    await interaction.editReply("❌ Ocorreu um erro ao carregar o painel.");
+    await interaction.editReply("Ocorreu um erro ao carregar o painel.");
   }
 }
 

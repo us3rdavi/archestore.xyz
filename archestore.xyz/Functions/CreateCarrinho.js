@@ -62,8 +62,8 @@ async function CreateCarrinho(interaction, infos) {
         // Resposta inicial indicando que o carrinho está sendo criado
         await interaction.reply({ content: `${Emojis.get('loading_emoji')} Criando seu carrinho...`, ephemeral: true }).then(async msg => {
             // Verifica se já existe um carrinho ou thread de troca
-            const cartThread = interaction.channel.threads.cache.find(x => x.name === `🛒・${interaction.user.username}・${interaction.user.id}`);
-            const exchangeThread = interaction.channel.threads.cache.find(x => x.name === `💱・${interaction.user.username}・${interaction.user.id}`);
+            const cartThread = interaction.channel.threads.cache.find(x => x.name === `carrinho・${interaction.user.username}・${interaction.user.id}`);
+            const exchangeThread = interaction.channel.threads.cache.find(x => x.name === `pagamento・${interaction.user.username}・${interaction.user.id}`);
 
             // Caso já exista, envia um botão para o usuário acessar o carrinho
             if (cartThread || exchangeThread) {
@@ -81,7 +81,7 @@ async function CreateCarrinho(interaction, infos) {
 
             // Cria a thread do carrinho
             const thread = await interaction.channel.threads.create({
-                name: `🛒・${interaction.user.username}・${interaction.user.id}`,
+                name: `carrinho・${interaction.user.username}・${interaction.user.id}`,
                 autoArchiveDuration: 60,
                 type: ChannelType.PrivateThread,
                 reason: 'Needed a separate thread for moderation',

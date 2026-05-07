@@ -350,7 +350,7 @@ module.exports = {
                     );
 
                     return matchingFields.map(iterator => ({
-                        name: `🧵 ${x.data.Config.name} ➔ ${iterator.Nome}`,
+                        name: `${x.data.Config.name} - ${iterator.Nome}`,
                         value: `${x.ID}_${iterator.Nome}`,
                     }));
                 });
@@ -373,7 +373,7 @@ module.exports = {
                     );
 
                     return matchingFields.map(iterator => ({
-                        name: `🧵 ${x.data.Config.name} ➔ ${iterator.Nome}`,
+                        name: `${x.data.Config.name} - ${iterator.Nome}`,
                         value: `${x.ID}_${iterator.Nome}`,
                     }));
                 });
@@ -392,7 +392,7 @@ module.exports = {
 
                 const config = produtosSelecionados.map(x => {
                     return {
-                        name: `🧵 ${x.data.Config.name}`,
+                        name: `${x.data.Config.name}`,
                         value: `${x.ID}`
                     }
                 })
@@ -596,7 +596,7 @@ module.exports = {
                     });
 
                     const transcriptEmbed = new EmbedBuilder()
-                        .setTitle(`📜 Transcript do Ticket: ${interaction.channel.name}`)
+                        .setTitle(`${Emojis.get('_messages_emoji')} Transcript do Ticket: ${interaction.channel.name}`)
                         .setDescription(`O ticket foi encerrado e aqui está o registro completo da conversa.`)
                         .setColor('#0cd4cc')
                         .addFields(
@@ -642,10 +642,10 @@ module.exports = {
 
                     const embed = new Discord.EmbedBuilder()
                         .setColor('#0cd4cc')
-                        .setTitle('🎫 Atualização do seu Ticket')
+                        .setTitle(`${Emojis.get('_ticket_emoji')} Atualização do seu Ticket`)
                         .setDescription('Olá! Temos novidades sobre o seu ticket. Estamos aguardando sua resposta!')
                         .addFields(
-                            { name: 'Status', value: '📝 Aguardando sua resposta', inline: true },
+                            { name: 'Status', value: `${Emojis.get('_notify_emoji')} Aguardando sua resposta`, inline: true },
                             { name: 'Ticket', value: `#${interaction.channel.name.split('・')[0]}`, inline: true }
                         )
                         .setTimestamp()
@@ -697,7 +697,7 @@ module.exports = {
             
                     const confirmationEmbed = new EmbedBuilder()
                         .setColor('#2b2d31')
-                        .setDescription(`👋 | Olá <@!${ultimosNumeros}>, Seu Ticket foi Assumido Pelo Staff ${staffMember}.`);
+                        .setDescription(`${Emojis.get('_staff_emoji')} Olá <@!${ultimosNumeros}>, Seu Ticket foi Assumido Pelo Staff ${staffMember}.`);
             
                     const buttonRow = new ActionRowBuilder().addComponents(
                         new ButtonBuilder()
@@ -717,7 +717,7 @@ module.exports = {
             
                     const confirmationEmbed222 = new EmbedBuilder()
                         .setColor('#2b2d31')
-                        .setDescription(`👋 | Olá <@!${ultimosNumeros}>, Seu Ticket foi Assumido Pelo Staff ${staffMember}.`);
+                        .setDescription(`${Emojis.get('_staff_emoji')} Olá <@!${ultimosNumeros}>, Seu Ticket foi Assumido Pelo Staff ${staffMember}.`);
             
                     tickets[ticketId] = { hasStaffInteracted: true, hasPokeStaffBeenClicked: false, staffMemberId: staffMember.id };
             
@@ -783,38 +783,43 @@ module.exports = {
                     const embed24 = new Discord.EmbedBuilder()
                         .setColor('#ff0000')
                         .setAuthor({ name: `${interaction.user.username} - Ticket`, iconURL: interaction.user.displayAvatarURL() })
-                        .setTitle(`👤 | Ticket Finalizado`)
+                        .setTitle(`${Emojis.get('_silueta_emoji')} Ticket Finalizado`)
                         .setDescription("> **Olá! O seu ticket foi finalizado, obrigado por usar nossos serviços**")
                         .setThumbnail(tickets.get("tickets.aparencia.banner"))
                         .setFooter({ text: `${interaction.guild.name}・${dataatual24}`, iconURL: interaction.guild.iconURL({ dynamic: true }) })
                         .addFields(
-                            { name: `**🆔 | Código de atendimento:**`, value: `\`${ticketcodigo24}\`` },
-                            { name: `**👤 | Quem abriu:**`, value: `${user ? user : 'Usuário não encontrado'}` },
-                            { name: `**🔓 | Quem Fechou:**`, value: `${interaction.user.globalName}` },
-                            { name: `**👥 | Assumido por:**`, value: assumidoPor },
-                            { name: `**🗑 | Horário Fechado:**`, value: `<t:${Tempoatual24}:R>` }
+                            { name: `**${Emojis.get('information_emoji')} Código de atendimento:**`, value: `\`${ticketcodigo24}\`` },
+                            { name: `**${Emojis.get('_silueta_emoji')} Quem abriu:**`, value: `${user ? user : 'Usuário não encontrado'}` },
+                            { name: `**${Emojis.get('confirmed_emoji')} Quem Fechou:**`, value: `${interaction.user.globalName}` },
+                            { name: `**${Emojis.get('_people_emoji')} Assumido por:**`, value: assumidoPor },
+                            { name: `**${Emojis.get('clock_emoji')} Horário Fechado:**`, value: `<t:${Tempoatual24}:R>` }
                         );
             
                     const row = new Discord.ActionRowBuilder().addComponents(
                         new Discord.ButtonBuilder()
                             .setCustomId("1avaliacao24")
-                            .setLabel("⭐ 1")
+                            .setLabel("1/5")
+                            .setEmoji({ id: '1501803947898306724' })
                             .setStyle(2),
                         new Discord.ButtonBuilder()
                             .setCustomId("2avaliacao24")
-                            .setLabel("⭐ 2")
+                            .setLabel("2/5")
+                            .setEmoji({ id: '1501803947898306724' })
                             .setStyle(2),
                         new Discord.ButtonBuilder()
                             .setCustomId("3avaliacao24")
-                            .setLabel("⭐ 3")
+                            .setLabel("3/5")
+                            .setEmoji({ id: '1501803947898306724' })
                             .setStyle(2),
                         new Discord.ButtonBuilder()
                             .setCustomId("4avaliacao24")
-                            .setLabel("⭐ 4")
+                            .setLabel("4/5")
+                            .setEmoji({ id: '1501803947898306724' })
                             .setStyle(2),
                         new Discord.ButtonBuilder()
                             .setCustomId("5avaliacao24")
-                            .setLabel("⭐ 5")
+                            .setLabel("5/5")
+                            .setEmoji({ id: '1501803947898306724' })
                             .setStyle(2),
                     );
             
@@ -828,16 +833,16 @@ module.exports = {
                     const embed244 = new Discord.EmbedBuilder()
                         .setColor('#ff0000')
                         .setAuthor({ name: `Ticket - System`, iconURL: interaction.guild.iconURL({ dynamic: true }) })
-                        .setTitle(`👤 | Novo Ticket Finalizado`)
+                        .setTitle(`${Emojis.get('_messages_emoji')} Novo Ticket Finalizado`)
                         .setDescription("> ** Logs de ticket **")
                         .setThumbnail(tickets.get("tickets.aparencia.banner"))
                         .setFooter({ text: `${interaction.guild.name}・${dataatual24}`, iconURL: interaction.guild.iconURL({ dynamic: true }) })
                         .addFields(
-                            { name: `**🆔 | Código de atendimento:**`, value: `\`${ticketcodigo24}\`` },
-                            { name: `**👤 | Quem abriu:**`, value: `${user ? user : 'Usuário não encontrado'}` },
-                            { name: `**🔓 | Quem Fechou:**`, value: `${interaction.user.globalName}` },
-                            { name: `**👥 | Assumido por:**`, value: assumidoPor },
-                            { name: `**🗑 | Horário Fechado:**`, value: `<t:${Tempoatual24}:R>` }
+                            { name: `**${Emojis.get('information_emoji')} Código de atendimento:**`, value: `\`${ticketcodigo24}\`` },
+                            { name: `**${Emojis.get('_silueta_emoji')} Quem abriu:**`, value: `${user ? user : 'Usuário não encontrado'}` },
+                            { name: `**${Emojis.get('confirmed_emoji')} Quem Fechou:**`, value: `${interaction.user.globalName}` },
+                            { name: `**${Emojis.get('_people_emoji')} Assumido por:**`, value: assumidoPor },
+                            { name: `**${Emojis.get('clock_emoji')} Horário Fechado:**`, value: `<t:${Tempoatual24}:R>` }
                         );
             
                     const umMinutoEmMilissegundos = 5 * 1000;
@@ -1032,12 +1037,12 @@ module.exports = {
                                 .setDescription(` você acessou a aba de **AutoClear**, suas **informações** mais os **botões de configurações** estão aqui em baixo. **Configure tudo!**`)
                                 .addFields(
                                     {
-                                        name: `🚪 | Canal AutoClear:`,
+                                        name: `Canal AutoClear:`,
                                         value: canalautoclear ? `<#${canalautoclear}>` : 'Nenhum canal selecionado',
                                         inline: true
                                     },
                                     {
-                                        name: `⏰ | Tempo AutoClear:`,
+                                        name: `Tempo AutoClear:`,
                                         value: `${time} segundos`,
                                         inline: true
                                     },

@@ -8,6 +8,8 @@ const {
     MessageFlags
 } = require("discord.js");
 const { tickets } = require("../DataBaseJson");
+const emojis = require("../DataBaseJson/Emojis.json");
+const Emojis = { get: (name) => emojis[name] || "" };
 
 function buildTicketComponents(ggg, aparencia) {
     const container = new ContainerBuilder();
@@ -22,7 +24,7 @@ function buildTicketComponents(ggg, aparencia) {
         container.setAccentColor(0x5865F2);
     }
 
-    const tituloEmoji = aparencia.emoji ? `${aparencia.emoji} ` : `🎧 `;
+    const tituloEmoji = aparencia.emoji ? `${aparencia.emoji} ` : `${Emojis.get('_support_emoji')} `;
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
             `## ${tituloEmoji}${aparencia.title || 'Central de Suporte'}`
@@ -69,7 +71,7 @@ function buildTicketComponents(ggg, aparencia) {
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-            `-# 🖥️ Nossa equipe de suporte geralmente responde em 5 a 30 minutos.`
+            `-# ${Emojis.get('system_emoji')} Nossa equipe de suporte geralmente responde em 5 a 30 minutos.`
         )
     );
 

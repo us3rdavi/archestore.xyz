@@ -10,7 +10,7 @@ async function profileuser(interaction, userID = null) {
     const UltimaCompra = await EstatisticasKing.LastOrder(userID)
     const rendimento = await EstatisticasKing.Ranking(10, 'valorTotal', userID)
 
-    if (PrimeiraCompra == null) return interaction.reply({ content: `❗ Sem dados salvos`, ephemeral: true })
+    if (PrimeiraCompra == null) return interaction.reply({ content: `Sem dados salvos`, ephemeral: true })
 
 
     const embed = new EmbedBuilder()

@@ -143,7 +143,7 @@ async function DentroCarrinhoEfiBank(client, interaction) {
                 )
 
             if (configuracao.get(`pagamentos.QRCode`) == `miniatura`) {
-                embed.setDescription(`-# \`⌚\` Caso prefira pagar com Qrcode utilize o Qrcode abaixo.`)
+                embed.setDescription(`-# Caso prefira pagar com Qrcode utilize o Qrcode abaixo.`)
                 embed.setThumbnail(`attachment://payment.png`)
             } else {
                 embed.setImage('attachment://payment.png')
@@ -155,7 +155,7 @@ async function DentroCarrinhoEfiBank(client, interaction) {
 
             await tt.edit({ embeds: [embed], files: [attachment], content: ``, components: [row3] })
 
-            interaction.channel.setName(`💱・${interaction.user.username}・${interaction.user.id}`)
+            interaction.channel.setName(`pagamento・${interaction.user.username}・${interaction.user.id}`)
 
             const mandanopvdocara = new EmbedBuilder()
                 .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#fcba03` : configuracao.get(`Cores.Processamento`)}`)
@@ -361,7 +361,7 @@ async function DentroCarrinhoPix(interaction, client) {
 
                 await tt.edit({ embeds: [embed], files: [attachment], content: ``, components: [row3] })
 
-                interaction.channel.setName(`💱・${interaction.user.username}・${interaction.user.id}`)
+                interaction.channel.setName(`pagamento・${interaction.user.username}・${interaction.user.id}`)
 
 
                 const mandanopvdocara = new EmbedBuilder()
@@ -587,7 +587,7 @@ async function DentroCarrinhoCartao(interaction, client) {
 
                 }
 
-                interaction.channel.setName(`💱・${interaction.user.username}・${interaction.user.id}`)
+                interaction.channel.setName(`pagamento・${interaction.user.username}・${interaction.user.id}`)
                 interaction.message.edit({ content: `Prossiga com seu pagamento. Clique no link abaixo para acessar um ambiente seguro. Após a confirmação, seu pedido será entregue automaticamente. `, components: [botao], embeds: [] })
             })
             .catch(async function (error) {

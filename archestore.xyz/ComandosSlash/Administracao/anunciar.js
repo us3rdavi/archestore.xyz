@@ -1,5 +1,7 @@
 const {ActivityType, ApplicationCommandOptionType, EmbedBuilder, cleanContent, ButtonBuilder, ActionRowBuilder } = require("discord.js");
 const { getPermissions } = require("../../Functions/PermissionsCache.js");
+const emojis = require("../../DataBaseJson/Emojis.json");
+const Emojis = { get: (name) => emojis[name] || "" };
 
 module.exports = {
     name: "anunciar",
@@ -9,10 +11,10 @@ module.exports = {
 
     const perm = await getPermissions(client.user.id);
     if (perm === null || !perm.includes(interaction.user.id)) {
-          return interaction.reply({ content: `❌️ Você não possui permissão para usar esse comando.`, ephemeral: true });
+          return interaction.reply({ content: `${Emojis.get('negative_emoji')} Você não possui permissão para usar esse comando.`, ephemeral: true });
     }
 
-    await interaction.reply({ content: '`💬 Escolha o tipo de aviso que deseja fazer.`', components: [
+    await interaction.reply({ content: `${Emojis.get('_messages_emoji')} Escolha o tipo de aviso que deseja fazer.`, components: [
         new ActionRowBuilder().addComponents(
             new ButtonBuilder()
             .setCustomId("contentanunciar24")

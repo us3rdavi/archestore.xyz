@@ -1,6 +1,8 @@
 const { ModalBuilder, TextInputBuilder, StringSelectMenuBuilder, ButtonStyle, ButtonBuilder, TextInputStyle, ActionRowBuilder, ChannelSelectMenuBuilder, EmbedBuilder } = require("discord.js");
 const { dbembed } = require("../../DataBaseJson/index.js");
 const { anunciarembed24 } = require("../../Functions/anunciar.js");
+const emojis = require("../../DataBaseJson/Emojis.json");
+const Emojis = { get: (name) => emojis[name] || "" };
 
 module.exports = {
     name: "interactionCreate",
@@ -8,8 +10,6 @@ module.exports = {
         const { customId } = interaction;
         if (!customId) return;
 
-        // Definir Embed - Abre o Select Menu
-        // Configurar Embed
         if (customId === "msgembed24") {
             const selectMenu = new ActionRowBuilder().addComponents(
                 new StringSelectMenuBuilder()
@@ -26,15 +26,13 @@ module.exports = {
                     ])
             );
 
-            await interaction.reply({ content: "** ✔ | Use o select menu abaixo para configurar:**", components: [selectMenu], ephemeral: true });
+            await interaction.reply({ content: `${Emojis.get('confirmed_emoji')} Use o select menu abaixo para configurar:`, components: [selectMenu], ephemeral: true });
         }
 
         if (customId === "atualizarembed2444") {
-
             await anunciarembed24(interaction, client)
         }
 
-        // Modal para cada opção do Select Menu
         if (interaction.isStringSelectMenu() && interaction.customId === "selectEmbedOption") {
             const selected = interaction.values[0];
             const modal = new ModalBuilder().setCustomId(`definirEmbed_${selected}`).setTitle("Definir Embed");
@@ -58,10 +56,9 @@ module.exports = {
                 fieldValue = fieldValue.replace(/\n/g, '\n');
         
                 dbembed.set(`embed.${fieldKey.replace('embed', '').toLowerCase()}`, fieldValue);
-                await interaction.reply({ content: '**✔ | Alteração feita com sucesso**', ephemeral: true });
+                await interaction.reply({ content: `${Emojis.get('confirmed_emoji')} Alteração feita com sucesso`, ephemeral: true });
             }
         }
-        
 
         if (customId === "adicionarbotaoembed") {
             const modal = new ModalBuilder()
@@ -151,7 +148,7 @@ module.exports = {
 
             const row = new ActionRowBuilder().addComponents(canalMenu);
 
-            await interaction.reply({ content: "**💬 | Selecione o canal onde deseja postar a embed:**", components: [row], ephemeral: true });
+            await interaction.reply({ content: `${Emojis.get('_messages_emoji')} Selecione o canal onde deseja postar a embed:`, components: [row], ephemeral: true });
         }
 
         if (interaction.isChannelSelectMenu() && interaction.customId === "selectcanalembed") {
@@ -188,14 +185,14 @@ module.exports = {
             }
 
             await canal.send({ embeds: [embed], components: row.components.length > 0 ? [row] : [] });
-            await interaction.reply({ content: `${Emojis.get(`confirmed_emoji`)} | Embed enviada com sucesso!`, ephemeral: true });
+            await interaction.reply({ content: `${Emojis.get('confirmed_emoji')} Embed enviada com sucesso!`, ephemeral: true });
         }
 
         if (customId === "resetarembed") {
             dbembed.delete("embed");
             dbembed.delete("button");
 
-            await interaction.reply({ content: "**🗑️ | Embed resetada com sucesso!**", ephemeral: true });
+            await interaction.reply({ content: `${Emojis.get('_trash_emoji')} Embed resetada com sucesso!`, ephemeral: true });
             await anunciarembed24(interaction, client);
         }
     }

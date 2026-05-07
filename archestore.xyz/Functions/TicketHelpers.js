@@ -9,6 +9,8 @@ const {
     MessageFlags
 } = require("discord.js");
 const { configuracao, tickets } = require("../DataBaseJson");
+const emojis = require("../DataBaseJson/Emojis.json");
+const Emojis = { get: (name) => emojis[name] || "" };
 
 function findTicketByThreadId(threadId) {
     const abertos = tickets.get('tickets.abertos') || {};
@@ -46,7 +48,7 @@ function buildTicketContainer(ticketData, aparencia, botoesAdicionais) {
         container.setAccentColor(0x5865F2);
     }
 
-    const emoji = aparencia.msgEmoji ? `${aparencia.msgEmoji} ` : '🎫 ';
+    const emoji = aparencia.msgEmoji ? `${aparencia.msgEmoji} ` : `${Emojis.get('_ticket_emoji')} `;
     const titulo = (aparencia.msgTitulo || 'Ticket #{numero}').replace('{numero}', ticketData.numero);
 
     container.addTextDisplayComponents(
@@ -61,10 +63,10 @@ function buildTicketContainer(ticketData, aparencia, botoesAdicionais) {
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-            `🎫 **Opção Selecionada:** ${ticketData.funcao}\n` +
-            `👤 **Assumido por:** ${assumidoPorText}\n` +
-            `🔢 **Nº do Ticket:** #${ticketData.numero}\n` +
-            `👤 **Aberto por:** ${ticketData.username || 'Desconhecido'}`
+            `${Emojis.get('_ticket_emoji')} **Opção Selecionada:** ${ticketData.funcao}\n` +
+            `${Emojis.get('_silueta_emoji')} **Assumido por:** ${assumidoPorText}\n` +
+            `${Emojis.get('information_emoji')} **Nº do Ticket:** #${ticketData.numero}\n` +
+            `${Emojis.get('_silueta_emoji')} **Aberto por:** ${ticketData.username || 'Desconhecido'}`
         )
     );
 
@@ -89,17 +91,17 @@ function buildTicketContainer(ticketData, aparencia, botoesAdicionais) {
         new ButtonBuilder()
             .setCustomId('ticket_assumir')
             .setLabel('Assumir')
-            .setEmoji('👋')
+            .setEmoji({ id: '1501803902046048297' })
             .setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
             .setCustomId('ticket_staffpanel')
             .setLabel('Painel Staff')
-            .setEmoji('🛠️')
+            .setEmoji({ id: '1501804000994132080' })
             .setStyle(ButtonStyle.Secondary),
         new ButtonBuilder()
             .setCustomId('ticket_finalizar')
             .setLabel('Finalizar')
-            .setEmoji('✅')
+            .setEmoji({ id: '1501804123924729946' })
             .setStyle(ButtonStyle.Success)
     );
     container.addActionRowComponents(mainRow);
@@ -137,7 +139,7 @@ function buildFinalizacaoContainer(config) {
         container.setAccentColor(0x57F287);
     }
 
-    const emoji = (config && config.emoji) || '✅';
+    const emoji = (config && config.emoji) || Emojis.get('_confirm_emoji');
     const titulo = (config && config.titulo) || 'Ticket Marcado como Concluído';
 
     container.addTextDisplayComponents(
@@ -149,7 +151,7 @@ function buildFinalizacaoContainer(config) {
     const descricao = (config && config.descricao) ||
         '> Se o seu problema foi **totalmente resolvido**, clique em **Resolvido** abaixo.\n' +
         '> Se você **ainda precisa de ajuda**, clique em **Precisa de Mais Ajuda** e reabriremos seu ticket.\n\n' +
-        '-# ⏰ Você tem 12 horas para responder antes do ticket ser fechado automaticamente.';
+        `-# ${Emojis.get('clock_emoji')} Você tem 12 horas para responder antes do ticket ser fechado automaticamente.`;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(descricao)
@@ -170,12 +172,12 @@ function buildFinalizacaoContainer(config) {
             new ButtonBuilder()
                 .setCustomId('ticket_resolvido')
                 .setLabel('Resolvido')
-                .setEmoji('✅')
+                .setEmoji({ id: '1501804123924729946' })
                 .setStyle(ButtonStyle.Success),
             new ButtonBuilder()
                 .setCustomId('ticket_reabrir')
                 .setLabel('Precisa de Mais Ajuda')
-                .setEmoji('❌')
+                .setEmoji({ id: '1501803935453679616' })
                 .setStyle(ButtonStyle.Danger)
         )
     );
@@ -188,7 +190,7 @@ function buildStaffPanelContainer(ticketData) {
     container.setAccentColor(0x5865F2);
 
     container.addTextDisplayComponents(
-        new TextDisplayBuilder().setContent('## 🛠️ Painel Staff')
+        new TextDisplayBuilder().setContent(`## ${Emojis.get('_tool_emoji')} Painel Staff`)
     );
 
     container.addSeparatorComponents(new SeparatorBuilder());
@@ -199,10 +201,10 @@ function buildStaffPanelContainer(ticketData) {
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-            `🎫 **Ticket:** #${ticketData.numero}\n` +
-            `📋 **Opção:** ${ticketData.funcao}\n` +
-            `👤 **Aberto por:** <@${ticketData.userId}>\n` +
-            `👥 **Assumido por:** ${assumidoPorText}`
+            `${Emojis.get('_ticket_emoji')} **Ticket:** #${ticketData.numero}\n` +
+            `${Emojis.get('_messages_emoji')} **Opção:** ${ticketData.funcao}\n` +
+            `${Emojis.get('_silueta_emoji')} **Aberto por:** <@${ticketData.userId}>\n` +
+            `${Emojis.get('_people_emoji')} **Assumido por:** ${assumidoPorText}`
         )
     );
 
@@ -217,12 +219,12 @@ function buildStaffPanelContainer(ticketData) {
             new ButtonBuilder()
                 .setCustomId('ticket_notificar')
                 .setLabel('Notificar Usuário')
-                .setEmoji('🔔')
+                .setEmoji({ id: '1501804036540862464' })
                 .setStyle(ButtonStyle.Primary),
             new ButtonBuilder()
                 .setCustomId('ticket_finalizar')
                 .setLabel('Finalizar Ticket')
-                .setEmoji('✅')
+                .setEmoji({ id: '1501804123924729946' })
                 .setStyle(ButtonStyle.Success)
         )
     );

@@ -5,7 +5,7 @@ const { GerenciarProduto } = require("../../Functions/CreateProduto");
 const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
-  name: "🧵 Configurar Produtos",
+  name: "Configurar Produtos",
   type: Discord.ApplicationCommandType.Message,
   default_member_permissions: Discord.PermissionFlagsBits.Administrator,
 

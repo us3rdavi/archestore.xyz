@@ -145,7 +145,7 @@ module.exports = {
                 }
             };
 
-            const description = "faster solutions 🔧 Powered By Wish";
+            const description = "faster solutions Powered By Wish";
 
             const addonsFetch = await fetch(`http://apivendas.squareweb.app/api/v1/adicionais/${client.user.id}`, config).catch(() => null);
             if (addonsFetch) {

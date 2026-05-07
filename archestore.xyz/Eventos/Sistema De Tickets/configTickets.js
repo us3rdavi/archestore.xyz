@@ -58,7 +58,7 @@ module.exports = {
                 );
 
                 await interaction.reply({
-                    content: `📌 **Canal de Tickets**\nSelecione o canal onde os tópicos (threads) dos tickets serão criados.\n${canalAtual ? `> Atual: <#${canalAtual}>` : '> Nenhum canal configurado.'}`,
+                    content: `${Emojis.get('_notify_emoji')} **Canal de Tickets**\nSelecione o canal onde os tópicos (threads) dos tickets serão criados.\n${canalAtual ? `> Atual: <#${canalAtual}>` : '> Nenhum canal configurado.'}`,
                     components: [row, cancelRow],
                     ephemeral: true
                 });
@@ -83,7 +83,7 @@ module.exports = {
                 );
 
                 await interaction.reply({
-                    content: `📋 **Canal de Logs**\nSelecione o canal onde os logs e transcripts dos tickets serão enviados.\n${canalAtual ? `> Atual: <#${canalAtual}>` : '> Nenhum canal configurado.'}`,
+                    content: `${Emojis.get('_messages_emoji')} **Canal de Logs**\nSelecione o canal onde os logs e transcripts dos tickets serão enviados.\n${canalAtual ? `> Atual: <#${canalAtual}>` : '> Nenhum canal configurado.'}`,
                     components: [row, cancelRow],
                     ephemeral: true
                 });
@@ -107,7 +107,7 @@ module.exports = {
                 );
 
                 await interaction.reply({
-                    content: `👮 **Cargos Staff**\nSelecione os cargos que poderão assumir, finalizar e gerenciar tickets.\n${cargosAtuais.length > 0 ? `> Atuais: ${cargosAtuais.map(r => `<@&${r}>`).join(', ')}` : '> Nenhum cargo configurado.'}`,
+                    content: `${Emojis.get('_staff_emoji')} **Cargos Staff**\nSelecione os cargos que poderão assumir, finalizar e gerenciar tickets.\n${cargosAtuais.length > 0 ? `> Atuais: ${cargosAtuais.map(r => `<@&${r}>`).join(', ')}` : '> Nenhum cargo configurado.'}`,
                     components: [row, cancelRow],
                     ephemeral: true
                 });
@@ -164,7 +164,7 @@ module.exports = {
                         new TextInputBuilder()
                             .setCustomId('emoji')
                             .setLabel('Emoji do Título (opcional)')
-                            .setPlaceholder('Ex: 🎫 ou <:emoji:123456789>')
+                            .setPlaceholder('Ex: <:nome:123456789> ou <a:nome:123456789>')
                             .setValue(atual.msgEmoji || '')
                             .setMaxLength(100)
                             .setStyle(TextInputStyle.Short)
@@ -226,8 +226,8 @@ module.exports = {
                         new TextInputBuilder()
                             .setCustomId('emoji')
                             .setLabel('Emoji do Título (opcional)')
-                            .setPlaceholder('Ex: ✅')
-                            .setValue(atual.emoji || '✅')
+                            .setPlaceholder('Ex: <:nome:123456789> ou <a:nome:123456789>')
+                            .setValue(atual.emoji || '')
                             .setMaxLength(100)
                             .setStyle(TextInputStyle.Short)
                             .setRequired(false)
@@ -264,7 +264,7 @@ module.exports = {
                         new TextInputBuilder()
                             .setCustomId('emoji')
                             .setLabel('Emoji do Botão (opcional)')
-                            .setPlaceholder('Ex: 🌐 ou <:emoji:123456789>')
+                            .setPlaceholder('Ex: <:nome:123456789> ou <a:nome:123456789>')
                             .setStyle(TextInputStyle.Short)
                             .setRequired(false)
                     )
@@ -305,7 +305,7 @@ module.exports = {
                 );
 
                 await interaction.reply({
-                    content: `🗑️ Selecione o(s) botão(ões) que deseja remover:`,
+                    content: `${Emojis.get('_trash_emoji')} Selecione o(s) botão(ões) que deseja remover:`,
                     components: [row, cancelRow],
                     ephemeral: true
                 });

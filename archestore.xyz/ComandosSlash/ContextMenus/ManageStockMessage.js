@@ -5,7 +5,7 @@ const { MessageStock } = require("../../Functions/ConfigEstoque");
 const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
-  name: "📦 Configurar Stock",
+  name: "Configurar Stock",
   type: Discord.ApplicationCommandType.Message,
   default_member_permissions: Discord.PermissionFlagsBits.Administrator,
 

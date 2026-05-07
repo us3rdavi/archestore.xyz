@@ -39,7 +39,7 @@ module.exports = {
                 // Verifica se há opções para exibir
                 if (options.length === 0) {
                     await interaction.update({
-                        content: '⚠ Não há mensagens automáticas para remover.',
+                        content: 'Não há mensagens automáticas para remover.',
                         embeds: [],
                         components: [],
                         ephemeral: true

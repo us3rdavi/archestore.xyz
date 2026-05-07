@@ -251,7 +251,7 @@ module.exports = {
                 try {
 
 
-                    await interaction.update({ components: [style2row], content: `❓ Quais campos de \`${ggg22.Config.name}\` deseja remover?`, embeds: [] })
+                    await interaction.update({ components: [style2row], content: `Quais campos de \`${ggg22.Config.name}\` deseja remover?`, embeds: [] })
                 } catch (error) {
                 }
             }

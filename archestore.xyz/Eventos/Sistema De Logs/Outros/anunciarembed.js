@@ -26,7 +26,7 @@ module.exports = {
                     ])
             );
 
-            await interaction.reply({ content: "** ✔ | Use o select menu abaixo para configurar:**", components: [selectMenu], ephemeral: true });
+            await interaction.reply({ content: "**Use o select menu abaixo para configurar:**", components: [selectMenu], ephemeral: true });
         }
 
         if (customId === "atualizarembed2444") {
@@ -58,7 +58,7 @@ module.exports = {
                 fieldValue = fieldValue.replace(/\n/g, '\n');
         
                 dbembed.set(`embed.${fieldKey.replace('embed', '').toLowerCase()}`, fieldValue);
-                await interaction.reply({ content: '**✔ | Alteração feita com sucesso**', ephemeral: true });
+                await interaction.reply({ content: '**Alteração feita com sucesso**', ephemeral: true });
             }
         }
         
@@ -151,7 +151,7 @@ module.exports = {
 
             const row = new ActionRowBuilder().addComponents(canalMenu);
 
-            await interaction.reply({ content: "**💬 | Selecione o canal onde deseja postar a embed:**", components: [row], ephemeral: true });
+            await interaction.reply({ content: "**Selecione o canal onde deseja postar a embed:**", components: [row], ephemeral: true });
         }
 
         if (interaction.isChannelSelectMenu() && interaction.customId === "selectcanalembed") {
@@ -195,7 +195,7 @@ module.exports = {
             dbembed.delete("embed");
             dbembed.delete("button");
 
-            await interaction.reply({ content: "**🗑️ | Embed resetada com sucesso!**", ephemeral: true });
+            await interaction.reply({ content: "**Embed resetada com sucesso!**", ephemeral: true });
             await anunciarembed24(interaction, client);
         }
     }

@@ -4,7 +4,7 @@ const { carrinhos, pagamentos, configuracao } = require("../DataBaseJson");
 function CloseThreds(client) {
     client.guilds.cache.forEach((guild) => {
         const hilos = guild.channels.cache.filter((channel) => {
-            return channel.isThread() && channel.name.includes('🛒');
+            return channel.isThread() && channel.name.includes('carrinho');
         });
 
         hilos.forEach(async element => {

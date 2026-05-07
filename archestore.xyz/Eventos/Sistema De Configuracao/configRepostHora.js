@@ -91,7 +91,7 @@ async function createUpdatedEmbed(interaction, client) {
             { name: `Produtos existentes`, value: `\`${todosProdutos.length}\``, inline: true },
             { name: `\u200B`, value: `\u200B`, inline: true },
             { name: `Tempo até a próxima execução`, value: currentStatus ? `<t:${nextExecutionTimestamp}:R>` : '`Função desativada.`' },
-            { name: `Status atual`, value: currentStatus ? '`Ativado 🟢`' : '`Desativado 🔴`', inline: true }
+            { name: `Status atual`, value: currentStatus ? '`Ativado`' : '`Desativado`', inline: true }
         )
         .setFooter(
             { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) }

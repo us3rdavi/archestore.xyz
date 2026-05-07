@@ -5,7 +5,7 @@ const { relikia } = require("../DataBaseJson");
 
 async function AutoClear(interaction, client) {
   if (!relikia) {
-    console.error("🚫 Erro: O banco de dados 'relikia' não está definido.");
+    console.error("Erro: O banco de dados 'relikia' não está definido.");
     return interaction.reply({ content: "Erro interno: Banco de dados não encontrado!", ephemeral: true });
   }
 
@@ -21,12 +21,12 @@ async function AutoClear(interaction, client) {
           .setDescription(`Você acessou a aba de **AutoClear**. Suas **informações** e os **botões de configurações** estão abaixo. **Configure tudo!**`)
           .addFields(
             {
-              name: `🚪 | Canal AutoClear:`,
+              name: `Canal AutoClear:`,
               value: canalautoclear !== "Nenhum canal selecionado" ? `<#${canalautoclear}>` : canalautoclear,
               inline: true
             },
             {
-              name: `⏰ | Tempo AutoClear:`,
+              name: `Tempo AutoClear:`,
               value: `${tempoclear} segundos`,
               inline: true
             },
@@ -66,7 +66,7 @@ async function AutoClear(interaction, client) {
       ]
     });
   } catch (error) {
-    console.error("🚫 Erro ao obter dados do banco:", error);
+    console.error("Erro ao obter dados do banco:", error);
     return interaction.reply({ content: "Erro ao acessar o banco de dados!", ephemeral: true });
   }
 }

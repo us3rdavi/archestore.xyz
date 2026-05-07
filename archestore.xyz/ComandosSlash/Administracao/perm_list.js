@@ -54,7 +54,7 @@ module.exports = {
     });
 
     // Criar a mensagem com ">" apenas na primeira linha
-    let content = "\`\📝\` **Usuários com permissão para gerenciar o BOT:**\n\n";
+    let content = "**Usuários com permissão para gerenciar o BOT:**\n\n";
     content += `> ${usersWithPerm[0]}\n`;
     for (let i = 1; i < usersWithPerm.length; i++) {
       content += `${usersWithPerm[i]}\n`;

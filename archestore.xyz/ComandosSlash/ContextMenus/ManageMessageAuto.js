@@ -4,7 +4,7 @@ const { owner } = require('../../config.json');
 const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
-    name: '🔂Editar Mensagem Automática',
+    name: 'Editar Mensagem Automática',
     type: ApplicationCommandType.Message,
     default_member_permissions: PermissionFlagsBits.Administrator,
 

@@ -17,7 +17,7 @@ async function AcoesAutomaticsConfigs(interaction, client) {
   const select = new ActionRowBuilder().addComponents(
     new StringSelectMenuBuilder()
       .setCustomId(`select_AcoesAutomaticsConfigs`)
-      .setPlaceholder(`🔧 Gerencie o sistema de moderação.`)
+      .setPlaceholder(`Gerencie o sistema de moderação.`)
       .addOptions(
         new StringSelectMenuOptionBuilder()
           .setLabel(`Limpar Canal`)
@@ -142,10 +142,10 @@ async function sistemaAntiRaid(interaction, client) {
   }
 
   embed.addFields(
-    { name: `Proteção de Cargos Deletados [\`${AntiRaid?.ExclusaoCargos?.status ? `🟢` : `🔴`}\`]:`, value: `- O usuário poderá excluir \`${AntiRaid?.ExclusaoCargos?.quantidadeporminuto || 0}\` Cargos por minutos e \`${AntiRaid?.ExclusaoCargos?.quantidadeporhora || 0}\` por hora.`, inline: false },
-    { name: `Proteção de Canais Deletados [\`${AntiRaid?.ExclusaoCanais?.status ? `🟢` : `🔴`}\`]:`, value: `- O usuário poderá excluir \`${AntiRaid?.ExclusaoCanais?.quantidadeporminuto || 0}\` Canais por minutos e \`${AntiRaid?.ExclusaoCanais?.quantidadeporhora || 0}\` por hora.`, inline: false },
-    { name: `Proteção de Banimentos [\`${AntiRaid?.Banimento?.status ? `🟢` : `🔴`}\`]:`, value: `- O usuário poderá banir \`${AntiRaid?.Banimento?.quantidadeporminuto || 0}\` membros por minutos e \`${AntiRaid?.Banimento?.quantidadeporhora || 0}\` por hora.`, inline: false },
-    { name: `Proteção de Expulsões [\`${AntiRaid?.Expulsao?.status ? `🟢` : `🔴`}\`]:`, value: `- O usuário poderá expulsar \`${AntiRaid?.Expulsao?.quantidadeporminuto || 0}\` membros por minutos e \`${AntiRaid?.Expulsao?.quantidadeporhora || 0}\` por hora.`, inline: false },
+    { name: `Proteção de Cargos Deletados [\`${AntiRaid?.ExclusaoCargos?.status ? `ON` : `OFF`}\`]:`, value: `- O usuário poderá excluir \`${AntiRaid?.ExclusaoCargos?.quantidadeporminuto || 0}\` Cargos por minutos e \`${AntiRaid?.ExclusaoCargos?.quantidadeporhora || 0}\` por hora.`, inline: false },
+    { name: `Proteção de Canais Deletados [\`${AntiRaid?.ExclusaoCanais?.status ? `ON` : `OFF`}\`]:`, value: `- O usuário poderá excluir \`${AntiRaid?.ExclusaoCanais?.quantidadeporminuto || 0}\` Canais por minutos e \`${AntiRaid?.ExclusaoCanais?.quantidadeporhora || 0}\` por hora.`, inline: false },
+    { name: `Proteção de Banimentos [\`${AntiRaid?.Banimento?.status ? `ON` : `OFF`}\`]:`, value: `- O usuário poderá banir \`${AntiRaid?.Banimento?.quantidadeporminuto || 0}\` membros por minutos e \`${AntiRaid?.Banimento?.quantidadeporhora || 0}\` por hora.`, inline: false },
+    { name: `Proteção de Expulsões [\`${AntiRaid?.Expulsao?.status ? `ON` : `OFF`}\`]:`, value: `- O usuário poderá expulsar \`${AntiRaid?.Expulsao?.quantidadeporminuto || 0}\` membros por minutos e \`${AntiRaid?.Expulsao?.quantidadeporhora || 0}\` por hora.`, inline: false },
   )
 
 

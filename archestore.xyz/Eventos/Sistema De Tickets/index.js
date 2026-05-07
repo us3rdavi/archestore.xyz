@@ -149,7 +149,7 @@ module.exports = {
             const confirmContainer = new ContainerBuilder();
             confirmContainer.setAccentColor(0x57F287);
             confirmContainer.addTextDisplayComponents(
-                new TextDisplayBuilder().setContent('## ✅ Ticket Encerrado\nEste ticket foi marcado como **resolvido**. Obrigado pelo contato!')
+                new TextDisplayBuilder().setContent(`## ${Emojis.get('confirmed_emoji')} Ticket Encerrado\nEste ticket foi marcado como **resolvido**. Obrigado pelo contato!`)
             );
 
             try {
@@ -180,15 +180,15 @@ module.exports = {
                     });
 
                     const logEmbed = new EmbedBuilder()
-                        .setTitle(`📋 Transcript — Ticket #${ticketData.numero}`)
+                        .setTitle(`${Emojis.get('_messages_emoji')} Transcript — Ticket #${ticketData.numero}`)
                         .setColor('#57F287')
                         .addFields(
-                            { name: '👤 Aberto por', value: `<@${ticketData.userId}> (\`${ticketData.username}\`)`, inline: true },
-                            { name: '👮 Assumido por', value: ticketData.staffMemberId ? `<@${ticketData.staffMemberId}>` : 'Ninguém', inline: true },
-                            { name: '📋 Opção', value: ticketData.funcao || 'Desconhecida', inline: true },
-                            { name: '🔢 Nº do Ticket', value: `#${ticketData.numero}`, inline: true },
-                            { name: '✅ Encerrado por', value: `${interaction.user} (\`Resolvido\`)`, inline: true },
-                            { name: '⏰ Encerrado em', value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: true }
+                            { name: `${Emojis.get('_silueta_emoji')} Aberto por`, value: `<@${ticketData.userId}> (\`${ticketData.username}\`)`, inline: true },
+                            { name: `${Emojis.get('_staff_emoji')} Assumido por`, value: ticketData.staffMemberId ? `<@${ticketData.staffMemberId}>` : 'Ninguém', inline: true },
+                            { name: `${Emojis.get('_messages_emoji')} Opção`, value: ticketData.funcao || 'Desconhecida', inline: true },
+                            { name: `${Emojis.get('information_emoji')} Nº do Ticket`, value: `#${ticketData.numero}`, inline: true },
+                            { name: `${Emojis.get('confirmed_emoji')} Encerrado por`, value: `${interaction.user} (\`Resolvido\`)`, inline: true },
+                            { name: `${Emojis.get('clock_emoji')} Encerrado em`, value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: true }
                         )
                         .setFooter({ text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) })
                         .setTimestamp();
@@ -197,11 +197,11 @@ module.exports = {
                 } catch (err) {
                     console.error('[Ticket] Erro ao gerar transcript:', err.message);
                     const logEmbed = new EmbedBuilder()
-                        .setTitle(`📋 Ticket #${ticketData.numero} Encerrado`)
+                        .setTitle(`${Emojis.get('_messages_emoji')} Ticket #${ticketData.numero} Encerrado`)
                         .setColor('#57F287')
                         .addFields(
-                            { name: '👤 Aberto por', value: `<@${ticketData.userId}>`, inline: true },
-                            { name: '✅ Encerrado por', value: `${interaction.user}`, inline: true }
+                            { name: `${Emojis.get('_silueta_emoji')} Aberto por`, value: `<@${ticketData.userId}>`, inline: true },
+                            { name: `${Emojis.get('confirmed_emoji')} Encerrado por`, value: `${interaction.user}`, inline: true }
                         )
                         .setTimestamp();
                     await logChannel.send({ embeds: [logEmbed] }).catch(() => {});
@@ -232,7 +232,7 @@ module.exports = {
             const reabertoContainer = new ContainerBuilder();
             reabertoContainer.setAccentColor(0xED4245);
             reabertoContainer.addTextDisplayComponents(
-                new TextDisplayBuilder().setContent('## ❗ Ticket Reaberto\nO usuário ainda precisa de ajuda. Um membro da equipe entrará em contato em breve.')
+                new TextDisplayBuilder().setContent(`## ${Emojis.get('warn_emoji')} Ticket Reaberto\nO usuário ainda precisa de ajuda. Um membro da equipe entrará em contato em breve.`)
             );
 
             try {
@@ -248,7 +248,7 @@ module.exports = {
             const extraMention = cargoadm && !staffRoles.includes(cargoadm) ? `<@&${cargoadm}>` : '';
 
             await interaction.channel.send({
-                content: `❗ <@${ticketData.userId}> ainda precisa de ajuda! ${roleMentions} ${extraMention}`.trim()
+                content: `${Emojis.get('warn_emoji')} <@${ticketData.userId}> ainda precisa de ajuda! ${roleMentions} ${extraMention}`.trim()
             });
         }
 
@@ -270,7 +270,7 @@ module.exports = {
             try {
                 const usuario = await client.users.fetch(ticketData.userId);
                 await usuario.send({
-                    content: `${Emojis.get('loading_emoji')} Olá, **${ticketData.username}**! Um membro da nossa equipe notificou você sobre o seu ticket **#${ticketData.numero}** no servidor **${interaction.guild.name}**. Por favor, acesse o ticket para continuar.`
+                    content: `${Emojis.get('_notify_emoji')} Olá, **${ticketData.username}**! Um membro da nossa equipe notificou você sobre o seu ticket **#${ticketData.numero}** no servidor **${interaction.guild.name}**. Por favor, acesse o ticket para continuar.`
                 });
                 await interaction.reply({
                     content: `${Emojis.get('confirmed_emoji')} Usuário <@${ticketData.userId}> foi notificado via DM!`,

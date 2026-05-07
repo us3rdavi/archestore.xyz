@@ -35,7 +35,7 @@ module.exports = {
                     .setCustomId('fileUrl')
                     .setLabel('Link do arquivo (imagem/gif) - opcional')
                     .setStyle(TextInputStyle.Short)
-					.setRequired(false)
+                                        .setRequired(false)
                     .setPlaceholder('Inserir link aqui (opcional)');
 
                 const row1 = new ActionRowBuilder().addComponents(channelIdInput);
@@ -53,7 +53,7 @@ module.exports = {
             const fileUrl = interaction.fields.getTextInputValue('fileUrl').trim(); 
 
             if (fileUrl && !fileUrl.startsWith('https://')) {
-                interaction.reply({ content: '⚠️ | O link do file deve começar com "https://".', ephemeral: true });
+                interaction.reply({ content: 'O link do file deve começar com "https://".', ephemeral: true });
                 return;
             }
 

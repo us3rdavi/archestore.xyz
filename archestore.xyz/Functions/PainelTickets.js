@@ -1,5 +1,7 @@
 const { ButtonBuilder, ActionRowBuilder, AttachmentBuilder, EmbedBuilder } = require("discord.js");
 const { tickets } = require("../DataBaseJson");
+const emojis = require("../DataBaseJson/Emojis.json");
+const Emojis = { get: (name) => emojis[name] || "" };
 
 async function painelTicket(interaction, useEditReply = false) {
     const atualstatus24 = tickets.get("statusmsg") || false;
@@ -61,12 +63,12 @@ async function painelTicket(interaction, useEditReply = false) {
     }
 
     const embed = new EmbedBuilder()
-        .setTitle('⚙️ Central de Atendimento')
+        .setTitle(`${Emojis.get('_settings_emoji')} Central de Atendimento`)
         .setFooter({ text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) })
         .setTimestamp();
 
     if (tickets.get(`tickets.aparencia.title`) !== null) {
-        embed.addFields({ name: '📋 Título do Painel', value: tickets.get(`tickets.aparencia.title`) || 'Não definido', inline: true });
+        embed.addFields({ name: `${Emojis.get('_messages_emoji')} Título do Painel`, value: tickets.get(`tickets.aparencia.title`) || 'Não definido', inline: true });
     }
     if (tickets.get(`tickets.aparencia.color`) !== null) {
         embed.setColor(tickets.get(`tickets.aparencia.color`) || '#5865F2');
@@ -79,17 +81,17 @@ async function painelTicket(interaction, useEditReply = false) {
     const botoesAdicionais = tickets.get('tickets.botoesAdicionais') || [];
 
     embed.addFields(
-        { name: '🎫 Canal de Tickets', value: canalTickets ? `<#${canalTickets}>` : '`Não configurado`', inline: true },
-        { name: '📋 Canal de Logs', value: canalLogs ? `<#${canalLogs}>` : '`Não configurado`', inline: true },
-        { name: '👮 Cargos Staff', value: staffRoles.length > 0 ? staffRoles.map(r => `<@&${r}>`).join(', ') : '`Nenhum configurado`', inline: false },
-        { name: '🔢 Total de Tickets', value: `\`${contador}\``, inline: true },
-        { name: '➕ Botões Adicionais', value: `\`${botoesAdicionais.length}\` botão(ões)`, inline: true }
+        { name: `${Emojis.get('_ticket_emoji')} Canal de Tickets`, value: canalTickets ? `<#${canalTickets}>` : '`Não configurado`', inline: true },
+        { name: `${Emojis.get('_messages_emoji')} Canal de Logs`, value: canalLogs ? `<#${canalLogs}>` : '`Não configurado`', inline: true },
+        { name: `${Emojis.get('_staff_emoji')} Cargos Staff`, value: staffRoles.length > 0 ? staffRoles.map(r => `<@&${r}>`).join(', ') : '`Nenhum configurado`', inline: false },
+        { name: `${Emojis.get('information_emoji')} Total de Tickets`, value: `\`${contador}\``, inline: true },
+        { name: `${Emojis.get('_add_emoji')} Botões Adicionais`, value: `\`${botoesAdicionais.length}\` botão(ões)`, inline: true }
     );
 
     const funcoes = tickets.get(`tickets.funcoes`);
     if (funcoes !== null && Object.keys(funcoes).length > 0) {
         const funcList = Object.keys(funcoes).slice(0, 5).join(', ');
-        embed.addFields({ name: '📁 Funções Configuradas', value: funcList + (Object.keys(funcoes).length > 5 ? ` +${Object.keys(funcoes).length - 5}` : ''), inline: false });
+        embed.addFields({ name: `${Emojis.get('_folder_emoji')} Funções Configuradas`, value: funcList + (Object.keys(funcoes).length > 5 ? ` +${Object.keys(funcoes).length - 5}` : ''), inline: false });
     }
 
     const row1 = new ActionRowBuilder().addComponents(

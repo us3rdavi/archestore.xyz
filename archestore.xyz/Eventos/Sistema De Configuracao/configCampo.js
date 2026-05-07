@@ -656,7 +656,7 @@ if (interaction.customId === 'estoquearquivo') {
 
 
             if (interaction.customId == 'simestoque') {
-                await interaction.update({ content: `🔄 Aguarde...`, components: [] })
+                await interaction.update({ content: `Aguarde...`, components: [] })
                 let estoque
                 const ggg = await db.get(`${interaction.user.id}.delimitadorStock`)
                 if (ggg.delimitador !== null) {
@@ -680,12 +680,12 @@ if (interaction.customId === 'estoquearquivo') {
                 await produtos.set(`${ggg.produto}.UltimaReposicao`, Date.now())
 
 
-                await interaction.editReply({ content: `🔄 Atualizando estoque...`, components: [] }).then(async msg => {
+                await interaction.editReply({ content: `Atualizando estoque...`, components: [] }).then(async msg => {
 
 
                 })
 
-                await interaction.editReply({ content: `🔄 Sincronizando mensagens...`, ephemeral: true })
+                await interaction.editReply({ content: `Sincronizando mensagens...`, ephemeral: true })
                 await UpdateMessageProduto(client, ggg.produto)
 
 
@@ -831,11 +831,11 @@ if (interaction.customId === 'estoquearquivo') {
 
 
                 if (gggaaa.estoque == 0) {
-                    interaction.reply({ content: `⚠️ O estoque desse item está vazio.`, ephemeral: true })
+                    interaction.reply({ content: `O estoque desse item está vazio.`, ephemeral: true })
                 } else {
 
 
-                    await interaction.reply({ content: `🔄 Aguarde...`, ephemeral: true }).then(async tt => {
+                    await interaction.reply({ content: `Aguarde...`, ephemeral: true }).then(async tt => {
                         const conteudoEstoque = gggaaa.estoque.join('\n');
                         const fileName = `stock_${ggg.camposelect}.txt`;
                         const fileBuffer = Buffer.from(conteudoEstoque, 'utf-8');

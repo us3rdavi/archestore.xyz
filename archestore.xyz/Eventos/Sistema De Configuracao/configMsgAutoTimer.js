@@ -30,7 +30,7 @@ module.exports = {
             const parsedInterval = parseInt(newInterval, 10);
 
             if (isNaN(parsedInterval)) {
-                await interaction.reply({ content: '⚠️  | Por favor, insira um número válido de minutos. **(ex: 2)**', ephemeral: true });
+                await interaction.reply({ content: 'Por favor, insira um número válido de minutos. **(ex: 2)**', ephemeral: true });
                 return;
             }
 

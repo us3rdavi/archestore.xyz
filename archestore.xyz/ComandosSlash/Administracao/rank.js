@@ -42,7 +42,7 @@ module.exports = {
 
       const embed = new EmbedBuilder()
         .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#fcba03` : configuracao.get(`Cores.Processamento`)}`)
-        .setTitle(`\`\🏆\`Ranking de gastos`)
+        .setTitle(`Ranking de gastos`)
         .setDescription(msg)
         .setFooter(
           { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) }
@@ -88,7 +88,7 @@ module.exports = {
           collector.on('end', collected => {
             if (collected.size === 0) {
               
-              interaction.editReply({ components: [], embeds: [], content: '😥 | Seu tempo expirou utilize /rank novamente!' });
+              interaction.editReply({ components: [], embeds: [], content: 'Seu tempo expirou. Utilize /rank novamente.' });
             }
           });
 

@@ -162,7 +162,7 @@ module.exports = {
 
             const row = new ActionRowBuilder().addComponents(canalMenu);
 
-            await interaction.reply({ content: "**💬 | Selecione o canal onde deseja postar:**", components: [row], ephemeral: true });
+            await interaction.reply({ content: "**Selecione o canal onde deseja postar:**", components: [row], ephemeral: true });
         }
 
         if (interaction.isChannelSelectMenu() && interaction.customId === "selectcanal") {
@@ -200,7 +200,7 @@ module.exports = {
                 await canal.send({ content });
             }
         
-            await interaction.update({ content: "**✔ | Mensagem enviada com sucesso!**", ephemeral: true });
+            await interaction.update({ content: "**Mensagem enviada com sucesso!**", ephemeral: true });
         }
         // Resetar
         if (customId === "resetarcontent") {

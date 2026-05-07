@@ -1,7 +1,8 @@
 const Discord = require("discord.js");
 const config = require("../../config.json");
 const { getPermissions } = require("../../Functions/PermissionsCache.js");
-const { Emojis } = require("../../DataBaseJson");
+const emojis = require("../../DataBaseJson/Emojis.json");
+const Emojis = { get: (name) => emojis[name] || "" };
 
 module.exports = {
     name: "say",
@@ -15,14 +16,14 @@ module.exports = {
             required: true,
         }
     ],
-    run: async (client, interaction) => {  // Corrigido 'Client' para 'client'
-        const perm = await getPermissions(client.user.id);  // Corrigido 'Client' para 'client'
+    run: async (client, interaction) => {
+        const perm = await getPermissions(client.user.id);
         if (perm === null || !perm.includes(interaction.user.id)) {
-            return interaction.reply({ content: `❌️ Você não possui permissão para usar esse comando.`, ephemeral: true });
+            return interaction.reply({ content: `${Emojis.get('negative_emoji')} Você não possui permissão para usar esse comando.`, ephemeral: true });
         } else {
             let dados = interaction.options.getString('texto');
-            await interaction.reply({ content: `✅️ Mensagem enviada com êxito. Verifique agora mesmo!`, ephemeral: true });
-            await interaction.channel.send({ content: `${dados}` });  // Corrigido para 'await'
+            await interaction.reply({ content: `${Emojis.get('confirmed_emoji')} Mensagem enviada com êxito. Verifique agora mesmo!`, ephemeral: true });
+            await interaction.channel.send({ content: `${dados}` });
             setTimeout(() => { interaction.deleteReply(); }, 5000);
         }
     }

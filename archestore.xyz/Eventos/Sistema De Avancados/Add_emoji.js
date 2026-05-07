@@ -14,7 +14,7 @@ module.exports = {
                 return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Você não possui permissão para usar esse comando.`, ephemeral: true });
             }
 
-            await interaction.reply({ content: "** > 🔄 | Colocando os emojis, aguarde...**", ephemeral: true });
+            await interaction.reply({ content: `${Emojis.get('loading_emoji')} **Colocando os emojis, aguarde...**`, ephemeral: true });
 
             const emojiArray = [
                 "https://cdn.discordapp.com/emojis/1183841001824067676.webp?size=96&quality=lossless",

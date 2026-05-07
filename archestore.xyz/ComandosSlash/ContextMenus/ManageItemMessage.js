@@ -5,7 +5,7 @@ const { GerenciarCampos2 } = require("../../Functions/GerenciarCampos");
 const { Emojis } = require("../../DataBaseJson");
 
 module.exports = {
-  name: "📋 Configure Items",
+  name: "Configure Items",
   type: Discord.ApplicationCommandType.Message,
   default_member_permissions: Discord.PermissionFlagsBits.Administrator,
 

@@ -86,7 +86,7 @@ module.exports = {
                 const row = new ActionRowBuilder().addComponents(selecionarcanal24);
 
                 await interaction.reply({
-                    content: '**✔ | Escolha Um Canal que será enviado a mensagem:**',
+                    content: '**Escolha Um Canal que será enviado a mensagem:**',
                     components: [row],
                     ephemeral: true
                 });

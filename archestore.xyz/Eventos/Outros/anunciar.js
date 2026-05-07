@@ -1,6 +1,8 @@
 const { ModalBuilder, TextInputBuilder, ButtonStyle, ButtonBuilder, TextInputStyle, ActionRowBuilder, ChannelSelectMenuBuilder } = require("discord.js");
 const { dbembed } = require("../../DataBaseJson/index.js");
 const { anunciar } = require("../../Functions/anunciar.js");
+const emojis = require("../../DataBaseJson/Emojis.json");
+const Emojis = { get: (name) => emojis[name] || "" };
 
 module.exports = {
     name: "interactionCreate",
@@ -40,7 +42,7 @@ module.exports = {
                 const imagemValida = /\.(jpeg|jpg|gif|png|webp|bmp|svg|tiff|ico)(\?.*)?$/i.test(imagemContent);
         
                 if (imagemContent && !imagemValida) {
-                    return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} URL da imagem inválida. Por favor, insira uma URL de imagem válida.`, ephemeral: true });
+                    return interaction.reply({ content: `${Emojis.get('negative_emoji')} URL da imagem inválida. Por favor, insira uma URL de imagem válida.`, ephemeral: true });
                 }
         
                 dbembed.set("content.mensagem", mensagemContent);
@@ -102,12 +104,12 @@ module.exports = {
                 }
         
                 if (!emojivalido24) {
-                    await interaction.reply({ content: `${Emojis.get(`negative_emoji`)} O __emoji__ fornecido é inválido. Por favor, use um emoji válido.`, ephemeral: true });
+                    await interaction.reply({ content: `${Emojis.get('negative_emoji')} O emoji fornecido é inválido. Por favor, use um emoji válido.`, ephemeral: true });
                     return;
                 }
         
                 if (emojiNoServer24) {
-                    await interaction.reply({ content: `${Emojis.get(`negative_emoji`)} O __emoji__ fornecido não está disponível no servidor. Por favor, escolha um emoji que está no servidor.`, ephemeral: true });
+                    await interaction.reply({ content: `${Emojis.get('negative_emoji')} O emoji fornecido não está disponível no servidor. Por favor, escolha um emoji que está no servidor.`, ephemeral: true });
                     return;
                 }
         
@@ -127,7 +129,7 @@ module.exports = {
             const emojiBotao = dbembed.get("contentbutton.emojibotao");
 
             if (!mensagem) {
-                await interaction.reply({ content: `${Emojis.get(`negative_emoji`)} A __mensagem__ não está configurada. Por favor, configure a mensagem antes de enviá-la.`, ephemeral: true });
+                await interaction.reply({ content: `${Emojis.get('negative_emoji')} A mensagem não está configurada. Por favor, configure a mensagem antes de enviá-la.`, ephemeral: true });
                 return;
             }
 
@@ -162,7 +164,7 @@ module.exports = {
 
             const row = new ActionRowBuilder().addComponents(canalMenu);
 
-            await interaction.reply({ content: "**💬 | Selecione o canal onde deseja postar:**", components: [row], ephemeral: true });
+            await interaction.reply({ content: `${Emojis.get('_messages_emoji')} Selecione o canal onde deseja postar:`, components: [row], ephemeral: true });
         }
 
         if (interaction.isChannelSelectMenu() && interaction.customId === "selectcanal") {
@@ -174,9 +176,8 @@ module.exports = {
             const linkBotao = dbembed.get("contentbutton.linkbotao");
             const emojiBotao = dbembed.get("contentbutton.emojibotao");
         
-            // Verifica se a mensagem está configurada
             if (!mensagem) {
-                await interaction.reply({ content: `${Emojis.get(`negative_emoji`)} A __mensagem__ não está configurada. Por favor, configure a mensagem antes de enviá-la.`, ephemeral: true });
+                await interaction.reply({ content: `${Emojis.get('negative_emoji')} A mensagem não está configurada. Por favor, configure a mensagem antes de enviá-la.`, ephemeral: true });
                 return;
             }
         
@@ -200,9 +201,9 @@ module.exports = {
                 await canal.send({ content });
             }
         
-            await interaction.update({ content: "**✔ | Mensagem enviada com sucesso!**", ephemeral: true });
+            await interaction.update({ content: `${Emojis.get('confirmed_emoji')} Mensagem enviada com sucesso!`, ephemeral: true });
         }
-        // Resetar
+
         if (customId === "resetarcontent") {
             dbembed.delete("content.mensagem");
             dbembed.delete("content.imagem");

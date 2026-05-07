@@ -40,7 +40,7 @@ module.exports = {
                 let count = 0;
 
                 for (const thread of allThreads.threads.values()) {
-                    if (!thread.name.includes('🛒')) {
+                    if (!thread.name.includes('carrinho')) {
                         await thread.delete();
                         count++;
                     }
@@ -61,7 +61,7 @@ module.exports = {
 
         collector.on('end', collected => {
             if (collected.size === 0) {
-                interaction.editReply({ content: '`⏱ | Tempo esgotado. Ação cancelada.`', components: [] });
+                interaction.editReply({ content: '> Tempo esgotado. Ação cancelada.', components: [] });
             }
         });
     }

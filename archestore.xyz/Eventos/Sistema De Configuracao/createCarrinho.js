@@ -47,7 +47,7 @@ module.exports = {
 
                 if (isNaN(qtd) || qtd <= 0 || qtd % 1 !== 0) {
                     return interaction.reply({
-                        content: `❓ A quantidade \`${qtd}\` não é um número inteiro válido ou é menor ou igual a zero, tente novamente.`,
+                        content: `A quantidade \`${qtd}\` não é um número inteiro válido ou é menor ou igual a zero, tente novamente.`,
                         ephemeral: true
                     });
                 }
@@ -196,7 +196,7 @@ module.exports = {
                     await interaction.message.edit({ content: ``, embeds: [embed], components: [row3], files: [attachment] })
                     await interaction.channel.send({ content: `||${interaction.user}|| ${pagamento.msg}` })
 
-                    interaction.channel.setName(`➕・${interaction.user.username}・${interaction.user.id}`)
+                    interaction.channel.setName(`pago・${interaction.user.username}・${interaction.user.id}`)
 
                 } else {
                     DentroCarrinho2(interaction)

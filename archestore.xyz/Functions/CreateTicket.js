@@ -70,9 +70,31 @@ async function CreateTicket(interaction, valor) {
     try {
         const thread = await ticketChannel.threads.create({
             name: threadName,
-            type: ChannelType.PublicThread,
+            type: ChannelType.PrivateThread,
+            invitable: false,
             reason: `Ticket #${contador} aberto por ${interaction.user.tag}`
         });
+
+        // Adicionar o usuário que abriu o ticket ao tópico privado
+        await thread.members.add(interaction.user.id).catch(() => {});
+
+        // Adicionar todos os membros com cargos staff ao tópico privado
+        const staffRoleIds = tickets.get('tickets.staffRoles') || [];
+        const cargoadm = configuracao.get('ConfigRoles.cargoadm');
+        const cargosup = configuracao.get('ConfigRoles.cargosup');
+        const allStaffRoleIds = [...new Set([...staffRoleIds, cargoadm, cargosup].filter(Boolean))];
+
+        try {
+            await interaction.guild.members.fetch();
+            for (const roleId of allStaffRoleIds) {
+                const role = interaction.guild.roles.cache.get(roleId);
+                if (role) {
+                    for (const [memberId] of role.members) {
+                        await thread.members.add(memberId).catch(() => {});
+                    }
+                }
+            }
+        } catch (e) {}
 
         const ticketData = {
             threadId: thread.id,
@@ -100,17 +122,17 @@ async function CreateTicket(interaction, valor) {
 
         const staffRoles = tickets.get('tickets.staffRoles') || [];
         const roleMentions = staffRoles.map(id => `<@&${id}>`).join(' ');
-        const cargoadm = configuracao.get('ConfigRoles.cargoadm');
-        const cargosup = configuracao.get('ConfigRoles.cargosup');
+        const cargoadmPing = configuracao.get('ConfigRoles.cargoadm');
+        const cargosupPing = configuracao.get('ConfigRoles.cargosup');
         const extraMentions = [
-            cargoadm && !staffRoles.includes(cargoadm) ? `<@&${cargoadm}>` : '',
-            cargosup && !staffRoles.includes(cargosup) ? `<@&${cargosup}>` : ''
+            cargoadmPing && !staffRoles.includes(cargoadmPing) ? `<@&${cargoadmPing}>` : '',
+            cargosupPing && !staffRoles.includes(cargosupPing) ? `<@&${cargosupPing}>` : ''
         ].filter(Boolean).join(' ');
 
         const pingContent = `${interaction.user} ${roleMentions} ${extraMentions}`.trim();
         const pingRoles = [...staffRoles];
-        if (cargoadm && !pingRoles.includes(cargoadm)) pingRoles.push(cargoadm);
-        if (cargosup && !pingRoles.includes(cargosup)) pingRoles.push(cargosup);
+        if (cargoadmPing && !pingRoles.includes(cargoadmPing)) pingRoles.push(cargoadmPing);
+        if (cargosupPing && !pingRoles.includes(cargosupPing)) pingRoles.push(cargosupPing);
 
         await thread.send({
             content: pingContent,
@@ -161,8 +183,8 @@ async function CreateTicket(interaction, valor) {
                     return {
                         label: `${quantity}x ${product}`.slice(0, 100),
                         value: product,
-                        description: `📅 Última compra: ${fd}`,
-                        emoji: { id: '1345629550981283912' }
+                        description: `${Emojis.get('date_emoji')} Última compra: ${fd}`.slice(0, 100),
+                        emoji: { id: '1501804055826141246' }
                     };
                 });
 

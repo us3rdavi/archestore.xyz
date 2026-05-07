@@ -143,7 +143,7 @@ module.exports = {
     });
 
     interaction.reply({
-      content: `\`\👻\` O cupom foi criado, sucesso em ${clientesComCupom.length} \`\📦\` Produtos e falhou nos produtos abaixo:\n\n\`${clientesSemCupom.slice(0, 10).join('\n')}${clientesSemCupom.length > 10 ? `\n... e mais ${clientesSemCupom.length - 10} produtos` : ''}\``,
+      content: `O cupom foi criado, sucesso em ${clientesComCupom.length} Produtos e falhou nos produtos abaixo:\n\n\`${clientesSemCupom.slice(0, 10).join('\n')}${clientesSemCupom.length > 10 ? `\n... e mais ${clientesSemCupom.length - 10} produtos` : ''}\``,
       ephemeral: true
     });
 

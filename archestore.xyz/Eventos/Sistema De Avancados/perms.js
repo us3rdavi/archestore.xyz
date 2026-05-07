@@ -1,6 +1,8 @@
 const { ActionRowBuilder, ButtonBuilder, ModalBuilder, SelectMenuBuilder, TextInputBuilder, TextInputStyle, EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
+const emojis = require("../../DataBaseJson/Emojis.json");
+const Emojis = { get: (name) => emojis[name] || "" };
 
 module.exports = {
     name: "interactionCreate",
@@ -13,7 +15,7 @@ module.exports = {
 
         if (customId === 'perm_add' || customId === 'perm_remove') {
             if (owner !== interaction.user.id) {
-                return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Você não tem permissão para usar este comando.`, ephemeral: true });
+                return interaction.reply({ content: `${Emojis.get('negative_emoji')} Você não tem permissão para usar este comando.`, ephemeral: true });
             }
 
             const modal = new ModalBuilder()
@@ -45,20 +47,20 @@ module.exports = {
                     }
                 } catch (error) {
                     console.error("Erro ao carregar o arquivo de permissões:", error);
-                    return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} O arquivo de permissões não pôde ser carregado.`, ephemeral: true });
+                    return interaction.reply({ content: `${Emojis.get('negative_emoji')} O arquivo de permissões não pôde ser carregado.`, ephemeral: true });
                 }
-    
+
                 if (!perms[userId]) {
                     perms[userId] = userId;
                     try {
                         fs.writeFileSync(permsarguivo24, JSON.stringify(perms, null, 2));
-                        return interaction.reply({ content: `${Emojis.get(`confirmed_emoji`)} O usuário com ID \`${userId}\` foi adicionado à lista de permissões do BOT.**`, ephemeral: true });
+                        return interaction.reply({ content: `${Emojis.get('confirmed_emoji')} O usuário com ID \`${userId}\` foi adicionado à lista de permissões do BOT.`, ephemeral: true });
                     } catch (error) {
                         console.error("Erro ao salvar o arquivo de permissões:", error);
-                        return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Houve um erro ao salvar o arquivo de permissões.`, ephemeral: true });
+                        return interaction.reply({ content: `${Emojis.get('negative_emoji')} Houve um erro ao salvar o arquivo de permissões.`, ephemeral: true });
                     }
                 } else {
-                    return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} O usuário já possui permissão no BOT.**`, ephemeral: true });
+                    return interaction.reply({ content: `${Emojis.get('negative_emoji')} O usuário já possui permissão no BOT.`, ephemeral: true });
                 }
             }
 
@@ -74,27 +76,27 @@ module.exports = {
                     }
                 } catch (error) {
                     console.error("Erro ao carregar o arquivo de permissões:", error);
-                    return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} O arquivo de permissões não pôde ser carregado.`, ephemeral: true });
+                    return interaction.reply({ content: `${Emojis.get('negative_emoji')} O arquivo de permissões não pôde ser carregado.`, ephemeral: true });
                 }
-    
+
                 if (!perms[userId]) {
-                    return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} O usuário com ID \`${userId}\` não está na lista de permissões do BOT.**`, ephemeral: true });
+                    return interaction.reply({ content: `${Emojis.get('negative_emoji')} O usuário com ID \`${userId}\` não está na lista de permissões do BOT.`, ephemeral: true });
                 }
 
                 delete perms[userId];
                 try {
                     fs.writeFileSync(permsarguivo24, JSON.stringify(perms, null, 2));
-                    return interaction.reply({ content: `${Emojis.get(`confirmed_emoji`)} O usuário com ID \`${userId}\` foi removido da lista de permissões do BOT.**`, ephemeral: true });
+                    return interaction.reply({ content: `${Emojis.get('confirmed_emoji')} O usuário com ID \`${userId}\` foi removido da lista de permissões do BOT.`, ephemeral: true });
                 } catch (error) {
                     console.error("Erro ao salvar o arquivo de permissões:", error);
-                    return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Houve um erro ao salvar o arquivo de permissões.`, ephemeral: true });
+                    return interaction.reply({ content: `${Emojis.get('negative_emoji')} Houve um erro ao salvar o arquivo de permissões.`, ephemeral: true });
                 }
             }
         }
 
         if (customId === 'perm_list') {
             if (owner !== interaction.user.id) {
-                return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Você não tem permissão para usar este comando.`, ephemeral: true });
+                return interaction.reply({ content: `${Emojis.get('negative_emoji')} Você não tem permissão para usar este comando.`, ephemeral: true });
             }
 
             let perms;
@@ -102,18 +104,18 @@ module.exports = {
                 perms = require(permsarguivo24);
             } catch (error) {
                 console.error("Erro ao carregar o arquivo de permissões:", error);
-                return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} O arquivo de permissões não pôde ser carregado.`, ephemeral: true });
+                return interaction.reply({ content: `${Emojis.get('negative_emoji')} O arquivo de permissões não pôde ser carregado.`, ephemeral: true });
             }
 
             const mempegarperm24 = Object.keys(perms).map(id => `<@${id}> (\`${id}\`)`);
 
             if (mempegarperm24.length === 0) {
-                return interaction.reply({ content: "> ** 👤 | Nenhum membro foi autorizado a utilizar o BOT.**", ephemeral: true });
+                return interaction.reply({ content: `${Emojis.get('_silueta_emoji')} Nenhum membro foi autorizado a utilizar o BOT.`, ephemeral: true });
             }
 
             const embed = new EmbedBuilder()
                 .setAuthor({ name: `${client.user.username}`, iconURL: 'https://cdn.discordapp.com/emojis/1212479066784006214.png?size=2048' })
-                .setTitle(`✔ — Membros Autorizados (${mempegarperm24.length})`)
+                .setTitle(`${Emojis.get('confirmed_emoji')} Membros Autorizados (${mempegarperm24.length})`)
                 .setDescription(mempegarperm24.join('\n'))
                 .setColor('#0cd4cc')
                 .setFooter({ text: 'Sistema De Permissão', iconURL: 'https://cdn.discordapp.com/emojis/1250586149630644234.gif?size=2048' });
