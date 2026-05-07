@@ -500,8 +500,13 @@ module.exports = {
         // ── [USUÁRIO] Copiar código PIX ───────────────────────────────────────
         if (interaction.isButton() && interaction.customId === 'ap_copiar_pix') {
             const pixCode = await db.get(`ap_pixcode_${interaction.user.id}`);
-            if (!pixCode) return interaction.reply({ content: `Código PIX não encontrado. Gere um novo pedido.`, flags: MessageFlags.Ephemeral });
-            await interaction.reply({ content: pixCode, flags: MessageFlags.Ephemeral });
+            await interaction.deferReply({ ephemeral: true });
+            if (!pixCode) {
+                await interaction.editReply({ content: 'Código PIX não encontrado. Gere um novo pedido.' });
+                return;
+            }
+            await interaction.editReply({ content: pixCode });
+            return;
         }
 
         // ── [USUÁRIO] Confirmou compra ────────────────────────────────────────
