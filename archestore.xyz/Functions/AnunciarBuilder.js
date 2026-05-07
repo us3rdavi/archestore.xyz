@@ -6,17 +6,17 @@ const {
 const { dbembed, Emojis } = require('../DataBaseJson');
 
 const NAV_OPTIONS = [
-    { label: 'Menu Principal', description: 'Voltar ao menu principal', value: 'main' },
-    { label: 'Título', description: 'Editar título da embed', value: 'title' },
-    { label: 'Descrição', description: 'Editar descrição da embed', value: 'description' },
-    { label: 'Campos', description: 'Editar campos da embed', value: 'fields' },
-    { label: 'Autor', description: 'Editar autor da embed', value: 'author' },
-    { label: 'Cor', description: 'Editar cor da embed', value: 'color' },
-    { label: 'URL', description: 'Editar URL da embed', value: 'url' },
-    { label: 'Thumbnail', description: 'Editar thumbnail da embed', value: 'thumbnail' },
-    { label: 'Imagem', description: 'Editar imagem da embed', value: 'image' },
-    { label: 'Footer', description: 'Editar footer da embed', value: 'footer' },
-    { label: 'Timestamp', description: 'Editar timestamp da embed', value: 'timestamp' },
+    { label: 'Menu Principal', description: 'Voltar ao menu principal',  value: 'main',        emoji: { name: 'system_emoji',   id: '1501804019184828507' } },
+    { label: 'Título',         description: 'Editar título da embed',     value: 'title',       emoji: { name: '_lapis_emoji',   id: '1501804003850322052' } },
+    { label: 'Descrição',      description: 'Editar descrição da embed',  value: 'description', emoji: { name: '_messages_emoji', id: '1501804039451709441' } },
+    { label: 'Campos',         description: 'Editar campos da embed',     value: 'fields',      emoji: { name: '_camp_emoji',    id: '1501804013262475275' } },
+    { label: 'Autor',          description: 'Editar autor da embed',      value: 'author',      emoji: { name: '_silueta_emoji', id: '1501804126487580773' } },
+    { label: 'Cor',            description: 'Editar cor da embed',        value: 'color',       emoji: { name: '_pincel_emoji',  id: '1501804122943389716' } },
+    { label: 'URL',            description: 'Editar URL da embed',        value: 'url',         emoji: { name: '_transfer_emoji',id: '1501803997583904810' } },
+    { label: 'Thumbnail',      description: 'Editar thumbnail da embed',  value: 'thumbnail',   emoji: { name: '_star_emoji',    id: '1501804049563910285' } },
+    { label: 'Imagem',         description: 'Editar imagem da embed',     value: 'image',       emoji: { name: '_search_emoji',  id: '1501803928973476023' } },
+    { label: 'Footer',         description: 'Editar footer da embed',     value: 'footer',      emoji: { name: '_fixe_emoji',    id: '1501804120615555132' } },
+    { label: 'Timestamp',      description: 'Editar timestamp da embed',  value: 'timestamp',   emoji: { name: 'clock_emoji',    id: '1501804058699366470' } },
 ];
 
 const SECTION_LABELS = {
