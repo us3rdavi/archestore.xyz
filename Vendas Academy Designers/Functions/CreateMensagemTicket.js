@@ -10,18 +10,28 @@ const {
 const { tickets } = require("../DataBaseJson");
 
 function buildTicketComponents(ggg, aparencia) {
-    const container = new ContainerBuilder().setAccentColor(0x5865F2);
+    const container = new ContainerBuilder();
+
+    if (aparencia.color) {
+        try {
+            container.setAccentColor(parseInt(aparencia.color.replace('#', ''), 16));
+        } catch (e) {
+            container.setAccentColor(0x5865F2);
+        }
+    } else {
+        container.setAccentColor(0x5865F2);
+    }
 
     const tituloEmoji = aparencia.emoji ? `${aparencia.emoji} ` : `🎧 `;
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-            `## ${tituloEmoji}${aparencia.title || 'Support Center'}`
+            `## ${tituloEmoji}${aparencia.title || 'Central de Suporte'}`
         )
     );
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-            aparencia.description || 'Select the option that best matches your needs.'
+            aparencia.description || 'Selecione a opção que melhor se adequa às suas necessidades.'
         )
     );
 
@@ -37,7 +47,7 @@ function buildTicketComponents(ggg, aparencia) {
     funcoes.forEach(([key, funcao]) => {
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(
-                `**${funcao.predescricao || funcao.nome}**\n-# Press **${funcao.nome}** to open the matching ticket flow.`
+                `**${funcao.predescricao || funcao.nome}**\n-# Clique em **${funcao.nome}** para abrir um ticket.`
             )
         );
 
@@ -46,7 +56,9 @@ function buildTicketComponents(ggg, aparencia) {
             .setLabel(funcao.nome)
             .setStyle(1);
 
-        if (funcao.emoji) btn.setEmoji(funcao.emoji);
+        if (funcao.emoji) {
+            try { btn.setEmoji(funcao.emoji); } catch (e) {}
+        }
 
         container.addActionRowComponents(
             new ActionRowBuilder().addComponents(btn)
@@ -57,7 +69,7 @@ function buildTicketComponents(ggg, aparencia) {
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-            `-# 🖥️ Our support team usually responds within 5-30 minutes.`
+            `-# 🖥️ Nossa equipe de suporte geralmente responde em 5 a 30 minutos.`
         )
     );
 
@@ -102,14 +114,11 @@ async function Checkarmensagensticket(client) {
             if (!channel) continue;
 
             const msg = await channel.messages.fetch(element.msgid);
-
             await msg.edit({
                 components: [container],
                 flags: MessageFlags.IsComponentsV2
             });
-        } catch (error) {
-            // Mensagem não existe mais ou sem acesso
-        }
+        } catch (error) {}
     }
 }
 

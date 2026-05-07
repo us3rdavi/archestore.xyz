@@ -4,7 +4,8 @@
             "banner": "https://media.discordapp.net/attachments/1381667384787603538/1384033242268831754/Suporte.png?ex=6850f4e7&is=684fa367&hm=5934378a9bbf33d1b2b4c559b423ad893abaeff69b7c2558dad04459c03d3fcb&=&format=webp&quality=lossless",
             "title": "Central de Suporte",
             "description": "Seja bem-vindo ao sistema de suporte da arche, selecione a opção que se adequa a você.\n\n> -# A Academy Designers não se responsabiliza pelos seus staffs \n> -# até porque não é um trabalho remunerado!",
-            "color": "#FF6600"
+            "color": "#FF6600",
+            "emoji": "<:emoji_1:1501809990569169077>"
         },
         "funcoes": {
             "Suporte": {
@@ -81,6 +82,16 @@
             },
             {
                 "msgid": "1501802014189944954",
+                "channelid": "1465571881758359700",
+                "guildid": "1396516441758367895"
+            },
+            {
+                "msgid": "1501804907601203211",
+                "channelid": "1465571881758359700",
+                "guildid": "1396516441758367895"
+            },
+            {
+                "msgid": "1501810419055071333",
                 "channelid": "1465571881758359700",
                 "guildid": "1396516441758367895"
             }

@@ -1542,7 +1542,7 @@ module.exports = {
             if (interaction.customId.startsWith('trocarpostagemticket')) {
                 const atualstatus24 = tickets.get("statusmsg") || false;
                 tickets.set("statusmsg", !atualstatus24);
-                painelTicket(interaction, client);
+                painelTicket(interaction);
             }
 
             if (interaction.customId.startsWith('painelconfigticket')) {
