@@ -16,8 +16,6 @@ const { QuickDB } = require('quick.db');
 const { configuracao, tickets, Emojis } = require('../../DataBaseJson');
 const centralCart = require('../../Functions/centralCartService');
 const { CreateTicket } = require('../../Functions/CreateTicket');
-const { qrGenerator } = require('../../Lib/QRCodeLib');
-const path = require('path');
 
 const db = new QuickDB();
 
@@ -131,10 +129,11 @@ async function processarCompra(interaction, dadosCompra) {
     let checkout;
     try {
         checkout = await centralCart.createCheckout({
-            packages: [{ id: packageId, quantity: 1 }],
-            discord_id: interaction.user.id,
+            cart: [{ package_id: packageId, quantity: 1 }],
+            client_discord: interaction.user.id,
             client_name: interaction.user.globalName || interaction.user.username,
-            email,
+            client_email: email,
+            terms: true,
             gateway,
         });
     } catch (err) {
@@ -143,9 +142,11 @@ async function processarCompra(interaction, dadosCompra) {
         return interaction.editReply({ components: [c], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
     }
 
-    const pixCode = checkout?.payment?.pix_code || checkout?.pix_code || checkout?.pix?.code || checkout?.qr_code || checkout?.qr_code_text || null;
-    const orderId = checkout?.id || checkout?.order_id || checkout?.internal_id || '—';
-    const valorFmt = checkout?.formatted_price || checkout?.price_display || preco;
+    const pixCode  = checkout?.pix_code  || null;
+    const qrBase64 = checkout?.qr_code   || null;
+    const orderId  = checkout?.order_id  || checkout?.id || '—';
+    const valorFmt = checkout?.formatted_price || preco;
+    const returnUrl = checkout?.return_url || null;
 
     const result = new ContainerBuilder().setAccentColor(0x57F287);
     result.addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${Emojis.get('neworder_emoji')} Pedido criado!\n-# ID: \`${orderId}\``));
@@ -153,23 +154,34 @@ async function processarCompra(interaction, dadosCompra) {
     result.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `**${Emojis.get('store_emoji')} Produto:** ${nome}\n` +
         `**${Emojis.get('_money_emoji')} Valor:** ${valorFmt}\n` +
-        `**${Emojis.get('pix_stamp_emoji')} Método:** ${checkout?.formatted_gateway || gateway}`
+        `**${Emojis.get('pix_stamp_emoji')} Método:** ${gateway === 'PIX' ? 'PIX' : 'Cartão de Crédito'}`
     ));
 
     const extraFiles = [];
-    if (pixCode) {
+
+    if (gateway === 'PIX' && pixCode) {
         result.addSeparatorComponents(new SeparatorBuilder());
         result.addTextDisplayComponents(new TextDisplayBuilder().setContent(
             `**${Emojis.get('pix_stamp_emoji')} Código PIX — Copia e Cola:**\n\`\`\`\n${pixCode}\n\`\`\``
         ));
-        try {
-            const gen = new qrGenerator({ imagePath: path.join(__dirname, '../../Handler/aaaaa.png') });
-            const qr = await gen.generate(pixCode);
-            if (qr.status === 'success') {
-                extraFiles.push(new AttachmentBuilder(Buffer.from(qr.response, 'base64'), { name: 'qrcode.png' }));
-                result.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${Emojis.get('information_emoji')} QR Code disponível na imagem abaixo.`));
-            }
-        } catch (e) {}
+        if (qrBase64) {
+            extraFiles.push(new AttachmentBuilder(Buffer.from(qrBase64, 'base64'), { name: 'qrcode.png' }));
+            result.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${Emojis.get('information_emoji')} Escaneie o QR Code abaixo para pagar.`));
+        }
+    } else if (returnUrl) {
+        result.addSeparatorComponents(new SeparatorBuilder());
+        result.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+            `**${Emojis.get('information_emoji')} Acesse o link para finalizar o pagamento:**\n${returnUrl}`
+        ));
+    }
+
+    if (returnUrl) {
+        result.addSeparatorComponents(new SeparatorBuilder());
+        result.addActionRowComponents(
+            new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setLabel('Ver Pedido').setStyle(ButtonStyle.Link).setURL(returnUrl)
+            )
+        );
     }
 
     await interaction.editReply({ components: [result], flags: MessageFlags.IsComponentsV2, embeds: [], content: '', files: extraFiles });
