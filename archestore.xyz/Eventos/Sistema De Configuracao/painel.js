@@ -105,7 +105,7 @@ module.exports = {
                     configuracao.delete('Instrucoes.mensagem');
                 }
 
-                await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Carregando...`, embeds: [], components: [] })
+                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
                 await Gerenciar2(interaction, client)
                 await interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Instruções definidas com sucesso!`, ephemeral: true });
             }
@@ -338,67 +338,6 @@ module.exports = {
         }
 
         if (interaction.isAutocomplete()) {
-            if (interaction.commandName == 'manage_item') {
-                const nomeDigitado = interaction.options.getFocused().toLowerCase();
-                const produtosFiltrados = produtos.filter(x => x.ID.toLowerCase().includes(nomeDigitado));
-                const produtosSelecionados = produtosFiltrados.slice(0, 25);
-
-                const config = produtosSelecionados.flatMap(x => {
-                    const matchingFields = x.data.Campos.filter(iterator =>
-                        iterator.Nome.toLowerCase().includes(nomeDigitado)
-                    );
-
-                    return matchingFields.map(iterator => ({
-                        name: `${x.data.Config.name} - ${iterator.Nome}`,
-                        value: `${x.ID}_${iterator.Nome}`,
-                    }));
-                });
-
-                const response = config.length > 0
-                    ? config
-                    : [{ name: 'Nenhum produto registrado foi encontrado', value: 'nada' }];
-
-                interaction.respond(response);
-            }
-
-            if (interaction.commandName == 'manage_stock') {
-                const nomeDigitado = interaction.options.getFocused().toLowerCase();
-                const produtosFiltrados = produtos.filter(x => x.ID.toLowerCase().includes(nomeDigitado));
-                const produtosSelecionados = produtosFiltrados.slice(0, 25);
-
-                const config = produtosSelecionados.flatMap(x => {
-                    const matchingFields = x.data.Campos.filter(iterator =>
-                        iterator.Nome.toLowerCase().includes(nomeDigitado)
-                    );
-
-                    return matchingFields.map(iterator => ({
-                        name: `${x.data.Config.name} - ${iterator.Nome}`,
-                        value: `${x.ID}_${iterator.Nome}`,
-                    }));
-                });
-
-                const response = config.length > 0
-                    ? config
-                    : [{ name: 'Nenhum produto registrado foi encontrado', value: 'nada' }];
-
-                interaction.respond(response);
-            }
-
-            if (interaction.commandName == 'manage_product') {
-                var nomeDigitado = interaction.options.getFocused().toLowerCase();
-                var produtosFiltrados = produtos.filter(x => x.ID.toLowerCase().includes(nomeDigitado));
-                var produtosSelecionados = produtosFiltrados.slice(0, 25);
-
-                const config = produtosSelecionados.map(x => {
-                    return {
-                        name: `${x.data.Config.name}`,
-                        value: `${x.ID}`
-                    }
-                })
-
-                interaction.respond(!config.length ? [{ name: `Nenhum produto registrado foi encontrado`, value: `nada` }] : config);
-
-            }
         }
 
         let valorticket
@@ -449,7 +388,7 @@ module.exports = {
 
             if (option === "realBRL") {
 
-                await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Carregando...`, embeds: [], components: [] })
+                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
 
                 Gerenciar2(interaction, client);
 
@@ -463,7 +402,7 @@ module.exports = {
 
             if (option == "permsConfig") {
 
-                await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Carregando...`, embeds: [], components: [] })
+                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
 
                 gerenciarPerms(interaction, client);
 
@@ -1387,7 +1326,7 @@ module.exports = {
 
             if (interaction.customId.startsWith('voltar1')) {
 
-                await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Carregando...`, embeds: [], components: [] })
+                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
 
                 Painel(interaction, client)
 
@@ -1693,7 +1632,7 @@ module.exports = {
 
             if (interaction.customId == "altMoeda") {
 
-                await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Carregando...`, embeds: [], components: [] });
+                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 });
 
                 moedaConfig(interaction, client);
 
@@ -1701,7 +1640,7 @@ module.exports = {
 
             if (interaction.customId == "protecaoBot") {
 
-                await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Carregando...`, embeds: [], components: [] });
+                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 });
 
                 const owners = owner.map(rs => `<@${rs}>`).join(', ')
 
@@ -1828,7 +1767,7 @@ module.exports = {
 
             if (interaction.customId.startsWith('voltar3')) {
 
-                await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Carregando...`, embeds: [], components: [] })
+                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
 
                 Gerenciar2(interaction, client)
 
@@ -1836,7 +1775,7 @@ module.exports = {
 
             if (interaction.customId.startsWith('voltar00')) {
 
-                await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Carregando...`, embeds: [], components: [] })
+                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
 
                 Painel(interaction, client)
 
@@ -1845,13 +1784,13 @@ module.exports = {
 
             if (interaction.customId.startsWith('painelconfigvendas')) {
 
-                await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Carregando...`, embeds: [], components: [] })
+                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
 
                 Gerenciar2(interaction, client)
 
             }
             if (interaction.customId.startsWith('voltarsendlogo')) {
-                await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Carregando...`, embeds: [], components: [] })
+                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
                 Gerenciar2(interaction, client)
             }
             if (interaction.customId == "botaoduvidas") {
@@ -1956,7 +1895,7 @@ module.exports = {
                 await interaction.update({ content: ``, embeds: [], components: [selectmenu] })
             }
             if (interaction.customId == "voltarProtect") {
-                await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Carregando...`, embeds: [], components: [] })
+                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
                 protectConfig(interaction, client);
             }
             if (interaction.customId == "addcanalboasvindas") {

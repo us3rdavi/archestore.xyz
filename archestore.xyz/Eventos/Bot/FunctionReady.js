@@ -1,8 +1,7 @@
 const { carregarCache } = require('../../Handler/EmojiFunctions');
 const { WebhookClient } = require('discord.js');
 const { CloseThreds } = require('../../Functions/CloseThread');
-const { VerificarPagamento } = require('../../Functions/VerficarPagamento');
-const { EntregarPagamentos } = require('../../Functions/AprovarPagamento');
+const { iniciarNotificacoes } = require('../../Functions/CCNotificacoes');
 const { CheckPosition } = require('../../Functions/PosicoesFunction.js');
 const { configuracao, Convites, GuildsInvites } = require('../../DataBaseJson');
 const { restart } = require('../../Functions/Restart.js');
@@ -49,14 +48,6 @@ module.exports = {
         // Chamar a função logo após o bot ligar
         await resetCarrinhosFile();
 
-        // Agenda para verificar e aprovar pagamentos
-
-        const verifyPayments = () => {
-            VerificarPagamento(client);
-        };
-        const deliverPayments = () => {
-            EntregarPagamentos(client, interaction);
-        };
         const closeThreads = () => {
             CloseThreds(client);
         };
@@ -67,9 +58,8 @@ module.exports = {
             Varredura(client)
         }, 86400000);
 
-        setInterval(verifyPayments, 10000);
-        setInterval(deliverPayments, 14000);
         setInterval(closeThreads, 60000);
+        iniciarNotificacoes(client);
 
         console.log(`${colors.green(`[LOG]`)} ${client.user.tag} Is ready!`)
         console.log(`${colors.green(`[LOG]`)} Version: v2.0.0`)
