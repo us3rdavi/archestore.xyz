@@ -40,7 +40,7 @@ module.exports = {
 
                 const embed = new EmbedBuilder()
                     .setAuthor({ name: `Dream Bot`, iconURL: "https://i.ibb.co/J3rR09C/Gif-Bot-Cyans.gif" })
-                    .setColor(configuracao.get('Cores.Principal') || '0cd4cc')
+                    .setColor(configuracao.get('Cores.Principal') || '5865F2')
                     .setTitle(`Canal Excluído`)
                     .addFields(
                         { name: `Canal:`, value: `\`${channel.name}\``, inline: true },

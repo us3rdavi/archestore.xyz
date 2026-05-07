@@ -6,7 +6,7 @@ async function restart(client, status) {
     if (configuracao.get('ConfigChannels.systemlogs') == null) return;
 
     const embed = new EmbedBuilder()
-        .setColor('#660f7e')
+        .setColor('#5865F2')
         .setTitle(`${Emojis.get('dream')} — Epro Reiniciado`)
         .addFields(
             { name: `${Emojis.get(`_tool_emoji`)} **Versão do eOS**`, value: `\`1.0\``, inline: true },

@@ -8,7 +8,7 @@ async function AcoesMsgsAutomatics(interaction, client) {
   const interval = intervalMinutes * 60 * 1000; // Converte milissegundos em minutos
 
   const embed = new EmbedBuilder()
-    .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
+    .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
     .setTitle(`Mensagens automáticas`)
     .setDescription(`Seu ${client.user.username} enviará mensagens automaticamente nos intervalos e no canal que você pré-definir.`)
     .addFields(

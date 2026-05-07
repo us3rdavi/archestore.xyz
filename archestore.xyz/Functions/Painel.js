@@ -90,8 +90,8 @@ async function Painel(interaction, client, config = { email: "" }) {
 async function Gerenciar2(interaction, client) {
     try {
         const ggg = produtos.valueArray();
-        const corPrincipal = configuracao.get('Cores.Principal') || '#660f7e';
-        let accentColor = 0x660f7e;
+        const corPrincipal = configuracao.get('Cores.Principal') || '#5865F2';
+        let accentColor = 0x5865F2;
         try { accentColor = parseInt(corPrincipal.replace('#', ''), 16); } catch (e) {}
 
         const container = new ContainerBuilder();
@@ -218,8 +218,8 @@ async function Gerenciar2(interaction, client) {
 async function definirduvidas(interaction, client) {
     try {
         const infoduvidas = configuracao.get(`BotaoDuvidas`);
-        const corPrincipal = configuracao.get('Cores.Principal') || '#660f7e';
-        let accentColor = 0x660f7e;
+        const corPrincipal = configuracao.get('Cores.Principal') || '#5865F2';
+        let accentColor = 0x5865F2;
         try { accentColor = parseInt(corPrincipal.replace('#', ''), 16); } catch (e) {}
 
         const container = new ContainerBuilder();

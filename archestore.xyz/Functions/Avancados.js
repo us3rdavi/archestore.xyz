@@ -27,7 +27,7 @@ function getSaudacao() {
 async function Avançados(interaction, client) {
 
   const embed = new EmbedBuilder()
-  .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
+  .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
   .setTitle(`Painel de Proteção`)
   .setAuthor({ name: `Gerenciamento de proteção`, iconURL: 'https://cdn.discordapp.com/emojis/1269773226960093184.png?size=2048' })
   .setDescription(`> ** ${getSaudacao()} Sr ${interaction.user}, Utilize os botões abaixo para configurar o ${client.user}.**`)
@@ -133,7 +133,7 @@ async function Configcomandos24(interaction, client) {
 async function Emojis24(interaction, client) {
 
   const embed = new EmbedBuilder()
-  .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
+  .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
   .setAuthor({ name: `Configuração De Emoji`, iconURL: 'https://cdn.discordapp.com/emojis/1269773226960093184.png?size=2048' })
   .setDescription(`> ** Configurações de emoji, para configurar os emojis utilize os botões abaixo, caso não saiba para que server esses emojis veja a imagem abaixo**`)
   .setImage("https://cdn.discordapp.com/attachments/1265464404728742029/1274493321535819847/image.png?ex=66c273e6&is=66c12266&hm=a1436106a04c631dbfec808ba58a34117f174e076671a3b3d9366d00f15c7be8&")
@@ -169,7 +169,7 @@ async function Emojis24(interaction, client) {
 async function Perms24(interaction, client) {
 
   const embed = new EmbedBuilder()
-  .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
+  .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
   .setAuthor({ name: `Configuração de permissão`, iconURL: 'https://cdn.discordapp.com/emojis/1269773226960093184.png?size=2048' })
   .setDescription(`> ** Configurações de Perm, Para outros usuarios poderem configurar a source**`)
 

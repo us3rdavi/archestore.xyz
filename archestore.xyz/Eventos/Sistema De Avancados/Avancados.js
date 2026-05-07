@@ -22,7 +22,7 @@ module.exports = {
 
         if (customId === 'select_menu' && interaction.values.includes('banunba24')) {
             const embedBanUnban = new EmbedBuilder()
-                .setColor(configuracao.get('Cores.Principal') || '0cd4cc')
+                .setColor(configuracao.get('Cores.Principal') || '5865F2')
                 .setTitle('Ban & Unban')
                 .setAuthor({ name: 'Sistema de proteção', iconURL: 'https://cdn.discordapp.com/emojis/1239020888398237766.gif?size=2048' })
                 .setDescription(`> ** ${getSaudacao()} Sr ${interaction.user}, Você Está configurando o comando Ban & Unban**`)
@@ -56,7 +56,7 @@ module.exports = {
 
         if (customId === 'select_menu' && interaction.values.includes('unlocklock24')) {
             const embedUnlockLock = new EmbedBuilder()
-                .setColor(configuracao.get('Cores.Principal') || '0cd4cc')
+                .setColor(configuracao.get('Cores.Principal') || '5865F2')
                 .setTitle('Unlock & Lock')
                 .setAuthor({ name: 'Sistema de proteção', iconURL: 'https://cdn.discordapp.com/emojis/1239020888398237766.gif?size=2048' })
                 .setDescription(`> ** ${getSaudacao()} Sr ${interaction.user}, Você Está configurando o comando Unlock & Lock**`)
@@ -89,7 +89,7 @@ module.exports = {
 
         if (customId === 'select_menu' && interaction.values.includes('clearnuke24')) {
             const embed24 = new EmbedBuilder()
-                .setColor(configuracao.get('Cores.Principal') || '0cd4cc')
+                .setColor(configuracao.get('Cores.Principal') || '5865F2')
                 .setTitle('Clear & Nuke')
                 .setAuthor({ name: 'Sistema de proteção', iconURL: 'https://cdn.discordapp.com/emojis/1239020888398237766.gif?size=2048' })
                 .setDescription(`> ** ${getSaudacao()} Sr ${interaction.user}, Você Está configurando o comando Clear & Nuke**`)

@@ -75,7 +75,7 @@ async function GerenciarCupom(interaction, produtoname, ggg222) {
             { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) }
         )
         .setTimestamp()
-        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc': configuracao.get('Cores.Principal')}`)
+        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2': configuracao.get('Cores.Principal')}`)
 
 
 

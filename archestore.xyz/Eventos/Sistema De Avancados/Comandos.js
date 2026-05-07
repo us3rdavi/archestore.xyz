@@ -18,21 +18,21 @@ module.exports = {
 
             const embeds = {
                 banUnban: new EmbedBuilder()
-                    .setColor(configuracao.get('Cores.Principal') || '0cd4cc')
+                    .setColor(configuracao.get('Cores.Principal') || '5865F2')
                     .setTitle('Configuração de Ban & Unban')
                     .setAuthor({ name: 'Sistema de proteção', iconURL: 'https://cdn.discordapp.com/emojis/1239020888398237766.gif?size=2048' })
                     .setDescription('> **Você está configurando o comando Ban & Unban. Selecione o canal e o cargo abaixo:**')
                     .setTimestamp(),
 
                 unlockLock: new EmbedBuilder()
-                    .setColor(configuracao.get('Cores.Principal') || '0cd4cc')
+                    .setColor(configuracao.get('Cores.Principal') || '5865F2')
                     .setTitle('Configuração de Unlock & Lock')
                     .setAuthor({ name: 'Sistema de proteção', iconURL: 'https://cdn.discordapp.com/emojis/1239020888398237766.gif?size=2048' })
                     .setDescription('> **Você está configurando o comando Unlock & Lock. Selecione o canal e o cargo abaixo:**')
                     .setTimestamp(),
 
                 clearNuke: new EmbedBuilder()
-                    .setColor(configuracao.get('Cores.Principal') || '0cd4cc')
+                    .setColor(configuracao.get('Cores.Principal') || '5865F2')
                     .setTitle('Configuração de Clear & Nuke')
                     .setAuthor({ name: 'Sistema de proteção', iconURL: 'https://cdn.discordapp.com/emojis/1239020888398237766.gif?size=2048' })
                     .setDescription('> **Você está configurando o comando Clear & Nuke. Selecione o canal e o cargo abaixo:**')

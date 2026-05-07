@@ -9,7 +9,7 @@ async function Varredura(client) {
     if (!configuracao.get('pagamentos.MpAPI')) return;
     let channel;
     const embed3 = new EmbedBuilder()
-        .setColor('#044cf4')
+        .setColor('#5865F2')
         .setTitle(`${Emojis.get(`system_emoji`)} — Varredura Anti-Fraude (Mercado Pago)`)
         .setDescription(`Seu Dream Bot está realizando uma varredura nos pagamentos para verificar a existência de quaisquer reembolsos suspeitos.`)
         .setFooter({ iconURL: "https://i.ibb.co/SBRZZjW/1238185861510594560.png", text: `Anti-Fraude - Dream Apps.` })

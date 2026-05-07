@@ -598,7 +598,7 @@ module.exports = {
                     const transcriptEmbed = new EmbedBuilder()
                         .setTitle(`${Emojis.get('_messages_emoji')} Transcript do Ticket: ${interaction.channel.name}`)
                         .setDescription(`O ticket foi encerrado e aqui está o registro completo da conversa.`)
-                        .setColor('#0cd4cc')
+                        .setColor('#5865F2')
                         .addFields(
                             { name: 'Ticket Criado Por', value: `<@${interaction.channel.name.split('・')[2]}>`, inline: true },
                             { name: 'Ticket Fechado Por', value: `${interaction.user}`, inline: true },
@@ -641,7 +641,7 @@ module.exports = {
                     const user = await interaction.client.users.fetch(userId);
 
                     const embed = new Discord.EmbedBuilder()
-                        .setColor('#0cd4cc')
+                        .setColor('#5865F2')
                         .setTitle(`${Emojis.get('_ticket_emoji')} Atualização do seu Ticket`)
                         .setDescription('Olá! Temos novidades sobre o seu ticket. Estamos aguardando sua resposta!')
                         .addFields(

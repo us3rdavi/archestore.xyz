@@ -712,7 +712,7 @@ async function DentroCarrinho1(thread, status, client) {
     let user = await client.users.fetch(ggg.user)
     let guild = await client.guilds.fetch(ggg.guild)
     const embed = new EmbedBuilder()
-        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
+        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
         .setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ dynamic: true }) ? user.displayAvatarURL({ dynamic: true }) : null })
         .setTitle(`Revisão do Pedido`)
 

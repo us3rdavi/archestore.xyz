@@ -5,8 +5,8 @@ const {
 const { produtos, Emojis, configuracao } = require("../DataBaseJson");
 
 function getAccentColor() {
-    const cor = configuracao.get('Cores.Principal') || '0cd4cc';
-    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x0cd4cc; }
+    const cor = configuracao.get('Cores.Principal') || '5865F2';
+    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
 }
 
 async function AcoesAutomaticsConfigs(interaction, client) {

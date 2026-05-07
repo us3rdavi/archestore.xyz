@@ -13,7 +13,7 @@ async function autoreact24(interaction, client) {
     const botaoemoji = mudarstatus ? "1248300875978641419" : "1248300851282579552";
 
     const embed = new EmbedBuilder()
-    .setColor(`${configuracao.get('Cores.Principal') || '0cd4cc'}`)
+    .setColor(`${configuracao.get('Cores.Principal') || '5865F2'}`)
     .setTitle("Auto Reação - Sistema")
     .setAuthor({ name: "Auto Reação - Sistema", iconURL: 'https://cdn.discordapp.com/emojis/1269773226960093184.png?size=2048' })
     .setDescription("`**Sistema de auto reação configurável.**")

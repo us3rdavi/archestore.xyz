@@ -64,7 +64,7 @@ async function GerenciarCampos2(interaction, campo, produtoname, update, reply) 
             { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) }
         )
         .setTimestamp()
-        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc': configuracao.get('Cores.Principal')}`)
+        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2': configuracao.get('Cores.Principal')}`)
         .setTitle(`${gggaaa.Nome}`)
         .addFields(
             { name: `**Estoque**`, value: `\`${gggaaa.estoque.length}\``, inline: true },
@@ -216,7 +216,7 @@ async function GerenciarCampos(interaction, produtoname) {
             { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) }
         )
         .setTimestamp()
-        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc': configuracao.get('Cores.Principal')}`)
+        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2': configuracao.get('Cores.Principal')}`)
 
 
 

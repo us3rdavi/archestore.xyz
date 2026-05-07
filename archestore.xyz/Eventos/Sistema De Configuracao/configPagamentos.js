@@ -450,7 +450,7 @@ module.exports = {
                                     name: `Modalmais`, value: `\`modalmais\``, inline: true
                                 }
                             )
-                            .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
+                            .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
                             .setFooter(
                                 { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) }
                             )
@@ -544,7 +544,7 @@ module.exports = {
                             embeds: [
                                 new EmbedBuilder()
                                     .setDescription(`Ops... parece que o banco que você setou é inválido, olhe exemplos de banco clicando no botão **Exemplos Bancos** abaixo.`)
-                                    .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
+                                    .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
                             ], components: [
                                 new ActionRowBuilder()
                                     .addComponents(

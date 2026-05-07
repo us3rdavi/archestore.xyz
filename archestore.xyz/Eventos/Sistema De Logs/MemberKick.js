@@ -40,7 +40,7 @@ module.exports = {
 
                 const embed = new EmbedBuilder()
                     .setAuthor({ name: `Membro Banido`, iconURL: "https://cdn.discordapp.com/emojis/1292306233897914570.webp?size=44&quality=lossless" })
-                    .setColor(configuracao.get('Cores.Principal') || '0cd4cc')
+                    .setColor(configuracao.get('Cores.Principal') || '5865F2')
                     .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
                     .addFields(
                         { name: `Moderador:`, value: `\`${executor}\`\n<@!${logEntry.executor.id}>`, inline: true },

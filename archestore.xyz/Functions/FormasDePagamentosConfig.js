@@ -15,7 +15,7 @@ async function FormasDePagamentos(interaction) {
             { name: `Stripe`, value: `${Emojis.get(`negative_emoji`)} \`Desabilitado\`\n${Emojis.get(`negative_emoji`)} \`Não configurado\``, inline: true },
             { name: `Pix Manual`, value: `${configuracao.get("pagamentos.SemiAutomatico.status") != true ? `${Emojis.get(`negative_emoji`)} \`Desabilitado\`` : `${Emojis.get(`confirmed_emoji`)} \`Habilitado\``}\n${configuracao.get("pagamentos.SemiAutomatico.pix") != null ? `${Emojis.get(`confirmed_emoji`)} \`Configurado\`` : `${Emojis.get(`negative_emoji`)} \`Não configurado\``}`, inline: true }
         )
-        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '#660f7e' : configuracao.get('Cores.Principal')}`)
+        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '#5865F2' : configuracao.get('Cores.Principal')}`)
         .setFooter(
             { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) }
         )
@@ -71,7 +71,7 @@ async function EfiBankConfiguracao(client, interaction, a) {
     const embed = new EmbedBuilder()
         .setTitle(`Configurar Efi Bank - ${configuracao.get("pagamentos.EfiOnOff") ? `HABILITADO` : `DESABILITADO`}`)
         .setDescription(`Aqui, você pode configurar tudo referente ao Efi Bank.`)
-        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '#660f7e' : configuracao.get('Cores.Principal')}`)
+        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '#5865F2' : configuracao.get('Cores.Principal')}`)
 
 
     if (configuracao.get("pagamentos.EfiAPI.client_id")) {

@@ -38,7 +38,7 @@ module.exports = {
     }
 
     const embed = new Discord.EmbedBuilder()
-      .setColor('#8b008b')
+      .setColor('#5865F2')
       .setTitle('**Parabéns!** Você ganhou um cupom de **desconto!**')
       .setDescription(`${user} Você foi **selecionado(a)** automáticamente pelo sistema para receber um cupom **exclusivo!**\n\n**Cupom:** \`${cupom}\`\n**Aproveite para realizar sua compra agora mesmo!**`)
       .addFields({ name: 'Válido somente para o produto:', value: `<#${channel.id}>` })

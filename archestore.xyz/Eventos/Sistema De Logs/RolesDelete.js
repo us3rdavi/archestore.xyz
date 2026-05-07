@@ -40,7 +40,7 @@ module.exports = {
 
                 const embed = new EmbedBuilder()
                     .setAuthor({ name: `Astral Bot`, iconURL: "https://i.ibb.co/J3rR09C/Gif-Bot-Cyans.gif" })
-                    .setColor(configuracao.get('Cores.Principal') || '0cd4cc')
+                    .setColor(configuracao.get('Cores.Principal') || '5865F2')
                     .setTitle(`Cargo Excluído`)
                     .addFields(
                         { name: `Cargo:`, value: `\`${role.name}\``, inline: true },

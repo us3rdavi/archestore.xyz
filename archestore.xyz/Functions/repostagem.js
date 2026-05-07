@@ -9,7 +9,7 @@ let cronJob = null;
 async function repostarProdutos(client) {
     const embed = new EmbedBuilder()
         .setAuthor({ name: '— Repostagem Automática', iconURL: 'https://cdn.discordapp.com/emojis/1230562921822683176.webp?size=44&quality=lossless' })
-        .setColor('#acf4c4')
+        .setColor('#5865F2')
         .setDescription('Seu ReturNBot iniciou um processo para repostar todas as mensagens de venda no servidor.')
         .setFooter({ text: 'Ações Automáticas - Astral Bot.', iconURL: 'https://cdn.discordapp.com/emojis/1285706921910734898.webp?size=44&quality=lossless' })
         .setTimestamp();

@@ -164,7 +164,7 @@ async function updateConfigEmbed(interaction, client) {
 
     const embed = new EmbedBuilder()
         .setTitle('Configurações de Mensagens Automáticas')
-        .setColor(configuracao.get('Cores.Principal') || '0cd4cc');
+        .setColor(configuracao.get('Cores.Principal') || '5865F2');
 
     msgData.forEach(data => {
         embed.addFields([

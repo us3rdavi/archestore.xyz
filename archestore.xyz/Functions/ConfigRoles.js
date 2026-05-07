@@ -6,8 +6,8 @@ const { configuracao, Emojis } = require("../DataBaseJson");
 
 
 async function ConfigChannels(interaction, client) {
-    const corPrincipal = configuracao.get('Cores.Principal') || '0cd4cc';
-    let accentColor = 0x0cd4cc;
+    const corPrincipal = configuracao.get('Cores.Principal') || '5865F2';
+    let accentColor = 0x5865F2;
     try { accentColor = parseInt(corPrincipal.replace('#', ''), 16); } catch (e) {}
 
     const row1 = new ActionRowBuilder()
@@ -74,8 +74,8 @@ async function ConfigChannels(interaction, client) {
 
 
 async function ConfigRoles(interaction, client) {
-    const corPrincipal = configuracao.get('Cores.Principal') || '0cd4cc';
-    let accentColor = 0x0cd4cc;
+    const corPrincipal = configuracao.get('Cores.Principal') || '5865F2';
+    let accentColor = 0x5865F2;
     try { accentColor = parseInt(corPrincipal.replace('#', ''), 16); } catch (e) {}
 
     const row1 = new ActionRowBuilder()

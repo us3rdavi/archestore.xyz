@@ -12,7 +12,7 @@ function Posicao1(interaction, client) {
 
     const embed = new EmbedBuilder()
         .setTitle(`Configurar posições`)
-        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
+        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
         .setDescription(`As "posições" são cargos personalizáveis que você pode definir para que os clientes recebam quando gastam uma certa quantia no servidor.`)
         .addFields(
             { name: `Primeira Colocação`, value: `${pos1 == undefined ? `Não configurado` : `Recebe o cargo <@&${pos1.role}> após gastar \`R$ ${Number(pos1.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`.`}` },

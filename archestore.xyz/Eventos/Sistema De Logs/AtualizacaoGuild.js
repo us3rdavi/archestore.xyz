@@ -16,7 +16,7 @@ module.exports = {
                 
                 const embed = new EmbedBuilder()
                     .setAuthor({ name: `Dream Bot`, iconURL: "https://i.ibb.co/J3rR09C/Gif-Bot-Cyans.gif" })
-                    .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
+                    .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
                     .setTitle(`URL Personalizada Alterada`)
                     .setFields(
                         { name: `URL Antiga`, value: `\`${oldGuild.vanityURLCode}\``, inline: true },

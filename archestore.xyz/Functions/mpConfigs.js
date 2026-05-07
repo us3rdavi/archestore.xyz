@@ -22,7 +22,7 @@ async function mpConfigs(interaction) {
             { name: `${Emojis.get(`_mp_emoji`)} Access Token`, value: `-# *Não compartilhe com ninguem*\n${maskedMpAPI}` },
             { name: `${Emojis.get(`_fixe_emoji`)} Bancos Bloqueados`, value: `${blockedBanksArray.length <= 0 ? `Nenhum` : `\`\`\`${BancosBloqueados}\`\`\``}` }
         )
-        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
+        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
         .setFooter(
             { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) }
         )
@@ -93,7 +93,7 @@ async function BloquearConta(client, interaction) {
     const embedx = new EmbedBuilder()
         .setTitle(`Contas Bloqueadas`)
         .setDescription(`Configure os bancos que serão bloqueados no sistema de pagamento Mercado Pago, caso o seu bot receba pagamentos de algum desses bancos, a transação será recusada.`)
-        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
+        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
         .setFooter(
             { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) }
         )

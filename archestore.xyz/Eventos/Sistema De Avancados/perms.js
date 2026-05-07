@@ -117,7 +117,7 @@ module.exports = {
                 .setAuthor({ name: `${client.user.username}`, iconURL: 'https://cdn.discordapp.com/emojis/1212479066784006214.png?size=2048' })
                 .setTitle(`${Emojis.get('confirmed_emoji')} Membros Autorizados (${mempegarperm24.length})`)
                 .setDescription(mempegarperm24.join('\n'))
-                .setColor('#0cd4cc')
+                .setColor('#5865F2')
                 .setFooter({ text: 'Sistema De Permissão', iconURL: 'https://cdn.discordapp.com/emojis/1250586149630644234.gif?size=2048' });
 
             return interaction.reply({ embeds: [embed], ephemeral: true });

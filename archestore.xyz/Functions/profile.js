@@ -14,7 +14,7 @@ async function profileuser(interaction, userID = null) {
 
 
     const embed = new EmbedBuilder()
-        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '635b44': configuracao.get('Cores.Principal')}`)
+        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2': configuracao.get('Cores.Principal')}`)
         .setAuthor({ name: `${interaction.user.username}`, iconURL: `${interaction.user.displayAvatarURL({ dynamic: true }) ? interaction.user.displayAvatarURL({ dynamic: true }) : null}` })
         .setTitle(`Perfil`)
         .addFields(

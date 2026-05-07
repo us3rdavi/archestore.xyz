@@ -4,7 +4,7 @@ const { configuracao } = require("../DataBaseJson")
 async function semiConfigs(interaction, client) {
 
     const embed = new EmbedBuilder()
-        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
+        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
         .setTitle(`Configurar Pagamento Manual - ${configuracao.get("pagamentos.SemiAutomatico.status") == false ? "Desabilitado" : "Habilitado"}`)
         .setDescription(`Aqui, você pode definir uma chave Pix e uma mensagem para o seu ${client.user.username} enviar quando a forma de pagamento "Pix" for selecionada. Ele irá gerar um QR Code com o valor exato do carrinho para essa chave. Lembre-se de que ele não consegue verificar se o pagamento foi aprovado, então você precisará clicar em "Confirmar pagamento" para iniciar o processo de entrega.`)
         .addFields(

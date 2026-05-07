@@ -59,7 +59,7 @@ module.exports = {
                     let channelNames = config.channels ? config.channels.map(id => `<#${id}>`).join(', ') : 'Não configurado';
 
                     const embed = new EmbedBuilder()
-                        .setColor(configuracao.get('Cores.Principal') || '0cd4cc')
+                        .setColor(configuracao.get('Cores.Principal') || '5865F2')
                         .setTitle('Configuração Atual de Bloqueio Automático')
                         .addFields(
                             { name: 'Horário de Bloqueio', value: config.abrir || 'Não configurado', inline: true },
@@ -181,7 +181,7 @@ module.exports = {
 
                     // Update the embed with new configuration details
                     const embed = new EmbedBuilder()
-                        .setColor(configuracao.get('Cores.Principal') || '0cd4cc')
+                        .setColor(configuracao.get('Cores.Principal') || '5865F2')
                         .setTitle('Configuração Atualizada de Bloqueio Automático')
                         .addFields(
                             { name: 'Horário de Bloqueio', value: lockTime, inline: true },

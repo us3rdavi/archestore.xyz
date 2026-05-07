@@ -19,7 +19,7 @@ module.exports = {
             const autoReactCanais = configuracao.get(`AutoReact.Canais`) || ["Nenhum canal configurado"];
         
             const embed24 = new EmbedBuilder()
-                .setColor(`${configuracao.get('Cores.Principal') || '0cd4cc'}`)
+                .setColor(`${configuracao.get('Cores.Principal') || '5865F2'}`)
                 .setTitle("Auto Reação - Sistema")
                 .setAuthor({ name: "Auto Reação - Sistema", iconURL: 'https://cdn.discordapp.com/emojis/1269773226960093184.png?size=2048' })
                 .setDescription("> ** Sistema de auto reação configurável.**")
@@ -101,7 +101,7 @@ module.exports = {
             const autoReactCanais = configuracao.get(`AutoReact.Canais`) || ["Nenhum canal configurado"];
         
             const embed24 = new EmbedBuilder()
-                .setColor(`${configuracao.get('Cores.Principal') || '0cd4cc'}`)
+                .setColor(`${configuracao.get('Cores.Principal') || '5865F2'}`)
                 .setTitle("Auto Reação - Sistema")
                 .setAuthor({ name: "Auto Reação - Sistema", iconURL: 'https://cdn.discordapp.com/emojis/1269773226960093184.png?size=2048' })
                 .setDescription("> ** Sistema de auto reação configurável.**")
@@ -155,7 +155,7 @@ module.exports = {
             const autoReactCanais = configuracao.get(`AutoReact.Canais`) || ["Nenhum canal configurado"];
         
             const embed24 = new EmbedBuilder()
-                .setColor(`${configuracao.get('Cores.Principal') || '0cd4cc'}`)
+                .setColor(`${configuracao.get('Cores.Principal') || '5865F2'}`)
                 .setTitle("Auto Reação - Sistema")
                 .setAuthor({ name: "Auto Reação - Sistema", iconURL: 'https://cdn.discordapp.com/emojis/1269773226960093184.png?size=2048' })
                 .setDescription("> ** Sistema de auto reação configurável.**")

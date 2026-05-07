@@ -63,12 +63,12 @@ function scheduleJobs(client, automaticos) {
                     } while (fetched.size >= 2);
 
                     const embed_delet = new EmbedBuilder()
-                        .setColor(configuracao.get(`Cores.Principal`) || '0cd4cc')
+                        .setColor(configuracao.get(`Cores.Principal`) || '5865F2')
                         .setAuthor({ name: 'Limpeza Concluida', iconURL: 'https://media.discordapp.net/attachments/1249514076116353055/1250591781985321072/eu_tambem_tenho_7.png?ex=666b7fdb&is=666a2e5b&hm=02766731d86f520e59f85ce34d174bdf4461e4bf43639ff4fd1094c0e82090c6&=&format=webp&quality=lossless' })
                         .setDescription(`Total de \`${messagesDeleted}\` mensagens removidas.`);
 
                     const embed = new EmbedBuilder()
-                        .setColor(configuracao.get(`Cores.Principal`) || '0cd4cc')
+                        .setColor(configuracao.get(`Cores.Principal`) || '5865F2')
                         .setDescription("Este canal foi trancado automaticamente pelo sistema.")
                         .setFooter({ text: `Boa noite! Volte novamente às ${unlockTime}` })
                         .setTimestamp();
@@ -110,7 +110,7 @@ function scheduleJobs(client, automaticos) {
                     });
 
                     const embed = new EmbedBuilder()
-                        .setColor(configuracao.get(`Cores.Principal`) || '0cd4cc')
+                        .setColor(configuracao.get(`Cores.Principal`) || '5865F2')
                         .setDescription("Este canal foi liberado automaticamente pelo sistema.")
                         .setFooter({ text: `Bom dia!` })
                         .setTimestamp();

@@ -106,7 +106,7 @@ function GerenciarProduto(interaction, status, produtoname) {
     .setColor(
       `${
         configuracao.get(`Cores.Principal`) == null
-          ? "0cd4cc"
+          ? "5865F2"
           : configuracao.get("Cores.Principal")
       }`
     );

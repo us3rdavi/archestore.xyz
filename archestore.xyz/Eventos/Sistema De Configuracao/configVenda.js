@@ -46,7 +46,7 @@ module.exports = {
                 interaction.reply({ components: [row1], content: `Selecione o canal onde quer postar a mensagem.`, ephemeral: true, })
 
 
-                if (a1 == '') a1 = '#0cd4cc'
+                if (a1 == '') a1 = '#5865F2'
 
                 db.set(`${interaction.user.id}_colocarvenda`, { produto: ggg.name, colorembed: a1 })
             } else if (interaction.customId === 'awdawdawdawdawdwadwadawdwaadawdawfewfryty565') {
@@ -73,7 +73,7 @@ module.exports = {
 
                 if (a2 == '') a2 = 'Comprar'
 
-                if (a4 == '') a4 = '#0cd4cc'
+                if (a4 == '') a4 = '#5865F2'
 
 
                 const emojiRegex = /^<:.+:\d+>$|^<a:.+:\d+>$|^\p{Emoji}$/u;
