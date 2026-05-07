@@ -124,15 +124,3 @@ const job = schedule.scheduleJob({ hour: 5, minute: 55, tz: 'America/Sao_Paulo' 
     resetCarrinhos();
 });
 
-client.on("ready", async () => {
-    const activities = [
-        { name: `discord.gg/barrinha acesse já!`, type: 1, url: 'https://www.twitch.tv/discord' },
-    ];
-
-    let i = 0;
-    setInterval(() => {
-        if (i >= activities.length) i = 0;
-        client.user.setActivity(activities[i]);
-        i++;
-    }, 5 * 1000);
-});
