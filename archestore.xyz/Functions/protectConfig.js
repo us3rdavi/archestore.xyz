@@ -13,7 +13,7 @@ async function protectConfig(interaction, client) {
                     {
                         value: "permsConfig",
                         label: "Permissões",
-                        emoji: "1371593631328243713",
+                        emoji: "1501804064596558017",
                         description: "Usuários com permissões de gerenciar o bot"
                     }
                 )

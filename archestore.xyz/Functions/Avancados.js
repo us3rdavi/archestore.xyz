@@ -53,7 +53,7 @@ async function Avançados(interaction, client) {
         new ButtonBuilder()
         .setCustomId("permissaoadm")
         .setLabel('Add Perms')
-        .setEmoji("1371593631328243713")
+        .setEmoji("1501804064596558017")
         .setStyle(2)
         .setDisabled(false),
 

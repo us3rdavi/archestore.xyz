@@ -69,7 +69,7 @@ async function Painel(interaction, client, config = { email: "" }) {
                 new ButtonBuilder()
                     .setCustomId("actionsautomations")
                     .setLabel('Moderação')
-                    .setEmoji("1371593631328243713")
+                    .setEmoji("1501804067616325723")
                     .setStyle(2),
             );
 
@@ -171,7 +171,7 @@ async function Gerenciar2(interaction, client) {
             new ButtonBuilder()
                 .setCustomId("definirduvidas")
                 .setLabel(`Botão de Dúvidas`)
-                .setEmoji("1371593631328243713")
+                .setEmoji("1501804124277051593")
                 .setStyle(2),
         );
 

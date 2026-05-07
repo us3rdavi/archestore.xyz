@@ -791,21 +791,6 @@
             "url": "https://discord.gg/tR6AryzMr",
             "expiresTimestamp": 1778451322000,
             "uses": 0
-        },
-        {
-            "code": "u88PawFuq",
-            "temporary": false,
-            "maxAge": 2592000,
-            "maxUses": 0,
-            "inviterId": "804354181653463120",
-            "targetUser": null,
-            "targetApplication": null,
-            "targetType": null,
-            "channelId": "1396627839444582631",
-            "createdTimestamp": 1775564481250,
-            "url": "https://discord.gg/u88PawFuq",
-            "expiresTimestamp": 1778156481000,
-            "uses": 0
         }
     ]
 }

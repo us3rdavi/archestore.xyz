@@ -197,7 +197,7 @@ async function EntregarPagamentos(client) {
 
             try {
                 const embedlogpublica = new EmbedBuilder()
-                    .setColor(`#62288d`)
+                    .setColor(`#5865F2`)
                     .setTitle(`${Emojis.get(`confirmedpayment_emoji`)} Compra Realizada`)
                     .setDescription(`O usuário <@!${user.id}> realizou uma compra no servidor`)
                     .addFields(

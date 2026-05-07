@@ -118,7 +118,7 @@ async function DentroCarrinhoEfiBank(client, interaction) {
             const attachment = new AttachmentBuilder(buffer, { name: "payment.png" });
 
             const embed = new EmbedBuilder()
-                .setColor(`${configuracao.get(`QRCode.principal`) || `#328dbc`}`)
+                .setColor(`${configuracao.get(`QRCode.principal`) || `#5865F2`}`)
                 .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL({ dynamic: true }) ? interaction.user.displayAvatarURL({ dynamic: true }) : null })
                 .setTitle(`Pagamento via PIX criado`)
                 .addFields(

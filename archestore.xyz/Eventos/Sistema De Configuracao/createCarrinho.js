@@ -157,7 +157,7 @@ module.exports = {
                     const attachment = new Discord.AttachmentBuilder(buffer, { name: "payment.png" });
 
                     const embed = new EmbedBuilder()
-                        .setColor(`${configuracao.get(`Cores.Principal`) == null ? `#2b2d31` : configuracao.get(`Cores.Principal`)}`)
+                        .setColor(`${configuracao.get(`Cores.Principal`) == null ? `#5865F2` : configuracao.get(`Cores.Principal`)}`)
                         .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL({ dynamic: true }) ? interaction.user.displayAvatarURL({ dynamic: true }) : null })
                         .setTitle(`Pagamento via PIX criado`)
                         .addFields(

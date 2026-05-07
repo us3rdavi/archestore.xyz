@@ -14,7 +14,7 @@ async function replyMessage({ interaction, type, message, components }) {
             return interaction.reply({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
         }
         case "loading": {
-            embed.setColor("#2b2d31");
+            embed.setColor("#5865F2");
             embed.setDescription(`${Emojis.get(`loading_emoji`)} ${message}`);
             return interaction.reply({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
         }
@@ -35,7 +35,7 @@ async function editReplyMessage({ interaction, type, message, components }) {
             return interaction.editReply({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
         }
         case "loading": {
-            embed.setColor("#2b2d31");
+            embed.setColor("#5865F2");
             embed.setDescription(`${Emojis.get(`loading_emoji`)} ${message}`);
             return interaction.editReply({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
         }
@@ -56,7 +56,7 @@ async function updateMessage({ interaction, type, message, components }) {
             return interaction.update({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
         }
         case "loading": {
-            embed.setColor("#2b2d31");
+            embed.setColor("#5865F2");
             embed.setDescription(`${Emojis.get(`loading_emoji`)} ${message}`);
             return interaction.update({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
         }
@@ -77,7 +77,7 @@ async function followUpMessage({ interaction, type, message, components }) {
             return interaction.followUp({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
         }
         case "loading": {
-            embed.setColor("#2b2d31");
+            embed.setColor("#5865F2");
             embed.setDescription(`${Emojis.get(`loading_emoji`)} ${message}`);
             return interaction.followUp({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
         }

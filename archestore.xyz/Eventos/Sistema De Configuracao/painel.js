@@ -10,7 +10,6 @@ const { gerenciarPerms } = require("../../Functions/modUsersPerms");
 const { configrole24 } = require("../../Functions/cargocomprar.js")
 const { EstatisticasKing } = require("../../index.js");
 const { profileuser } = require("../../Functions/profile");
-const { anunciar, anunciarembed24 } = require("../../Functions/anunciar.js")
 const { produtos, configuracao, tickets,  estatisticas } = require("../../DataBaseJson");
 const { Avançados, Configcomandos24, Emojis24, Perms24 } = require("../../Functions/Avancados.js");
 const { Posicao1 } = require("../../Functions/PosicoesFunction.js");
@@ -696,7 +695,7 @@ module.exports = {
                     const owner = await interaction.guild.members.fetch(ultimosNumeros);
             
                     const confirmationEmbed = new EmbedBuilder()
-                        .setColor('#2b2d31')
+                        .setColor('#5865F2')
                         .setDescription(`${Emojis.get('_staff_emoji')} Olá <@!${ultimosNumeros}>, Seu Ticket foi Assumido Pelo Staff ${staffMember}.`);
             
                     const buttonRow = new ActionRowBuilder().addComponents(
@@ -716,7 +715,7 @@ module.exports = {
                     }
             
                     const confirmationEmbed222 = new EmbedBuilder()
-                        .setColor('#2b2d31')
+                        .setColor('#5865F2')
                         .setDescription(`${Emojis.get('_staff_emoji')} Olá <@!${ultimosNumeros}>, Seu Ticket foi Assumido Pelo Staff ${staffMember}.`);
             
                     tickets[ticketId] = { hasStaffInteracted: true, hasPokeStaffBeenClicked: false, staffMemberId: staffMember.id };
@@ -1121,7 +1120,7 @@ module.exports = {
                     await interaction.reply({
                         embeds: [
                             new EmbedBuilder()
-                                .setColor(`#2b2d31`)
+                                .setColor(`#5865F2`)
                                 .setDescription(`${Emojis.get(`confirmed_emoji`)} Seu AutoClear foi parado e as configurações foram resetadas.`)
                         ],
                         content: `${interaction.user}`,
@@ -1132,7 +1131,7 @@ module.exports = {
                     await interaction.reply({
                         embeds: [
                             new EmbedBuilder()
-                                .setColor(`#2b2d31`)
+                                .setColor(`#5865F2`)
                                 .setDescription(`${Emojis.get(`negative_emoji`)} | Ocorreu um erro ao parar o AutoClear.`)
                         ],
                         content: `${interaction.user}`,
@@ -1732,12 +1731,8 @@ module.exports = {
                 autoreact24(interaction, client)
             }
             
-            if (interaction.customId.startsWith('contentanunciar24')) {
-                anunciar(interaction, client)
-            }
-
-            if (interaction.customId.startsWith('embedanunciar24')) {
-                anunciarembed24(interaction, client)
+            if (interaction.customId.startsWith('contentanunciar24') || interaction.customId.startsWith('embedanunciar24')) {
+                return interaction.reply({ content: `${Emojis.get('negative_emoji')} Use o comando \`/anunciar\` para criar anúncios.`, ephemeral: true });
             }
             
             

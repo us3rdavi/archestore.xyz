@@ -28,7 +28,7 @@ module.exports = {
               new ButtonBuilder()
                 .setCustomId("painelconfigticket")
                 .setLabel("Central de Atendimento")
-                .setEmoji("1371593631328243713")
+                .setEmoji("1501803899085131867")
                 .setStyle(1)
                 .setDisabled(false),
               new ButtonBuilder()
@@ -68,7 +68,7 @@ module.exports = {
               new ButtonBuilder()
                 .setCustomId("actionsautomations")
                 .setLabel('Moderação')
-                .setEmoji("1371593631328243713")
+                .setEmoji("1501804067616325723")
                 .setStyle(2),
             );
         

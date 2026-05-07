@@ -195,7 +195,7 @@ async function CreateTicket(interaction, valor) {
                         .addOptions(options.slice(0, 25));
 
                     const selectEmbed = new EmbedBuilder()
-                        .setColor('#2F3136')
+                        .setColor('#5865F2')
                         .setDescription(
                             `## Compras Encontradas ${Emojis.get('lupa')}\n` +
                             `- Caso o assunto for sobre algum produto que você comprou, escolha a opção abaixo.\n` +

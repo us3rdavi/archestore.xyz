@@ -1,54 +1,86 @@
-const { EmbedBuilder, ApplicationCommandType, ActionRowBuilder, ButtonBuilder } = require("discord.js");
+const {
+    ActionRowBuilder, ButtonBuilder,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
+} = require('discord.js');
+const { configuracao, Emojis } = require('../DataBaseJson');
 
 async function Gerenciar(interaction, client) {
+    try {
+        const corPrincipal = configuracao.get('Cores.Principal') || '#5865F2';
+        let accentColor = 0x5865F2;
+        try { accentColor = parseInt(corPrincipal.replace('#', ''), 16); } catch (e) {}
 
+        const container = new ContainerBuilder();
+        container.setAccentColor(accentColor);
 
-    const row1 = new ActionRowBuilder()
-        .addComponents(
+        container.addTextDisplayComponents(
+            new TextDisplayBuilder().setContent(
+                `## ${Emojis.get('_settings_emoji')} Definições\n` +
+                `Gerencie as configurações do bot.`
+            )
+        );
+
+        container.addSeparatorComponents(new SeparatorBuilder());
+
+        const row1 = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('configcargos')
+                    .setLabel('Cargos')
+                    .setEmoji(Emojis.get('_multi_silueta_emoji'))
+                    .setStyle(2),
+                new ButtonBuilder()
+                    .setCustomId('personalizarcanais')
+                    .setLabel('Canais')
+                    .setEmoji(Emojis.get('_camp_emoji'))
+                    .setStyle(2),
+            );
+
+        const row2 = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('formasdepagamentos')
+                    .setLabel('Formas de Pagamento')
+                    .setEmoji(Emojis.get('_money_emoji'))
+                    .setStyle(1),
+            );
+
+        const row3 = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
-                .setCustomId("configcargos")
-                .setLabel('Cargos')
-                .setEmoji("1371605365799780462")
+                .setCustomId('voltar00')
+                .setEmoji(Emojis.get('_back_emoji'))
                 .setStyle(2),
             new ButtonBuilder()
-                .setCustomId("personalizarcanais")
-                .setLabel('Canais')
-                .setEmoji("1371605612403757086")
-                .setStyle(2),
-        )
+                .setCustomId('voltar1')
+                .setEmoji('1371580875615113307')
+                .setDisabled(true)
+                .setStyle(1)
+        );
 
-    const row2 = new ActionRowBuilder()
-        .addComponents(
-            new ButtonBuilder()
-                .setCustomId("formasdepagamentos")
-                .setLabel('Formas de pagamento')
-                .setEmoji("1371593627477737502")
-                .setStyle(1),
-        )
+        container.addActionRowComponents(row1);
+        container.addActionRowComponents(row2);
+        container.addActionRowComponents(row3);
 
-    const row3 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId("voltar00")
-            .setEmoji("1371605354605051996")
-            .setStyle(2),
-        new ButtonBuilder()
-            .setCustomId(`voltar1`)
-            .setEmoji("1371580875615113307")
-            .setDisabled(true)
-            .setStyle(1)
-    )
+        const payload = {
+            components: [container],
+            flags: MessageFlags.IsComponentsV2,
+            embeds: [],
+            content: ''
+        };
 
-
-    if (interaction.message == undefined) {
-        interaction.reply({ embeds: [], components: [row1, row2, row3], content: `O que precisa configurar?` })
-    } else {
-        await interaction.update({ embeds: [], components: [row1, row2, row3], content: `O que precisa configurar?` })
+        if (!interaction.message) {
+            await interaction.reply({ ...payload, ephemeral: true });
+        } else {
+            await interaction.update(payload);
+        }
+    } catch (error) {
+        console.error('Erro na função Gerenciar:', error);
+        try {
+            if (!interaction.replied && !interaction.deferred) {
+                await interaction.reply({ content: 'Ocorreu um erro ao carregar as definições.', ephemeral: true });
+            }
+        } catch (e) {}
     }
-
 }
 
-
-
-module.exports = {
-    Gerenciar
-}
+module.exports = { Gerenciar };

@@ -26,7 +26,7 @@ function getSaudacao() {
 async function PermsAvançados24(interaction, client) {
 
     const embed = new EmbedBuilder()
-    .setColor("Aqua")
+    .setColor('#5865F2')
     .setAuthor({ name: "Sistema de permissão avançada", iconURL: 'https://cdn.discordapp.com/emojis/1238672086164049930.png?size=2048' })
     .setDescription("> ** Gerencie Permissões avançadas de usuarios especificos**")
     .setFooter({ text: "Sistema de permissão avançada", iconURL: 'https://cdn.discordapp.com/emojis/1250223548019245099.gif?size=2048' })
