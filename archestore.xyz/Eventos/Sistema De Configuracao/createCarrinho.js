@@ -243,7 +243,7 @@ module.exports = {
 
 
                 const mandanopvdocara = new EmbedBuilder()
-                    .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#fcba03` : configuracao.get(`Cores.Processamento`)}`)
+                    .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#5865F2` : configuracao.get(`Cores.Processamento`)}`)
                     .setTitle(`${Emojis.get(`neworder_emoji`)} Pedido solicitado`)
                     .setFooter(
                         { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) }
@@ -264,7 +264,7 @@ module.exports = {
 
 
                 const dsfjmsdfjnsdfj = new EmbedBuilder()
-                    .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#fcba03` : configuracao.get(`Cores.Processamento`)}`)
+                    .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#5865F2` : configuracao.get(`Cores.Processamento`)}`)
                     .setTitle(`${Emojis.get(`neworder_emoji`)} Pedido solicitado`)
                     .setDescription(`Usuário ${interaction.user} solicitou um pedido.`)
                     .addFields(

@@ -1,51 +1,61 @@
-const { ApplicationCommandType, EmbedBuilder, Webhook, ActionRowBuilder, ButtonBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require("discord.js");
-const fs = require("fs");
-const path = require("path");
-const client = require("discord.js")
-const { JsonDatabase } = require("wio.db");
-const { produtos, configuracao } = require("../DataBaseJson");
+const {
+    ActionRowBuilder, ButtonBuilder,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
+} = require("discord.js");
+const { configuracao, Emojis } = require("../DataBaseJson");
+
+function getAccentColor() {
+    const cor = configuracao.get('Cores.Principal') || '5865F2';
+    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
+}
 
 async function automatico(interaction, client) {
+    const container = new ContainerBuilder();
+    container.setAccentColor(getAccentColor());
 
+    container.addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(
+            `## ${Emojis.get('dream')} Automações\nEscolha o sistema que deseja configurar.`
+        )
+    );
 
-        const row2 = new ActionRowBuilder()
-        .addComponents(
-            new ButtonBuilder()
+    container.addSeparatorComponents(new SeparatorBuilder());
+
+    const row2 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
             .setCustomId("autoreact24")
             .setLabel('Auto React')
             .setEmoji("1371605384565096499")
-            .setDisabled(false)
             .setStyle(2),
-
-            new ButtonBuilder()
+        new ButtonBuilder()
             .setCustomId("configmsgauto")
-            .setLabel('Mensagem Automatica')
+            .setLabel('Mensagem Automática')
             .setEmoji("1371605445155885127")
             .setStyle(2),
-
-            new ButtonBuilder()
+        new ButtonBuilder()
             .setCustomId("configlock")
-            .setLabel('Lock Automatico')
+            .setLabel('Lock Automático')
             .setEmoji("1371605629218721892")
             .setStyle(1),
+    );
 
-        )
+    const row3 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("voltar1")
+            .setEmoji("1371605354605051996")
+            .setLabel('Voltar')
+            .setStyle(2)
+    );
 
-        const row3 = new ActionRowBuilder()
-        .addComponents(
+    container.addActionRowComponents(row2);
+    container.addActionRowComponents(row3);
 
-            new ButtonBuilder()
-                .setCustomId("voltar1")
-                .setEmoji("1371605354605051996")
-                .setLabel('Voltar')
-                .setStyle(2)
-
-        )
-
-    await interaction.update({ embeds: [], content: `Oque deseja configurar?`, ephemeral: true, components: [row2, row3]/* row4, row3]*/ })
+    await interaction.update({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        content: '',
+        embeds: []
+    });
 }
 
-
-module.exports = {
-    automatico
-}
+module.exports = { automatico }

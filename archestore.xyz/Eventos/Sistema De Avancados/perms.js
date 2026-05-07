@@ -1,4 +1,7 @@
-const { ActionRowBuilder, ButtonBuilder, ModalBuilder, SelectMenuBuilder, TextInputBuilder, TextInputStyle, EmbedBuilder } = require('discord.js');
+const {
+    ActionRowBuilder, ButtonBuilder, ModalBuilder, TextInputBuilder, TextInputStyle,
+    ContainerBuilder, TextDisplayBuilder, MessageFlags
+} = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const emojis = require("../../DataBaseJson/Emojis.json");
@@ -30,7 +33,6 @@ module.exports = {
                 .setRequired(true);
 
             modal.addComponents(new ActionRowBuilder().addComponents(userIdInput));
-
             await interaction.showModal(modal);
         }
 
@@ -113,14 +115,20 @@ module.exports = {
                 return interaction.reply({ content: `${Emojis.get('_silueta_emoji')} Nenhum membro foi autorizado a utilizar o BOT.`, ephemeral: true });
             }
 
-            const embed = new EmbedBuilder()
-                .setAuthor({ name: `${client.user.username}`, iconURL: 'https://cdn.discordapp.com/emojis/1212479066784006214.png?size=2048' })
-                .setTitle(`${Emojis.get('confirmed_emoji')} Membros Autorizados (${mempegarperm24.length})`)
-                .setDescription(mempegarperm24.join('\n'))
-                .setColor('#5865F2')
-                .setFooter({ text: 'Sistema De Permissão', iconURL: 'https://cdn.discordapp.com/emojis/1250586149630644234.gif?size=2048' });
+            const container = new ContainerBuilder();
+            container.setAccentColor(0x5865F2);
+            container.addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    `## ${Emojis.get('confirmed_emoji')} Membros Autorizados (${mempegarperm24.length})\n${mempegarperm24.join('\n')}`
+                )
+            );
 
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.reply({
+                components: [container],
+                flags: MessageFlags.IsComponentsV2,
+                embeds: [],
+                ephemeral: true
+            });
         }
     }
 };

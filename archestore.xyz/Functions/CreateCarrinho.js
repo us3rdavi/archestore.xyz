@@ -42,7 +42,7 @@ async function CreateCarrinho(interaction, infos) {
             return interaction.reply({
                 embeds: [new EmbedBuilder()
                     .setDescription(`Ops... o canal de logs pedidos ainda não foi configurado, faça um retorno em breve!`)
-                    .setColor(configuracao.get('Cores.Erro') || 'ff0000')
+                    .setColor(configuracao.get('Cores.Erro') || '5865F2')
                 ],
                 ephemeral: true
             });
@@ -53,7 +53,7 @@ async function CreateCarrinho(interaction, infos) {
             return interaction.reply({
                 embeds: [new EmbedBuilder()
                     .setDescription(`Ops... a forma de pagamento não foi configurada ainda, faça um retorno em breve!`)
-                    .setColor(configuracao.get('Cores.Erro') || 'ff0000')
+                    .setColor(configuracao.get('Cores.Erro') || '5865F2')
                 ],
                 ephemeral: true
             });

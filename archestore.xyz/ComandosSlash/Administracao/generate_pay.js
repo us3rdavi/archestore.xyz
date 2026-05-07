@@ -108,7 +108,7 @@ module.exports = {
                     const attachment = new AttachmentBuilder(buffer, { name: "payment.png" });
 
                     const embed = new EmbedBuilder()
-                        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '2b2d31' : configuracao.get('Cores.Principal')}`)
+                        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
                         .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL({ dynamic: true }) ? interaction.user.displayAvatarURL({ dynamic: true }) : null })
                         .setTitle(`Pagamento via PIX criado`)
                         .addFields(
@@ -163,7 +163,7 @@ module.exports = {
             let chavepix = configuracao.get(`pagamentos.SemiAutomatico.chavepix`) || `Nenhuma chave Pix configurada.`;
             const embed = new EmbedBuilder()
                 .setAuthor({ name: `Pagamento semi-automático`, iconURL: `https://cdn.discordapp.com/emojis/1230562913790595133.webp` })
-                .setColor(`Yellow`)
+                .setColor(`#5865F2`)
                 .setDescription(`- Um pagamento foi gerado com sucesso!`)
                 .setFields(
                     { name: `Preço:`, value: `\`${Number(price).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}\``, inline: true },

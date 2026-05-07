@@ -1,5 +1,5 @@
 const Discord = require("discord.js")
-const { ActionRowBuilder, EmbedBuilder, ButtonBuilder, InteractionType, StringSelectMenuBuilder, ChannelType, PermissionsBitField, RoleSelectMenuBuilder, ChannelSelectMenuBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+const { ActionRowBuilder, EmbedBuilder, ButtonBuilder, InteractionType, StringSelectMenuBuilder, ChannelType, PermissionsBitField, RoleSelectMenuBuilder, ChannelSelectMenuBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags } = require('discord.js');
 const { Painel, Gerenciar2, definirduvidas } = require("../../Functions/Painel");
 const { configqrcode } = require("../../Functions/QRCode.js");
 const { AcoesAutomaticsConfigs, LimpezaAutomatica, msgbemvindo, msgbemvindocanais, GerenciarCanais, SistemaNukar, sistemaAntiRaid, SistemadeFiltro, SistemaAntiFake } = require("../../Functions/AcoesAutomatics.js");
@@ -720,7 +720,14 @@ module.exports = {
             
                     tickets[ticketId] = { hasStaffInteracted: true, hasPokeStaffBeenClicked: false, staffMemberId: staffMember.id };
             
-                    await interaction.editReply({ embeds: [confirmationEmbed222] });
+                    {
+                        const cor = configuracao.get('Cores.Principal') || '5865F2';
+                        const accentColor = (() => { try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; } })();
+                        const assumirContainer = new ContainerBuilder();
+                        assumirContainer.setAccentColor(accentColor);
+                        assumirContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('_staff_emoji')} Olá <@!${ultimosNumeros}>, Seu Ticket foi Assumido Pelo Staff ${staffMember}.`));
+                        await interaction.editReply({ components: [assumirContainer], flags: MessageFlags.IsComponentsV2, embeds: [] });
+                    }
                 } catch (error) {
                     await interaction.followUp({ content: `${Emojis.get(`negative_emoji`)} | Ocorreu um erro ao tentar assumir o ticket.`, ephemeral: true });
                 }
@@ -780,7 +787,7 @@ module.exports = {
                     }
             
                     const embed24 = new Discord.EmbedBuilder()
-                        .setColor('#ff0000')
+                        .setColor('#5865F2')
                         .setAuthor({ name: `${interaction.user.username} - Ticket`, iconURL: interaction.user.displayAvatarURL() })
                         .setTitle(`${Emojis.get('_silueta_emoji')} Ticket Finalizado`)
                         .setDescription("> **Olá! O seu ticket foi finalizado, obrigado por usar nossos serviços**")
@@ -830,7 +837,7 @@ module.exports = {
                     }
             
                     const embed244 = new Discord.EmbedBuilder()
-                        .setColor('#ff0000')
+                        .setColor('#5865F2')
                         .setAuthor({ name: `Ticket - System`, iconURL: interaction.guild.iconURL({ dynamic: true }) })
                         .setTitle(`${Emojis.get('_messages_emoji')} Novo Ticket Finalizado`)
                         .setDescription("> ** Logs de ticket **")
@@ -1099,14 +1106,12 @@ module.exports = {
                     }
                 }, tempoAutoClear * 1000);
 
-                await interaction.reply({
-                    content: `${interaction.user}`,
-                    embeds: [
-                        new EmbedBuilder()
-                            .setDescription(`${Emojis.get(`confirmed_emoji`)} Seu AutoClear foi iniciado corretamente no canal <#${canalAutoClear}>`)
-                    ],
-                    ephemeral: true
-                });
+                {
+                    const acClearContainer = new ContainerBuilder();
+                    { const _c = configuracao.get('Cores.Principal') || '5865F2'; acClearContainer.setAccentColor((() => { try { return parseInt(_c.replace('#',''),16); } catch(e){ return 0x5865F2; } })()); }
+                    acClearContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('confirmed_emoji')} Seu AutoClear foi iniciado corretamente no canal <#${canalAutoClear}>`));
+                    await interaction.reply({ content: `${interaction.user}`, components: [acClearContainer], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
+                }
             }
 
             if (interaction.customId.endsWith("pararautoclear")) {
@@ -1117,27 +1122,19 @@ module.exports = {
                 try {
                     await relikia.delete("autoclear.channel");
                     relikia.set("autoclear.time", 10);
-                    await interaction.reply({
-                        embeds: [
-                            new EmbedBuilder()
-                                .setColor(`#5865F2`)
-                                .setDescription(`${Emojis.get(`confirmed_emoji`)} Seu AutoClear foi parado e as configurações foram resetadas.`)
-                        ],
-                        content: `${interaction.user}`,
-                        ephemeral: true
-
-                    });
+                    {
+                        const acStopContainer = new ContainerBuilder();
+                        { const _c = configuracao.get('Cores.Principal') || '5865F2'; acStopContainer.setAccentColor((() => { try { return parseInt(_c.replace('#',''),16); } catch(e){ return 0x5865F2; } })()); }
+                        acStopContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('confirmed_emoji')} Seu AutoClear foi parado e as configurações foram resetadas.`));
+                        await interaction.reply({ content: `${interaction.user}`, components: [acStopContainer], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
+                    }
                 } catch (error) {
-                    await interaction.reply({
-                        embeds: [
-                            new EmbedBuilder()
-                                .setColor(`#5865F2`)
-                                .setDescription(`${Emojis.get(`negative_emoji`)} | Ocorreu um erro ao parar o AutoClear.`)
-                        ],
-                        content: `${interaction.user}`,
-                        ephemeral: true
-
-                    });
+                    {
+                        const acErrContainer = new ContainerBuilder();
+                        acErrContainer.setAccentColor(0x5865F2);
+                        acErrContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('negative_emoji')} Ocorreu um erro ao parar o AutoClear.`));
+                        await interaction.reply({ content: `${interaction.user}`, components: [acErrContainer], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
+                    }
                 }
             }
 
@@ -1300,36 +1297,36 @@ module.exports = {
                 } else if (interaction.customId == 'twoHours') {
                     rendimento = await EstatisticasKing.SalesLastTwoHours();
                     name = 'Resumo das vendas das últimas 2 horas';
-                    embed = new EmbedBuilder()
-                        .setColor(`${configuracao.get(`Cores.Principal`) == null ? `#00FF00` : configuracao.get(`Cores.Principal`)}`)
-                        .setTitle(`${name}`)
-                        .addFields(
-                            { name: `**Rendimento**`, value: `\`R$ ${Number(rendimento.rendimentoTotal).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\``, inline: true },
-                            { name: `**Pedidos aprovados**`, value: `\`${rendimento.quantidadeTotal}\``, inline: true },
-                            { name: `**Produtos entregues**`, value: `\`${rendimento.produtosEntregue}\``, inline: true },
-                            { name: `**Usuários únicos**`, value: `\`${rendimento.usuarios.length}\``, inline: true }
-                        )
-                        .setAuthor({ name: `${interaction.user.username}` })
-                        .setTimestamp()
-                        .setFooter({ text: `${interaction.user.username}` });
-
-                    interaction.update({ content: ``, embeds: [embed] });
+                    {
+                        const cor = configuracao.get('Cores.Principal') || '5865F2';
+                        const accentColor = (() => { try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; } })();
+                        const statsContainer = new ContainerBuilder();
+                        statsContainer.setAccentColor(accentColor);
+                        statsContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                            `## ${name}\n` +
+                            `**Rendimento:** \`R$ ${Number(rendimento.rendimentoTotal).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`\n` +
+                            `**Pedidos aprovados:** \`${rendimento.quantidadeTotal}\`\n` +
+                            `**Produtos entregues:** \`${rendimento.produtosEntregue}\`\n` +
+                            `**Usuários únicos:** \`${rendimento.usuarios.length}\``
+                        ));
+                        interaction.update({ content: '', components: [statsContainer], flags: MessageFlags.IsComponentsV2, embeds: [] });
+                    }
                     return;
                 }
 
-                embed = new EmbedBuilder()
-                    .setColor(`${configuracao.get(`Cores.Principal`) == null ? `#00FF00` : configuracao.get(`Cores.Principal`)}`)
-                    .setTitle(`${name}`)
-                    .addFields(
-                        { name: `**Rendimento**`, value: `\`R$ ${Number(rendimento.rendimentoTotal).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\``, inline: true },
-                        { name: `**Pedidos aprovados**`, value: `\`${rendimento.quantidadeTotal}\``, inline: true },
-                        { name: `**Produtos entregues**`, value: `\`${rendimento.produtosEntregue}\``, inline: true },
-                    )
-                    .setAuthor({ name: `${interaction.user.username}`, iconURL: `${interaction.user.displayAvatarURL({ dynamic: true })}` ? interaction.user.displayAvatarURL({ dynamic: true }) : null })
-                    .setTimestamp()
-                    .setFooter({ text: `${interaction.user.username}` });
-
-                interaction.update({ content: ``, embeds: [embed] });
+                {
+                    const cor = configuracao.get('Cores.Principal') || '5865F2';
+                    const accentColor = (() => { try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; } })();
+                    const statsContainer = new ContainerBuilder();
+                    statsContainer.setAccentColor(accentColor);
+                    statsContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                        `## ${name}\n` +
+                        `**Rendimento:** \`R$ ${Number(rendimento.rendimentoTotal).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`\n` +
+                        `**Pedidos aprovados:** \`${rendimento.quantidadeTotal}\`\n` +
+                        `**Produtos entregues:** \`${rendimento.produtosEntregue}\``
+                    ));
+                    interaction.update({ content: '', components: [statsContainer], flags: MessageFlags.IsComponentsV2, embeds: [] });
+                }
             }
 
             if (interaction.customId.startsWith('criarrrr')) {
@@ -1638,7 +1635,7 @@ module.exports = {
                 const newnameboteN5 = new TextInputBuilder()
                     .setCustomId('tokenMP5')
                     .setLabel(`COR DE FALHA`)
-                    .setPlaceholder(`Insira aqui um código Hex Color, ex: #ff0000`)
+                    .setPlaceholder(`Insira aqui um código Hex Color, ex: #5865F2`)
                     .setStyle(TextInputStyle.Short)
                     .setRequired(false)
 
@@ -1744,45 +1741,61 @@ module.exports = {
                 AutoClear(interaction, client);
             }
             if (interaction.customId.startsWith('painelpersonalizar')) {
+                const _cor = configuracao.get('Cores.Principal') || '5865F2';
+                let _ac = 0x5865F2;
+                try { _ac = parseInt(_cor.replace('#', ''), 16); } catch (e) {}
 
+                const _cont = new ContainerBuilder();
+                _cont.setAccentColor(_ac);
 
-                const row2 = new ActionRowBuilder()
-                    .addComponents(
-                        new ButtonBuilder()
-                            .setCustomId("coresembeds")
-                            .setLabel('Editar cores dos embeds')
-                            .setEmoji(`1178080366871973958`)
-                            .setStyle(1),
-
-                        new ButtonBuilder()
-                            .setCustomId("personalizarbot")
-                            .setLabel('Personalizar Bot')
-                            .setEmoji(`1178080828933283960`)
-                            .setStyle(1),
-
-                        new ButtonBuilder()
-                            .setCustomId("definirtema")
-                            .setLabel('Definir tema')
-                            .setEmoji(`1178066208835252266`)
-                            .setDisabled(true)
-                            .setStyle(1)
+                _cont.addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
+                        `## ${Emojis.get('dream')} Meu Bot Designer\nEscolha uma opção e use sua criatividade e profissionalismo.`
                     )
+                );
+
+                _cont.addSeparatorComponents(new SeparatorBuilder());
+
+                const row2 = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
+                        .setCustomId("coresembeds")
+                        .setLabel('Editar cores dos embeds')
+                        .setEmoji('1178080366871973958')
+                        .setStyle(1),
+                    new ButtonBuilder()
+                        .setCustomId("personalizarbot")
+                        .setLabel('Personalizar Bot')
+                        .setEmoji('1178080828933283960')
+                        .setStyle(1),
+                    new ButtonBuilder()
+                        .setCustomId("definirtema")
+                        .setLabel('Definir tema')
+                        .setEmoji('1178066208835252266')
+                        .setDisabled(true)
+                        .setStyle(1)
+                );
 
                 const row3 = new ActionRowBuilder().addComponents(
                     new ButtonBuilder()
                         .setCustomId("voltar00")
-                        .setEmoji(`1238413255886639104`)
+                        .setEmoji('1238413255886639104')
                         .setStyle(2),
                     new ButtonBuilder()
-                        .setCustomId(`voltar1`)
-                        .setEmoji('1292237216915128361')
+                        .setCustomId('voltar1')
+                        .setEmoji('1371580875615113307')
                         .setDisabled(true)
                         .setStyle(1)
-                )
+                );
 
-                interaction.update({ embeds: [], components: [row2, row3], content: `Escolha uma opção e use sua criatividade e profissionalismo ;) ` })
+                _cont.addActionRowComponents(row2);
+                _cont.addActionRowComponents(row3);
 
-
+                await interaction.update({
+                    components: [_cont],
+                    flags: MessageFlags.IsComponentsV2,
+                    content: '',
+                    embeds: []
+                });
             }
             if (interaction.customId.startsWith('painelconfigbv')) {
                 msgbemvindo(interaction, client)

@@ -125,7 +125,7 @@ module.exports = {
                 }
 
                 let embed = new EmbedBuilder(interaction.message.embeds[0])
-                await embed.setColor(`Red`)
+                await embed.setColor(`#5865F2`)
                 await embed.addFields({ name: 'Reembolso', value: `${interaction.user} efetuou o reembolso <t:${Math.floor(Date.now() / 1000)}:R>`, inline: true })
                 await interaction.message.edit({ embeds: [embed], components: [] })
                 interaction.editReply({ content: `${Emojis.get(`confirmed_emoji`)} Pagamento estornado com sucesso.` })

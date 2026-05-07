@@ -27,7 +27,7 @@ module.exports = {
             const nomeUsuario = member.user.username;
 
             let embed = new EmbedBuilder()
-                .setColor(`#FF0000`)
+                .setColor(`#5865F2`)
                 .setTitle(`${Emojis.get(`member_remove_emoji`)} | Saída`)
                 .setDescription(`${member} **${nomeUsuario}** saiu do servidor.`)
 

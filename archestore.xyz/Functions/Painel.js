@@ -12,7 +12,22 @@ const roundedPercentage = Math.min(100, Math.round(memoryUsagePercentage));
 async function Painel(interaction, client, config = { email: "" }) {
     try {
         const status = configuracao.get("vendasstatus") || false;
-        const userEmail = config?.email || "usuário";
+        const corPrincipal = configuracao.get('Cores.Principal') || '5865F2';
+        let accentColor = 0x5865F2;
+        try { accentColor = parseInt(corPrincipal.replace('#', ''), 16); } catch (e) {}
+
+        const container = new ContainerBuilder();
+        container.setAccentColor(accentColor);
+
+        container.addTextDisplayComponents(
+            new TextDisplayBuilder().setContent(
+                `## ${Emojis.get('dream')} Painel de Configuração\n` +
+                `Olá **${interaction.user.displayName || interaction.user.username}**, bem-vindo ao painel de configuração.\n\n` +
+                `-# Loja: \`${status ? 'Ativa' : 'Inativa'}\``
+            )
+        );
+
+        container.addSeparatorComponents(new SeparatorBuilder());
 
         const row2 = new ActionRowBuilder()
             .addComponents(
@@ -30,8 +45,7 @@ async function Painel(interaction, client, config = { email: "" }) {
                     .setCustomId("painelconfigticket")
                     .setLabel("Central de Atendimento")
                     .setEmoji("1371593631328243713")
-                    .setStyle(1)
-                    .setDisabled(false),
+                    .setStyle(1),
                 new ButtonBuilder()
                     .setCustomId("painelpersonalizar")
                     .setLabel('Meu Bot Designer')
@@ -43,15 +57,14 @@ async function Painel(interaction, client, config = { email: "" }) {
             .addComponents(
                 new ButtonBuilder()
                     .setCustomId("gerenciarconfigs")
-                    .setLabel('Definiçôes')
+                    .setLabel('Definições')
                     .setEmoji("1371571230041178125")
                     .setStyle(2),
                 new ButtonBuilder()
                     .setCustomId("permcomprar")
                     .setLabel("Autorização")
                     .setEmoji("1371577447031640124")
-                    .setStyle(2)
-                    .setDisabled(false),
+                    .setStyle(2),
                 new ButtonBuilder()
                     .setCustomId("configavançadas24")
                     .setLabel('Proteção')
@@ -73,9 +86,14 @@ async function Painel(interaction, client, config = { email: "" }) {
                     .setStyle(2),
             );
 
+        container.addActionRowComponents(row2);
+        container.addActionRowComponents(row3);
+        container.addActionRowComponents(row4);
+
         await interaction.editReply({
-            content: `https://cdn.discordapp.com/attachments/1384354103701798912/1384381565534077039/logo.gif?ex=6852394d&is=6850e7cd&hm=8b38a1ce88a9d98c9be56f67090348b73a7a3eaded106871bcf821da2c76d990&`,
-            components: [row2, row3, row4],
+            components: [container],
+            flags: MessageFlags.IsComponentsV2,
+            content: '',
             embeds: []
         });
 

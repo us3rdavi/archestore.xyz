@@ -81,7 +81,7 @@ async function Varredura(client) {
 
             const embed = new EmbedBuilder()
                 .setTitle(`${Emojis.get(`failuser_emoji`)} Reembolso fraudulento`)
-                .setColor('Red')
+                .setColor('#5865F2')
                 .setDescription(`Identificamos que um usuário realizou um reembolso de forma inadequada em sua loja. Como medida preventiva, e para garantir a segurança, esse usuário, responsável pelo reembolso indevido, foi permanentemente banido de efetuar compras em qualquer loja que utilize o sistema Ease Bot.`)
                 .setFields(
                     { name: `ID do pedido`, value: `${element.id}`, inline: true },

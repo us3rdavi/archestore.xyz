@@ -1,4 +1,4 @@
-const { ActionRowBuilder, TextInputBuilder, TextInputStyle, InteractionType, ModalBuilder, EmbedBuilder, ButtonBuilder, Embed, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } = require("discord.js");
+const { ActionRowBuilder, TextInputBuilder, TextInputStyle, InteractionType, ModalBuilder, EmbedBuilder, ButtonBuilder, Embed, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags } = require("discord.js");
 const { configuracao } = require("../../DataBaseJson");
 const { Gerenciar } = require("../../Functions/Gerenciar");
 const { FormasDePagamentos } = require("../../Functions/FormasDePagamentosConfig");
@@ -365,12 +365,14 @@ module.exports = {
 
                                 )
 
+                            const errTimeoutContainer = new ContainerBuilder();
+                            errTimeoutContainer.setAccentColor(0x5865F2);
+                            errTimeoutContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('negative_emoji')} Você não se cadastrou durante 5 minutos, cadastre-se novamente!`));
+                            errTimeoutContainer.addActionRowComponents(fernandinhaa);
                             interaction.editReply({
-                                embeds: [
-                                    new EmbedBuilder()
-                                        .setDescription(`${Emojis.get(`negative_emoji`)} Você não se cadastrou durante 5 Minutos, cadastre-se novamente!`)
-                                ],
-                                components: [fernandinhaa]
+                                components: [errTimeoutContainer],
+                                flags: MessageFlags.IsComponentsV2,
+                                embeds: []
                             })
 
                         }, tempoLimite);
@@ -395,68 +397,26 @@ module.exports = {
 
             if (interaction.customId == 'exemplesbancks') {
 
-                interaction.reply({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setTitle(`Exemplos Bancos`)
-                            .setDescription(`Em cima fica o banco que será bloqueado e em baixo o que setar no **Bloquear Banco** para bloquear aquele banco, vale ressaltar que para setar vários bancos no bloquear banco, usa-se virgula a cada nome setado. Ex: \`inter, nu\``)
-                            .setFields(
-                                {
-                                    name: `Nu Pagamentos S.A.`, value: `\`nu\``, inline: true
-                                },
-                                {
-                                    name: `Mercadopago.com Representações Ltda.`, value: `\`mp\``, inline: true
-                                },
-                                {
-                                    name: `Banco do Brasil S.A.`, value: `\`bdb\``, inline: true
-                                },
-                                {
-                                    name: `Caixa Econômica Federal`, value: `\`caixa\``, inline: true
-                                },
-                                {
-                                    name: `Banco Itaú Unibanco S.A.`, value: `\`itau\``, inline: true
-                                },
-                                {
-                                    name: `Banco Bradesco S.A.`, value: `\`bradesco\``, inline: true
-                                },
-                                {
-                                    name: `Neon Pagamentos S.A.`, value: `\`neon\``, inline: true
-                                },
-                                {
-                                    name: `Original S.A.`, value: `\`original\``, inline: true
-                                },
-                                {
-                                    name: `Next`, value: `\`next\``, inline: true
-                                },
-                                {
-                                    name: `Agibank`, value: `\`agibank\``, inline: true
-                                },
-                                {
-                                    name: `Santander (Brasil) S.A.`, value: `\`santander\``, inline: true
-                                },
-                                {
-                                    name: `C6 Bank S.A.`, value: `\`c6\``, inline: true
-                                },
-                                {
-                                    name: `Banrisul`, value: `\`banrisul\``, inline: true
-                                },
-                                {
-                                    name: `PagSeguro Internet S.A.`, value: `\`pagseguro\``, inline: true
-                                },
-                                {
-                                    name: `BS2`, value: `\`bs2\``, inline: true
-                                },
-                                {
-                                    name: `Modalmais`, value: `\`modalmais\``, inline: true
-                                }
-                            )
-                            .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
-                            .setFooter(
-                                { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) }
-                            )
-                            .setTimestamp()
-                    ], ephemeral: true
-                })
+                {
+                    const cor = configuracao.get('Cores.Principal') || '5865F2';
+                    const accentColor = (() => { try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; } })();
+                    const banksContainer = new ContainerBuilder();
+                    banksContainer.setAccentColor(accentColor);
+                    banksContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                        `## Exemplos de Bancos\nAbaixo estão os identificadores para usar no campo **Bloquear Banco**. Separe múltiplos com vírgula. Ex: \`inter, nu\`\n\n` +
+                        `\`nu\` — Nu Pagamentos S.A.\n\`mp\` — Mercadopago.com Representações Ltda.\n\`bdb\` — Banco do Brasil S.A.\n` +
+                        `\`caixa\` — Caixa Econômica Federal\n\`itau\` — Banco Itaú Unibanco S.A.\n\`bradesco\` — Banco Bradesco S.A.\n` +
+                        `\`inter\` — Banco Inter\n\`neon\` — Neon Pagamentos S.A.\n\`original\` — Original S.A.\n\`next\` — Next\n` +
+                        `\`agibank\` — Agibank\n\`santander\` — Santander (Brasil) S.A.\n\`c6\` — C6 Bank S.A.\n` +
+                        `\`banrisul\` — Banrisul\n\`pagseguro\` — PagSeguro Internet S.A.\n\`bs2\` — BS2\n\`modalmais\` — Modalmais`
+                    ));
+                    interaction.reply({
+                        components: [banksContainer],
+                        flags: MessageFlags.IsComponentsV2,
+                        embeds: [],
+                        ephemeral: true
+                    });
+                }
 
             }
 
@@ -540,21 +500,18 @@ module.exports = {
                     const inputBanksArray = inputBanks.replace(/\s/g, '').split(',');
                     const invalidBanks = inputBanksArray.filter((bank) => !validBanks.includes(bank));
                     if (invalidBanks.length > 0) {
+                        const cor2 = configuracao.get('Cores.Principal') || '5865F2';
+                        const accentColor2 = (() => { try { return parseInt(cor2.replace('#', ''), 16); } catch (e) { return 0x5865F2; } })();
+                        const invalidBankContainer = new ContainerBuilder();
+                        invalidBankContainer.setAccentColor(accentColor2);
+                        invalidBankContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`Ops... parece que o banco que você setou é inválido. Olhe os exemplos clicando no botão abaixo.`));
+                        invalidBankContainer.addSeparatorComponents(new SeparatorBuilder());
+                        invalidBankContainer.addActionRowComponents(new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("exemplesbancks").setLabel('Exemplos Bancos').setEmoji('1238417688129310782').setStyle(2).setDisabled(false)));
                         await interaction.reply({
-                            embeds: [
-                                new EmbedBuilder()
-                                    .setDescription(`Ops... parece que o banco que você setou é inválido, olhe exemplos de banco clicando no botão **Exemplos Bancos** abaixo.`)
-                                    .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
-                            ], components: [
-                                new ActionRowBuilder()
-                                    .addComponents(
-                                        new ButtonBuilder()
-                                            .setCustomId("exemplesbancks")
-                                            .setLabel('Exemplos Bancos')
-                                            .setEmoji(`1238417688129310782`)
-                                            .setStyle(2)
-                                            .setDisabled(false)
-                                    )], ephemeral: true
+                            components: [invalidBankContainer],
+                            flags: MessageFlags.IsComponentsV2,
+                            embeds: [],
+                            ephemeral: true
                         });
                     } else {
                         configuracao.set(`pagamentos.BancosBloqueados`, inputBanksArray);

@@ -123,7 +123,7 @@ async function EntregarPagamentos(client) {
                             content: '',
                             embeds: [
                                 new EmbedBuilder()
-                                    .setColor('Red')
+                                    .setColor('#5865F2')
                                     .setAuthor({ name: `Alerta de estoque!`, iconURL: "https://cdn.discordapp.com/emojis/1238303687248576544.webp?size=96&quality=lossless" })
                                     //.setTitle('⚠️ Alerta de Estoque')
                                     .setDescription(`O estoque do produto **${yy.infos.produto} - ${yy.infos.campo}** acabou!`)
@@ -146,7 +146,7 @@ async function EntregarPagamentos(client) {
             const attachment = new AttachmentBuilder(fileContent, { name: `${entrega.data.id}.txt` }, { type: 'text/plain' });
 
             const dsfjmsdfjnsdfj2 = new EmbedBuilder()
-                .setColor(`${configuracao.get(`Cores.Sucesso`) == null ? `#7464ff` : configuracao.get(`Cores.Sucesso`)}`) //7464ff
+                .setColor(`${configuracao.get(`Cores.Sucesso`) == null ? `#5865F2` : configuracao.get(`Cores.Sucesso`)}`) //7464ff
                 .setTitle(`${Emojis.get(`deliveredorder_emoji`)} Entrega Realizada`)
                 .setDescription(`Seu produto foi anexado a essa mensagem`)
                 .addFields(
@@ -397,7 +397,7 @@ async function EntregarPagamentos(client) {
 
 
                 const embedddd = new EmbedBuilder()
-                    .setColor(`${configuracao.get(`Cores.Sucesso`) == null ? `#7464fc` : configuracao.get(`Cores.Sucesso`)}`) //7464fc
+                    .setColor(`${configuracao.get(`Cores.Sucesso`) == null ? `#5865F2` : configuracao.get(`Cores.Sucesso`)}`) //7464fc
                     .setTitle(`${Emojis.get(`deliveredorder_emoji`)} Entrega Realizada`)
                     .setDescription(`Seu pedido foi anexado a essa mensagem.`)
                     .setFooter(
@@ -481,7 +481,7 @@ async function EntregarPagamentos(client) {
 
                     embeds: [
                         new EmbedBuilder()
-                            .setColor(`${configuracao.get(`Cores.Sucesso`) == null ? `#7464fc` : configuracao.get(`Cores.Sucesso`)}`)
+                            .setColor(`${configuracao.get(`Cores.Sucesso`) == null ? `#5865F2` : configuracao.get(`Cores.Sucesso`)}`)
                             .setTitle(`${Emojis.get(`deliveredorder_emoji`)} Entrega Realizada`)
                             .setDescription(`Usuário <@!${user.id}> teve seu pedido entregue.`)
                             .addFields(
@@ -550,7 +550,7 @@ async function EntregarPagamentos(client) {
                             content: '',
                             embeds: [
                                 new EmbedBuilder()
-                                    .setColor('Red')
+                                    .setColor('#5865F2')
                                     .setAuthor({ name: `Alerta de estoque!`, iconURL: "https://cdn.discordapp.com/emojis/1238303687248576544.webp?size=96&quality=lossless" })
                                     //.setTitle('⚠️ Alerta de Estoque')
                                     .setDescription(`O estoque do produto **${yy.infos.produto} - ${yy.infos.campo}** acabou!`)
@@ -583,7 +583,7 @@ async function EntregarPagamentos(client) {
             const embed = new EmbedBuilder()
                 .setAuthor({ name: `${user.username} | Pedido: #${entrega.data.id}` })
                 .setTitle(`Informação do pedido.`)
-                .setColor(`${configuracao.get(`Cores.Principal`) == null ? `#008000` : configuracao.get(`Cores.Principal`)}`) //008000
+                .setColor(`${configuracao.get(`Cores.Principal`) == null ? `#5865F2` : configuracao.get(`Cores.Principal`)}`) //008000
                 .setFields(
                     { name: 'Detalhes:', value: `\`${yy.quantidadeselecionada}x ${yy.infos.produto} - ${yy.infos.campo} | R$ ${Number(valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`` },
                     { name: 'Status:', value: `Pagamento confirmado, aguardando entrega` }
@@ -607,7 +607,7 @@ async function EntregarPagamentos(client) {
                 const embed = new EmbedBuilder()
                     .setAuthor({ name: `${user.username} | Pedido: #${entrega.data.id}` })
                     .setTitle(`Informação do pedido.`)
-                    .setColor(`${configuracao.get(`Cores.Principal`) == null ? `#008000` : configuracao.get(`Cores.Principal`)}`)
+                    .setColor(`${configuracao.get(`Cores.Principal`) == null ? `#5865F2` : configuracao.get(`Cores.Principal`)}`)
                     .setFields(
                         { name: 'Detalhes:', value: `\`${yy.quantidadeselecionada}x ${yy.infos.produto} - ${yy.infos.campo} | R$ ${Number(valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`` },
                         { name: 'Status:', value: `Pagamento confirmado, aguardando entrega` },
@@ -682,7 +682,7 @@ async function verificarEstoqueEReembolsar(client, yy, entrega, gggaaa) {
         }
 
         const embedReembolso = new EmbedBuilder()
-            .setColor('Red')
+            .setColor('#5865F2')
             .setAuthor({ name: `Reembolso Necessário | Pedido: #${entrega.data.id}`, iconURL: "https://cdn.discordapp.com/emojis/1260006704691675156.png" })
             .setTitle('Estoque Insuficiente')
             .setDescription(`Infelizmente, o produto "${yy.infos.produto} - ${yy.infos.campo}" não está mais disponível em estoque.`)
@@ -716,7 +716,7 @@ async function verificarEstoqueEReembolsar(client, yy, entrega, gggaaa) {
             if (response.status === 201) {
                 console.log(`Reembolso realizado com sucesso para o pedido ${entrega.data.id}`);
 
-                embedReembolso.setColor('Green')
+                embedReembolso.setColor('#5865F2')
                     .setAuthor({ name: `Reembolso Confirmado! | Pedido: #${entrega.data.id}`, iconURL: "https://cdn.discordapp.com/emojis/1260006725814190150.png" })
                     .setDescription(`O reembolso para o produto(s) foi processado com sucesso.`)
                     .spliceFields(0, 1, { name: 'Status', value: '`Reembolso Concluído`' })
@@ -731,7 +731,7 @@ async function verificarEstoqueEReembolsar(client, yy, entrega, gggaaa) {
             } else {
                 console.error(`Erro no reembolso do pedido ${entrega.data.id}:`, response.data);
 
-                embedReembolso.setColor('Orange')
+                embedReembolso.setColor('#5865F2')
                     .setTitle('Erro no Reembolso')
                     .setDescription(`Ocorreu um erro ao processar o reembolso. Nossa equipe foi notificada e resolverá o problema o mais rápido possível.`)
                     .spliceFields(0, 1, { name: 'Status', value: '`Reembolso Pendente`' });
@@ -739,7 +739,7 @@ async function verificarEstoqueEReembolsar(client, yy, entrega, gggaaa) {
         } catch (error) {
             console.error('Erro ao processar reembolso:', error);
 
-            embedReembolso.setColor('Red')
+            embedReembolso.setColor('#5865F2')
                 .setTitle('Erro no Reembolso')
                 .setDescription(`Ocorreu um erro ao processar o reembolso. Nossa equipe foi notificada e resolverá o problema o mais rápido possível.`)
                 .spliceFields(0, 1, { name: 'Status', value: '`Reembolso Pendente`' });
@@ -766,7 +766,7 @@ async function verificarEstoqueEReembolsar(client, yy, entrega, gggaaa) {
                 const statusValue = statusField ? statusField.value : 'Reembolso Feito!';
 
                 const embedLog = new EmbedBuilder()
-                    .setColor('Gold')
+                    .setColor('#5865F2')
                     .setAuthor({ name: `Reembolso Processado | Pedido: #${entrega.data.id}`, iconURL: "https://cdn.discordapp.com/emojis/1260006725814190150.png" })
                     .setTitle('Registro de Reembolso')
                     .setDescription(`Atenção equipe! Um reembolso foi processado devido a estoque insuficiente.`)

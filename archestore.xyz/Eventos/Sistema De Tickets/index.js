@@ -181,7 +181,7 @@ module.exports = {
 
                     const logEmbed = new EmbedBuilder()
                         .setTitle(`${Emojis.get('_messages_emoji')} Transcript — Ticket #${ticketData.numero}`)
-                        .setColor('#57F287')
+                        .setColor('#5865F2')
                         .addFields(
                             { name: `${Emojis.get('_silueta_emoji')} Aberto por`, value: `<@${ticketData.userId}> (\`${ticketData.username}\`)`, inline: true },
                             { name: `${Emojis.get('_staff_emoji')} Assumido por`, value: ticketData.staffMemberId ? `<@${ticketData.staffMemberId}>` : 'Ninguém', inline: true },
@@ -198,7 +198,7 @@ module.exports = {
                     console.error('[Ticket] Erro ao gerar transcript:', err.message);
                     const logEmbed = new EmbedBuilder()
                         .setTitle(`${Emojis.get('_messages_emoji')} Ticket #${ticketData.numero} Encerrado`)
-                        .setColor('#57F287')
+                        .setColor('#5865F2')
                         .addFields(
                             { name: `${Emojis.get('_silueta_emoji')} Aberto por`, value: `<@${ticketData.userId}>`, inline: true },
                             { name: `${Emojis.get('confirmed_emoji')} Encerrado por`, value: `${interaction.user}`, inline: true }

@@ -9,7 +9,7 @@ async function handleProfileUpdate(oldMember, newMember, logChannelId, client) {
 
         if (oldMember.nickname !== newMember.nickname) {
             const embedNickname = new EmbedBuilder()
-                .setColor(0x3498DB)
+                .setColor(0x5865F2)
                 .setTitle(`${Emojis.get('_lapis_emoji')} Mudança de Nickname`)
                 .setDescription(`${newMember.user.tag} alterou seu nickname`)
                 .addFields(
@@ -23,7 +23,7 @@ async function handleProfileUpdate(oldMember, newMember, logChannelId, client) {
 
         if (oldMember.user.avatarURL() !== newMember.user.avatarURL()) {
             const embedAvatar = new EmbedBuilder()
-                .setColor(0x1ABC9C)
+                .setColor(0x5865F2)
                 .setTitle(`${Emojis.get('photo_emoji')} Mudança de Avatar`)
                 .setDescription(`${newMember.user.tag} atualizou seu avatar`)
                 .setThumbnail(newMember.user.avatarURL())

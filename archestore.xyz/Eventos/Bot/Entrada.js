@@ -45,7 +45,7 @@ module.exports = {
 
             const embed = new EmbedBuilder()
                 .setTitle(`${Emojis.get(`member_add_emoji`)} | Entrada`)
-                .setColor('#40f018')
+                .setColor('#5865F2')
                 .setDescription(`-# ${member}${member.user.username}\n${Emojis.get(`date_emoji`)} **Criação:** ${diasnodiscord} dias no Discord\n${Emojis.get(`invite_emoji`)} **Convidante:** ${convidante}`)
 
             try {
@@ -78,7 +78,7 @@ module.exports = {
                 )
                 .setFooter({ text: member.guild.name })
                 .setTimestamp()
-                .setColor(configuracao.get(`Cores.Principal`) || `#fcba03`);
+                .setColor(configuracao.get(`Cores.Principal`) || `#5865F2`);
 
             try {
                 const notificationChannel = client.channels.cache.get(channelId);

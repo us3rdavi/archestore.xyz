@@ -67,7 +67,7 @@ async function repostarProdutos(client) {
 
                         if (systemLogsChannel) {
                             const errorEmbed = new EmbedBuilder()
-                                .setColor('#FF0000')
+                                .setColor('#5865F2')
                                 .setTitle('Erro ao Repostar Produto')
                                 .setDescription(`Ocorreu um erro ao tentar repostar o produto.`)
                                 .addFields(

@@ -1,45 +1,67 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require("discord.js");
-const { configuracao } = require("../DataBaseJson")
+const {
+    ActionRowBuilder, ButtonBuilder,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
+} = require("discord.js");
+const { configuracao } = require("../DataBaseJson");
+
+function getAccentColor() {
+    const cor = configuracao.get('Cores.Principal') || '5865F2';
+    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
+}
 
 async function semiConfigs(interaction, client) {
+    const isEnabled = configuracao.get("pagamentos.SemiAutomatico.status") !== false;
+    const chavePix = configuracao.get("pagamentos.SemiAutomatico.pix") || "Não configurado";
+    const msgAuxilio = configuracao.get("pagamentos.SemiAutomatico.msg") || "Não configurado";
 
-    const embed = new EmbedBuilder()
-        .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
-        .setTitle(`Configurar Pagamento Manual - ${configuracao.get("pagamentos.SemiAutomatico.status") == false ? "Desabilitado" : "Habilitado"}`)
-        .setDescription(`Aqui, você pode definir uma chave Pix e uma mensagem para o seu ${client.user.username} enviar quando a forma de pagamento "Pix" for selecionada. Ele irá gerar um QR Code com o valor exato do carrinho para essa chave. Lembre-se de que ele não consegue verificar se o pagamento foi aprovado, então você precisará clicar em "Confirmar pagamento" para iniciar o processo de entrega.`)
-        .addFields(
-            {
-                name: `Chave PIX`, value: `${configuracao.get("pagamentos.SemiAutomatico.pix") == null ? "Não configurado" : configuracao.get("pagamentos.SemiAutomatico.pix")}`
-            },
-            {
-                name: `Mensagem De Auxílio`, value: `${configuracao.get("pagamentos.SemiAutomatico.msg") == null ? "Não configurado" : configuracao.get("pagamentos.SemiAutomatico.msg")}`
-            }
+    const container = new ContainerBuilder();
+    container.setAccentColor(getAccentColor());
+
+    container.addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(
+            `## Configurar Pagamento Manual — \`${isEnabled ? 'Habilitado' : 'Desabilitado'}\`\n` +
+            `Defina uma chave Pix e uma mensagem que o **${client.user.username}** enviará quando o pagamento "Pix" for selecionado.\n` +
+            `-# Aviso: Manter esta função habilitada sobrescreverá a função automática do Mercado Pago.\n\n` +
+            `**Chave PIX:** \`${chavePix}\`\n` +
+            `**Mensagem de Auxílio:** ${msgAuxilio}`
         )
-        .setFooter({ text: `Aviso: Manter esta função habilitada sobrescreverá a função automática do Mercado Pago.`, iconURL: interaction.guild.iconURL() })
-        .setTimestamp()
+    );
 
-    const row1 = new ActionRowBuilder()
-        .addComponents(
-            new ButtonBuilder().setCustomId(`editConfigSemi`).setLabel(`Editar Configurações`).setEmoji(`1246953149009367173`).setStyle(1),
-            new ButtonBuilder().setCustomId(`onOffSemi`).setLabel(configuracao.get("pagamentos.SemiAutomatico.status") != false ? "Desabilitar" : "Habilitar").setEmoji(`1246953228655132772`).setStyle(configuracao.get("pagamentos.SemiAutomatico.status") != false ? 4 : 3)
-        )
+    container.addSeparatorComponents(new SeparatorBuilder());
 
-    const row2 = new ActionRowBuilder()
-        .addComponents(
-            new ButtonBuilder()
-                .setCustomId("formasdepagamentos")
-                .setEmoji(`1238413255886639104`)
-                .setStyle(2),
-            new ButtonBuilder()
-                .setCustomId(`voltar1`)
-                .setEmoji('1292237216915128361')
-                .setStyle(1)
-        )
+    const row1 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId('editConfigSemi')
+            .setLabel('Editar Configurações')
+            .setEmoji('1246953149009367173')
+            .setStyle(1),
+        new ButtonBuilder()
+            .setCustomId('onOffSemi')
+            .setLabel(isEnabled ? "Desabilitar" : "Habilitar")
+            .setEmoji('1246953228655132772')
+            .setStyle(isEnabled ? 4 : 3)
+    );
 
-    interaction.editReply({ content: ``, embeds: [embed], components: [row1, row2] })
+    const row2 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("formasdepagamentos")
+            .setEmoji('1238413255886639104')
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId('voltar1')
+            .setEmoji('1371580875615113307')
+            .setStyle(1)
+    );
 
+    container.addActionRowComponents(row1);
+    container.addActionRowComponents(row2);
+
+    interaction.editReply({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        content: '',
+        embeds: []
+    });
 }
 
-module.exports = {
-    semiConfigs
-}
+module.exports = { semiConfigs }

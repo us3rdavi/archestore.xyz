@@ -1,5 +1,24 @@
-const { ActionRowBuilder, EmbedBuilder, ButtonBuilder, ChannelSelectMenuBuilder, ChannelType, RoleSelectMenuBuilder } = require('discord.js');
+const {
+    ActionRowBuilder, ButtonBuilder, ChannelSelectMenuBuilder, ChannelType, RoleSelectMenuBuilder,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
+} = require('discord.js');
 const { configuracao } = require("../../DataBaseJson");
+
+function getAccentColor() {
+    const cor = configuracao.get('Cores.Principal') || '5865F2';
+    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
+}
+
+function buildCommandPanel(title, desc, rows) {
+    const container = new ContainerBuilder();
+    container.setAccentColor(getAccentColor());
+    container.addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(`## ${title}\n${desc}`)
+    );
+    container.addSeparatorComponents(new SeparatorBuilder());
+    for (const row of rows) container.addActionRowComponents(row);
+    return container;
+}
 
 module.exports = {
     name: "interactionCreate",
@@ -16,48 +35,22 @@ module.exports = {
                 }
             }
 
-            const embeds = {
-                banUnban: new EmbedBuilder()
-                    .setColor(configuracao.get('Cores.Principal') || '5865F2')
-                    .setTitle('Configuração de Ban & Unban')
-                    .setAuthor({ name: 'Sistema de proteção', iconURL: 'https://cdn.discordapp.com/emojis/1239020888398237766.gif?size=2048' })
-                    .setDescription('> **Você está configurando o comando Ban & Unban. Selecione o canal e o cargo abaixo:**')
-                    .setTimestamp(),
-
-                unlockLock: new EmbedBuilder()
-                    .setColor(configuracao.get('Cores.Principal') || '5865F2')
-                    .setTitle('Configuração de Unlock & Lock')
-                    .setAuthor({ name: 'Sistema de proteção', iconURL: 'https://cdn.discordapp.com/emojis/1239020888398237766.gif?size=2048' })
-                    .setDescription('> **Você está configurando o comando Unlock & Lock. Selecione o canal e o cargo abaixo:**')
-                    .setTimestamp(),
-
-                clearNuke: new EmbedBuilder()
-                    .setColor(configuracao.get('Cores.Principal') || '5865F2')
-                    .setTitle('Configuração de Clear & Nuke')
-                    .setAuthor({ name: 'Sistema de proteção', iconURL: 'https://cdn.discordapp.com/emojis/1239020888398237766.gif?size=2048' })
-                    .setDescription('> **Você está configurando o comando Clear & Nuke. Selecione o canal e o cargo abaixo:**')
-                    .setTimestamp(),
-            };
-
-            const rows = (idRole, idChannel) => [
+            const makeRows = (idRole, idChannel) => [
                 new ActionRowBuilder().addComponents(
-                    new RoleSelectMenuBuilder()
-                        .setCustomId(idRole)
-                        .setMaxValues(1)
-                        .setPlaceholder("Selecione o cargo")
+                    new RoleSelectMenuBuilder().setCustomId(idRole).setMaxValues(1).setPlaceholder("Selecione o cargo")
                 ),
                 new ActionRowBuilder().addComponents(
-                    new ChannelSelectMenuBuilder()
-                        .setCustomId(idChannel)
-                        .setChannelTypes(ChannelType.GuildText)
-                        .setMaxValues(1)
-                        .setPlaceholder("Selecione o canal de logs")
+                    new ChannelSelectMenuBuilder().setCustomId(idChannel).setChannelTypes(ChannelType.GuildText).setMaxValues(1).setPlaceholder("Selecione o canal de logs")
                 )
             ];
 
-            // Configuração de Ban & Unban
             if (customId === 'configurar_banunban') {
-                await safeReply({ embeds: [embeds.banUnban], components: rows('selecionar_cargo_banunban', 'selecionar_canal_banunban'), ephemeral: true });
+                await safeReply({
+                    components: [buildCommandPanel('Configuração de Ban & Unban', 'Você está configurando o comando **Ban & Unban**. Selecione o canal e o cargo abaixo:', makeRows('selecionar_cargo_banunban', 'selecionar_canal_banunban'))],
+                    flags: MessageFlags.IsComponentsV2,
+                    embeds: [],
+                    ephemeral: true
+                });
             }
             if (customId === 'selecionar_canal_banunban') {
                 configuracao.set('ConfigCommands.banchannel', interaction.values[0]);
@@ -68,9 +61,13 @@ module.exports = {
                 await safeReply({ content: `> Cargo configurado para: <@&${interaction.values[0]}>`, ephemeral: true });
             }
 
-            // Configuração de Unlock & Lock
             if (customId === 'configurar_unlocklock') {
-                await safeReply({ embeds: [embeds.unlockLock], components: rows('selecionar_cargo_unlocklock', 'selecionar_canal_unlocklock'), ephemeral: true });
+                await safeReply({
+                    components: [buildCommandPanel('Configuração de Unlock & Lock', 'Você está configurando o comando **Unlock & Lock**. Selecione o canal e o cargo abaixo:', makeRows('selecionar_cargo_unlocklock', 'selecionar_canal_unlocklock'))],
+                    flags: MessageFlags.IsComponentsV2,
+                    embeds: [],
+                    ephemeral: true
+                });
             }
             if (customId === 'selecionar_canal_unlocklock') {
                 configuracao.set('ConfigCommands.lockschannel', interaction.values[0]);
@@ -81,9 +78,13 @@ module.exports = {
                 await safeReply({ content: `> Cargo configurado para: <@&${interaction.values[0]}>`, ephemeral: true });
             }
 
-            // Configuração de Clear & Nuke
             if (customId === 'configurar_clearnuke') {
-                await safeReply({ embeds: [embeds.clearNuke], components: rows('selecionar_cargo_clearnuke', 'selecionar_canal_clearnuke'), ephemeral: true });
+                await safeReply({
+                    components: [buildCommandPanel('Configuração de Clear & Nuke', 'Você está configurando o comando **Clear & Nuke**. Selecione o canal e o cargo abaixo:', makeRows('selecionar_cargo_clearnuke', 'selecionar_canal_clearnuke'))],
+                    flags: MessageFlags.IsComponentsV2,
+                    embeds: [],
+                    ephemeral: true
+                });
             }
             if (customId === 'selecionar_canal_clearnuke') {
                 configuracao.set('ConfigCommands.nukechannel', interaction.values[0]);

@@ -28,7 +28,7 @@ function CloseThreds(client) {
                     const member = await client.users.fetch(ultimoNumero)
 
                     const embed = new EmbedBuilder()
-                        .setColor(`${configuracao.get(`Cores.Erro`) == null ? `#ff0000` : configuracao.get(`Cores.Erro`)}`)
+                        .setColor(`${configuracao.get(`Cores.Erro`) == null ? `#5865F2` : configuracao.get(`Cores.Erro`)}`)
                         .setTitle(`Carrinho expirado.`)
                         .setDescription(`Seu carrinho foi fechado por inatividade.`)
 
@@ -42,7 +42,7 @@ function CloseThreds(client) {
                     const channela = await client.channels.fetch(configuracao.get('ConfigChannels.logpedidos'));
 
                     const embed = new EmbedBuilder()
-                        .setColor(`${configuracao.get(`Cores.Erro`) == null ? `#ff0000` : configuracao.get(`Cores.Erro`)}`)
+                        .setColor(`${configuracao.get(`Cores.Erro`) == null ? `#5865F2` : configuracao.get(`Cores.Erro`)}`)
                         .setTitle(`Carrinho expirado.`)
                         .setDescription(`O carrinho de <@!${ultimoNumero}> foi fechado por inatividade (\`10 Minutos\`).`)
 

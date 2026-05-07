@@ -11,7 +11,7 @@ async function handleDeletedMessage(message, logChannelId, client) {
 
         const deleteEmbed = new EmbedBuilder()
             .setTitle(`${Emojis.get('_trash_emoji')} Mensagem Apagada`)
-            .setColor(0xDD2E44)
+            .setColor(0x5865F2)
             .addFields(
                 { name: 'Canal', value: `${message.channel}`, inline: true },
                 { name: 'Autor', value: `${message.author} (${message.author.tag})`, inline: true },
@@ -44,7 +44,7 @@ async function handleUpdatedMessage(oldMessage, newMessage, logChannelId, client
 
         const updateEmbed = new EmbedBuilder()
             .setTitle(`${Emojis.get('_lapis_emoji')} Mensagem Editada`)
-            .setColor(0xFFCC4D)
+            .setColor(0x5865F2)
             .addFields(
                 { name: 'Canal', value: `${oldMessage.channel}`, inline: true },
                 { name: 'Autor', value: `${oldMessage.author} (${oldMessage.author.tag})`, inline: true },

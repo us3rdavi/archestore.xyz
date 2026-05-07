@@ -221,7 +221,7 @@ async function painelConfiguracaoTicket(interaction) {
         new ButtonBuilder()
             .setCustomId("canallogsticket2")
             .setLabel('Canal de Logs')
-            .setEmoji("1371593613665894562")
+            .setEmoji("1501804039451709441")
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("cargosstaff")
@@ -239,7 +239,7 @@ async function painelConfiguracaoTicket(interaction) {
         new ButtonBuilder()
             .setCustomId("configmensagemfinal")
             .setLabel('Mensagem de Finalização')
-            .setEmoji("1371593617868591185")
+            .setEmoji("1501804067616325723")
             .setStyle(2)
     );
 

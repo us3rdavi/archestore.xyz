@@ -45,7 +45,7 @@ async function VerificarPagamento(client) {
                         const channela = await client.channels.fetch(configuracao.get(`ConfigChannels.logpedidos`));
 
                         const mandanopvdocara = new EmbedBuilder()
-                            .setColor(`${configuracao.get(`Cores.Erro`) == null ? `#ff0000` : configuracao.get(`Cores.Erro`)}`) //ff0000
+                            .setColor(`${configuracao.get(`Cores.Erro`) == null ? `#5865F2` : configuracao.get(`Cores.Erro`)}`) //ff0000
                             .setAuthor({ name: ` Pagamento expirado`, iconURL: "https://i.ibb.co/cgc5HYq/1238523554337787976.png" })
                             .setFooter(
                                 { text: car.guild.name, iconURL: car.guild.iconURL }
@@ -124,7 +124,7 @@ async function VerificarPagamento(client) {
 
                     const embed = new EmbedBuilder()
                         .setTitle(`${Emojis.get(`failpayment_emoji`)} Pagamento não aprovado`)
-                        .setColor(`Red`)
+                        .setColor(`#5865F2`)
                         .setDescription(`Esse servidor não está aceitando pagamentos desta instituição \`${bank}\`, seu dinheiro foi reembolsado, tente novamente usando outro banco.`)
                         .setFields(
                             { name: `Detalhes`, value: `\`${yy.quantidadeselecionada}x ${yy.infos.produto} - ${yy.infos.campo} | R$ ${Number(valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`` },
@@ -144,7 +144,7 @@ async function VerificarPagamento(client) {
 
                     const embedlog = new EmbedBuilder()
                         .setTitle(`${Emojis.get(`failpayment_emoji`)} Pagamento não aprovado`)
-                        .setColor(`Red`)
+                        .setColor(`#5865F2`)
                         .setDescription(`Usuário <@!${yy.user}> teve o dinheiro reembolsado e o produto não entregue, pelo motivo do banco \`${bank}\` estar na lista de bancos bloqueados.`)
                         .setFields(
                             { name: `Detalhes`, value: `\`${yy.quantidadeselecionada}x ${yy.infos.produto} - ${yy.infos.campo} | R$ ${Number(valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`` },
@@ -175,7 +175,7 @@ async function VerificarPagamento(client) {
                 let user = await client.users.fetch(yy.user);
 
                 const mandanopvdocara2 = new EmbedBuilder()
-                    .setColor(`${configuracao.get(`Cores.Sucesso`) == null ? `#40fc04` : configuracao.get(`Cores.Sucesso`)}`) //40fc04
+                    .setColor(`${configuracao.get(`Cores.Sucesso`) == null ? `#5865F2` : configuracao.get(`Cores.Sucesso`)}`) //40fc04
                     .setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ dynamic: true }) ? user.displayAvatarURL({ dynamic: true }) : null })
                     .setTitle(`${Emojis.get(`confirmedpayment_emoji`)} Pagamento aprovado`)
                     .setDescription(`Seu pagamento foi aprovado, e o processo de entrega já foi iniciado.`)
@@ -192,7 +192,7 @@ async function VerificarPagamento(client) {
 
 
                 const dsfjmsdfjnsdfj2 = new EmbedBuilder()
-                    .setColor(`${configuracao.get(`Cores.Sucesso`) == null ? `#40fc04` : configuracao.get(`Cores.Sucesso`)}`) //40fc04
+                    .setColor(`${configuracao.get(`Cores.Sucesso`) == null ? `#5865F2` : configuracao.get(`Cores.Sucesso`)}`) //40fc04
                     .setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ dynamic: true }) ? user.displayAvatarURL({ dynamic: true }) : null })
                     .setTitle(`${Emojis.get(`confirmedpayment_emoji`)} Pagamento aprovado`)
                     .setDescription(`Seu pagamento foi aprovado, e o processo de entrega já foi iniciado.`)
@@ -213,7 +213,7 @@ async function VerificarPagamento(client) {
                 }
 
                 const dsfjmsdfjnsdfj222 = new EmbedBuilder()
-                    .setColor(`${configuracao.get(`Cores.Sucesso`) == null ? `#40fc04` : configuracao.get(`Cores.Sucesso`)}`) //40fc0
+                    .setColor(`${configuracao.get(`Cores.Sucesso`) == null ? `#5865F2` : configuracao.get(`Cores.Sucesso`)}`) //40fc0
                     .setTitle(`${Emojis.get(`confirmedpayment_emoji`)} Pedido aprovado`)
                     .setDescription(`Usuário <@!${yy.user}> efetuou o pagamento.`)
                     .addFields(
@@ -285,7 +285,7 @@ async function VerificarPagamento(client) {
                 if (blockbank.status == 400) {
                     const embed = new EmbedBuilder()
                         .setTitle(`${Emojis.get(`failpayment_emoji`)} Pagamento não aprovado`)
-                        .setColor(`Red`)
+                        .setColor(`#5865F2`)
                         .setDescription(`Esse servidor não está aceitando pagamentos desta instituição \`${bank}\`, seu dinheiro foi reembolsado, tente novamente usando outro banco.`)
                         .setFields(
                             { name: `Detalhes`, value: `\`${yy.quantidadeselecionada}x ${yy.infos.produto} - ${yy.infos.campo} | R$ ${Number(valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`` },
@@ -305,7 +305,7 @@ async function VerificarPagamento(client) {
 
                     const embedlog = new EmbedBuilder()
                         .setTitle(`${Emojis.get(`failpayment_emoji`)} Pagamento não aprovado`)
-                        .setColor(`Red`)
+                        .setColor(`#5865F2`)
                         .setDescription(`Usuário <@!${yy.user}> teve o dinheiro reembolsado e o produto não entregue, pelo motivo do banco \`${bank}\` estar na lista de bancos bloqueados.`)
                         .setFields(
                             { name: `Detalhes`, value: `\`${yy.quantidadeselecionada}x ${yy.infos.produto} - ${yy.infos.campo} | R$ ${Number(valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`` },
@@ -335,7 +335,7 @@ async function VerificarPagamento(client) {
                 const embedgeral = new EmbedBuilder()
                     .setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ dynamic: true }) ? user.displayAvatarURL({ dynamic: true }) : null })
                     .setTitle(`${Emojis.get(`confirmedpayment_emoji`)}Pagamento aprovado`)
-                    .setColor(`${configuracao.get(`Cores.Sucesso`) == null ? `#40fc04` : configuracao.get(`Cores.Sucesso`)}`) //40fc04
+                    .setColor(`${configuracao.get(`Cores.Sucesso`) == null ? `#5865F2` : configuracao.get(`Cores.Sucesso`)}`) //40fc04
                     .setDescription(`\`${user.username} - ${payment.data.description}\``)
                     .setFields(
                         { name: `Valor Pago`, value: `\`${Number(payment.data.pagamentos2.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`` },
@@ -349,7 +349,7 @@ async function VerificarPagamento(client) {
                 const embed = new EmbedBuilder()
                     .setAuthor({ name: user.username, iconURL: user.displayAvatarURL({ dynamic: true }) ? user.displayAvatarURL({ dynamic: true }) : null })
                     .setTitle(`${Emojis.get(`confirmedpayment_emoji`)} Pagamento aprovado`)
-                    .setColor(`${configuracao.get(`Cores.Sucesso`) == null ? `#40fc04` : configuracao.get(`Cores.Sucesso`)}`) //40fc04
+                    .setColor(`${configuracao.get(`Cores.Sucesso`) == null ? `#5865F2` : configuracao.get(`Cores.Sucesso`)}`) //40fc04
                     .setDescription(`\`${user.username} - ${payment.data.description}\``)
                     .addFields(
                         { name: `ID do Pedido`, value: `\`${payment.data.pagamentos2.id}\`` },
@@ -431,7 +431,7 @@ async function BloquearConta(client, res, payment, threadChannel, msg, lk) {
                 let motivo = contaBloqueada.split(':')[1] || 'Motivo não especificado';
 
                 const embed = new EmbedBuilder()
-                    .setColor(`${configuracao.get(`Cores.Erro`) || `#ff0000`}`)
+                    .setColor(`${configuracao.get(`Cores.Erro`) || `#5865F2`}`)
                     .setTitle(`${Emojis.get(`failpayment_emoji`)} Pedido não aprovado`)
                     .setDescription(`Esse servidor não está aceitando pagamentos desta conta \`${id}\`, seu dinheiro foi reembolsado, tente novamente usando outra conta.`)
                     .addFields(
@@ -441,7 +441,7 @@ async function BloquearConta(client, res, payment, threadChannel, msg, lk) {
                     );
 
                 const embed2 = new EmbedBuilder()
-                    .setColor(`${configuracao.get(`Cores.Erro`) || `#ff0000`}`)
+                    .setColor(`${configuracao.get(`Cores.Erro`) || `#5865F2`}`)
                     .setTitle(`${Emojis.get(`failpayment_emoji`)} Pedido não aprovado`)
                     .setDescription(`Esse servidor não está aceitando pagamentos desta conta \`${id}\`, o dinheiro do Comprador foi reembolsado. Obrigado por confiar em meu trabalho.`)
                     .addFields(

@@ -161,7 +161,7 @@ async function SendLogs(client, channel_logs) {
     const embed = new EmbedBuilder()
         .setTitle(`${Emojis.get(`confirmed_backup_emoji`)} — Dados Sincronizados`)
         .setDescription('As configurações do servidor, incluindo canais, cargos, permissões, mensagens, emojis e stickers, foram salvas na nuvem. Se por acaso seu servidor enfrentar problemas no futuro, será possível restaurá-lo completamente com apenas um comando.')
-        .setColor('White')
+        .setColor('#5865F2')
         .setFields({
             name: `Informações salvas na nuvem`,
             value: `- Canais: \`${BackupStorage.get(`Backup_${channel_logs.guild.id}`)[0]?.channels?.length}\` | Cargos: \`${BackupStorage.get(`Backup_${channel_logs.guild.id}`)[0]?.roles?.length}\` | Emojis: \`${BackupStorage.get(`Backup_${channel_logs.guild.id}`)[0]?.emojis?.length}\` | Figurinhas: \`${BackupStorage.get(`Backup_${channel_logs.guild.id}`)[0]?.stickers?.length}\`\n- Permissões, configurações e mensagens também foram salvas.\n-# Esse sistema está em desenvolvimento.`

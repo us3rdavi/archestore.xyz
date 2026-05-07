@@ -1,26 +1,28 @@
-const { ApplicationCommandType, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField } = require("discord.js");
-const { Emojis } = require("../../DataBaseJson");
+const {
+    ApplicationCommandType,
+    ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
+} = require("discord.js");
+const { Emojis, configuracao } = require("../../DataBaseJson");
+
+function getAccentColor() {
+    const cor = configuracao.get('Cores.Principal') || '5865F2';
+    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
+}
 
 module.exports = {
     name: "deletealltickets",
-    description:"Deleta todos os tickets",
+    description: "Deleta todos os tickets",
     type: ApplicationCommandType.ChatInput,
-    run: async(client, interaction) => {
+    run: async (client, interaction) => {
         if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-            return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Faltam permissões.`, ephemeral: true });
+            return interaction.reply({ content: `${Emojis.get('negative_emoji')} Faltam permissões.`, ephemeral: true });
         }
 
-        const row = new ActionRowBuilder()
-            .addComponents(
-                new ButtonBuilder()
-                    .setCustomId('delete')
-                    .setLabel('Deletar')
-                    .setStyle(ButtonStyle.Danger),
-                new ButtonBuilder()
-                    .setCustomId('cancel')
-                    .setLabel('Cancelar')
-                    .setStyle(ButtonStyle.Secondary)
-            );
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId('delete').setLabel('Deletar').setStyle(ButtonStyle.Danger),
+            new ButtonBuilder().setCustomId('cancel').setLabel('Cancelar').setStyle(ButtonStyle.Secondary)
+        );
 
         const reply = await interaction.reply({
             content: `Deseja realmente deletar todos os tickets?`,
@@ -34,7 +36,7 @@ module.exports = {
 
         collector.on('collect', async i => {
             if (i.customId === 'delete') {
-                await i.update({ content: `${Emojis.get(`loading_emoji`)} Deletando Tickets...`, components: [] });
+                await i.update({ content: `${Emojis.get('loading_emoji')} Deletando Tickets...`, components: [] });
 
                 const allThreads = await interaction.guild.channels.fetchActiveThreads();
                 let count = 0;
@@ -46,16 +48,22 @@ module.exports = {
                     }
                 }
 
-                const embed = new EmbedBuilder()
-                    .setTitle('Tickets Deletados')
-                    .setDescription(`${Emojis.get(`confirmed_emoji`)} Todos os **${count}** tickets foram deletados com sucesso`)
-                    .setColor('#00FF00')
-                    .setFooter({ text: `${interaction.guild.name}` })
-                    .setTimestamp();
+                const container = new ContainerBuilder();
+                container.setAccentColor(getAccentColor());
+                container.addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
+                        `## Tickets Deletados\n${Emojis.get('confirmed_emoji')} Todos os **${count}** tickets foram deletados com sucesso`
+                    )
+                );
 
-                return interaction.editReply({ content: '', embeds: [embed] });
+                return interaction.editReply({
+                    content: '',
+                    components: [container],
+                    flags: MessageFlags.IsComponentsV2,
+                    embeds: []
+                });
             } else if (i.customId === 'cancel') {
-                await i.update({ content: `${Emojis.get(`confirmed_emoji`)} Ação cancelada.`, components: [] });
+                await i.update({ content: `${Emojis.get('confirmed_emoji')} Ação cancelada.`, components: [] });
             }
         });
 

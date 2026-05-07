@@ -84,7 +84,7 @@ async function SystemLockAndUnlock(client) {
 async function UnlockChannels(client, canais) {
     const embed = new EmbedBuilder()
         .setAuthor({ name: 'Canal Aberto Pelo Sistema', iconURL: 'https://cdn.discordapp.com/emojis/1230562932044070922.webp?size=44&quality=lossless' })
-        .setColor('#41ffa1')
+        .setColor('#5865F2')
         .setDescription('- Este canal foi aberto automaticamente pelo sistema.\n- Agora você pode enviar mensagens.');
 
     let ids = [];
@@ -115,7 +115,7 @@ async function LockChannels(client, canais) {
     const abertura = configuracao.get('AutomaticSettings.GerenciarCanais.abertura') || 'não definida';
     const embed = new EmbedBuilder()
         .setAuthor({ name: 'Canal Fechado Pelo Sistema', iconURL: 'https://cdn.discordapp.com/emojis/1230562904424845322.webp?size=44&quality=lossless' })
-        .setColor('#ff5251')
+        .setColor('#5865F2')
         .setDescription(`- Este canal foi fechado automaticamente. Ele será reaberto às \`${abertura}\`.`);
 
     let ids = [];

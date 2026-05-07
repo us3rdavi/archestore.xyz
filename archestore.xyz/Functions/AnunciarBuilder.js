@@ -129,25 +129,6 @@ function buildSectionScreen(userId, section) {
     container.addActionRowComponents(buildNavSelect(userId, section));
     container.addSeparatorComponents(new SeparatorBuilder());
 
-    const sectionLabel = SECTION_LABELS[section] || section;
-
-    let currentValue;
-    if (section === 'fields') {
-        currentValue = data.fields?.length > 0 ? `${data.fields.length} campo(s)` : 'Nenhum';
-    } else if (section === 'timestamp') {
-        currentValue = data.timestamp ? new Date(data.timestamp).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : 'Não definido';
-    } else {
-        currentValue = data[section] || 'Não definido';
-    }
-
-    container.addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(
-            `**${sectionLabel}** ›\n-# Valor atual: \`${currentValue}\``
-        )
-    );
-
-    container.addSeparatorComponents(new SeparatorBuilder());
-
     let actionRow;
     if (section === 'fields') {
         actionRow = new ActionRowBuilder().addComponents(

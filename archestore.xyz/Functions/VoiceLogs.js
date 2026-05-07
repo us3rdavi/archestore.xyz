@@ -12,7 +12,7 @@ async function handleVoiceStateUpdate(oldState, newState, logChannelId, client) 
         const usernameWithTag = `${member.user.tag}`;
 
         const embed = new EmbedBuilder()
-            .setColor(0x0099ff)
+            .setColor(0x5865F2)
             .setAuthor({ name: usernameWithTag, iconURL: userAvatar })
             .setTimestamp();
 
@@ -22,7 +22,7 @@ async function handleVoiceStateUpdate(oldState, newState, logChannelId, client) 
         if (!oldState.channelId && newState.channelId) {
             voiceJoinTimestamps.set(member.id, Date.now());
             embed.setDescription(`**Entrou** no canal ${newChannel}`)
-                .setColor(0x77B255);
+                .setColor(0x5865F2);
         } else if (oldState.channelId && !newState.channelId) {
             const joinTime = voiceJoinTimestamps.get(member.id) || Date.now();
             const duration = Date.now() - joinTime;
@@ -30,7 +30,7 @@ async function handleVoiceStateUpdate(oldState, newState, logChannelId, client) 
             voiceJoinTimestamps.delete(member.id);
 
             embed.setDescription(`**Saiu** do canal ${oldChannel} — **${durationMinutes} min**`)
-                .setColor(0xDD2E44);
+                .setColor(0x5865F2);
         } else if (oldState.channelId && newState.channelId && oldState.channelId !== newState.channelId) {
             const joinTime = voiceJoinTimestamps.get(member.id) || Date.now();
             const duration = Date.now() - joinTime;
@@ -38,7 +38,7 @@ async function handleVoiceStateUpdate(oldState, newState, logChannelId, client) 
             voiceJoinTimestamps.set(member.id, Date.now());
 
             embed.setDescription(`**Mudou** de ${oldChannel} para ${newChannel} — **${durationMinutes} min**`)
-                .setColor(0xFFAA00);
+                .setColor(0x5865F2);
         } else {
             return;
         }

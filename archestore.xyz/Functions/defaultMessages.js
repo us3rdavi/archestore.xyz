@@ -1,87 +1,44 @@
-const { EmbedBuilder } = require("discord.js");
+const { ContainerBuilder, TextDisplayBuilder, MessageFlags } = require("discord.js");
+const { configuracao, Emojis } = require("../DataBaseJson");
+
+function getAccentColor() {
+    const cor = configuracao.get('Cores.Principal') || '5865F2';
+    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
+}
+
+function buildContainer(text, rowComponent) {
+    const container = new ContainerBuilder();
+    container.setAccentColor(getAccentColor());
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(text));
+    if (rowComponent) container.addActionRowComponents(rowComponent);
+    return container;
+}
+
+function getEmoji(type) {
+    if (type === 'error') return Emojis.get('negative_emoji') || '';
+    if (type === 'success') return Emojis.get('confirmed_emoji') || '';
+    if (type === 'loading') return Emojis.get('loading_emoji') || '';
+    return '';
+}
 
 async function replyMessage({ interaction, type, message, components }) {
-    const embed = new EmbedBuilder();
-    switch (type) {
-        case "error": {
-            embed.setColor("Red");
-            embed.setDescription(`${Emojis.get(`negative_emoji`)} ${message}`);
-            return interaction.reply({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
-        }
-        case "success": {
-            embed.setColor("Green");
-            embed.setDescription(`${Emojis.get(`confirmed_emoji`)} ${message}`);
-            return interaction.reply({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
-        }
-        case "loading": {
-            embed.setColor("#5865F2");
-            embed.setDescription(`${Emojis.get(`loading_emoji`)} ${message}`);
-            return interaction.reply({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
-        }
-    }
+    const container = buildContainer(`${getEmoji(type)} ${message}`, components || null);
+    return interaction.reply({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
 }
 
 async function editReplyMessage({ interaction, type, message, components }) {
-    const embed = new EmbedBuilder();
-    switch (type) {
-        case "error": {
-            embed.setColor("Red");
-            embed.setDescription(`${Emojis.get(`negative_emoji`)} ${message}`);
-            return interaction.editReply({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
-        }
-        case "success": {
-            embed.setColor("Green");
-            embed.setDescription(`${Emojis.get(`confirmed_emoji`)} ${message}`);
-            return interaction.editReply({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
-        }
-        case "loading": {
-            embed.setColor("#5865F2");
-            embed.setDescription(`${Emojis.get(`loading_emoji`)} ${message}`);
-            return interaction.editReply({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
-        }
-    }
+    const container = buildContainer(`${getEmoji(type)} ${message}`, components || null);
+    return interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
 }
 
 async function updateMessage({ interaction, type, message, components }) {
-    const embed = new EmbedBuilder();
-    switch (type) {
-        case "error": {
-            embed.setColor("Red");
-            embed.setDescription(`${Emojis.get(`negative_emoji`)} ${message}`);
-            return interaction.update({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
-        }
-        case "success": {
-            embed.setColor("Green");
-            embed.setDescription(`${Emojis.get(`confirmed_emoji`)} ${message}`);
-            return interaction.update({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
-        }
-        case "loading": {
-            embed.setColor("#5865F2");
-            embed.setDescription(`${Emojis.get(`loading_emoji`)} ${message}`);
-            return interaction.update({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
-        }
-    }
+    const container = buildContainer(`${getEmoji(type)} ${message}`, components || null);
+    return interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
 }
 
 async function followUpMessage({ interaction, type, message, components }) {
-    const embed = new EmbedBuilder();
-    switch (type) {
-        case "error": {
-            embed.setColor("Red");
-            embed.setDescription(`${Emojis.get(`negative_emoji`)} ${message}`);
-            return interaction.followUp({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
-        }
-        case "success": {
-            embed.setColor("Green");
-            embed.setDescription(`${Emojis.get(`confirmed_emoji`)} ${message}`);
-            return interaction.followUp({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
-        }
-        case "loading": {
-            embed.setColor("#5865F2");
-            embed.setDescription(`${Emojis.get(`loading_emoji`)} ${message}`);
-            return interaction.followUp({ embeds: [embed], components: components ? [components] : [], ephemeral: true });
-        }
-    }
+    const container = buildContainer(`${getEmoji(type)} ${message}`, components || null);
+    return interaction.followUp({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
 }
 
 module.exports = {

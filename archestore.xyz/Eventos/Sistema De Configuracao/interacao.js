@@ -25,19 +25,14 @@ module.exports = {
 
             interaction.channel.permissionOverwrites.edit(interaction.guild.id, { SendMessages: true })
 
-            interaction.update({
-                embeds: [
-                    new EmbedBuilder()
-                        .setDescription(`Este canal ${interaction.channel} foi destrancado por (${interaction.user})`)
-                        .setColor(`#00FF00`)
-                ],
-                components: [
-                    new ActionRowBuilder()
-                        .addComponents(
-                            new ButtonBuilder().setCustomId(`unlockChannel`).setLabel(`Destrancar`).setStyle(2).setDisabled(true)
-                        )
-                ]
-            });
+            {
+                const { ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
+                const unlockContainer = new ContainerBuilder();
+                unlockContainer.setAccentColor(0x00FF00);
+                unlockContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`Este canal ${interaction.channel} foi destrancado por (${interaction.user})`));
+                unlockContainer.addActionRowComponents(new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('unlockChannel').setLabel('Destrancar').setStyle(2).setDisabled(true)));
+                interaction.update({ components: [unlockContainer], flags: MessageFlags.IsComponentsV2, embeds: [] });
+            }
 
         }
 

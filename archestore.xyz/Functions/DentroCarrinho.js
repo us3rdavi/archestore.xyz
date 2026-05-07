@@ -158,7 +158,7 @@ async function DentroCarrinhoEfiBank(client, interaction) {
             interaction.channel.setName(`pagamento・${interaction.user.username}・${interaction.user.id}`)
 
             const mandanopvdocara = new EmbedBuilder()
-                .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#fcba03` : configuracao.get(`Cores.Processamento`)}`)
+                .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#5865F2` : configuracao.get(`Cores.Processamento`)}`)
                 .setTitle(`Pedido solicitado`)
                 .setFooter(
                     { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) }
@@ -188,7 +188,7 @@ async function DentroCarrinhoEfiBank(client, interaction) {
             }
 
             const dsfjmsdfjnsdfj = new EmbedBuilder()
-                .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#fcba03` : configuracao.get(`Cores.Processamento`)}`)
+                .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#5865F2` : configuracao.get(`Cores.Processamento`)}`)
                 .setTitle(`Pedido solicitado`)
                 .setDescription(`Usuário ${interaction.user} solicitou um pedido.`)
                 .addFields(
@@ -320,7 +320,7 @@ async function DentroCarrinhoPix(interaction, client) {
                 const attachment = new AttachmentBuilder(buffer, { name: "payment.png" });
 
                 const embed = new EmbedBuilder()
-                    .setColor(`${configuracao.get(`Cores.Principal`) == null ? '2b2d31' : configuracao.get('Cores.Principal')}`)
+                    .setColor(`${configuracao.get(`Cores.Principal`) == null ? '5865F2' : configuracao.get('Cores.Principal')}`)
                     .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL({ dynamic: true }) ? interaction.user.displayAvatarURL({ dynamic: true }) : null })
                     .setTitle(`Pagamento via PIX criado`)
                     .addFields(
@@ -365,7 +365,7 @@ async function DentroCarrinhoPix(interaction, client) {
 
 
                 const mandanopvdocara = new EmbedBuilder()
-                    .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#fcba03` : configuracao.get(`Cores.Processamento`)}`)
+                    .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#5865F2` : configuracao.get(`Cores.Processamento`)}`)
                     .setTitle(`${Emojis.get(`neworder_emoji`)} Pedido solicitado`)
                     .setFooter(
                         { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) }
@@ -397,7 +397,7 @@ async function DentroCarrinhoPix(interaction, client) {
 
 
                 const dsfjmsdfjnsdfj = new EmbedBuilder()
-                    .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#fcba03` : configuracao.get(`Cores.Processamento`)}`)
+                    .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#5865F2` : configuracao.get(`Cores.Processamento`)}`)
                     .setTitle(`${Emojis.get(`neworder_emoji`)} Pedido solicitado`)
                     .setDescription(`Usuário ${interaction.user} solicitou um pedido.`)
                     .addFields(
@@ -534,7 +534,7 @@ async function DentroCarrinhoCartao(interaction, client) {
                 pagamentos.set(`${interaction.channel.id}.pagamentos`, { id: data.body.id, cp: data.body.init_point, method: 'site', data: Date.now(), PaymentId: ID })
 
                 const mandanopvdocara = new EmbedBuilder()
-                    .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#fcba03` : configuracao.get(`Cores.Processamento`)}`)
+                    .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#5865F2` : configuracao.get(`Cores.Processamento`)}`)
                     .setTitle(`${Emojis.get(`neworder_emoji`)} Pedido solicitado`)
                     .setFooter(
                         { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) }
@@ -565,7 +565,7 @@ async function DentroCarrinhoCartao(interaction, client) {
 
 
                 const dsfjmsdfjnsdfj = new EmbedBuilder()
-                    .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#fcba03` : configuracao.get(`Cores.Processamento`)}`)
+                    .setColor(`${configuracao.get(`Cores.Processamento`) == null ? `#5865F2` : configuracao.get(`Cores.Processamento`)}`)
                     .setTitle(`${Emojis.get(`neworder_emoji`)} Pedido solicitado`)
                     .setDescription(`Usuário ${interaction.user} solicitou um pedido.`)
                     .addFields(

@@ -1,4 +1,8 @@
-const { ModalBuilder, TextInputBuilder, TextInputStyle, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelSelectMenuBuilder, ChannelType } = require("discord.js");
+const {
+    ModalBuilder, TextInputBuilder, TextInputStyle, EmbedBuilder,
+    ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelSelectMenuBuilder, ChannelType,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
+} = require("discord.js");
 
 module.exports = {
     name: "interactionCreate",
@@ -7,45 +11,32 @@ module.exports = {
         if (!customId) return;
 
         if (customId === `${interaction.user.id}_discohookconfig`) {
-            const botaosite24 = new ButtonBuilder()
-                .setLabel('DiscoHook ')
-                .setURL('https://discohook.org/')
-                .setStyle(5);
+            const container = new ContainerBuilder();
+            container.setAccentColor(0x5865F2);
 
-            const botaotutorial24 = new ButtonBuilder()
-                .setLabel('Tutorial')
-                .setURL('https://discohook.org/faq')
-                .setStyle(5);
+            container.addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    `## DiscoHook Import — Mensagem de Resgate\nImporte a mensagem do termo usando DiscoHook.\n\n` +
+                    `**Como usar:** Acesse o site DiscoHook, crie a mensagem desejada, clique em *JSON Data Editor*, copie o código, volte ao Discord e clique em **Importar**.\n\n` +
+                    `-# Use o botão "Tutorial" para mais detalhes.`
+                )
+            );
 
-            const botaoimportar24 = new ButtonBuilder()
-                .setLabel('Importar')
-                .setCustomId('importacaocodigo24')
-                .setStyle(3)
-                .setEmoji('1251585341895213118');
+            container.addSeparatorComponents(new SeparatorBuilder());
 
-            const botaoVoltar = new ButtonBuilder()
-                .setCustomId("painelconfigvendas")
-                .setLabel('Voltar')
-                .setEmoji('1178068047202893869')
-                .setStyle(2);
-
-            const row = new ActionRowBuilder()
-                .addComponents(botaosite24, botaotutorial24, botaoimportar24, botaoVoltar);
-
-            const embed = new EmbedBuilder()
-                .setAuthor({ name: 'DiscoHook Import - Mensagem de resgate', iconURL: 'https://cdn.discordapp.com/emojis/990284971384111204.png?size=2048' })
-                .setDescription('> Importe a mensagem do termo usando DiscoHook.')
-                .setColor("DarkBlue")
-                .setThumbnail('https://cdn.discordapp.com/emojis/1200049577877835787.png?size=2048')
-                .addFields([
-                    { name: 'Help', value: '**Use o botão "DiscoHook" Para acessar o site e quando criar a mensagem que quer clique em Json Data Editor e volte pro discord e clique em Importar E cole o codigo la e clique em enviar.**' },
-                    { name: 'Ajuda', value: '**Use o botão "tutorial" para mais detalhes.**' }
-                ])
-                .setFooter({ text: 'Sistema DiscoHook', iconURL: 'https://cdn.discordapp.com/emojis/1248300571522371686.png?size=2048' });
+            container.addActionRowComponents(
+                new ActionRowBuilder().addComponents(
+                    new ButtonBuilder().setLabel('DiscoHook').setURL('https://discohook.org/').setStyle(5),
+                    new ButtonBuilder().setLabel('Tutorial').setURL('https://discohook.org/faq').setStyle(5),
+                    new ButtonBuilder().setLabel('Importar').setCustomId('importacaocodigo24').setStyle(3).setEmoji('1251585341895213118'),
+                    new ButtonBuilder().setCustomId("painelconfigvendas").setLabel('Voltar').setEmoji('1178068047202893869').setStyle(2)
+                )
+            );
 
             await interaction.update({
-                embeds: [embed],
-                components: [row],
+                components: [container],
+                flags: MessageFlags.IsComponentsV2,
+                embeds: [],
                 ephemeral: true
             });
         }
@@ -62,9 +53,7 @@ module.exports = {
                 .setPlaceholder('Cole aqui o código JSON gerado pelo DiscoHook')
                 .setRequired(true);
 
-            const actionRow = new ActionRowBuilder().addComponents(jsoninput24);
-            modal.addComponents(actionRow);
-
+            modal.addComponents(new ActionRowBuilder().addComponents(jsoninput24));
             await interaction.showModal(modal);
         }
 
@@ -75,7 +64,7 @@ module.exports = {
                 const discohook24data24 = JSON.parse(Jsonsalvar24);
 
                 if (!discohook24data24 || (!discohook24data24.content && !discohook24data24.embeds)) {
-                    throw new Error(`${Emojis.get(`negative_emoji`)} O Codigo "Json" Que Você Pois não possui o "Content" ou "embed"`);
+                    throw new Error('O Código JSON não possui "content" ou "embeds"');
                 }
 
                 const selecionarcanal24 = new ChannelSelectMenuBuilder()
@@ -83,26 +72,22 @@ module.exports = {
                     .setPlaceholder('Selecione o canal para enviar a mensagem')
                     .setChannelTypes([ChannelType.GuildText]);
 
-                const row = new ActionRowBuilder().addComponents(selecionarcanal24);
-
                 await interaction.reply({
-                    content: '**Escolha Um Canal que será enviado a mensagem:**',
-                    components: [row],
+                    content: '**Escolha um canal para enviar a mensagem:**',
+                    components: [new ActionRowBuilder().addComponents(selecionarcanal24)],
                     ephemeral: true
                 });
 
                 interaction.client.tempJsonData = discohook24data24;
-
             } catch (error) {
-                console.error(`${Emojis.get(`negative_emoji`)} Ocorreu um erro ao processar o codigo Json:`, error);
-                await interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Ocorreu um erro ao processar o codigo Json: ${error.message}**`, ephemeral: true });
+                console.error('Erro ao processar JSON:', error);
+                await interaction.reply({ content: `Ocorreu um erro ao processar o código JSON: ${error.message}`, ephemeral: true });
             }
         }
 
         if (customId === 'selecioanrcanal24') {
             const selectedChannelId = interaction.values[0];
             const channel = interaction.guild.channels.cache.get(selectedChannelId);
-
             const discohook24data24 = interaction.client.tempJsonData;
             const content = discohook24data24.content || null;
             const embeds = discohook24data24.embeds ? discohook24data24.embeds.map(embed => new EmbedBuilder(embed)) : null;
@@ -114,11 +99,11 @@ module.exports = {
             } else if (embeds) {
                 await channel.send({ embeds });
             } else {
-                await interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Não Foi Encontrada Nenhuma configuração válida encontrada.`, ephemeral: true });
+                await interaction.reply({ content: `Não foi encontrada nenhuma configuração válida.`, ephemeral: true });
                 return;
             }
 
-            await interaction.update({ content: `${Emojis.get(`confirmed_emoji`)} Mensagem enviada com sucesso: ${channel}!`, components: [], ephemeral: true });
+            await interaction.update({ content: `Mensagem enviada com sucesso em ${channel}!`, components: [], ephemeral: true });
         }
     }
 };
