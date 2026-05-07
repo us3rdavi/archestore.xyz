@@ -1,22 +1,36 @@
-const { RoleSelectMenuBuilder, EmbedBuilder, InteractionType, ActionRowBuilder, ButtonBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require("discord.js")
-const { JsonDatabase } = require('wio.db');
-const { tickets, configuracao } = require("../DataBaseJson/index")
+const {
+    ActionRowBuilder, ButtonBuilder, ModalBuilder, TextInputBuilder, TextInputStyle,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
+} = require("discord.js");
+const { tickets } = require("../DataBaseJson/index");
+const emojis = require("../DataBaseJson/Emojis.json");
+const Emojis = { get: (name) => emojis[name] || "" };
 
 async function Atendimentohorario(interaction, client) {
-
     const atendimentohorario24 = tickets.get(`statushorario`) || false;
 
-    const embed = new EmbedBuilder()
-    .setAuthor({ name: 'Horario Atendimento', iconURL: `https://cdn.discordapp.com/emojis/1250148517368959089.png?size=2048` })
-    .setDescription(`**Configure o horario de atendimento, Ex: \`10:00\` ate as \`19:00\`, Quando o __cliente__ tente abrir fora do horário de expediente não criará um ticket.**`)
-    .setThumbnail(`https://cdn.discordapp.com/attachments/1345901017513853010/1350680766903746590/dreamapps-ezgif.com-video-to-gif-converter.gif?ex=67d79efd&is=67d64d7d&hm=18e792aedd90fd83b2afa151ce3894b6c3fab6fbd7fe981c9e0b2fce29a08b42&`)
-    .setFooter({ text: `${interaction.guild.name}`, iconURL: interaction.guild.iconURL({ dynamic: true }) })
-    .addFields(
-        { name: '**\`Status\`**', value: atendimentohorario24 ? 'On' : 'Off' },
-        { name: '**\`Horario de Abertura\`**', value: `\`${tickets.get("horarioAbertura") || `Não Definido`}\`` },
-        { name: '**\`Horario de Fechamento\`**', value: `\`${tickets.get("horarioFechamento") || `Não Definido`}\`` },
-    )
-    .setTimestamp();
+    const container = new ContainerBuilder();
+    container.setAccentColor(atendimentohorario24 ? 0x57F287 : 0xED4245);
+
+    container.addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(`## Horário de Atendimento`)
+    );
+
+    container.addSeparatorComponents(new SeparatorBuilder());
+
+    const abertura = tickets.get("horarioAbertura") || 'Não Definido';
+    const fechamento = tickets.get("horarioFechamento") || 'Não Definido';
+
+    container.addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(
+            `**Configure o horario de atendimento, Ex: \`10:00\` ate as \`19:00\`, Quando o __cliente__ tente abrir fora do horário de expediente não criará um ticket.**\n\n` +
+            `**Status:** \`${atendimentohorario24 ? 'On' : 'Off'}\`\n` +
+            `**Horário de Abertura:** \`${abertura}\`\n` +
+            `**Horário de Fechamento:** \`${fechamento}\``
+        )
+    );
+
+    container.addSeparatorComponents(new SeparatorBuilder());
 
     const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
@@ -34,10 +48,16 @@ async function Atendimentohorario(interaction, client) {
             .setLabel('Voltar')
             .setEmoji("1371593637179297923")
             .setStyle(2),
-    )
+    );
 
-    await interaction.update({ embeds: [embed], components: [row], ephemeral: true })
+    container.addActionRowComponents(row);
 
+    await interaction.update({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        content: '',
+        embeds: []
+    });
 }
 
 module.exports = {

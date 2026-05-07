@@ -99,20 +99,25 @@
                 "msgid": "1501898428081504367",
                 "channelid": "1465571881758359700",
                 "guildid": "1396516441758367895"
+            },
+            {
+                "msgid": "1501904836378103940",
+                "channelid": "1465571881758359700",
+                "guildid": "1396516441758367895"
             }
         ],
-        "contador": 1,
+        "contador": 2,
         "abertos": {
             "804354181653463120": {
-                "threadId": "1501898440127418419",
-                "numero": 1,
-                "funcao": "Suporte",
-                "assumidoPor": "us3r_davi",
-                "staffMemberId": "804354181653463120",
+                "threadId": "1501904910516748329",
+                "numero": 2,
+                "funcao": "Dúvidas",
+                "assumidoPor": null,
+                "staffMemberId": null,
                 "abertoPor": "804354181653463120",
                 "username": "us3r_davi",
                 "guildId": "1396516441758367895",
-                "messageId": "1501898443608821902"
+                "messageId": "1501904917839872190"
             }
         },
         "staffRoles": [

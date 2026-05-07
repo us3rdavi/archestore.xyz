@@ -1,674 +1,674 @@
-const { EmbedBuilder, ApplicationCommandType, ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } = require("discord.js");
+const {
+    ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
+} = require("discord.js");
 const { produtos, Emojis, configuracao } = require("../DataBaseJson");
 
+function getAccentColor() {
+    const cor = configuracao.get('Cores.Principal') || '0cd4cc';
+    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x0cd4cc; }
+}
+
 async function AcoesAutomaticsConfigs(interaction, client) {
+    const container = new ContainerBuilder();
+    container.setAccentColor(getAccentColor());
 
-  const embed = new EmbedBuilder()
-    .setAuthor({ name: `Dream Apps Bot`, iconURL: "https://i.ibb.co/J3rR09C/Gif-Bot-Cyans.gif" })
-    .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
-    .setTitle(`${Emojis.get('_support_emoji')} **Painel De Moderação**`)
-    .setDescription(`- Olá **${interaction.user.displayName ? interaction.user.displayName : interaction.user.username}**, Você está no painel de configuração de moderação.`)
-    .setFooter(
-      { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) ? interaction.guild.iconURL({ dynamic: true }) : null }
-    )
-    .setTimestamp()
+    container.addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(
+            `## ${Emojis.get('_support_emoji')} Painel De Moderação\n` +
+            `Olá **${interaction.user.displayName || interaction.user.username}**, você está no painel de configuração de moderação.`
+        )
+    );
 
+    container.addSeparatorComponents(new SeparatorBuilder());
 
-  const select = new ActionRowBuilder().addComponents(
-    new StringSelectMenuBuilder()
-      .setCustomId(`select_AcoesAutomaticsConfigs`)
-      .setPlaceholder(`Gerencie o sistema de moderação.`)
-      .addOptions(
-        new StringSelectMenuOptionBuilder()
-          .setLabel(`Limpar Canal`)
-          .setValue(`LimpezaAutomatica`)
-          .setDescription(`Limpeza Automática de Mensagens`)
-          .setEmoji(`1238300628225228961`),
-        new StringSelectMenuOptionBuilder()
-          .setLabel(`Gerenciar Canais`)
-          .setValue(`GerenciarCanais`)
-          .setDescription(`Abertura e Fechamento de Canais`)
-          .setEmoji(`1244438113368150061`),
-        new StringSelectMenuOptionBuilder()
-          .setLabel(`Nukar Canal`)
-          .setValue(`SistemaNukar`)
-          .setDescription(`Nukar Canal`)
-          .setEmoji(`1229787813046915092`),
-        new StringSelectMenuOptionBuilder()
-          .setLabel(`Anti-Raid`)
-          .setValue(`sistemaAntiRaid`)
-          .setDescription(`Sistema Anti-Raid`)
-          .setEmoji(`1286081797297279091`),
-        new StringSelectMenuOptionBuilder()
-          .setLabel(`Anti-Fake`)
-          .setValue(`SistemaAntiFake`)
-          .setDescription(`Sistema Anti-Fake`)
-          .setEmoji(`1286081797297279091`),
-        new StringSelectMenuOptionBuilder()
-          .setLabel(`Sistema de Filtro`)
-          .setValue(`SistemadeFiltro`)
-          .setDescription(`Sistema de Filtro`)
-          .setEmoji(`1286078168855478446`),
-        new StringSelectMenuOptionBuilder()
-          .setLabel(`Repostagem`)
-          .setValue(`automaticRepostar`)
-          .setDescription(`Repostagem de Mensagens`)
-          .setEmoji(`1238303687248576544`),
-        new StringSelectMenuOptionBuilder()
-          .setLabel(`Mensagens Automáticas`)
-          .setValue(`MsgsAutoConfig`)
-          .setDescription(`Mensagens Automáticas`)
-          .setEmoji(`1238709839685746758`),
-      )
-  )
+    const select = new ActionRowBuilder().addComponents(
+        new StringSelectMenuBuilder()
+            .setCustomId(`select_AcoesAutomaticsConfigs`)
+            .setPlaceholder(`Gerencie o sistema de moderação.`)
+            .addOptions(
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(`Limpar Canal`)
+                    .setValue(`LimpezaAutomatica`)
+                    .setDescription(`Limpeza Automática de Mensagens`)
+                    .setEmoji(`1238300628225228961`),
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(`Gerenciar Canais`)
+                    .setValue(`GerenciarCanais`)
+                    .setDescription(`Abertura e Fechamento de Canais`)
+                    .setEmoji(`1244438113368150061`),
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(`Nukar Canal`)
+                    .setValue(`SistemaNukar`)
+                    .setDescription(`Nukar Canal`)
+                    .setEmoji(`1229787813046915092`),
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(`Anti-Raid`)
+                    .setValue(`sistemaAntiRaid`)
+                    .setDescription(`Sistema Anti-Raid`)
+                    .setEmoji(`1286081797297279091`),
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(`Anti-Fake`)
+                    .setValue(`SistemaAntiFake`)
+                    .setDescription(`Sistema Anti-Fake`)
+                    .setEmoji(`1286081797297279091`),
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(`Sistema de Filtro`)
+                    .setValue(`SistemadeFiltro`)
+                    .setDescription(`Sistema de Filtro`)
+                    .setEmoji(`1286078168855478446`),
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(`Repostagem`)
+                    .setValue(`automaticRepostar`)
+                    .setDescription(`Repostagem de Mensagens`)
+                    .setEmoji(`1238303687248576544`),
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(`Mensagens Automáticas`)
+                    .setValue(`MsgsAutoConfig`)
+                    .setDescription(`Mensagens Automáticas`)
+                    .setEmoji(`1238709839685746758`),
+            )
+    );
 
+    const botoesvoltar = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("voltar1")
+            .setEmoji(`1238413255886639104`)
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId(`voltar12`)
+            .setEmoji('1292237216915128361')
+            .setDisabled(true)
+            .setStyle(1)
+    );
 
-  const botoesvoltar = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("voltar1")
-      .setEmoji(`1238413255886639104`)
-      .setStyle(2),
-    new ButtonBuilder()
-      .setCustomId(`voltar12`)
-      .setEmoji('1292237216915128361')
-      .setDisabled(true)
-      .setStyle(1)
-  )
+    container.addActionRowComponents(select);
+    container.addActionRowComponents(botoesvoltar);
 
-  await interaction.update({ content: ``, components: [select, botoesvoltar], embeds: [embed], ephemeral: true })
+    await interaction.update({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        content: '',
+        embeds: []
+    });
 }
+
 async function SistemaAntiFake(interaction, client) {
+    const AntiFake = configuracao.get(`AntiFake`);
+    const container = new ContainerBuilder();
+    container.setAccentColor(getAccentColor());
 
-  const embed = new EmbedBuilder()
-    .setAuthor({ name: `DreamApps Bot`, iconURL: "https://i.ibb.co/J3rR09C/Gif-Bot-Cyans.gif" })
-    .setTitle(`${Emojis.get('_support_emoji')} **Painel De Anti-Fake**`)
-    .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
-    .setDescription(`- Gerencie o sistema de Anti-Fake do seu servidor.`)
+    let desc = `## ${Emojis.get('_support_emoji')} Painel De Anti-Fake\nGerencie o sistema de Anti-Fake do seu servidor.`;
 
-  let AntiFake = configuracao.get(`AntiFake`);
+    if (AntiFake) {
+        desc += `\n\n**Sistema AntiFake:**\n` +
+            `Dias Mínimos: \`${AntiFake?.diasminimos ?? 'Não Definido'}\`\n` +
+            `Status Bloqueados: \`${AntiFake?.status?.length > 0 ? AntiFake.status.join(', ') : 'Nenhum Salvo'}\`\n` +
+            `Nomes Bloqueados: \`${AntiFake?.nomes?.length > 0 ? AntiFake.nomes.join(', ') : 'Nenhum Salvo'}\``;
+    }
 
-  if (AntiFake) {
-    embed.addFields(
-      {
-        name: `Sistema AntiFake`,
-        value: `Dias Mínimos: \`${AntiFake?.diasminimos ? AntiFake?.diasminimos : `Não Definido`}\`\nStatus Bloqueados: \`${AntiFake?.status.length > 0 ? AntiFake?.status.join(',').replace(/\s*,\s*$/, '') : `Nenhum Salvo`}\`\nNomes Bloqueados: \`${AntiFake?.nomes.length > 0 ? AntiFake?.nomes.join(',').replace(/\s*,\s*$/, '') : `Nenhum Salvo`}\``
-      },
-    )
-  }
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(desc));
+    container.addSeparatorComponents(new SeparatorBuilder());
 
-  const botao = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("personalizarantifake")
-      .setLabel('Anti-Fake')
-      .setEmoji("1371593625112285208")
-      .setStyle(1),
-  )
+    const botao = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("personalizarantifake")
+            .setLabel('Anti-Fake')
+            .setEmoji("1371593625112285208")
+            .setStyle(1),
+    );
 
-  const botoesvoltar = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("voltar_AcoesAutomaticsConfigs")
-      .setEmoji("1371593637179297923")
-      .setStyle(2),
-    new ButtonBuilder()
-      .setCustomId(`voltar1`)
-      .setEmoji("1371593617868591185")
-      .setStyle(1)
-  )
+    const botoesvoltar = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("voltar_AcoesAutomaticsConfigs")
+            .setEmoji("1371593637179297923")
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId(`voltar1`)
+            .setEmoji("1371593617868591185")
+            .setStyle(1)
+    );
 
-  await interaction.update({ content: ``, components: [botao, botoesvoltar], embeds: [embed], ephemeral: true })
+    container.addActionRowComponents(botao);
+    container.addActionRowComponents(botoesvoltar);
+
+    await interaction.update({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        content: '',
+        embeds: []
+    });
 }
+
 async function sistemaAntiRaid(interaction, client) {
+    let AntiRaid = configuracao.get(`AutomaticSettings.sistemaAntiRaid`);
+    let metodopunicao = AntiRaid?.punicao === `RemoverCargos`
+        ? `Remover Todos os Cargos`
+        : AntiRaid?.punicao
+            ? AntiRaid.punicao.charAt(0).toUpperCase() + AntiRaid.punicao.slice(1)
+            : 'Remover Todos os Cargos';
 
-  let AntiRaid = configuracao.get(`AutomaticSettings.sistemaAntiRaid`);
-  let metodopunicao = AntiRaid?.punicao == `RemoverCargos` ? `Remover Todos os Cargos` : AntiRaid?.punicao?.charAt(0).toUpperCase() + AntiRaid?.punicao?.slice(1);
+    const container = new ContainerBuilder();
+    container.setAccentColor(AntiRaid?.status ? 0x57F287 : 0xED4245);
 
-  const embed = new EmbedBuilder()
-    .setAuthor({ name: `DreamApps Bot`, iconURL: "https://i.ibb.co/J3rR09C/Gif-Bot-Cyans.gif" })
-    .setTitle(`Anti-Raid - ${AntiRaid?.status ? `HABILITADO` : `DESABILITADO`}`)
-    .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
-    .setDescription(`- Gerencie o sistema de Anti-Raid do seu servidor.`)
-    .setFields(
-      { name: `Canal de Logs:`, value: `${AntiRaid?.canallogs ? `<#${AntiRaid?.canallogs}>` : `\`Não Definido\``}`, inline: true },
-      { name: `Proteção de Convite:`, value: `\`${AntiRaid?.convitepersonalizado ? `Sua URL está Protegida` : `Sua URL NÃO está Protegida`}\``, inline: true },
-      { name: `Método de Punição:`, value: `\`${AntiRaid?.punicao ? metodopunicao : `Remover Todos os Cargos`}\``, inline: true },
-    )
+    let desc = `## Anti-Raid — ${AntiRaid?.status ? `HABILITADO` : `DESABILITADO`}\n` +
+        `Gerencie o sistema de Anti-Raid do seu servidor.\n\n` +
+        `**Canal de Logs:** ${AntiRaid?.canallogs ? `<#${AntiRaid.canallogs}>` : '`Não Definido`'}\n` +
+        `**Proteção de Convite:** \`${AntiRaid?.convitepersonalizado ? `Sua URL está Protegida` : `Sua URL NÃO está Protegida`}\`\n` +
+        `**Método de Punição:** \`${metodopunicao}\``;
 
-  if (AntiRaid?.cargos?.length > 0) {
-    let cargos = "";
-    AntiRaid?.cargos.forEach((cargo) => {
-      cargos += `<@&${cargo}>\n`;
+    if (AntiRaid?.cargos?.length > 0) {
+        desc += `\n\n**Cargos Imunes:**\n${AntiRaid.cargos.map(c => `<@&${c}>`).join('\n')}`;
+    }
+
+    desc += `\n\n**Proteção de Cargos Deletados [\`${AntiRaid?.ExclusaoCargos?.status ? `ON` : `OFF`}\`]:**\n` +
+        `O usuário poderá excluir \`${AntiRaid?.ExclusaoCargos?.quantidadeporminuto || 0}\` por minuto e \`${AntiRaid?.ExclusaoCargos?.quantidadeporhora || 0}\` por hora.\n` +
+        `**Proteção de Canais Deletados [\`${AntiRaid?.ExclusaoCanais?.status ? `ON` : `OFF`}\`]:**\n` +
+        `O usuário poderá excluir \`${AntiRaid?.ExclusaoCanais?.quantidadeporminuto || 0}\` por minuto e \`${AntiRaid?.ExclusaoCanais?.quantidadeporhora || 0}\` por hora.\n` +
+        `**Proteção de Banimentos [\`${AntiRaid?.Banimento?.status ? `ON` : `OFF`}\`]:**\n` +
+        `O usuário poderá banir \`${AntiRaid?.Banimento?.quantidadeporminuto || 0}\` por minuto e \`${AntiRaid?.Banimento?.quantidadeporhora || 0}\` por hora.\n` +
+        `**Proteção de Expulsões [\`${AntiRaid?.Expulsao?.status ? `ON` : `OFF`}\`]:**\n` +
+        `O usuário poderá expulsar \`${AntiRaid?.Expulsao?.quantidadeporminuto || 0}\` por minuto e \`${AntiRaid?.Expulsao?.quantidadeporhora || 0}\` por hora.`;
+
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(desc));
+    container.addSeparatorComponents(new SeparatorBuilder());
+
+    const botao = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`statusantiraid`)
+            .setLabel(`${AntiRaid?.status ? `Desativar` : `Ativar`} Sistema`)
+            .setEmoji("1371593609891283115")
+            .setStyle(AntiRaid?.status ? 4 : 3),
+        new ButtonBuilder()
+            .setCustomId(`statusconvitepersonalizado`)
+            .setLabel(`${AntiRaid?.convitepersonalizado ? `Desativar` : `Ativar`} Proteção de Convite`)
+            .setEmoji("1371593609891283115")
+            .setStyle(AntiRaid?.convitepersonalizado ? 4 : 3),
+    );
+
+    const botao2 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`canallogsantiraid`)
+            .setLabel(`Canal de Logs`)
+            .setEmoji(`1233127513178247269`)
+            .setStyle(1),
+        new ButtonBuilder()
+            .setCustomId(`cargosimunesantiraid`)
+            .setLabel(`Cargos Imunes`)
+            .setEmoji(`1233127515141308416`)
+            .setStyle(1),
+        new ButtonBuilder()
+            .setCustomId(`metodopunicao`)
+            .setLabel(`Método de Punição`)
+            .setEmoji(`1233103066975309984`)
+            .setStyle(1),
+    );
+
+    const select = new ActionRowBuilder().addComponents(
+        new StringSelectMenuBuilder()
+            .setCustomId(`metodopunicaoantiraid`)
+            .setPlaceholder(`Selecione um método de punição`)
+            .addOptions(
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(`Exclusão de Cargos`)
+                    .setValue(`ExclusaoCargos`)
+                    .setDescription(`Puna quem ultrapassar o limite de exclusão por Minuto/Hora`)
+                    .setEmoji(`1232782650385629299`),
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(`Exclusão de Canais`)
+                    .setValue(`ExclusaoCanais`)
+                    .setDescription(`Puna quem ultrapassar o limite de exclusão por Minuto/Hora`)
+                    .setEmoji(`1232782650385629299`),
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(`Banimento`)
+                    .setValue(`Banimento`)
+                    .setDescription(`Puna quem ultrapassar o limite de banimentos por Minuto/Hora`)
+                    .setEmoji(`1232782650385629299`),
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(`Expulsão`)
+                    .setValue(`Expulsao`)
+                    .setDescription(`Puna quem ultrapassar o limite de expulsões por Minuto/Hora`)
+                    .setEmoji(`1232782650385629299`)
+            )
+    );
+
+    const botoesvoltar = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("voltar_AcoesAutomaticsConfigs")
+            .setEmoji("1371593637179297923")
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId(`voltar1`)
+            .setEmoji("1371593617868591185")
+            .setStyle(1)
+    );
+
+    container.addActionRowComponents(botao);
+    container.addActionRowComponents(botao2);
+    container.addActionRowComponents(select);
+    container.addActionRowComponents(botoesvoltar);
+
+    await interaction.update({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        content: '',
+        embeds: []
     });
-    embed.addFields({ name: `Cargos Imunes`, value: cargos });
-  }
-
-  embed.addFields(
-    { name: `Proteção de Cargos Deletados [\`${AntiRaid?.ExclusaoCargos?.status ? `ON` : `OFF`}\`]:`, value: `- O usuário poderá excluir \`${AntiRaid?.ExclusaoCargos?.quantidadeporminuto || 0}\` Cargos por minutos e \`${AntiRaid?.ExclusaoCargos?.quantidadeporhora || 0}\` por hora.`, inline: false },
-    { name: `Proteção de Canais Deletados [\`${AntiRaid?.ExclusaoCanais?.status ? `ON` : `OFF`}\`]:`, value: `- O usuário poderá excluir \`${AntiRaid?.ExclusaoCanais?.quantidadeporminuto || 0}\` Canais por minutos e \`${AntiRaid?.ExclusaoCanais?.quantidadeporhora || 0}\` por hora.`, inline: false },
-    { name: `Proteção de Banimentos [\`${AntiRaid?.Banimento?.status ? `ON` : `OFF`}\`]:`, value: `- O usuário poderá banir \`${AntiRaid?.Banimento?.quantidadeporminuto || 0}\` membros por minutos e \`${AntiRaid?.Banimento?.quantidadeporhora || 0}\` por hora.`, inline: false },
-    { name: `Proteção de Expulsões [\`${AntiRaid?.Expulsao?.status ? `ON` : `OFF`}\`]:`, value: `- O usuário poderá expulsar \`${AntiRaid?.Expulsao?.quantidadeporminuto || 0}\` membros por minutos e \`${AntiRaid?.Expulsao?.quantidadeporhora || 0}\` por hora.`, inline: false },
-  )
-
-
-
-  const botao = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(`statusantiraid`)
-      .setLabel(`${AntiRaid?.status ? `Desativar` : `Ativar`} Sistema`)
-      .setEmoji("1371593609891283115")
-      .setStyle(AntiRaid?.status ? 4 : 3),
-    new ButtonBuilder()
-      .setCustomId(`statusconvitepersonalizado`)
-      .setLabel(`${AntiRaid?.convitepersonalizado ? `Desativar` : `Ativar`} Proteção de Convite`)
-      .setEmoji("1371593609891283115")
-      .setStyle(AntiRaid?.convitepersonalizado ? 4 : 3),
-  )
-  const botao2 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(`canallogsantiraid`)
-      .setLabel(`Canal de Logs`)
-      .setEmoji(`1233127513178247269`)
-      .setStyle(1),
-    new ButtonBuilder()
-      .setCustomId(`cargosimunesantiraid`)
-      .setLabel(`Cargos Imunes`)
-      .setEmoji(`1233127515141308416`)
-      .setStyle(1),
-    new ButtonBuilder()
-      .setCustomId(`metodopunicao`)
-      .setLabel(`Método de Punição`)
-      .setEmoji(`1233103066975309984`)
-      .setStyle(1),
-  )
-
-  const select = new ActionRowBuilder().addComponents(
-    new StringSelectMenuBuilder()
-      .setCustomId(`metodopunicaoantiraid`)
-      .setPlaceholder(`Selecione um método de punição`)
-      .addOptions(
-        new StringSelectMenuOptionBuilder()
-          .setLabel(`Exclusão de Cargos`)
-          .setValue(`ExclusaoCargos`)
-          .setDescription(`Puna quem ultrapassar o limite de exclusão por Minuto/Hora`)
-          .setEmoji(`1232782650385629299`),
-        new StringSelectMenuOptionBuilder()
-          .setLabel(`Exclusão de Canais`)
-          .setValue(`ExclusaoCanais`)
-          .setDescription(`Puna quem ultrapassar o limite de exclusão por Minuto/Hora`)
-          .setEmoji(`1232782650385629299`),
-        new StringSelectMenuOptionBuilder()
-          .setLabel(`Banimento`)
-          .setValue(`Banimento`)
-          .setDescription(`Puna quem ultrapassar o limite de banimentos por Minuto/Hora`)
-          .setEmoji(`1232782650385629299`),
-        new StringSelectMenuOptionBuilder()
-          .setLabel(`Expulsão`)
-          .setValue(`Expulsao`)
-          .setDescription(`Puna quem ultrapassar o limite de expulsões por Minuto/Hora`)
-          .setEmoji(`1232782650385629299`)
-      )
-  )
-
-  const botoesvoltar = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("voltar_AcoesAutomaticsConfigs")
-      .setEmoji("1371593637179297923")
-      .setStyle(2),
-    new ButtonBuilder()
-      .setCustomId(`voltar1`)
-      .setEmoji("1371593617868591185")
-      .setStyle(1)
-  )
-
-  await interaction.update({ content: ``, components: [botao, botao2, select, botoesvoltar], embeds: [embed], ephemeral: true })
 }
+
 async function LimpezaAutomatica(interaction, client) {
+    let canais = configuracao.get(`AutomaticSettings.LimpezaAutomatica.canais`);
+    const execucoes = configuracao.get(`AutomaticSettings.LimpezaAutomatica`);
 
-  let canais = configuracao.get(`AutomaticSettings.LimpezaAutomatica.canais`)
+    const container = new ContainerBuilder();
+    container.setAccentColor(getAccentColor());
 
-  const embed = new EmbedBuilder()
-    .setAuthor({ name: `DreamApps Bot`, iconURL: "https://i.ibb.co/J3rR09C/Gif-Bot-Cyans.gif" })
-    .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
-    .setTitle(`${Emojis.get('_support_emoji')} **Painel De Limpeza Automática**`)
-    .setDescription(`- Seu Bot realizará a limpeza automática das mensagens nos canais selecionados por você, conforme o horário estabelecido.`)
-    .setFooter(
-      { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) ? interaction.guild.iconURL({ dynamic: true }) : null }
-    )
-    .setTimestamp()
+    let desc = `## ${Emojis.get('_support_emoji')} Painel De Limpeza Automática\n` +
+        `Seu Bot realizará a limpeza automática das mensagens nos canais selecionados conforme o horário estabelecido.`;
 
-  if (configuracao.get(`AutomaticSettings.LimpezaAutomatica.primeira`) && configuracao.get(`AutomaticSettings.LimpezaAutomatica.segunda`)) {
-    let execucoes = configuracao.get(`AutomaticSettings.LimpezaAutomatica`);
+    if (execucoes?.primeira && execucoes?.segunda) {
+        const toTimestamp = hora => {
+            let [h, m] = hora.split(':');
+            let agora = new Date();
+            agora.setHours(h, m, 0, 0);
+            if (agora < new Date()) agora.setDate(agora.getDate() + 1);
+            return Math.floor(agora.getTime() / 1000);
+        };
+        desc += `\n\n**Horários de execução (${execucoes.status ? 'Ativo' : 'Inativo'}):**\n` +
+            `\`${execucoes.primeira}\` (próx. em <t:${toTimestamp(execucoes.primeira)}:R>)\n` +
+            `\`${execucoes.segunda}\` (próx. em <t:${toTimestamp(execucoes.segunda)}:R>)`;
+    }
 
-    const toTimestamp = hora => {
-      let [h, m] = hora.split(':');
-      let agora = new Date();
-      agora.setHours(h, m, 0, 0);
+    if (canais?.length > 0) {
+        desc += `\n\n**Canais:**\n${canais.map(c => `<#${c}>`).join('\n')}`;
+    }
 
-      if (agora < new Date()) {
-        agora.setDate(agora.getDate() + 1);
-      }
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(desc));
+    container.addSeparatorComponents(new SeparatorBuilder());
 
-      return Math.floor(agora.getTime() / 1000);
-    };
+    const row1 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("configurarLimpeza")
+            .setLabel('Definir Regras')
+            .setEmoji(`1233103066975309984`)
+            .setStyle(1),
+        new ButtonBuilder()
+            .setCustomId("adicionarcanal_LimpezaAutomatica")
+            .setLabel('Adicionar Canal')
+            .setEmoji(`1233110125330563104`)
+            .setStyle(3),
+        new ButtonBuilder()
+            .setCustomId("removercanal_LimpezaAutomatica")
+            .setLabel('Remover Canal')
+            .setEmoji(`1242907028079247410`)
+            .setStyle(4)
+    );
 
-    embed.addFields({
-      name: `Horários de execução (${execucoes.status ? 'Ativo' : 'Inativo'})`,
-      value: `\`${execucoes.primeira}\` (Próxima execução em <t:${toTimestamp(execucoes.primeira)}:R>)\n`
-        + `\`${execucoes.segunda}\` (Próxima execução em <t:${toTimestamp(execucoes.segunda)}:R>)`
+    const botoesvoltar = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("voltar_AcoesAutomaticsConfigs")
+            .setEmoji(`1238413255886639104`)
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId(`voltar1`)
+            .setEmoji('1292237216915128361')
+            .setStyle(1)
+    );
+
+    container.addActionRowComponents(row1);
+    container.addActionRowComponents(botoesvoltar);
+
+    await interaction.update({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        content: '',
+        embeds: []
     });
-  }
-
-  if (canais?.length > 0) {
-    let canaismsg = "";
-    canais.forEach((canal) => {
-      canaismsg += `<#${canal}>\n`;
-    });
-    embed.addFields({ name: `Canais`, value: canaismsg });
-  }
-
-
-  const row1 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("configurarLimpeza")
-      .setLabel('Definir Regras')
-      .setEmoji(`1233103066975309984`)
-      .setStyle(1),
-    new ButtonBuilder()
-      .setCustomId("adicionarcanal_LimpezaAutomatica")
-      .setLabel('Adicionar Canal')
-      .setEmoji(`1233110125330563104`)
-      .setStyle(3),
-    new ButtonBuilder()
-      .setCustomId("removercanal_LimpezaAutomatica")
-      .setLabel('Remover Canal')
-      .setEmoji(`1242907028079247410`)
-      .setStyle(4)
-  )
-
-  const botoesvoltar = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("voltar_AcoesAutomaticsConfigs")
-      .setEmoji(`1238413255886639104`)
-      .setStyle(2),
-    new ButtonBuilder()
-      .setCustomId(`voltar1`)
-      .setEmoji('1292237216915128361')
-      .setStyle(1)
-  )
-
-
-  await interaction.update({ content: ``, components: [row1, botoesvoltar], embeds: [embed], ephemeral: true })
 }
+
 async function GerenciarCanais(interaction, client) {
+    let canais = configuracao.get(`AutomaticSettings.GerenciarCanais.canais`);
+    const execucoes = configuracao.get(`AutomaticSettings.GerenciarCanais`);
 
-  let canais = configuracao.get(`AutomaticSettings.GerenciarCanais.canais`)
+    const container = new ContainerBuilder();
+    container.setAccentColor(getAccentColor());
 
-  const embed = new EmbedBuilder()
-    .setAuthor({ name: `DreamApps Bot`, iconURL: "https://i.ibb.co/J3rR09C/Gif-Bot-Cyans.gif" })
-    .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
-    .setTitle(`${Emojis.get('_support_emoji')} **Painel De Canais**`)
-    .setDescription(`- Aqui você pode gerenciar os canais que o bot irá atuar.`)
-    .setFooter(
-      { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) ? interaction.guild.iconURL({ dynamic: true }) : null }
-    )
-    .setTimestamp()
+    let desc = `## ${Emojis.get('_support_emoji')} Painel De Canais\nAqui você pode gerenciar os canais que o bot irá atuar.`;
 
-  if (configuracao.get(`AutomaticSettings.GerenciarCanais.abertura`) && configuracao.get(`AutomaticSettings.GerenciarCanais.fechamento`)) {
-    let execucoes = configuracao.get(`AutomaticSettings.GerenciarCanais`);
+    if (execucoes?.abertura && execucoes?.fechamento) {
+        const toTimestamp = hora => {
+            let [h, m] = hora.split(':');
+            let agora = new Date();
+            agora.setHours(h, m, 0, 0);
+            if (agora < new Date()) agora.setDate(agora.getDate() + 1);
+            return Math.floor(agora.getTime() / 1000);
+        };
+        desc += `\n\n**Horários de execução (${execucoes.status ? 'Ativo' : 'Inativo'}):**\n` +
+            `\`${execucoes.abertura}\` (Abertura em <t:${toTimestamp(execucoes.abertura)}:R>)\n` +
+            `\`${execucoes.fechamento}\` (Fechamento em <t:${toTimestamp(execucoes.fechamento)}:R>)`;
+    }
 
-    const toTimestamp = hora => {
-      let [h, m] = hora.split(':');
-      let agora = new Date();
-      agora.setHours(h, m, 0, 0);
+    if (canais?.length > 0) {
+        desc += `\n\n**Canais:**\n${canais.map(c => `<#${c}>`).join('\n')}`;
+    }
 
-      if (agora < new Date()) {
-        agora.setDate(agora.getDate() + 1);
-      }
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(desc));
+    container.addSeparatorComponents(new SeparatorBuilder());
 
-      return Math.floor(agora.getTime() / 1000);
-    };
+    const row1 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("configurarCanais")
+            .setLabel('Definir Regras')
+            .setEmoji(`1233103066975309984`)
+            .setStyle(1),
+        new ButtonBuilder()
+            .setCustomId("adicionarcanal_GerenciarCanais")
+            .setLabel('Adicionar Canal')
+            .setEmoji(`1233110125330563104`)
+            .setStyle(3),
+        new ButtonBuilder()
+            .setCustomId("removercanal_GerenciarCanais")
+            .setLabel('Remover Canal')
+            .setEmoji(`1242907028079247410`)
+            .setDisabled(!canais?.length)
+            .setStyle(4),
+    );
 
-    embed.addFields({
-      name: `Horários de execução (${execucoes.status ? 'Ativo' : 'Inativo'})`,
-      value: `\`${execucoes.abertura}\` (Abertura em <t:${toTimestamp(execucoes.abertura)}:R>)\n`
-        + `\`${execucoes.fechamento}\` (Fechamento em <t:${toTimestamp(execucoes.fechamento)}:R>)`
+    const botoesvoltar = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("voltar_AcoesAutomaticsConfigs")
+            .setEmoji(`1238413255886639104`)
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId(`voltar1`)
+            .setEmoji('1292237216915128361')
+            .setStyle(1)
+    );
+
+    container.addActionRowComponents(row1);
+    container.addActionRowComponents(botoesvoltar);
+
+    await interaction.update({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        content: '',
+        embeds: []
     });
-  }
-
-  if (canais?.length > 0) {
-    let canaismsg = "";
-    canais.forEach((canal) => {
-      canaismsg += `<#${canal}>\n`;
-    });
-    embed.addFields({ name: `Canais`, value: canaismsg });
-  }
-
-  const row1 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("configurarCanais")
-      .setLabel('Definir Regras')
-      .setEmoji(`1233103066975309984`)
-      .setStyle(1),
-    new ButtonBuilder()
-      .setCustomId("adicionarcanal_GerenciarCanais")
-      .setLabel('Adicionar Canal')
-      .setEmoji(`1233110125330563104`)
-      .setStyle(3),
-    new ButtonBuilder()
-      .setCustomId("removercanal_GerenciarCanais")
-      .setLabel('Remover Canal')
-      .setEmoji(`1242907028079247410`)
-      .setDisabled(canais?.length == 0)
-      .setStyle(4),
-  )
-
-  const botoesvoltar = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("voltar_AcoesAutomaticsConfigs")
-      .setEmoji(`1238413255886639104`)
-      .setStyle(2),
-    new ButtonBuilder()
-      .setCustomId(`voltar1`)
-      .setEmoji('1292237216915128361')
-      .setStyle(1)
-  )
-
-  await interaction.update({ content: ``, components: [row1, botoesvoltar], embeds: [embed], ephemeral: true })
 }
+
 async function SistemaNukar(interaction, client) {
+    let canais = configuracao.get(`AutomaticSettings.SistemaNukar.canais`);
+    const execucoes = configuracao.get(`AutomaticSettings.SistemaNukar`);
 
-  let canais = configuracao.get(`AutomaticSettings.SistemaNukar.canais`)
+    const container = new ContainerBuilder();
+    container.setAccentColor(getAccentColor());
 
-  const embed = new EmbedBuilder()
-    .setAuthor({ name: `DreamApps Bot`, iconURL: "https://i.ibb.co/J3rR09C/Gif-Bot-Cyans.gif" })
-    .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
-    .setTitle(`${Emojis.get('_support_emoji')} **Painel De Nuke Automatico**`)
-    .setDescription(`- Aqui você pode configurar o sistema de nukar.`)
-    .setFooter(
-      { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) ? interaction.guild.iconURL({ dynamic: true }) : null }
-    )
-    .setTimestamp()
+    let desc = `## ${Emojis.get('_support_emoji')} Painel De Nuke Automático\nAqui você pode configurar o sistema de nukar.`;
 
-  if (configuracao.get(`AutomaticSettings.SistemaNukar.horario`)) {
-    let execucoes = configuracao.get(`AutomaticSettings.SistemaNukar`);
+    if (execucoes?.horario) {
+        const toTimestamp = hora => {
+            let [h, m] = hora.split(':');
+            let agora = new Date();
+            agora.setHours(h, m, 0, 0);
+            if (agora < new Date()) agora.setDate(agora.getDate() + 1);
+            return Math.floor(agora.getTime() / 1000);
+        };
+        desc += `\n\n**Horário de execução (${execucoes.status ? 'Ativo' : 'Inativo'}):**\n` +
+            `\`${execucoes.horario}\` (próx. em <t:${toTimestamp(execucoes.horario)}:R>)`;
+    }
 
-    const toTimestamp = hora => {
-      let [h, m] = hora.split(':');
-      let agora = new Date();
-      agora.setHours(h, m, 0, 0);
+    if (canais?.length > 0) {
+        desc += `\n\n**Canais:**\n${canais.map(c => `<#${c}>`).join('\n')}`;
+    }
 
-      if (agora < new Date()) {
-        agora.setDate(agora.getDate() + 1);
-      }
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(desc));
+    container.addSeparatorComponents(new SeparatorBuilder());
 
-      return Math.floor(agora.getTime() / 1000);
-    };
+    const row1 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("configurarNukar")
+            .setLabel('Definir Regras')
+            .setEmoji(`1233103066975309984`)
+            .setStyle(1),
+        new ButtonBuilder()
+            .setCustomId("adicionarcanal_SistemaNukar")
+            .setLabel('Adicionar Canal')
+            .setEmoji(`1233110125330563104`)
+            .setStyle(3),
+        new ButtonBuilder()
+            .setCustomId("removercanal_SistemaNukar")
+            .setLabel('Remover Canal')
+            .setEmoji(`1242907028079247410`)
+            .setDisabled(!canais?.length)
+            .setStyle(4),
+    );
 
-    embed.addFields({
-      name: `Horário de execução (${execucoes.status ? 'Ativo' : 'Inativo'})`,
-      value: `\`${execucoes.horario}\` (Próxima execução em <t:${toTimestamp(execucoes.horario)}:R>)`
+    const botoesvoltar = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("voltar_AcoesAutomaticsConfigs")
+            .setEmoji(`1238413255886639104`)
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId(`voltar1`)
+            .setEmoji('1292237216915128361')
+            .setStyle(1)
+    );
+
+    container.addActionRowComponents(row1);
+    container.addActionRowComponents(botoesvoltar);
+
+    await interaction.update({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        content: '',
+        embeds: []
     });
-  }
-
-  if (canais?.length > 0) {
-    let canaismsg = "";
-    canais.forEach((canal) => {
-      canaismsg += `<#${canal}>\n`;
-    });
-    embed.addFields({ name: `Canais`, value: canaismsg });
-  }
-
-  const row1 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("configurarNukar")
-      .setLabel('Definir Regras')
-      .setEmoji(`1233103066975309984`)
-      .setStyle(1),
-    new ButtonBuilder()
-      .setCustomId("adicionarcanal_SistemaNukar")
-      .setLabel('Adicionar Canal')
-      .setEmoji(`1233110125330563104`)
-      .setStyle(3),
-    new ButtonBuilder()
-      .setCustomId("removercanal_SistemaNukar")
-      .setLabel('Remover Canal')
-      .setEmoji(`1242907028079247410`)
-      .setDisabled(canais?.length == 0)
-      .setStyle(4),
-  )
-
-  const botoesvoltar = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("voltar_AcoesAutomaticsConfigs")
-      .setEmoji(`1238413255886639104`)
-      .setStyle(2),
-    new ButtonBuilder()
-      .setCustomId(`voltar1`)
-      .setEmoji('1292237216915128361')
-      .setStyle(1)
-  )
-
-  await interaction.update({ content: ``, components: [row1, botoesvoltar], embeds: [embed], ephemeral: true })
 }
+
 async function SistemadeFiltro(interaction, client) {
+    let info = configuracao.get(`AutomaticSettings.SistemadeFiltro`);
 
-  let info = configuracao.get(`AutomaticSettings.SistemadeFiltro`);
+    const container = new ContainerBuilder();
+    container.setAccentColor(getAccentColor());
 
-  const embed = new EmbedBuilder()
-    .setAuthor({ name: `DreamApps Bot`, iconURL: "https://i.ibb.co/J3rR09C/Gif-Bot-Cyans.gif" })
-    .setColor(`${configuracao.get(`Cores.Principal`) == null ? '0cd4cc' : configuracao.get('Cores.Principal')}`)
-    .setTitle(`${Emojis.get('_support_emoji')} **Painel De Sistema De Filtros**`)
-    .setDescription(`- Aqui você pode configurar o sistema de filtro.`)
-    .setFooter(
-      { text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) ? interaction.guild.iconURL({ dynamic: true }) : null }
-    )
-    .setTimestamp()
+    let desc = `## ${Emojis.get('_support_emoji')} Painel De Sistema De Filtros\nAqui você pode configurar o sistema de filtro.`;
 
-  if (info) {
-    const ms = require('ms');
-    let tempo = info?.tempo == 'permanente' ? `Punição permantente.` : info?.tempo != undefined ? `${ms(info?.tempo)}` : `Não Definido`;
-    embed.addFields(
-      { name: `Regras de Execução (${info?.status ? 'Ativo' : 'Inativo'})`, value: `Punição: \`${info?.punicao ? info?.punicao?.charAt(0).toUpperCase() + info?.punicao?.slice(1) : `Sem Punição`}\`\nTempo: \`${info?.tempo == 'permanente' ? `Punição permantente.` : `${tempo}`}\`` },
-    )
-  }
+    if (info) {
+        const ms = require('ms');
+        const tempo = info?.tempo === 'permanente'
+            ? `Punição permanente.`
+            : info?.tempo != undefined
+                ? `${ms(info.tempo)}`
+                : `Não Definido`;
 
-  if (info?.cargos?.length > 0) {
-    let cargos = "";
-    info.cargos.forEach((cargo) => {
-      cargos += `<@&${cargo}>\n`;
-    });
-
-    embed.addFields({ name: `Cargos Imunes`, value: cargos });
-  }
-
-  if (info?.categoria?.length > 0) {
-    let categorias = "";
-    info.categoria.forEach((categoria) => {
-      categorias += `<#${categoria}>\n`;
-    });
-
-    embed.addFields({ name: `Categorias Imunes`, value: categorias });
-  }
-
-  if (info?.links?.length > 0 || info?.palavras?.length > 0) {
-    let links = "";
-    let palavras = "";
-
-    info?.links.forEach((link) => {
-      links += `${link.trim()}, `;
-    });
-
-    info?.palavras.forEach((palavra) => {
-      palavras += `${palavra.trim()}, `;
-    });
-
-    if (links.length > 0) {
-      links = links.slice(0, -2);
+        desc += `\n\n**Regras de Execução (${info?.status ? 'Ativo' : 'Inativo'}):**\n` +
+            `Punição: \`${info?.punicao ? info.punicao.charAt(0).toUpperCase() + info.punicao.slice(1) : 'Sem Punição'}\`\n` +
+            `Tempo: \`${tempo}\``;
     }
 
-    if (palavras.length > 0) {
-      palavras = palavras.slice(0, -2);
+    if (info?.cargos?.length > 0) {
+        desc += `\n\n**Cargos Imunes:**\n${info.cargos.map(c => `<@&${c}>`).join('\n')}`;
     }
 
-    let stringsalva = "";
-    if (links.length > 0) {
-      stringsalva += `Links: \`${links}\`\n`;
+    if (info?.categoria?.length > 0) {
+        desc += `\n\n**Categorias Imunes:**\n${info.categoria.map(c => `<#${c}>`).join('\n')}`;
     }
 
-    if (palavras.length > 0) {
-      stringsalva += `Palavras: \`${palavras}\`\n`;
+    if (info?.links?.length > 0 || info?.palavras?.length > 0) {
+        let strFiltros = `\n\n**Informações de Filtros:**\nFiltrar Convites: \`${info?.convites ? 'Ativo' : 'Inativo'}\``;
+        if (info.links?.length > 0) strFiltros += `\nLinks: \`${info.links.join(', ')}\``;
+        if (info.palavras?.length > 0) strFiltros += `\nPalavras: \`${info.palavras.join(', ')}\``;
+        desc += strFiltros;
     }
 
-    embed.addFields({
-      name: `Informações de Filtros`,
-      value: `Filtrar Convites: \`${info?.convites ? 'Ativo' : 'Inativo'}\`\n${stringsalva}`
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(desc));
+    container.addSeparatorComponents(new SeparatorBuilder());
+
+    const row1 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("configurarFiltro")
+            .setLabel('Definir Regras')
+            .setEmoji(`1233103066975309984`)
+            .setStyle(3),
+        new ButtonBuilder()
+            .setCustomId("configuracaoexcecao")
+            .setLabel('Definir Exceções')
+            .setEmoji(`1234606184711979178`)
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId("adicionarFiltro")
+            .setLabel('Gerenciar Filtro')
+            .setEmoji(`1286078168855478446`)
+            .setStyle(1),
+    );
+
+    const botoesvoltar = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("voltar_AcoesAutomaticsConfigs")
+            .setEmoji(`1238413255886639104`)
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId(`voltar1`)
+            .setEmoji('1292237216915128361')
+            .setStyle(1)
+    );
+
+    container.addActionRowComponents(row1);
+    container.addActionRowComponents(botoesvoltar);
+
+    await interaction.update({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        content: '',
+        embeds: []
     });
-
-  }
-
-  const row1 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("configurarFiltro")
-      .setLabel('Definir Regras')
-      .setEmoji(`1233103066975309984`)
-      .setStyle(3),
-    new ButtonBuilder()
-      .setCustomId("configuracaoexcecao")
-      .setLabel('Definir Exceções')
-      .setEmoji(`1234606184711979178`)
-      .setStyle(2),
-    new ButtonBuilder()
-      .setCustomId("adicionarFiltro")
-      .setLabel('Gerenciar Filtro')
-      .setEmoji(`1286078168855478446`)
-      .setStyle(1),
-  )
-
-  const botoesvoltar = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("voltar_AcoesAutomaticsConfigs")
-      .setEmoji(`1238413255886639104`)
-      .setStyle(2),
-    new ButtonBuilder()
-      .setCustomId(`voltar1`)
-      .setEmoji('1292237216915128361')
-      .setStyle(1)
-  )
-
-  await interaction.update({ content: ``, components: [row1, botoesvoltar], embeds: [embed], ephemeral: true })
 }
+
 async function msgbemvindo(interaction, client) {
-  let msg = configuracao.get(`Entradas.msg`);
+    let msg = configuracao.get(`Entradas.msg`);
 
-  const mapeamentoSubstituicao = {
-    "{member}": `<@${interaction.user.id}>`,
-    "{guildname}": `${interaction.guild.name}`
-  };
+    const container = new ContainerBuilder();
+    container.setAccentColor(getAccentColor());
 
-  const substituirPalavras = (match) => mapeamentoSubstituicao[match] || match;
-  const stringNova = msg.replace(/{member}|{guildname}/g, substituirPalavras);
+    let preview = msg;
+    if (msg) {
+        const mapeamento = {
+            "{member}": `<@${interaction.user.id}>`,
+            "{guildname}": `${interaction.guild.name}`
+        };
+        preview = msg.replace(/{member}|{guildname}/g, m => mapeamento[m] || m);
+    }
 
-  const embed = new EmbedBuilder()
-    .setAuthor({ name:  `DreamApps Bot`, iconURL: "https://i.ibb.co/J3rR09C/Gif-Bot-Cyans.gif" })
-    .setColor(`${configuracao.get(`Cores.Principal`) == null ? "0cd4cc" : configuracao.get("Cores.Principal")}`)
-    .setTitle(`${Emojis.get('_support_emoji')} **Painel De Boas Vindas**`)
-    .setDescription(`- Aqui você pode configurar a mensagem de boas vindas.`)
-    .setFields(
-      { name: `Mensagem`, value: `${configuracao.get("Entradas.msg") == null ? "Não definido" : stringNova}` }
-    )
-    .setFooter({ text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) ? interaction.guild.iconURL({ dynamic: true }) : null })
-    .setTimestamp();
+    let desc = `## ${Emojis.get('_support_emoji')} Painel De Boas Vindas\nAqui você pode configurar a mensagem de boas vindas.\n\n` +
+        `**Mensagem:**\n${msg ? preview : 'Não definido'}`;
 
-  if (configuracao.get(`Entradas.tempo`)) {
-    embed.addFields({ name: `Tempo`, value: `\`${configuracao.get(`Entradas.tempo`)} segundos\`` });
-  }
+    if (configuracao.get(`Entradas.tempo`)) {
+        desc += `\n\n**Tempo:** \`${configuracao.get(`Entradas.tempo`)} segundos\``;
+    }
 
-  if (configuracao.get(`Entradas.canais`)?.length > 0) {
-    let canais = "";
-    configuracao.get(`Entradas.canais`).forEach((canal) => {
-      canais += `<#${canal}>\n`;
+    const canais = configuracao.get(`Entradas.canais`) || [];
+    if (canais.length > 0) {
+        desc += `\n\n**Canais:**\n${canais.map(c => `<#${c}>`).join('\n')}`;
+    }
+
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(desc));
+    container.addSeparatorComponents(new SeparatorBuilder());
+
+    const row1 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("configurarboasvindas")
+            .setLabel('Configurar mensagem')
+            .setEmoji(`1233103066975309984`)
+            .setStyle(1),
+        new ButtonBuilder()
+            .setCustomId("canaisboasvindas")
+            .setLabel('Canais')
+            .setEmoji(`1233127513178247269`)
+            .setStyle(1)
+    );
+
+    const botoesvoltar = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("voltar_AcoesAutomaticsConfigs")
+            .setEmoji(`1238413255886639104`)
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId(`voltar1`)
+            .setEmoji('1292237216915128361')
+            .setStyle(1)
+    );
+
+    container.addActionRowComponents(row1);
+    container.addActionRowComponents(botoesvoltar);
+
+    await interaction.update({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        content: '',
+        embeds: []
     });
-    embed.addFields({ name: `Canais`, value: canais });
-  }
-
-  const row2 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId("editarmensagemboasvindas").setLabel("Editar").setEmoji(`1178079212700188692`).setStyle(1),
-    new ButtonBuilder().setCustomId('canaisboasvindas').setLabel('Canais').setEmoji(`1233127513178247269`).setStyle(1),
-  );
-
-  const botoesvoltar = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("voltar_AcoesAutomaticsConfigs")
-      .setEmoji(`1238413255886639104`)
-      .setStyle(2),
-    new ButtonBuilder()
-      .setCustomId(`voltar1`)
-      .setEmoji('1292237216915128361')
-      .setStyle(1)
-  )
-
-  await interaction.update({ components: [row2, botoesvoltar], content: ``, embeds: [embed], ephemeral: true });
 }
+
 async function msgbemvindocanais(interaction, client) {
-  let msg = configuracao.get(`Entradas.msg`);
-  const mapeamentoSubstituicao = {
-    "{member}": `<@${interaction.user.id}>`,
-    "{guildname}": `${interaction.guild.name}`
-  };
+    const canais = configuracao.get(`Entradas.canais`) || [];
 
-  const substituirPalavras = (match) => mapeamentoSubstituicao[match] || match;
-  const stringNova = msg ? msg?.replace(/{member}|{guildname}/g, substituirPalavras) : "Não definido";
+    const container = new ContainerBuilder();
+    container.setAccentColor(getAccentColor());
 
-  const embed = new EmbedBuilder()
-    .setAuthor({ name: `DreamApps Bot`, iconURL: "https://i.ibb.co/J3rR09C/Gif-Bot-Cyans.gif" })
-    .setColor(`${configuracao.get(`Cores.Principal`) == null ? "0cd4cc" : configuracao.get("Cores.Principal")}`)
-    .setTitle("Configurar Boas vindas")
-    .setDescription(`- Aqui você pode configurar a mensagem de boas vindas.`)
-    .setFields(
-      { name: `Mensagem`, value: `${configuracao.get("Entradas.msg") == null ? "Não definido" : stringNova}` }
-    )
-    .setFooter({ text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) ? interaction.guild.iconURL({ dynamic: true }) : null })
-    .setTimestamp();
+    let desc = `## ${Emojis.get('_support_emoji')} Canais de Boas Vindas\nGerencie os canais onde as mensagens de boas vindas serão enviadas.\n\n` +
+        `**Canais configurados:** \`${canais.length}\``;
 
-  if (configuracao.get(`Entradas.tempo`)) {
-    embed.addFields({ name: `Tempo`, value: `\`${configuracao.get(`Entradas.tempo`)} segundos\`` });
-  }
+    if (canais.length > 0) {
+        desc += `\n${canais.map(c => `<#${c}>`).join('\n')}`;
+    }
 
-  if (configuracao.get(`Entradas.canais`)?.length > 0) {
-    let canais = "";
-    configuracao.get(`Entradas.canais`).forEach((canal) => {
-      canais += `<#${canal}>\n`;
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(desc));
+    container.addSeparatorComponents(new SeparatorBuilder());
+
+    const row1 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("addcanalboasvindas")
+            .setLabel('Adicionar Canal')
+            .setEmoji(`1233110125330563104`)
+            .setStyle(3),
+        new ButtonBuilder()
+            .setCustomId("removercanalboasvindas")
+            .setLabel('Remover Canal')
+            .setEmoji(`1242907028079247410`)
+            .setDisabled(canais.length === 0)
+            .setStyle(4)
+    );
+
+    const botoesvoltar = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("voltar_msgbemvindo")
+            .setEmoji(`1238413255886639104`)
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId(`voltar1`)
+            .setEmoji('1292237216915128361')
+            .setStyle(1)
+    );
+
+    container.addActionRowComponents(row1);
+    container.addActionRowComponents(botoesvoltar);
+
+    await interaction.update({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        content: '',
+        embeds: []
     });
-    embed.addFields({ name: `Canais`, value: canais });
-  }
-
-  const row1 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId("adicionarcanal_msgbemvindocanais").setLabel("Adicionar Canais").setEmoji(`1233110125330563104`).setStyle(1),
-    new ButtonBuilder().setCustomId("removercanalboasvindas").setLabel("Remover Canais").setEmoji(`1242907028079247410`).setStyle(1).setDisabled(configuracao.get(`Entradas.canais`)?.length == 0)
-  );
-
-  const botoesvoltar = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("voltar_msgbemvindo")
-      .setEmoji(`1238413255886639104`)
-      .setStyle(2),
-    new ButtonBuilder()
-      .setCustomId(`voltar1`)
-      .setEmoji('1292237216915128361')
-      .setStyle(1)
-  )
-
-  await interaction.update({ content: ``, embeds: [embed], components: [row1, botoesvoltar], ephemeral: true });
 }
-
 
 module.exports = {
-  AcoesAutomaticsConfigs,
-  LimpezaAutomatica,
-  msgbemvindo,
-  msgbemvindocanais,
-  GerenciarCanais,
-  SistemaNukar,
-  sistemaAntiRaid,
-  SistemadeFiltro,
-  SistemaAntiFake
-}
+    AcoesAutomaticsConfigs,
+    SistemaAntiFake,
+    sistemaAntiRaid,
+    LimpezaAutomatica,
+    GerenciarCanais,
+    SistemaNukar,
+    SistemadeFiltro,
+    msgbemvindo,
+    msgbemvindocanais
+};

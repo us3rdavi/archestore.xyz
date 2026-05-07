@@ -1,4 +1,8 @@
-const { ButtonBuilder, ActionRowBuilder, AttachmentBuilder, EmbedBuilder } = require("discord.js");
+const {
+    ButtonBuilder, ActionRowBuilder,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MediaGalleryBuilder,
+    MessageFlags
+} = require("discord.js");
 const { tickets } = require("../DataBaseJson");
 const emojis = require("../DataBaseJson/Emojis.json");
 const Emojis = { get: (name) => emojis[name] || "" };
@@ -10,14 +14,31 @@ async function painelTicket(interaction, useEditReply = false) {
         const mensagemConfigurada = tickets.get(`tickets.aparencia.message`) || 'Nenhuma mensagem configurada.';
         const bannerMensagem = tickets.get(`tickets.aparencia.bannermsg`) || null;
 
-        const row2 = new ActionRowBuilder().addComponents(
+        const container = new ContainerBuilder();
+        container.setAccentColor(0x5865F2);
+
+        container.addTextDisplayComponents(
+            new TextDisplayBuilder().setContent(mensagemConfigurada)
+        );
+
+        if (bannerMensagem) {
+            try {
+                container.addMediaGalleryComponents(
+                    new MediaGalleryBuilder().addItems({ media: { url: bannerMensagem } })
+                );
+            } catch (e) {}
+        }
+
+        container.addSeparatorComponents(new SeparatorBuilder());
+
+        const row1 = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId("definiraparencia")
                 .setLabel('Definir aparência')
                 .setEmoji("1371593617868591185")
                 .setStyle(2)
         );
-        const row3 = new ActionRowBuilder().addComponents(
+        const row2 = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId("addfuncaoticket")
                 .setLabel('Adicionar função')
@@ -34,7 +55,7 @@ async function painelTicket(interaction, useEditReply = false) {
                 .setEmoji("1371593613665894562")
                 .setStyle(2)
         );
-        const row4 = new ActionRowBuilder().addComponents(
+        const row3 = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId("postarticket")
                 .setLabel('Postar')
@@ -47,14 +68,15 @@ async function painelTicket(interaction, useEditReply = false) {
                 .setStyle(2)
         );
 
-        let attach24 = null;
-        if (bannerMensagem) attach24 = new AttachmentBuilder(bannerMensagem);
+        container.addActionRowComponents(row1);
+        container.addActionRowComponents(row2);
+        container.addActionRowComponents(row3);
 
         const payload = {
-            content: mensagemConfigurada,
-            files: attach24 ? [attach24] : [],
+            content: '',
             embeds: [],
-            components: [row2, row3, row4]
+            components: [container],
+            flags: MessageFlags.IsComponentsV2
         };
 
         if (useEditReply) await interaction.editReply(payload);
@@ -62,37 +84,45 @@ async function painelTicket(interaction, useEditReply = false) {
         return;
     }
 
-    const embed = new EmbedBuilder()
-        .setTitle(`${Emojis.get('_settings_emoji')} Central de Atendimento`)
-        .setFooter({ text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) })
-        .setTimestamp();
-
-    if (tickets.get(`tickets.aparencia.title`) !== null) {
-        embed.addFields({ name: `${Emojis.get('_messages_emoji')} Título do Painel`, value: tickets.get(`tickets.aparencia.title`) || 'Não definido', inline: true });
-    }
-    if (tickets.get(`tickets.aparencia.color`) !== null) {
-        embed.setColor(tickets.get(`tickets.aparencia.color`) || '#5865F2');
-    }
-
     const canalTickets = tickets.get('tickets.canalTickets');
     const canalLogs = tickets.get('tickets.canalLogs');
     const staffRoles = tickets.get('tickets.staffRoles') || [];
     const contador = tickets.get('tickets.contador') || 0;
     const botoesAdicionais = tickets.get('tickets.botoesAdicionais') || [];
+    const aparenciaTitle = tickets.get('tickets.aparencia.title');
+    const aparenciaColor = tickets.get('tickets.aparencia.color');
 
-    embed.addFields(
-        { name: `${Emojis.get('_ticket_emoji')} Canal de Tickets`, value: canalTickets ? `<#${canalTickets}>` : '`Não configurado`', inline: true },
-        { name: `${Emojis.get('_messages_emoji')} Canal de Logs`, value: canalLogs ? `<#${canalLogs}>` : '`Não configurado`', inline: true },
-        { name: `${Emojis.get('_staff_emoji')} Cargos Staff`, value: staffRoles.length > 0 ? staffRoles.map(r => `<@&${r}>`).join(', ') : '`Nenhum configurado`', inline: false },
-        { name: `${Emojis.get('information_emoji')} Total de Tickets`, value: `\`${contador}\``, inline: true },
-        { name: `${Emojis.get('_add_emoji')} Botões Adicionais`, value: `\`${botoesAdicionais.length}\` botão(ões)`, inline: true }
+    let accentColor = 0x5865F2;
+    if (aparenciaColor) {
+        try { accentColor = parseInt(aparenciaColor.replace('#', ''), 16); } catch (e) {}
+    }
+
+    const container = new ContainerBuilder();
+    container.setAccentColor(accentColor);
+
+    container.addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(`## ${Emojis.get('_settings_emoji')} Central de Atendimento`)
     );
 
-    const funcoes = tickets.get(`tickets.funcoes`);
-    if (funcoes !== null && Object.keys(funcoes).length > 0) {
+    container.addSeparatorComponents(new SeparatorBuilder());
+
+    let info = '';
+    if (aparenciaTitle) info += `${Emojis.get('_messages_emoji')} **Título:** ${aparenciaTitle}\n`;
+    info += `${Emojis.get('_ticket_emoji')} **Canal de Tickets:** ${canalTickets ? `<#${canalTickets}>` : '`Não configurado`'}\n`;
+    info += `${Emojis.get('_messages_emoji')} **Canal de Logs:** ${canalLogs ? `<#${canalLogs}>` : '`Não configurado`'}\n`;
+    info += `${Emojis.get('_staff_emoji')} **Cargos Staff:** ${staffRoles.length > 0 ? staffRoles.map(r => `<@&${r}>`).join(', ') : '`Nenhum configurado`'}\n`;
+    info += `${Emojis.get('information_emoji')} **Total de Tickets:** \`${contador}\`\n`;
+    info += `${Emojis.get('_add_emoji')} **Botões Adicionais:** \`${botoesAdicionais.length}\` botão(ões)`;
+
+    const funcoes = tickets.get('tickets.funcoes');
+    if (funcoes && Object.keys(funcoes).length > 0) {
         const funcList = Object.keys(funcoes).slice(0, 5).join(', ');
-        embed.addFields({ name: `${Emojis.get('_folder_emoji')} Funções Configuradas`, value: funcList + (Object.keys(funcoes).length > 5 ? ` +${Object.keys(funcoes).length - 5}` : ''), inline: false });
+        info += `\n${Emojis.get('_folder_emoji')} **Funções:** ${funcList}${Object.keys(funcoes).length > 5 ? ` +${Object.keys(funcoes).length - 5}` : ''}`;
     }
+
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(info));
+
+    container.addSeparatorComponents(new SeparatorBuilder());
 
     const row1 = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
@@ -101,36 +131,13 @@ async function painelTicket(interaction, useEditReply = false) {
             .setEmoji("1371593617868591185")
             .setStyle(2),
         new ButtonBuilder()
-            .setCustomId("configmensageminicial")
-            .setLabel('Mensagem Inicial')
-            .setEmoji("1371593617868591185")
-            .setStyle(2),
-        new ButtonBuilder()
-            .setCustomId("configmensagemfinal")
-            .setLabel('Mensagem de Finalização')
-            .setEmoji("1371593617868591185")
+            .setCustomId("configuracaoticket")
+            .setLabel('Configuração')
+            .setEmoji("1371593610339942493")
             .setStyle(2)
     );
 
     const row2 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId("canalticketconfigsystem")
-            .setLabel('Canal de Tickets')
-            .setEmoji("1371593613665894562")
-            .setStyle(2),
-        new ButtonBuilder()
-            .setCustomId("canallogsticket2")
-            .setLabel('Canal de Logs')
-            .setEmoji("1371593613665894562")
-            .setStyle(2),
-        new ButtonBuilder()
-            .setCustomId("cargosstaff")
-            .setLabel('Cargos Staff')
-            .setEmoji("1371593623514124510")
-            .setStyle(2)
-    );
-
-    const row3 = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId("addfuncaoticket")
             .setLabel('Adicionar Função')
@@ -148,20 +155,7 @@ async function painelTicket(interaction, useEditReply = false) {
             .setStyle(2)
     );
 
-    const row4 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId("adicionarbotaoticket")
-            .setLabel('Adicionar Botão')
-            .setEmoji("1371593623514124510")
-            .setStyle(2),
-        new ButtonBuilder()
-            .setCustomId("removerbotoesticket")
-            .setLabel('Remover Botão')
-            .setEmoji("1371593634029371432")
-            .setStyle(4)
-    );
-
-    const row5 = new ActionRowBuilder().addComponents(
+    const row3 = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId("postarticket")
             .setLabel('Postar Painel')
@@ -174,10 +168,115 @@ async function painelTicket(interaction, useEditReply = false) {
             .setStyle(2)
     );
 
-    const payload = { content: '', files: [], embeds: [embed], components: [row1, row2, row3, row4, row5] };
+    container.addActionRowComponents(row1);
+    container.addActionRowComponents(row2);
+    container.addActionRowComponents(row3);
+
+    const payload = {
+        content: '',
+        embeds: [],
+        components: [container],
+        flags: MessageFlags.IsComponentsV2
+    };
 
     if (useEditReply) await interaction.editReply(payload);
     else await interaction.update(payload);
 }
 
-module.exports = { painelTicket };
+async function painelConfiguracaoTicket(interaction) {
+    const canalTickets = tickets.get('tickets.canalTickets');
+    const canalLogs = tickets.get('tickets.canalLogs');
+    const staffRoles = tickets.get('tickets.staffRoles') || [];
+    const botoesAdicionais = tickets.get('tickets.botoesAdicionais') || [];
+    const mensagemInicial = tickets.get('tickets.mensagemInicial') || {};
+    const mensagemFinal = tickets.get('tickets.mensagemFinalizacao') || {};
+
+    const container = new ContainerBuilder();
+    container.setAccentColor(0x5865F2);
+
+    container.addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(`## ${Emojis.get('_settings_emoji')} Configuração\nGerencie canais, cargos e mensagens do sistema de tickets.`)
+    );
+
+    container.addSeparatorComponents(new SeparatorBuilder());
+
+    let info = '';
+    info += `${Emojis.get('_ticket_emoji')} **Canal de Tickets:** ${canalTickets ? `<#${canalTickets}>` : '`Não configurado`'}\n`;
+    info += `${Emojis.get('_messages_emoji')} **Canal de Logs:** ${canalLogs ? `<#${canalLogs}>` : '`Não configurado`'}\n`;
+    info += `${Emojis.get('_staff_emoji')} **Cargos Staff:** ${staffRoles.length > 0 ? staffRoles.map(r => `<@&${r}>`).join(', ') : '`Nenhum configurado`'}\n`;
+    info += `${Emojis.get('_add_emoji')} **Botões Adicionais:** \`${botoesAdicionais.length}\` botão(ões)\n`;
+    info += `${Emojis.get('_messages_emoji')} **Msg. Inicial:** ${mensagemInicial.msgTitulo ? `\`${mensagemInicial.msgTitulo}\`` : '`Não configurada`'}\n`;
+    info += `${Emojis.get('_messages_emoji')} **Msg. Finalização:** ${mensagemFinal.titulo ? `\`${mensagemFinal.titulo}\`` : '`Não configurada`'}`;
+
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(info));
+
+    container.addSeparatorComponents(new SeparatorBuilder());
+
+    const row1 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("canalticketconfigsystem")
+            .setLabel('Canal de Tickets')
+            .setEmoji("1371593613665894562")
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId("canallogsticket2")
+            .setLabel('Canal de Logs')
+            .setEmoji("1371593613665894562")
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId("cargosstaff")
+            .setLabel('Cargos Staff')
+            .setEmoji("1371593623514124510")
+            .setStyle(2)
+    );
+
+    const row2 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("configmensageminicial")
+            .setLabel('Mensagem Inicial')
+            .setEmoji("1371593617868591185")
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId("configmensagemfinal")
+            .setLabel('Mensagem de Finalização')
+            .setEmoji("1371593617868591185")
+            .setStyle(2)
+    );
+
+    const row3 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("adicionarbotaoticket")
+            .setLabel('Adicionar Botão')
+            .setEmoji("1371593623514124510")
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId("removerbotoesticket")
+            .setLabel('Remover Botão')
+            .setEmoji("1371593634029371432")
+            .setStyle(4)
+    );
+
+    const row4 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId("painelconfigticket")
+            .setLabel('Voltar')
+            .setEmoji("1371593637179297923")
+            .setStyle(2)
+    );
+
+    container.addActionRowComponents(row1);
+    container.addActionRowComponents(row2);
+    container.addActionRowComponents(row3);
+    container.addActionRowComponents(row4);
+
+    const payload = {
+        content: '',
+        embeds: [],
+        components: [container],
+        flags: MessageFlags.IsComponentsV2
+    };
+
+    await interaction.update(payload);
+}
+
+module.exports = { painelTicket, painelConfiguracaoTicket };
