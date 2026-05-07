@@ -1,7 +1,15 @@
-const { ApplicationCommandType, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
-const { createDiscount } = require("../../Functions/CentralCartAPI");
+const {
+    ApplicationCommandType, PermissionFlagsBits,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
+} = require("discord.js");
+const { configuracao, Emojis } = require("../../DataBaseJson");
 const { getPermissions } = require("../../Functions/PermissionsCache.js");
-const { Emojis } = require("../../DataBaseJson");
+const { createDiscount } = require("../../Functions/CentralCartAPI");
+
+function getAccentColor() {
+    const cor = configuracao.get('Cores.Principal') || '5865F2';
+    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
+}
 
 module.exports = {
     name: "cc_cupom_criar",
@@ -28,7 +36,7 @@ module.exports = {
     run: async (client, interaction) => {
         const perm = await getPermissions(client.user.id);
         if (perm === null || !perm.includes(interaction.user.id)) {
-            return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Faltam permissões.`, ephemeral: true });
+            return interaction.reply({ content: `${Emojis.get('negative_emoji')} Faltam permissões.`, ephemeral: true });
         }
 
         await interaction.deferReply({ ephemeral: true });
@@ -38,6 +46,10 @@ module.exports = {
         const valor = interaction.options.getNumber("valor");
         const max_usos = interaction.options.getInteger("max_usos");
         const expira = interaction.options.getString("expira_em");
+
+        const loading = new ContainerBuilder().setAccentColor(getAccentColor());
+        loading.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Criando cupom...`));
+        await interaction.editReply({ components: [loading], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
 
         try {
             const body = {
@@ -51,23 +63,36 @@ module.exports = {
 
             const res = await createDiscount(body);
 
-            const valorFmt = tipo === "PERCENTAGE" ? `${valor}%` : `R$ ${(valor / 100).toFixed(2).replace('.', ',')}`;
+            const valorFmt = tipo === "PERCENTAGE"
+                ? `\`${valor}%\``
+                : `\`R$ ${(valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\``;
 
-            const embed = new EmbedBuilder()
-                .setTitle("🎟️ Cupom criado com sucesso!")
-                .setColor(0x00b300)
-                .addFields(
-                    { name: "🏷️ Código", value: `\`${res.coupon || codigo}\``, inline: true },
-                    { name: "💸 Desconto", value: valorFmt, inline: true },
-                    { name: "🔢 Máx. usos", value: max_usos ? `\`${max_usos}\`` : "Ilimitado", inline: true },
-                    { name: "📅 Expira em", value: expira || "Sem expiração", inline: true },
+            const container = new ContainerBuilder();
+            container.setAccentColor(getAccentColor());
+
+            container.addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    `## ${Emojis.get('_diamond_emoji')} Cupom criado\n` +
+                    `-# CentralCart`
                 )
-                .setFooter({ text: "CentralCart" })
-                .setTimestamp();
+            );
 
-            return interaction.editReply({ embeds: [embed] });
+            container.addSeparatorComponents(new SeparatorBuilder());
+
+            container.addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    `**Código:** \`${res.coupon || codigo}\`\n` +
+                    `**Desconto:** ${valorFmt}\n` +
+                    `**Máx. usos:** ${max_usos ? `\`${max_usos}\`` : '`Ilimitado`'}\n` +
+                    `**Expira em:** ${expira ? `\`${expira}\`` : '`Sem expiração`'}`
+                )
+            );
+
+            await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
         } catch (err) {
-            return interaction.editReply({ content: `❌ Erro ao criar cupom: \`${err.message}\`` });
+            const errContainer = new ContainerBuilder().setAccentColor(getAccentColor());
+            errContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('negative_emoji')} Erro ao criar cupom: \`${err.message}\``));
+            await interaction.editReply({ components: [errContainer], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
         }
     }
 };

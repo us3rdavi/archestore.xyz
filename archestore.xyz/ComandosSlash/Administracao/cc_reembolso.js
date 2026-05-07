@@ -1,7 +1,15 @@
-const { ApplicationCommandType, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
-const { updateOrder } = require("../../Functions/CentralCartAPI");
+const {
+    ApplicationCommandType, PermissionFlagsBits,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
+} = require("discord.js");
+const { configuracao, Emojis } = require("../../DataBaseJson");
 const { getPermissions } = require("../../Functions/PermissionsCache.js");
-const { Emojis } = require("../../DataBaseJson");
+const { updateOrder } = require("../../Functions/CentralCartAPI");
+
+function getAccentColor() {
+    const cor = configuracao.get('Cores.Principal') || '5865F2';
+    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
+}
 
 module.exports = {
     name: "cc_reembolso",
@@ -15,30 +23,45 @@ module.exports = {
     run: async (client, interaction) => {
         const perm = await getPermissions(client.user.id);
         if (perm === null || !perm.includes(interaction.user.id)) {
-            return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Faltam permissões.`, ephemeral: true });
+            return interaction.reply({ content: `${Emojis.get('negative_emoji')} Faltam permissões.`, ephemeral: true });
         }
 
         await interaction.deferReply({ ephemeral: true });
 
         const id = interaction.options.getString("id");
 
+        const loading = new ContainerBuilder().setAccentColor(getAccentColor());
+        loading.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Processando reembolso...`));
+        await interaction.editReply({ components: [loading], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+
         try {
             const res = await updateOrder(id, { status: "REFUNDED", manually_refunded: true });
 
-            const embed = new EmbedBuilder()
-                .setTitle("↩️ Pedido Reembolsado")
-                .setColor(0xff9900)
-                .addFields(
-                    { name: "🆔 Pedido", value: `\`${id}\``, inline: true },
-                    { name: "📌 Novo status", value: res.formatted_status || "REFUNDED", inline: true },
-                    { name: "👤 Cliente", value: res.client_name || res.client_email || "N/A", inline: true },
-                )
-                .setFooter({ text: "CentralCart" })
-                .setTimestamp();
+            const container = new ContainerBuilder();
+            container.setAccentColor(getAccentColor());
 
-            return interaction.editReply({ embeds: [embed] });
+            container.addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    `## ${Emojis.get('_transfer_emoji')} Reembolso realizado\n` +
+                    `-# CentralCart`
+                )
+            );
+
+            container.addSeparatorComponents(new SeparatorBuilder());
+
+            container.addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    `**Pedido:** \`${id}\`\n` +
+                    `**Status:** \`${res.formatted_status || 'REFUNDED'}\`\n` +
+                    `**Cliente:** ${res.client_name || res.client_email || 'N/A'}`
+                )
+            );
+
+            await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
         } catch (err) {
-            return interaction.editReply({ content: `❌ Erro ao reembolsar pedido: \`${err.message}\`` });
+            const errContainer = new ContainerBuilder().setAccentColor(getAccentColor());
+            errContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('negative_emoji')} Erro ao reembolsar pedido: \`${err.message}\``));
+            await interaction.editReply({ components: [errContainer], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
         }
     }
 };

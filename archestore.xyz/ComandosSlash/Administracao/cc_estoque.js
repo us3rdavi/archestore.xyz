@@ -1,7 +1,15 @@
-const { ApplicationCommandType, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
-const { listLicenseKeys, addLicenseKeys } = require("../../Functions/CentralCartAPI");
+const {
+    ApplicationCommandType, PermissionFlagsBits,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
+} = require("discord.js");
+const { configuracao, Emojis } = require("../../DataBaseJson");
 const { getPermissions } = require("../../Functions/PermissionsCache.js");
-const { Emojis } = require("../../DataBaseJson");
+const { listLicenseKeys, addLicenseKeys } = require("../../Functions/CentralCartAPI");
+
+function getAccentColor() {
+    const cor = configuracao.get('Cores.Principal') || '5865F2';
+    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
+}
 
 module.exports = {
     name: "cc_estoque",
@@ -31,7 +39,7 @@ module.exports = {
     run: async (client, interaction) => {
         const perm = await getPermissions(client.user.id);
         if (perm === null || !perm.includes(interaction.user.id)) {
-            return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Faltam permissões.`, ephemeral: true });
+            return interaction.reply({ content: `${Emojis.get('negative_emoji')} Faltam permissões.`, ephemeral: true });
         }
 
         await interaction.deferReply({ ephemeral: true });
@@ -39,50 +47,80 @@ module.exports = {
         const sub = interaction.options.getSubcommand();
         const produtoId = interaction.options.getInteger("produto_id");
 
+        const loading = new ContainerBuilder().setAccentColor(getAccentColor());
+        loading.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Processando estoque...`));
+        await interaction.editReply({ components: [loading], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+
         try {
             if (sub === "ver") {
                 const chaves = await listLicenseKeys(produtoId);
 
                 if (!chaves.length) {
-                    return interaction.editReply({ content: `🔍 Nenhuma chave de licença no produto \`${produtoId}\`.` });
+                    const container = new ContainerBuilder().setAccentColor(getAccentColor());
+                    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                        `${Emojis.get('_search_emoji')} Nenhuma chave de licença no produto \`${produtoId}\`.`
+                    ));
+                    return interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
                 }
 
-                const linhas = chaves.slice(0, 20).map((c, i) => `\`${i + 1}.\` ||${c.value}||`);
+                const linhas = chaves.slice(0, 20).map((c, i) => `**${i + 1}.** ||${c.value}||`);
 
-                const embed = new EmbedBuilder()
-                    .setTitle(`🔑 Chaves do produto \`${produtoId}\``)
-                    .setColor(0x00b300)
-                    .setDescription(linhas.join("\n"))
-                    .setFooter({ text: `Total: ${chaves.length} chave(s) | CentralCart` })
-                    .setTimestamp();
+                const container = new ContainerBuilder();
+                container.setAccentColor(getAccentColor());
 
-                return interaction.editReply({ embeds: [embed] });
+                container.addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
+                        `## ${Emojis.get('_folder_emoji')} Estoque — Produto \`${produtoId}\`\n` +
+                        `-# CentralCart — ${chaves.length} chave(s)`
+                    )
+                );
+
+                container.addSeparatorComponents(new SeparatorBuilder());
+
+                container.addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(linhas.join('\n'))
+                );
+
+                return interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
 
             } else if (sub === "adicionar") {
-                const chavesStr = interaction.options.getString("chaves");
-                const chavesArr = chavesStr.split(",").map(c => c.trim()).filter(Boolean);
+                const chavesArr = interaction.options.getString("chaves")
+                    .split(",").map(c => c.trim()).filter(Boolean);
 
                 if (!chavesArr.length) {
-                    return interaction.editReply({ content: `❌ Nenhuma chave válida encontrada.` });
+                    const container = new ContainerBuilder().setAccentColor(getAccentColor());
+                    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('negative_emoji')} Nenhuma chave válida encontrada.`));
+                    return interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
                 }
 
                 const res = await addLicenseKeys(produtoId, chavesArr);
 
-                const embed = new EmbedBuilder()
-                    .setTitle("✅ Chaves adicionadas!")
-                    .setColor(0x00b300)
-                    .setDescription(res.message || `${chavesArr.length} chave(s) adicionada(s).`)
-                    .addFields(
-                        { name: "📦 Produto", value: `\`${produtoId}\``, inline: true },
-                        { name: "🔑 Qtd. adicionada", value: `\`${res.added_count ?? chavesArr.length}\``, inline: true },
-                    )
-                    .setFooter({ text: "CentralCart" })
-                    .setTimestamp();
+                const container = new ContainerBuilder();
+                container.setAccentColor(getAccentColor());
 
-                return interaction.editReply({ embeds: [embed] });
+                container.addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
+                        `## ${Emojis.get('_folder_emoji')} Chaves adicionadas\n` +
+                        `-# CentralCart`
+                    )
+                );
+
+                container.addSeparatorComponents(new SeparatorBuilder());
+
+                container.addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
+                        `${Emojis.get('confirmed_emoji')} ${res.message || `${chavesArr.length} chave(s) adicionada(s).`}\n\n` +
+                        `**Produto:** \`${produtoId}\`\n` +
+                        `**Adicionadas:** \`${res.added_count ?? chavesArr.length}\``
+                    )
+                );
+
+                return interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
             }
         } catch (err) {
-            return interaction.editReply({ content: `❌ Erro: \`${err.message}\`` });
+            const errContainer = new ContainerBuilder().setAccentColor(getAccentColor());
+            errContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('negative_emoji')} Erro: \`${err.message}\``));
+            await interaction.editReply({ components: [errContainer], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
         }
     }
 };

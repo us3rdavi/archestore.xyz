@@ -1,7 +1,15 @@
-const { ApplicationCommandType, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
-const { getAppDetails } = require("../../Functions/CentralCartAPI");
+const {
+    ApplicationCommandType, PermissionFlagsBits,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
+} = require("discord.js");
+const { configuracao, Emojis } = require("../../DataBaseJson");
 const { getPermissions } = require("../../Functions/PermissionsCache.js");
-const { Emojis } = require("../../DataBaseJson");
+const { getAppDetails } = require("../../Functions/CentralCartAPI");
+
+function getAccentColor() {
+    const cor = configuracao.get('Cores.Principal') || '5865F2';
+    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
+}
 
 module.exports = {
     name: "cc_loja",
@@ -12,30 +20,48 @@ module.exports = {
     run: async (client, interaction) => {
         const perm = await getPermissions(client.user.id);
         if (perm === null || !perm.includes(interaction.user.id)) {
-            return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Faltam permissões.`, ephemeral: true });
+            return interaction.reply({ content: `${Emojis.get('negative_emoji')} Faltam permissões.`, ephemeral: true });
         }
 
         await interaction.deferReply({ ephemeral: true });
 
+        const loading = new ContainerBuilder().setAccentColor(getAccentColor());
+        loading.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando informações da loja...`));
+        await interaction.editReply({ components: [loading], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+
         try {
             const loja = await getAppDetails();
 
-            const embed = new EmbedBuilder()
-                .setTitle(`🏪 ${loja.name}`)
-                .setColor(loja.primary_color || 0x00b300)
-                .setThumbnail(loja.logo || null)
-                .addFields(
-                    { name: "🆔 ID da Loja", value: `\`${loja.id}\``, inline: true },
-                    { name: "📦 Plano", value: `\`${loja.plan}\``, inline: true },
-                    { name: "🌐 URL", value: `[Acessar loja](${loja.url})`, inline: true },
-                    { name: "📅 Assinatura válida até", value: loja.overdue_date ? `<t:${Math.floor(new Date(loja.overdue_date).getTime() / 1000)}:D>` : "N/A", inline: true },
-                )
-                .setFooter({ text: "CentralCart" })
-                .setTimestamp();
+            const vencimento = loja.overdue_date
+                ? `<t:${Math.floor(new Date(loja.overdue_date).getTime() / 1000)}:D>`
+                : 'N/A';
 
-            return interaction.editReply({ embeds: [embed] });
+            const container = new ContainerBuilder();
+            container.setAccentColor(getAccentColor());
+
+            container.addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    `## ${Emojis.get('store_emoji')} ${loja.name}\n` +
+                    `-# CentralCart — Informações da loja`
+                )
+            );
+
+            container.addSeparatorComponents(new SeparatorBuilder());
+
+            container.addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    `**ID da loja:** \`${loja.id}\`\n` +
+                    `**Plano:** \`${loja.plan}\`\n` +
+                    `**URL:** ${loja.url}\n` +
+                    `**Assinatura válida até:** ${vencimento}`
+                )
+            );
+
+            await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
         } catch (err) {
-            return interaction.editReply({ content: `❌ Erro ao buscar loja: \`${err.message}\`` });
+            const errContainer = new ContainerBuilder().setAccentColor(getAccentColor());
+            errContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('negative_emoji')} Erro ao buscar loja: \`${err.message}\``));
+            await interaction.editReply({ components: [errContainer], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
         }
     }
 };
