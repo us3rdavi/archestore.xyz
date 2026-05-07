@@ -192,6 +192,7 @@ module.exports = {
                 let DESC = interaction.fields.getTextInputValue('tokenMP2');
                 let BANNER = interaction.fields.getTextInputValue('tokenMP3');
                 let COREMBED = interaction.fields.getTextInputValue('tokenMP5');
+                let EMOJI = interaction.fields.getTextInputValue('tokenMP6');
 
                 if (TITULO.length > 256) {
                     return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} O título não pode ter mais de 256 caracteres!`, ephemeral: true });
@@ -232,6 +233,17 @@ module.exports = {
                     tickets.set(`tickets.aparencia.description`, DESC)
                 } else {
                     tickets.delete(`tickets.aparencia.description`)
+                }
+
+                if (EMOJI !== '') {
+                    const emojiRegex = /^(\p{Emoji_Presentation}|\p{Extended_Pictographic}|<a?:\w+:\d+>)$/u;
+                    if (!emojiRegex.test(EMOJI.trim())) {
+                        return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Emoji inválido! Use um emoji padrão (ex: 🎧) ou um emoji personalizado (ex: <:nome:123456789>).`, ephemeral: true });
+                    } else {
+                        tickets.set(`tickets.aparencia.emoji`, EMOJI.trim())
+                    }
+                } else {
+                    tickets.delete(`tickets.aparencia.emoji`)
                 }
 
                 await painelTicket(interaction)
@@ -1502,13 +1514,21 @@ module.exports = {
                     .setValue(dd?.color == undefined ? '' : dd.color)
                     .setRequired(false)
 
+                const newnameboteN6 = new TextInputBuilder()
+                    .setCustomId('tokenMP6')
+                    .setLabel(`EMOJI DO TÍTULO (OPCIONAL)`)
+                    .setPlaceholder(`Ex: 🎧 ou <:nome:123456789> ou <a:nome:123456789>`)
+                    .setStyle(TextInputStyle.Short)
+                    .setValue(dd?.emoji == undefined ? '' : dd.emoji)
+                    .setRequired(false)
 
                 const firstActionRow3 = new ActionRowBuilder().addComponents(newnameboteN);
                 const firstActionRow4 = new ActionRowBuilder().addComponents(newnameboteN2);
                 const firstActionRow5 = new ActionRowBuilder().addComponents(newnameboteN4);
                 const firstActionRow6 = new ActionRowBuilder().addComponents(newnameboteN5);
+                const firstActionRow7 = new ActionRowBuilder().addComponents(newnameboteN6);
 
-                modalaAA.addComponents(firstActionRow3, firstActionRow4, firstActionRow5, firstActionRow6);
+                modalaAA.addComponents(firstActionRow3, firstActionRow4, firstActionRow5, firstActionRow6, firstActionRow7);
                 await interaction.showModal(modalaAA);
 
 

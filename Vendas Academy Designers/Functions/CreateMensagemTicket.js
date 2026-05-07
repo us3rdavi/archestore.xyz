@@ -12,9 +12,10 @@ const { tickets } = require("../DataBaseJson");
 function buildTicketComponents(ggg, aparencia) {
     const container = new ContainerBuilder().setAccentColor(0x5865F2);
 
+    const tituloEmoji = aparencia.emoji ? `${aparencia.emoji} ` : `🎧 `;
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-            `## 🎧 ${aparencia.title || 'Support Center'}`
+            `## ${tituloEmoji}${aparencia.title || 'Support Center'}`
         )
     );
 
