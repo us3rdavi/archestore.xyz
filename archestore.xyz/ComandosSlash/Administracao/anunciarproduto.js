@@ -46,7 +46,7 @@ module.exports = {
         });
 
         try {
-            const res = await centralCart.listPackages({ all: true });
+            const res = await centralCart.listPackages();
             const pacotes = (res.data || res || []).filter(p => p.enabled !== false);
 
             if (!pacotes.length) {
@@ -94,7 +94,7 @@ module.exports = {
                     .addOptions(
                         chunk.map(p => ({
                             label: (p.name || 'Produto').slice(0, 100),
-                            description: (p.formatted_price || (p.price != null ? `R$ ${p.price}` : 'Ver detalhes')).slice(0, 100),
+                            description: (p.is_variation_parent ? `📦 Package — ${p.price_display || 'Ver variantes'}` : (p.price_display || (p.price != null ? `R$ ${p.price}` : 'Ver detalhes'))).slice(0, 100),
                             value: String(p.id),
                         }))
                     );
