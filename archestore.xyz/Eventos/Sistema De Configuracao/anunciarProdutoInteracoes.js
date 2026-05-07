@@ -122,7 +122,7 @@ function buildCardPublico(pacote, variante, nomeCustom, descCustom) {
 // ─── Checkout ────────────────────────────────────────────────────────────────
 
 async function processarCompra(interaction, dadosCompra) {
-    const { packageId, nome, preco, entregaAuto, gateway } = dadosCompra;
+    const { packageId, nome, preco, entregaAuto, gateway, email } = dadosCompra;
 
     const loadingContainer = new ContainerBuilder().setAccentColor(getAccentColor());
     loadingContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Criando pedido, aguarde...`));
@@ -134,6 +134,7 @@ async function processarCompra(interaction, dadosCompra) {
             packages: [{ id: packageId, quantity: 1 }],
             discord_id: interaction.user.id,
             client_name: interaction.user.globalName || interaction.user.username,
+            email,
             gateway,
         });
     } catch (err) {
@@ -220,41 +221,10 @@ module.exports = {
             try {
                 const pacote = await centralCart.getPackage(packageId);
 
-                await db.set(`ap_cfg_${interaction.user.id}`, { pacote, varianteId: null, variante: null, nomeCustom: null, descCustom: null });
+                await db.set(`ap_cfg_${interaction.user.id}`, { pacote, nomeCustom: null, descCustom: null });
 
-                if (isPackage(pacote) && getVariants(pacote).length > 0) {
-                    // É package com variantes → pedir para escolher variante ou postar tudo
-                    const vars = getVariants(pacote);
-                    const container = new ContainerBuilder().setAccentColor(getAccentColor());
-                    container.addTextDisplayComponents(
-                        new TextDisplayBuilder().setContent(
-                            `## ${Emojis.get('_cart_emoji')} Package: ${pacote.name}\n` +
-                            `-# Este package possui **${vars.length} variante(s)**. Escolha uma variante específica ou poste o package inteiro.`
-                        )
-                    );
-                    container.addSeparatorComponents(new SeparatorBuilder());
-                    container.addActionRowComponents(
-                        new ActionRowBuilder().addComponents(
-                            new StringSelectMenuBuilder()
-                                .setCustomId('ap_cfg_variante')
-                                .setPlaceholder('Selecione uma variante específica...')
-                                .addOptions(vars.slice(0, 25).map(v => ({
-                                    label: (v.name || 'Variante').slice(0, 100),
-                                    description: formatarPreco(v).slice(0, 100),
-                                    value: String(v.id),
-                                })))
-                        )
-                    );
-                    container.addActionRowComponents(
-                        new ActionRowBuilder().addComponents(
-                            new ButtonBuilder().setCustomId('ap_cfg_package_inteiro').setLabel('Postar package inteiro (todas as variantes)').setStyle(ButtonStyle.Secondary).setEmoji({ id: '1501803960393269298' })
-                        )
-                    );
-                    await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
-                } else {
-                    // Produto normal → card de config direto
-                    await interaction.editReply({ components: [buildCardConfig(pacote, null, null, null)], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
-                }
+                // Package ou produto normal → card de config direto (o card já mostra o select de variantes se for package)
+                await interaction.editReply({ components: [buildCardConfig(pacote, null, null, null)], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
             } catch (err) {
                 const c = new ContainerBuilder().setAccentColor(0xED4245);
                 c.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('negative_emoji')} Erro ao buscar produto: \`${err.message}\``));
@@ -262,42 +232,20 @@ module.exports = {
             }
         }
 
-        // ── [STAFF] Selecionou variante específica ────────────────────────────
-        if (interaction.isStringSelectMenu() && interaction.customId === 'ap_cfg_variante') {
-            const varianteId = interaction.values[0];
-            const dados = await db.get(`ap_cfg_${interaction.user.id}`);
-            if (!dados) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sessão expirada. Execute o comando novamente.`, ephemeral: true });
-
-            const variante = getVariants(dados.pacote).find(v => String(v.id) === varianteId) || { id: varianteId };
-            await db.set(`ap_cfg_${interaction.user.id}`, { ...dados, varianteId, variante });
-
-            await interaction.update({ components: [buildCardConfig(dados.pacote, variante, dados.nomeCustom, dados.descCustom)], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
-        }
-
-        // ── [STAFF] Postar package inteiro (todas as variantes) ───────────────
-        if (interaction.isButton() && interaction.customId === 'ap_cfg_package_inteiro') {
-            const dados = await db.get(`ap_cfg_${interaction.user.id}`);
-            if (!dados) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sessão expirada.`, ephemeral: true });
-
-            await db.set(`ap_cfg_${interaction.user.id}`, { ...dados, varianteId: null, variante: null });
-            await interaction.update({ components: [buildCardConfig(dados.pacote, null, dados.nomeCustom, dados.descCustom)], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
-        }
-
         // ── [STAFF] Editar nome/descrição ─────────────────────────────────────
         if (interaction.isButton() && interaction.customId === 'ap_cfg_editar') {
             const dados = await db.get(`ap_cfg_${interaction.user.id}`);
             if (!dados) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sessão expirada.`, ephemeral: true });
 
-            const base = dados.variante || dados.pacote;
             const modal = new ModalBuilder().setCustomId('ap_cfg_modal').setTitle('Editar nome e descrição');
             modal.addComponents(
                 new ActionRowBuilder().addComponents(
                     new TextInputBuilder().setCustomId('ap_nome').setLabel('Nome exibido no card').setStyle(TextInputStyle.Short)
-                        .setValue(dados.nomeCustom || base.name || '').setMaxLength(100).setRequired(false)
+                        .setValue(dados.nomeCustom || dados.pacote.name || '').setMaxLength(100).setRequired(false)
                 ),
                 new ActionRowBuilder().addComponents(
                     new TextInputBuilder().setCustomId('ap_desc').setLabel('Descrição exibida no card').setStyle(TextInputStyle.Paragraph)
-                        .setValue(dados.descCustom || base.description || '').setMaxLength(1000).setRequired(false)
+                        .setValue(dados.descCustom || dados.pacote.description || '').setMaxLength(1000).setRequired(false)
                 )
             );
             await interaction.showModal(modal);
@@ -312,7 +260,7 @@ module.exports = {
             const descCustom = interaction.fields.getTextInputValue('ap_desc').trim() || null;
             await db.set(`ap_cfg_${interaction.user.id}`, { ...dados, nomeCustom, descCustom });
 
-            await interaction.update({ components: [buildCardConfig(dados.pacote, dados.variante, nomeCustom, descCustom)], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+            await interaction.update({ components: [buildCardConfig(dados.pacote, null, nomeCustom, descCustom)], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
         }
 
         // ── [STAFF] Postar no canal ───────────────────────────────────────────
@@ -324,19 +272,19 @@ module.exports = {
             loading.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Postando...`));
             await interaction.update({ components: [loading], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
 
-            const { pacote, variante, nomeCustom, descCustom } = dados;
+            const { pacote, nomeCustom, descCustom } = dados;
             try {
-                const cardPublico = buildCardPublico(pacote, variante, nomeCustom, descCustom);
+                const cardPublico = buildCardPublico(pacote, null, nomeCustom, descCustom);
                 const msg = await interaction.channel.send({ components: [cardPublico], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
 
-                const ehPkg = !variante && isPackage(pacote);
+                const ehPkg = isPackage(pacote);
                 await db.set(`ap_msg_${msg.id}`, {
-                    packageId:  variante ? variante.id : pacote.id,
-                    nome:       nomeCustom || (variante ? variante.name : pacote.name) || 'Produto',
-                    preco:      formatarPreco(variante || pacote),
-                    entregaAuto: isEntregaAuto(variante || pacote),
+                    packageId:   pacote.id,
+                    nome:        nomeCustom || pacote.name || 'Produto',
+                    preco:       formatarPreco(pacote),
+                    entregaAuto: isEntregaAuto(pacote),
                     ehPkg,
-                    variantes:  ehPkg ? getVariants(pacote) : [],
+                    variantes:   ehPkg ? getVariants(pacote) : [],
                 });
 
                 await db.delete(`ap_cfg_${interaction.user.id}`);
@@ -360,9 +308,9 @@ module.exports = {
             const variante = (msgDados.variantes || []).find(v => String(v.id) === varianteId);
             await db.set(`ap_user_${interaction.user.id}_${interaction.message.id}`, {
                 varianteId,
-                nome:  variante?.name  || 'Variante',
-                preco: variante ? formatarPreco(variante) : msgDados.preco,
-                entregaAuto: msgDados.entregaAuto,
+                nome:        variante?.name  || 'Variante',
+                preco:       variante ? formatarPreco(variante) : msgDados.preco,
+                entregaAuto: variante ? isEntregaAuto(variante) : msgDados.entregaAuto,
             });
 
             const c = new ContainerBuilder().setAccentColor(getAccentColor());
@@ -372,7 +320,7 @@ module.exports = {
             await interaction.reply({ components: [c], flags: MessageFlags.IsComponentsV2, embeds: [], content: '', ephemeral: true });
         }
 
-        // ── [USUÁRIO] Clicou em Comprar no card público ───────────────────────
+        // ── [USUÁRIO] Clicou em Comprar → pede email via modal ────────────────
         if (interaction.isButton() && interaction.customId === 'ap_pub_comprar') {
             const msgDados = await db.get(`ap_msg_${interaction.message.id}`);
             if (!msgDados) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Este card expirou.`, ephemeral: true });
@@ -380,23 +328,43 @@ module.exports = {
             let packageId   = msgDados.packageId;
             let nome        = msgDados.nome;
             let preco       = msgDados.preco;
-            const entregaAuto = msgDados.entregaAuto;
+            let entregaAuto = msgDados.entregaAuto;
 
             if (msgDados.ehPkg) {
                 const selecao = await db.get(`ap_user_${interaction.user.id}_${interaction.message.id}`);
                 if (!selecao) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Selecione uma variante no menu acima antes de clicar em Comprar.`, ephemeral: true });
-                packageId = selecao.varianteId;
-                nome      = selecao.nome;
-                preco     = selecao.preco;
+                packageId   = selecao.varianteId;
+                nome        = selecao.nome;
+                preco       = selecao.preco;
+                entregaAuto = selecao.entregaAuto;
             }
 
             await db.set(`ap_purchase_${interaction.user.id}`, { packageId, nome, preco, entregaAuto, msgId: interaction.message.id });
 
+            const modal = new ModalBuilder().setCustomId('ap_email_modal').setTitle('Dados para o pedido');
+            modal.addComponents(
+                new ActionRowBuilder().addComponents(
+                    new TextInputBuilder().setCustomId('ap_email').setLabel('Seu e-mail').setStyle(TextInputStyle.Short)
+                        .setPlaceholder('exemplo@email.com').setRequired(true).setMaxLength(254)
+                )
+            );
+            await interaction.showModal(modal);
+        }
+
+        // ── [USUÁRIO] Submeteu email → mostra seleção de pagamento ───────────
+        if (interaction.isModalSubmit() && interaction.customId === 'ap_email_modal') {
+            const dadosCompra = await db.get(`ap_purchase_${interaction.user.id}`);
+            if (!dadosCompra) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sessão expirada. Clique em Comprar novamente.`, ephemeral: true });
+
+            const email = interaction.fields.getTextInputValue('ap_email').trim();
+            await db.set(`ap_purchase_${interaction.user.id}`, { ...dadosCompra, email });
+
+            const { nome, preco } = dadosCompra;
             const container = new ContainerBuilder().setAccentColor(getAccentColor());
             container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${Emojis.get('pix_stamp_emoji')} Método de Pagamento\n-# Escolha como deseja pagar.`));
             container.addSeparatorComponents(new SeparatorBuilder());
             container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-                `**${Emojis.get('store_emoji')} Produto:** ${nome}\n**${Emojis.get('_money_emoji')} Valor:** ${preco}`
+                `**${Emojis.get('store_emoji')} Produto:** ${nome}\n**${Emojis.get('_money_emoji')} Valor:** ${preco}\n**${Emojis.get('information_emoji')} E-mail:** ${email}`
             ));
             container.addSeparatorComponents(new SeparatorBuilder());
             container.addActionRowComponents(
@@ -417,13 +385,14 @@ module.exports = {
             const dadosCompra = await db.get(`ap_purchase_${interaction.user.id}`);
             if (!dadosCompra) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sessão expirada. Clique em Comprar novamente.`, ephemeral: true });
 
-            const { nome, preco, entregaAuto } = dadosCompra;
+            const { nome, preco, entregaAuto, email } = dadosCompra;
             const container = new ContainerBuilder().setAccentColor(getAccentColor());
             container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${Emojis.get('_confirm_emoji')} Confirmar Compra\n-# Revise os detalhes antes de confirmar.`));
             container.addSeparatorComponents(new SeparatorBuilder());
             container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                 `**${Emojis.get('store_emoji')} Produto:** ${nome}\n` +
                 `**${Emojis.get('_money_emoji')} Valor:** ${preco}\n` +
+                `**${Emojis.get('information_emoji')} E-mail:** ${email}\n` +
                 `**${Emojis.get('pix_stamp_emoji')} Pagamento:** ${gatewayLabel}\n` +
                 `**${Emojis.get(entregaAuto ? 'deliveredorder_emoji' : '_ticket_emoji')} Entrega:** ${entregaAuto ? 'Automática (via DM)' : 'Manual (via Ticket)'}`
             ));
