@@ -18,7 +18,7 @@ module.exports = {
             };
     
             await interaction.reply({
-                content: `> Limpando minha DM Com A Sua! Aguarde ...`,
+                content: `Limpando minha DM Com A Sua! Aguarde ...`,
                 ephemeral: true
             });
     
@@ -33,7 +33,7 @@ module.exports = {
                 };
     
                 await interaction.editReply({
-                    content: `> **${deletedCount}** mensagens apagadas ...`,
+                    content: `**${deletedCount}** mensagens apagadas ...`,
                     ephemeral: true
                 });
     

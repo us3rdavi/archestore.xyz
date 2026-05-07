@@ -54,11 +54,11 @@ module.exports = {
             }
             if (customId === 'selecionar_canal_banunban') {
                 configuracao.set('ConfigCommands.banchannel', interaction.values[0]);
-                await safeReply({ content: `> Canal de logs configurado para: <#${interaction.values[0]}>`, ephemeral: true });
+                await safeReply({ content: `Canal de logs configurado para: <#${interaction.values[0]}>`, ephemeral: true });
             }
             if (customId === 'selecionar_cargo_banunban') {
                 configuracao.set('ConfigCommands.banrole', interaction.values[0]);
-                await safeReply({ content: `> Cargo configurado para: <@&${interaction.values[0]}>`, ephemeral: true });
+                await safeReply({ content: `Cargo configurado para: <@&${interaction.values[0]}>`, ephemeral: true });
             }
 
             if (customId === 'configurar_unlocklock') {
@@ -71,11 +71,11 @@ module.exports = {
             }
             if (customId === 'selecionar_canal_unlocklock') {
                 configuracao.set('ConfigCommands.lockschannel', interaction.values[0]);
-                await safeReply({ content: `> Canal de logs configurado para: <#${interaction.values[0]}>`, ephemeral: true });
+                await safeReply({ content: `Canal de logs configurado para: <#${interaction.values[0]}>`, ephemeral: true });
             }
             if (customId === 'selecionar_cargo_unlocklock') {
                 configuracao.set('ConfigCommands.locksrole', interaction.values[0]);
-                await safeReply({ content: `> Cargo configurado para: <@&${interaction.values[0]}>`, ephemeral: true });
+                await safeReply({ content: `Cargo configurado para: <@&${interaction.values[0]}>`, ephemeral: true });
             }
 
             if (customId === 'configurar_clearnuke') {
@@ -88,11 +88,11 @@ module.exports = {
             }
             if (customId === 'selecionar_canal_clearnuke') {
                 configuracao.set('ConfigCommands.nukechannel', interaction.values[0]);
-                await safeReply({ content: `> Canal de logs configurado para: <#${interaction.values[0]}>`, ephemeral: true });
+                await safeReply({ content: `Canal de logs configurado para: <#${interaction.values[0]}>`, ephemeral: true });
             }
             if (customId === 'selecionar_cargo_clearnuke') {
                 configuracao.set('ConfigCommands.nukerole', interaction.values[0]);
-                await safeReply({ content: `> Cargo configurado para: <@&${interaction.values[0]}>`, ephemeral: true });
+                await safeReply({ content: `Cargo configurado para: <@&${interaction.values[0]}>`, ephemeral: true });
             }
 
         } catch (error) {

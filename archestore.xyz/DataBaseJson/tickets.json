@@ -107,21 +107,10 @@
             }
         ],
         "contador": 2,
-        "abertos": {
-            "804354181653463120": {
-                "threadId": "1501904910516748329",
-                "numero": 2,
-                "funcao": "Dúvidas",
-                "assumidoPor": null,
-                "staffMemberId": null,
-                "abertoPor": "804354181653463120",
-                "username": "us3r_davi",
-                "guildId": "1396516441758367895",
-                "messageId": "1501904917839872190"
-            }
-        },
+        "abertos": {},
         "staffRoles": [
             "1397274200032542810"
-        ]
+        ],
+        "canalLogs": "1465801978499301663"
     }
 }

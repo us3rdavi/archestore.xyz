@@ -41,7 +41,7 @@ module.exports = {
 
     // Resposta efêmera
     interaction.reply({ 
-      content: '`Olá senhor, selecione algum filtro.`', 
+      content: 'Olá senhor, selecione algum filtro.', 
       components: [row], 
       ephemeral: true 
     });

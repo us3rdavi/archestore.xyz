@@ -69,7 +69,7 @@ module.exports = {
 
         collector.on('end', collected => {
             if (collected.size === 0) {
-                interaction.editReply({ content: '> Tempo esgotado. Ação cancelada.', components: [] });
+                interaction.editReply({ content: 'Tempo esgotado. Ação cancelada.', components: [] });
             }
         });
     }
