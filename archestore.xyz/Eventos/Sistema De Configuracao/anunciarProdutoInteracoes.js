@@ -158,11 +158,33 @@ async function processarCompra(interaction, dadosCompra) {
         return interaction.editReply({ components: [c], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
     }
 
-    const pixCode  = checkout?.pix_code  || null;
-    const qrBase64 = checkout?.qr_code   || null;
-    const orderId  = checkout?.order_id  || checkout?.id || '—';
+    console.log('[Checkout] Campos retornados:', JSON.stringify(Object.keys(checkout || {})));
+    console.log('[Checkout] Resposta completa:', JSON.stringify(checkout));
+
+    const pixCode =
+        checkout?.pix_code ||
+        checkout?.pix?.code ||
+        checkout?.pix?.brcode ||
+        checkout?.brcode ||
+        checkout?.emv ||
+        checkout?.qr_code_text ||
+        null;
+
+    const qrBase64 =
+        checkout?.qr_code ||
+        checkout?.pix?.qr_code ||
+        checkout?.qr_code_base64 ||
+        checkout?.pix?.qr_code_base64 ||
+        checkout?.qrcode ||
+        null;
+
+    const orderId  = checkout?.order_id || checkout?.id || '—';
     const valorFmt = checkout?.formatted_price || preco;
-    const returnUrl = checkout?.return_url || null;
+    const returnUrl = checkout?.return_url || checkout?.payment_url || null;
+
+    if (gateway === 'PIX' && pixCode) {
+        await db.set(`ap_pixcode_${interaction.user.id}`, pixCode);
+    }
 
     const result = new ContainerBuilder().setAccentColor(0x57F287);
     result.addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${Emojis.get('neworder_emoji')} Pedido criado!\n-# ID: \`${orderId}\``));
@@ -181,8 +203,27 @@ async function processarCompra(interaction, dadosCompra) {
             `**${Emojis.get('pix_stamp_emoji')} Código PIX — Copia e Cola:**\n\`\`\`\n${pixCode}\n\`\`\``
         ));
         if (qrBase64) {
-            extraFiles.push(new AttachmentBuilder(Buffer.from(qrBase64, 'base64'), { name: 'qrcode.png' }));
-            result.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${Emojis.get('information_emoji')} Escaneie o QR Code abaixo para pagar.`));
+            try {
+                const qrBuffer = Buffer.from(qrBase64, 'base64');
+                extraFiles.push(new AttachmentBuilder(qrBuffer, { name: 'qrcode.png' }));
+                result.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${Emojis.get('information_emoji')} Escaneie o QR Code abaixo para pagar.`));
+            } catch (e) {
+                console.log('[Checkout] Erro ao converter QR base64:', e.message);
+            }
+        }
+        result.addSeparatorComponents(new SeparatorBuilder());
+        result.addActionRowComponents(
+            new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId('ap_copiar_pix').setLabel('Copiar código PIX').setStyle(ButtonStyle.Primary).setEmoji({ id: '1501803973383028856' })
+            )
+        );
+    } else if (gateway === 'PIX' && !pixCode) {
+        result.addSeparatorComponents(new SeparatorBuilder());
+        result.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+            `${Emojis.get('information_emoji')} Pedido criado. ${returnUrl ? `Acesse o link abaixo para pagar:` : `Aguarde o código PIX em breve.`}`
+        ));
+        if (returnUrl) {
+            result.addTextDisplayComponents(new TextDisplayBuilder().setContent(returnUrl));
         }
     } else if (returnUrl) {
         result.addSeparatorComponents(new SeparatorBuilder());
@@ -192,7 +233,6 @@ async function processarCompra(interaction, dadosCompra) {
     }
 
     if (returnUrl) {
-        result.addSeparatorComponents(new SeparatorBuilder());
         result.addActionRowComponents(
             new ActionRowBuilder().addComponents(
                 new ButtonBuilder().setLabel('Ver Pedido').setStyle(ButtonStyle.Link).setURL(returnUrl)
@@ -444,6 +484,18 @@ module.exports = {
             const c = new ContainerBuilder().setAccentColor(0xED4245);
             c.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('negative_emoji')} Compra cancelada.`));
             await interaction.update({ components: [c], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+        }
+
+        // ── [USUÁRIO] Copiar código PIX ───────────────────────────────────────
+        if (interaction.isButton() && interaction.customId === 'ap_copiar_pix') {
+            const pixCode = await db.get(`ap_pixcode_${interaction.user.id}`);
+            if (!pixCode) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Código PIX não encontrado. Gere um novo pedido.`, ephemeral: true });
+
+            const c = new ContainerBuilder().setAccentColor(getAccentColor());
+            c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                `**${Emojis.get('pix_stamp_emoji')} Seu código PIX:**\n\`\`\`\n${pixCode}\n\`\`\`\n-# Selecione o texto acima e copie.`
+            ));
+            await interaction.reply({ components: [c], flags: MessageFlags.IsComponentsV2, embeds: [], content: '', ephemeral: true });
         }
 
         // ── [USUÁRIO] Confirmou compra ────────────────────────────────────────
