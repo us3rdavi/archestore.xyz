@@ -1,0 +1,46 @@
+{
+    "Compras": [
+        {
+            "id": "Aprovado Manualmente",
+            "method": "pix",
+            "user": "1053453825840775309",
+            "valor": 2.5,
+            "data": 1747165974963
+        },
+        {
+            "id": "Aprovado Manualmente",
+            "method": "pix",
+            "user": "1365456878284443731",
+            "valor": 2,
+            "data": 1747201007304
+        },
+        {
+            "id": "Aprovado Manualmente",
+            "method": "pix",
+            "user": "1365456878284443731",
+            "valor": 2,
+            "data": 1747201287082
+        },
+        {
+            "id": "Aprovado Manualmente",
+            "method": "pix",
+            "user": "1021941265815838801",
+            "valor": 2,
+            "data": 1747201447091
+        },
+        {
+            "id": "Aprovado Manualmente",
+            "method": "pix",
+            "user": "1021941265815838801",
+            "valor": 2,
+            "data": 1747203759856
+        },
+        {
+            "id": "Aprovado Manualmente",
+            "method": "pix",
+            "user": "1021941265815838801",
+            "valor": 3,
+            "data": 1747385488003
+        }
+    ]
+}

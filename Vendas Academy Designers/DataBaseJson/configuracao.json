@@ -1,0 +1,99 @@
+{
+    "email": "epifanioneide751@gmail.com",
+    "Emojis_EntregAbaixo": [
+        {
+            "id": "1371926306471805062",
+            "name": "eb1"
+        },
+        {
+            "id": "1371926307423916105",
+            "name": "eb2"
+        },
+        {
+            "id": "1371926309000843446",
+            "name": "eb3"
+        },
+        {
+            "id": "1371926309692772353",
+            "name": "eb4"
+        },
+        {
+            "id": "1371926310967971870",
+            "name": "eb5"
+        },
+        {
+            "id": "1371926311722815590",
+            "name": "eb6"
+        },
+        {
+            "id": "1371926312867991745",
+            "name": "eb7"
+        },
+        {
+            "id": "1371926314516480041",
+            "name": "eb8"
+        }
+    ],
+    "Emojis_EntregAuto": [],
+    "ConfigChannels": {
+        "logpedidos": "1381667385895026771",
+        "eventbuy": "1381667653654941727",
+        "systemlogs": "1381667384787603538",
+        "antiraid": "1381667384787603538",
+        "entradas": "1371590052232171685",
+        "saídas": "1381667387744456704",
+        "mensagens": "1381667389262790736",
+        "tráfego": "1381667390034673664",
+        "feedback": "1381667388591833288",
+        "feedbackticket": "1381667388591833288"
+    },
+    "ConfigRoles": {
+        "cargoadm": "1381408478773641387",
+        "cargosup": "1371590050197930118",
+        "cargoCliente": "1380947696340439230",
+        "cargomembro": "1371590050181156870",
+        "cargocarrinho": "1370994749166587905",
+        "statuscomprar": true
+    },
+    "pagamentos": {
+        "SemiAutomatico": {
+            "status": true,
+            "pix": "44999473574",
+            "msg": "apos o pagamento envie o comprovante no carrinho!"
+        },
+        "MpOnOff": false
+    },
+    "ConfigLinks": {
+        "link": "https://discord.com/oauth2/authorize?client_id=1367658332181233856&response_type=code&redirect_uri=https://abravanelstore.squareweb.app//callback&scope=guilds+guilds.join+email+identify"
+    },
+    "BotaoDuvidas": {
+        "ultimaTroca": 1747163765722,
+        "status": true,
+        "nomebotao": "abrir ticket",
+        "linkbotao": "https://discord.com/channels/1365462216194785362/1365482013062205440"
+    },
+    "AutoReact": {
+        "status": false,
+        "Emoji": "<a:4red_cora:1384030038344728617>",
+        "Canais": [
+            "1380940473631244288"
+        ]
+    },
+    "Repostagem": {
+        "Status": true,
+        "Hora": "14:30"
+    },
+    "AutomaticSettings": {
+        "sistemaAntiRaid": {
+            "ExclusaoCanais": {
+                "status": true,
+                "quantidadeporminuto": 1,
+                "quantidadeporhora": 1
+            },
+            "status": true
+        }
+    },
+    "Status1": "vendas on",
+    "Status2": "by draxgosotzin",
+    "vendasstatus": true
+}

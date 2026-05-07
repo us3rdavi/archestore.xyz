@@ -1,0 +1,74 @@
+{
+    "tickets": {
+        "aparencia": {
+            "banner": "https://media.discordapp.net/attachments/1381667384787603538/1384033242268831754/Suporte.png?ex=6850f4e7&is=684fa367&hm=5934378a9bbf33d1b2b4c559b423ad893abaeff69b7c2558dad04459c03d3fcb&=&format=webp&quality=lossless",
+            "title": "Olá! Bem-vindo(a) ao sistema de tickets deste servidor.",
+            "description": "Para abrir um ticket e receber atendimento personalizado, clique no botão abaixo. Após enviar seu motivo de contato, criaremos um canal de texto privado para assistência rápida e segura. Estamos aqui para ajudar!\n\n> -# A Academy Designers não se responsabiliza pelos seus staffs \n> -# até porque não é um trabalho remunerado!",
+            "color": "#FF6600"
+        },
+        "funcoes": {
+            "Suporte": {
+                "nome": "Suporte",
+                "predescricao": "Preciso de suporte",
+                "emoji": "<:pessoa:1249533752884072490>"
+            },
+            "Dúvidas": {
+                "nome": "Dúvidas",
+                "predescricao": "Tenho uma duvida",
+                "emoji": "<:estoque:1249533741685276736>"
+            }
+        },
+        "messageid": [
+            {
+                "msgid": "1371927493577146538",
+                "channelid": "1365482013062205440",
+                "guildid": "1365462216194785362"
+            },
+            {
+                "msgid": "1372063990380761160",
+                "channelid": "1371635274521640981",
+                "guildid": "1338367318857875530"
+            },
+            {
+                "msgid": "1372287650072887520",
+                "channelid": "1371635274521640981",
+                "guildid": "1338367318857875530"
+            },
+            {
+                "msgid": "1377860285431414944",
+                "channelid": "1377856296635863121",
+                "guildid": "1377847206442307604"
+            },
+            {
+                "msgid": "1377861455214284851",
+                "channelid": "1377856296635863121",
+                "guildid": "1377847206442307604"
+            },
+            {
+                "msgid": "1384026679042769000",
+                "channelid": "1380711750504026172",
+                "guildid": "1371590050181156864"
+            },
+            {
+                "msgid": "1384028773665472562",
+                "channelid": "1380711750504026172",
+                "guildid": "1371590050181156864"
+            },
+            {
+                "msgid": "1384028852774506597",
+                "channelid": "1380711750504026172",
+                "guildid": "1371590050181156864"
+            },
+            {
+                "msgid": "1384029074883743785",
+                "channelid": "1380711750504026172",
+                "guildid": "1371590050181156864"
+            },
+            {
+                "msgid": "1384033342751510621",
+                "channelid": "1380711750504026172",
+                "guildid": "1371590050181156864"
+            }
+        ]
+    }
+}

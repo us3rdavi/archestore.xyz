@@ -1,0 +1,4 @@
+Creditos de postagem: Academy Designers By: Knz
+
+Coloque sua WebHoock em index.js na linha 41
+Coloque seu id em DataBaseJson em Perms
