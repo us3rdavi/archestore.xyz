@@ -78,6 +78,9 @@ const refounds = new JsonDatabase({
 const Compras = new JsonDatabase({
   databasePath: "./DataBaseJson/Compras.json"
 });
+const painelCards = new JsonDatabase({
+  databasePath: "./DataBaseJson/painelCards.json"
+});
 
 module.exports = {
   produtos,
@@ -98,5 +101,6 @@ module.exports = {
   Emojis,
   refounds,
   Compras,
-  dbembed
+  dbembed,
+  painelCards
 }

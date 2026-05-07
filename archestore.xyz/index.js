@@ -51,6 +51,14 @@ events.run(client);
 
 client.slashCommands = new Collection();
 
+client.on('error', (err) => {
+    console.log(`${colors.red(`[ERROR]`)} ${err.message}`);
+});
+
+process.on('unhandledRejection', (err) => {
+    console.log(`${colors.red(`[UNHANDLED]`)} ${err?.message || err}`);
+});
+
 client.login(config.token).catch((err) => {
     if (err?.message?.includes("intent")) return console.log(`${colors.red(`[LOG]`)} Ativa as Intents do Bot`);
     if (err?.message?.includes("invalid")) return console.log(`${colors.red(`[LOG]`)} Token Incorreto`);

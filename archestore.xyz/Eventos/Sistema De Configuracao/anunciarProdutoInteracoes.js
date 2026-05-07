@@ -13,7 +13,7 @@ const {
     AttachmentBuilder,
 } = require('discord.js');
 const { QuickDB } = require('quick.db');
-const { configuracao, tickets, Emojis } = require('../../DataBaseJson');
+const { configuracao, tickets, Emojis, painelCards } = require('../../DataBaseJson');
 const centralCart = require('../../Functions/centralCartService');
 const { CreateTicket } = require('../../Functions/CreateTicket');
 
@@ -29,6 +29,22 @@ function isPackage(p)     { return p?.is_variation_parent === true; }
 function getVariants(p)   { return Array.isArray(p?.variations) ? p.variations : []; }
 function formatarPreco(p) { return p?.price_display || (p?.price != null ? `R$ ${Number(p.price).toFixed(2).replace('.', ',')}` : 'N/A'); }
 function isEntregaAuto(p) { return p?.chat_delivery?.enabled === true; }
+
+// ─── Helpers persistência de cards ───────────────────────────────────────────
+
+function cardKey(msgId) { return `cards.${msgId}`; }
+
+function setCard(msgId, data) {
+    painelCards.set(cardKey(msgId), data);
+}
+
+function getCard(msgId) {
+    return painelCards.get(cardKey(msgId));
+}
+
+function deleteCard(msgId) {
+    painelCards.delete(cardKey(msgId));
+}
 
 // ─── Builders de UI ──────────────────────────────────────────────────────────
 
@@ -120,7 +136,7 @@ function buildCardPublico(pacote, variante, nomeCustom, descCustom) {
 // ─── Checkout ────────────────────────────────────────────────────────────────
 
 async function processarCompra(interaction, dadosCompra) {
-    const { packageId, nome, preco, entregaAuto, gateway, email } = dadosCompra;
+    const { packageId, nome, preco, entregaAuto, gateway, email, nomeCliente } = dadosCompra;
 
     const loadingContainer = new ContainerBuilder().setAccentColor(getAccentColor());
     loadingContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Criando pedido, aguarde...`));
@@ -131,7 +147,7 @@ async function processarCompra(interaction, dadosCompra) {
         checkout = await centralCart.createCheckout({
             cart: [{ package_id: packageId, quantity: 1 }],
             client_discord: interaction.user.id,
-            client_name: interaction.user.globalName || interaction.user.username,
+            client_name: nomeCliente || interaction.user.globalName || interaction.user.username,
             client_email: email,
             terms: true,
             gateway,
@@ -225,7 +241,6 @@ module.exports = {
         if (interaction.isStringSelectMenu() && interaction.customId.startsWith('ap_cfg_select_')) {
             const packageId = Number(interaction.values[0]);
 
-            // Responde imediatamente com loading (evita timeout de 3s)
             const loading = new ContainerBuilder().setAccentColor(getAccentColor());
             loading.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando produto...`));
             await interaction.update({ components: [loading], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
@@ -235,7 +250,6 @@ module.exports = {
 
                 await db.set(`ap_cfg_${interaction.user.id}`, { pacote, nomeCustom: null, descCustom: null });
 
-                // Package ou produto normal → card de config direto (o card já mostra o select de variantes se for package)
                 await interaction.editReply({ components: [buildCardConfig(pacote, null, null, null)], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
             } catch (err) {
                 const c = new ContainerBuilder().setAccentColor(0xED4245);
@@ -290,7 +304,7 @@ module.exports = {
                 const msg = await interaction.channel.send({ components: [cardPublico], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
 
                 const ehPkg = isPackage(pacote);
-                await db.set(`ap_msg_${msg.id}`, {
+                setCard(msg.id, {
                     packageId:   pacote.id,
                     nome:        nomeCustom || pacote.name || 'Produto',
                     preco:       formatarPreco(pacote),
@@ -314,8 +328,8 @@ module.exports = {
         // ── [USUÁRIO] Selecionou variante no card público ─────────────────────
         if (interaction.isStringSelectMenu() && interaction.customId === 'ap_pub_variante') {
             const varianteId = interaction.values[0];
-            const msgDados = await db.get(`ap_msg_${interaction.message.id}`);
-            if (!msgDados) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Este card expirou.`, ephemeral: true });
+            const msgDados = getCard(interaction.message.id);
+            if (!msgDados) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Este card não foi encontrado. Solicite ao admin que reposte o produto.`, ephemeral: true });
 
             const variante = (msgDados.variantes || []).find(v => String(v.id) === varianteId);
             await db.set(`ap_user_${interaction.user.id}_${interaction.message.id}`, {
@@ -332,10 +346,10 @@ module.exports = {
             await interaction.reply({ components: [c], flags: MessageFlags.IsComponentsV2, embeds: [], content: '', ephemeral: true });
         }
 
-        // ── [USUÁRIO] Clicou em Comprar → pede email via modal ────────────────
+        // ── [USUÁRIO] Clicou em Comprar → pede nome e email via modal ─────────
         if (interaction.isButton() && interaction.customId === 'ap_pub_comprar') {
-            const msgDados = await db.get(`ap_msg_${interaction.message.id}`);
-            if (!msgDados) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Este card expirou.`, ephemeral: true });
+            const msgDados = getCard(interaction.message.id);
+            if (!msgDados) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Este card não foi encontrado. Solicite ao admin que reposte o produto.`, ephemeral: true });
 
             let packageId   = msgDados.packageId;
             let nome        = msgDados.nome;
@@ -356,6 +370,10 @@ module.exports = {
             const modal = new ModalBuilder().setCustomId('ap_email_modal').setTitle('Dados para o pedido');
             modal.addComponents(
                 new ActionRowBuilder().addComponents(
+                    new TextInputBuilder().setCustomId('ap_nome_cliente').setLabel('Informe seu nome').setStyle(TextInputStyle.Short)
+                        .setPlaceholder('João Silva').setRequired(true).setMaxLength(100)
+                ),
+                new ActionRowBuilder().addComponents(
                     new TextInputBuilder().setCustomId('ap_email').setLabel('Seu e-mail').setStyle(TextInputStyle.Short)
                         .setPlaceholder('exemplo@email.com').setRequired(true).setMaxLength(254)
                 )
@@ -363,20 +381,21 @@ module.exports = {
             await interaction.showModal(modal);
         }
 
-        // ── [USUÁRIO] Submeteu email → mostra seleção de pagamento ───────────
+        // ── [USUÁRIO] Submeteu nome+email → mostra seleção de pagamento ───────
         if (interaction.isModalSubmit() && interaction.customId === 'ap_email_modal') {
             const dadosCompra = await db.get(`ap_purchase_${interaction.user.id}`);
             if (!dadosCompra) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sessão expirada. Clique em Comprar novamente.`, ephemeral: true });
 
+            const nomeCliente = interaction.fields.getTextInputValue('ap_nome_cliente').trim();
             const email = interaction.fields.getTextInputValue('ap_email').trim();
-            await db.set(`ap_purchase_${interaction.user.id}`, { ...dadosCompra, email });
+            await db.set(`ap_purchase_${interaction.user.id}`, { ...dadosCompra, email, nomeCliente });
 
             const { nome, preco } = dadosCompra;
             const container = new ContainerBuilder().setAccentColor(getAccentColor());
             container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${Emojis.get('pix_stamp_emoji')} Método de Pagamento\n-# Escolha como deseja pagar.`));
             container.addSeparatorComponents(new SeparatorBuilder());
             container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-                `**${Emojis.get('store_emoji')} Produto:** ${nome}\n**${Emojis.get('_money_emoji')} Valor:** ${preco}\n**${Emojis.get('information_emoji')} E-mail:** ${email}`
+                `**${Emojis.get('store_emoji')} Produto:** ${nome}\n**${Emojis.get('_money_emoji')} Valor:** ${preco}\n**${Emojis.get('information_emoji')} Nome:** ${nomeCliente}\n**${Emojis.get('information_emoji')} E-mail:** ${email}`
             ));
             container.addSeparatorComponents(new SeparatorBuilder());
             container.addActionRowComponents(
@@ -397,13 +416,14 @@ module.exports = {
             const dadosCompra = await db.get(`ap_purchase_${interaction.user.id}`);
             if (!dadosCompra) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sessão expirada. Clique em Comprar novamente.`, ephemeral: true });
 
-            const { nome, preco, entregaAuto, email } = dadosCompra;
+            const { nome, preco, entregaAuto, email, nomeCliente } = dadosCompra;
             const container = new ContainerBuilder().setAccentColor(getAccentColor());
             container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${Emojis.get('_confirm_emoji')} Confirmar Compra\n-# Revise os detalhes antes de confirmar.`));
             container.addSeparatorComponents(new SeparatorBuilder());
             container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                 `**${Emojis.get('store_emoji')} Produto:** ${nome}\n` +
                 `**${Emojis.get('_money_emoji')} Valor:** ${preco}\n` +
+                `**${Emojis.get('information_emoji')} Nome:** ${nomeCliente}\n` +
                 `**${Emojis.get('information_emoji')} E-mail:** ${email}\n` +
                 `**${Emojis.get('pix_stamp_emoji')} Pagamento:** ${gatewayLabel}\n` +
                 `**${Emojis.get(entregaAuto ? 'deliveredorder_emoji' : '_ticket_emoji')} Entrega:** ${entregaAuto ? 'Automática (via DM)' : 'Manual (via Ticket)'}`
