@@ -14,12 +14,28 @@ const {
     MediaGalleryBuilder,
     MediaGalleryItemBuilder,
 } = require('discord.js');
-const { QuickDB } = require('quick.db');
 const { configuracao, tickets, Emojis, painelCards } = require('../../DataBaseJson');
 const centralCart = require('../../Functions/centralCartService');
 const { CreateTicket } = require('../../Functions/CreateTicket');
 
-const db = new QuickDB();
+// Sessões de compra em memória — eliminam conflitos SQLite do QuickDB
+const sessao = new Map();
+const TTL_MS = 30 * 60 * 1000; // 30 minutos
+
+function sessaoSet(key, value) {
+    sessao.set(key, { value, expireAt: Date.now() + TTL_MS });
+}
+
+function sessaoGet(key) {
+    const entry = sessao.get(key);
+    if (!entry) return null;
+    if (Date.now() > entry.expireAt) { sessao.delete(key); return null; }
+    return entry.value;
+}
+
+function sessaoDel(key) {
+    sessao.delete(key);
+}
 
 function getAccentColor() {
     const cor = configuracao.get('Cores.Principal') || '5865F2';
@@ -185,7 +201,7 @@ async function processarCompra(interaction, dadosCompra) {
     const returnUrl = checkout?.return_url || checkout?.payment_url || null;
 
     if (gateway === 'PIX' && pixCode) {
-        await db.set(`ap_pixcode_${interaction.user.id}`, pixCode);
+        sessaoSet(`ap_pixcode_${interaction.user.id}`, pixCode);
     }
 
     const result = new ContainerBuilder().setAccentColor(0x57F287);
@@ -299,7 +315,7 @@ module.exports = {
             try {
                 const pacote = await centralCart.getPackage(packageId);
 
-                await db.set(`ap_cfg_${interaction.user.id}`, { pacote, nomeCustom: null, descCustom: null });
+                sessaoSet(`ap_cfg_${interaction.user.id}`, { pacote, nomeCustom: null, descCustom: null });
 
                 await interaction.editReply({ components: [buildCardConfig(pacote, null, null, null)], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
             } catch (err) {
@@ -311,7 +327,7 @@ module.exports = {
 
         // ── [STAFF] Editar nome/descrição ─────────────────────────────────────
         if (interaction.isButton() && interaction.customId === 'ap_cfg_editar') {
-            const dados = await db.get(`ap_cfg_${interaction.user.id}`);
+            const dados = sessaoGet(`ap_cfg_${interaction.user.id}`);
             if (!dados) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sessão expirada.`, ephemeral: true });
 
             const modal = new ModalBuilder().setCustomId('ap_cfg_modal').setTitle('Editar nome e descrição');
@@ -330,19 +346,19 @@ module.exports = {
 
         // ── [STAFF] Submeteu edição ───────────────────────────────────────────
         if (interaction.isModalSubmit() && interaction.customId === 'ap_cfg_modal') {
-            const dados = await db.get(`ap_cfg_${interaction.user.id}`);
+            const dados = sessaoGet(`ap_cfg_${interaction.user.id}`);
             if (!dados) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sessão expirada.`, ephemeral: true });
 
             const nomeCustom = interaction.fields.getTextInputValue('ap_nome').trim() || null;
             const descCustom = interaction.fields.getTextInputValue('ap_desc').trim() || null;
-            await db.set(`ap_cfg_${interaction.user.id}`, { ...dados, nomeCustom, descCustom });
+            sessaoSet(`ap_cfg_${interaction.user.id}`, { ...dados, nomeCustom, descCustom });
 
             await interaction.update({ components: [buildCardConfig(dados.pacote, null, nomeCustom, descCustom)], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
         }
 
         // ── [STAFF] Postar no canal ───────────────────────────────────────────
         if (interaction.isButton() && interaction.customId === 'ap_cfg_postar') {
-            const dados = await db.get(`ap_cfg_${interaction.user.id}`);
+            const dados = sessaoGet(`ap_cfg_${interaction.user.id}`);
             if (!dados) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sessão expirada.`, ephemeral: true });
 
             const loading = new ContainerBuilder().setAccentColor(getAccentColor());
@@ -364,7 +380,7 @@ module.exports = {
                     variantes:   ehPkg ? getVariants(pacote) : [],
                 });
 
-                await db.delete(`ap_cfg_${interaction.user.id}`);
+                sessaoDel(`ap_cfg_${interaction.user.id}`);
 
                 const ok = new ContainerBuilder().setAccentColor(0x57F287);
                 ok.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('confirmed_emoji')} Card postado com sucesso em ${interaction.channel}!`));
@@ -383,7 +399,7 @@ module.exports = {
             if (!msgDados) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Este card não foi encontrado. Solicite ao admin que reposte o produto.`, ephemeral: true });
 
             const variante = (msgDados.variantes || []).find(v => String(v.id) === varianteId);
-            await db.set(`ap_user_${interaction.user.id}_${interaction.message.id}`, {
+            sessaoSet(`ap_user_${interaction.user.id}_${interaction.message.id}`, {
                 varianteId,
                 nome:        variante?.name  || 'Variante',
                 preco:       variante ? formatarPreco(variante) : msgDados.preco,
@@ -408,7 +424,7 @@ module.exports = {
             let entregaAuto = msgDados.entregaAuto;
 
             if (msgDados.ehPkg) {
-                const selecao = await db.get(`ap_user_${interaction.user.id}_${interaction.message.id}`);
+                const selecao = sessaoGet(`ap_user_${interaction.user.id}_${interaction.message.id}`);
                 if (!selecao) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Selecione uma variante no menu acima antes de clicar em Comprar.`, ephemeral: true });
                 packageId   = selecao.varianteId;
                 nome        = selecao.nome;
@@ -416,7 +432,7 @@ module.exports = {
                 entregaAuto = selecao.entregaAuto;
             }
 
-            await db.set(`ap_purchase_${interaction.user.id}`, { packageId, nome, preco, entregaAuto, msgId: interaction.message.id });
+            sessaoSet(`ap_purchase_${interaction.user.id}`, { packageId, nome, preco, entregaAuto, msgId: interaction.message.id });
 
             const modal = new ModalBuilder().setCustomId('ap_email_modal').setTitle('Dados para o pedido');
             modal.addComponents(
@@ -434,12 +450,12 @@ module.exports = {
 
         // ── [USUÁRIO] Submeteu nome+email → mostra seleção de pagamento ───────
         if (interaction.isModalSubmit() && interaction.customId === 'ap_email_modal') {
-            const dadosCompra = await db.get(`ap_purchase_${interaction.user.id}`);
+            const dadosCompra = sessaoGet(`ap_purchase_${interaction.user.id}`);
             if (!dadosCompra) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sessão expirada. Clique em Comprar novamente.`, ephemeral: true });
 
             const nomeCliente = interaction.fields.getTextInputValue('ap_nome_cliente').trim();
             const email = interaction.fields.getTextInputValue('ap_email').trim();
-            await db.set(`ap_purchase_${interaction.user.id}`, { ...dadosCompra, email, nomeCliente });
+            sessaoSet(`ap_purchase_${interaction.user.id}`, { ...dadosCompra, email, nomeCliente });
 
             const { nome, preco } = dadosCompra;
             const container = new ContainerBuilder().setAccentColor(getAccentColor());
@@ -464,7 +480,7 @@ module.exports = {
             const gateway      = interaction.customId === 'ap_pay_pix' ? 'PIX' : 'CREDIT_CARD';
             const gatewayLabel = interaction.customId === 'ap_pay_pix' ? 'PIX' : 'Cartão de Crédito';
 
-            const dadosCompra = await db.get(`ap_purchase_${interaction.user.id}`);
+            const dadosCompra = sessaoGet(`ap_purchase_${interaction.user.id}`);
             if (!dadosCompra) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sessão expirada. Clique em Comprar novamente.`, ephemeral: true });
 
             const { nome, preco, entregaAuto, email, nomeCliente } = dadosCompra;
@@ -491,7 +507,7 @@ module.exports = {
 
         // ── [USUÁRIO] Cancelou ────────────────────────────────────────────────
         if (interaction.isButton() && interaction.customId === 'ap_pay_cancelar') {
-            await db.delete(`ap_purchase_${interaction.user.id}`);
+            sessaoDel(`ap_purchase_${interaction.user.id}`);
             const c = new ContainerBuilder().setAccentColor(0xED4245);
             c.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('negative_emoji')} Compra cancelada.`));
             await interaction.update({ components: [c], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
@@ -499,7 +515,7 @@ module.exports = {
 
         // ── [USUÁRIO] Copiar código PIX ───────────────────────────────────────
         if (interaction.isButton() && interaction.customId === 'ap_copiar_pix') {
-            const pixCode = await db.get(`ap_pixcode_${interaction.user.id}`);
+            const pixCode = sessaoGet(`ap_pixcode_${interaction.user.id}`);
             await interaction.deferReply({ ephemeral: true });
             if (!pixCode) {
                 await interaction.editReply({ content: 'Código PIX não encontrado. Gere um novo pedido.' });
@@ -512,11 +528,11 @@ module.exports = {
         // ── [USUÁRIO] Confirmou compra ────────────────────────────────────────
         if (interaction.isButton() && interaction.customId.startsWith('ap_pay_confirmar_')) {
             const gateway     = interaction.customId.replace('ap_pay_confirmar_', '');
-            const dadosCompra = await db.get(`ap_purchase_${interaction.user.id}`);
+            const dadosCompra = sessaoGet(`ap_purchase_${interaction.user.id}`);
             if (!dadosCompra) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sessão expirada. Clique em Comprar novamente.`, ephemeral: true });
 
-            await db.delete(`ap_purchase_${interaction.user.id}`);
-            if (dadosCompra.msgId) await db.delete(`ap_user_${interaction.user.id}_${dadosCompra.msgId}`);
+            sessaoDel(`ap_purchase_${interaction.user.id}`);
+            if (dadosCompra.msgId) sessaoDel(`ap_user_${interaction.user.id}_${dadosCompra.msgId}`);
 
             await processarCompra(interaction, { ...dadosCompra, gateway });
         }
