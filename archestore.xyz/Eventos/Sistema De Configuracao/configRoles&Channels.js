@@ -1,6 +1,7 @@
 const { RoleSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ChannelSelectMenuBuilder, ChannelType } = require("discord.js");
 const { configuracao } = require("../../DataBaseJson");
 const { ConfigRoles, ConfigChannels } = require("../../Functions/ConfigRoles");
+const { logAction } = require('../../Functions/AuditLog.js');
 
 module.exports = {
     name: 'interactionCreate',
@@ -397,56 +398,67 @@ module.exports = {
                 const channel = interaction.values[0]
                 configuracao.set(`ConfigChannels.antiraid`, channel)
                 ConfigChannels(interaction, client)
+                logAction(client, { action: 'Canal Anti-Raid configurado', details: `<#${channel}>`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId == 'logpedidos') {
                 const channel = interaction.values[0]
                 configuracao.set(`ConfigChannels.logpedidos`, channel)
                 ConfigChannels(interaction, client)
+                logAction(client, { action: 'Canal Log de Pedidos configurado', details: `<#${channel}>`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId == 'eventbuy') {
                 const channel = interaction.values[0]
                 configuracao.set(`ConfigChannels.eventbuy`, channel)
                 ConfigChannels(interaction, client)
+                logAction(client, { action: 'Canal Log de Compras configurado', details: `<#${channel}>`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId == 'boasvindascoole') {
                 const channel = interaction.values[0]
                 configuracao.set(`ConfigChannels.boasvindascoole`, channel)
                 ConfigChannels(interaction, client)
+                logAction(client, { action: 'Canal Boas-Vindas configurado', details: `<#${channel}>`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId == 'systemlogs') {
                 const channel = interaction.values[0]
                 configuracao.set(`ConfigChannels.systemlogs`, channel)
                 ConfigChannels(interaction, client)
+                logAction(client, { action: 'Canal Log do Sistema configurado', details: `<#${channel}>`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId == 'logentrada') {
                 const channel = interaction.values[0]
                 configuracao.set(`ConfigChannels.entradas`, channel)
                 ConfigChannels(interaction, client)
+                logAction(client, { action: 'Canal Log de Entrada configurado', details: `<#${channel}>`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId == 'logsaida') {
                 const channel = interaction.values[0]
                 configuracao.set(`ConfigChannels.saídas`, channel)
                 ConfigChannels(interaction, client)
+                logAction(client, { action: 'Canal Log de Saída configurado', details: `<#${channel}>`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId == 'logmensagem') {
                 const channel = interaction.values[0]
                 configuracao.set(`ConfigChannels.mensagens`, channel)
                 ConfigChannels(interaction, client)
+                logAction(client, { action: 'Canal Log de Mensagens configurado', details: `<#${channel}>`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId == 'trafegocall') {
                 const channel = interaction.values[0]
                 configuracao.set(`ConfigChannels.tráfego`, channel)
                 ConfigChannels(interaction, client)
+                logAction(client, { action: 'Canal Tráfego de Call configurado', details: `<#${channel}>`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId == 'feedback') {
                 const channel = interaction.values[0]
                 configuracao.set(`ConfigChannels.feedback`, channel)
                 ConfigChannels(interaction, client)
+                logAction(client, { action: 'Canal Feedback configurado', details: `<#${channel}>`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId == 'feedbackticket24') {
                 const channel = interaction.values[0]
                 configuracao.set(`ConfigChannels.feedbackticket`, channel)
                 ConfigChannels(interaction, client)
+                logAction(client, { action: 'Canal Feedback Ticket configurado', details: `<#${channel}>`, userId: interaction.user.id, guildId: interaction.guildId });
             }
         }
 
@@ -456,21 +468,25 @@ module.exports = {
 
                 configuracao.set(`ConfigRoles.cargoadm`, role)
                 ConfigRoles(interaction, client)
+                logAction(client, { action: 'Cargo Administrador configurado', details: `<@&${role}>`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId == 'definircargosup') {
                 const role = interaction.values[0]
                 configuracao.set(`ConfigRoles.cargosup`, role)
                 ConfigRoles(interaction, client)
+                logAction(client, { action: 'Cargo Suporte configurado', details: `<@&${role}>`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId == 'roleclienteease') {
                 const role = interaction.values[0]
                 configuracao.set(`ConfigRoles.cargoCliente`, role)
                 ConfigRoles(interaction, client)
+                logAction(client, { action: 'Cargo Cliente configurado', details: `<@&${role}>`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId == 'rolememberok') {
                 const role = interaction.values[0]
                 configuracao.set(`ConfigRoles.cargomembro`, role)
                 ConfigRoles(interaction, client)
+                logAction(client, { action: 'Cargo Membro configurado', details: `<@&${role}>`, userId: interaction.user.id, guildId: interaction.guildId });
             }
 
         }

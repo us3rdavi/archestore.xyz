@@ -96,6 +96,8 @@ module.exports = {
                 await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Carregando...`, embeds: [], components: [] })
 
                 semiConfigs(interaction, client);
+                const { logAction: _logSemi } = require('../../Functions/AuditLog.js');
+                _logSemi(client, { action: 'Pagamento Semi-automático configurado', details: `Chave Pix definida, mensagem atualizada`, userId: interaction.user.id, guildId: interaction.guildId });
 
             }
         }
@@ -144,7 +146,8 @@ module.exports = {
             }
 
             if (interaction.customId == 'onOffSemi') {
-                if (configuracao.get("pagamentos.SemiAutomatico.status") == false) {
+                const statusAtual = configuracao.get("pagamentos.SemiAutomatico.status") == false;
+                if (statusAtual) {
                     configuracao.set("pagamentos.SemiAutomatico.status", true);
                     await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Carregando...`, embeds: [], components: [] })
                     semiConfigs(interaction, client);
@@ -153,6 +156,8 @@ module.exports = {
                     await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Carregando...`, embeds: [], components: [] })
                     semiConfigs(interaction, client);
                 }
+                const { logAction: _logOnOff } = require('../../Functions/AuditLog.js');
+                _logOnOff(client, { action: `Pagamento Semi-automático ${statusAtual ? 'ativado' : 'desativado'}`, details: `Status: \`${statusAtual ? 'ativo' : 'inativo'}\``, userId: interaction.user.id, guildId: interaction.guildId });
             }
 
             if (interaction.customId == 'Voltar4') {
@@ -524,6 +529,8 @@ module.exports = {
 
                 interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Campo adicionado.`, ephemeral: true })
                 await UpdateMessageProduto(client, ggg.name)
+                const { logAction: _logCampo } = require('../../Functions/AuditLog.js');
+                _logCampo(client, { action: 'Campo de Produto criado', details: `Produto: \`${ggg.name}\`, Campo: \`${nomecampo}\`, Preço: \`${precocampo}\``, userId: interaction.user.id, guildId: interaction.guildId });
 
 
             }
@@ -567,6 +574,8 @@ module.exports = {
                 }
 
                 GerenciarProduto(interaction, 1, ggg.name);
+                const { logAction: _logEdit } = require('../../Functions/AuditLog.js');
+                _logEdit(client, { action: 'Produto editado', details: `Produto: \`${ggg.name}\` → \`${nome}\``, userId: interaction.user.id, guildId: interaction.guildId });
             }
 
 

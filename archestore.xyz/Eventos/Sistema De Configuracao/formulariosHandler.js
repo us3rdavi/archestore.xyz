@@ -416,8 +416,9 @@ async function handleFormAction(interaction, client, action) {
             !k.startsWith('submissions') && !k.startsWith('responses')
         );
         if (dataSlots.length >= 5) {
-            await interaction.editReply({
+            await interaction.reply({
                 content: `${Emojis.get('negative_emoji')} Limite de 5 formulários atingido. Delete um antes de criar outro.`,
+                ephemeral: true,
             });
             return;
         }
@@ -443,10 +444,12 @@ async function handleFormAction(interaction, client, action) {
             active: false,
         };
         formularios.set(guildId, slots);
-        await interaction.editReply(buildFormPanelPayload(guildId, slotId));
+        await interaction.reply({ ephemeral: true, ...buildFormPanelPayload(guildId, slotId) });
+        const { logAction } = require('../../Functions/AuditLog.js');
+        logAction(client, { action: 'Formulário Criado', details: `Slot \`${slotId}\` criado`, userId, guildId });
 
     } else if (action === 'form_manage') {
-        await interaction.editReply(buildFormManagePayload(guildId, userId));
+        await interaction.reply({ ephemeral: true, ...buildFormManagePayload(guildId, userId) });
     }
 }
 
@@ -484,6 +487,8 @@ module.exports = {
                 if (slots[slotId]) {
                     slots[slotId].channel_input = interaction.values[0] || null;
                     formularios.set(guildId, slots);
+                    const { logAction } = require('../../Functions/AuditLog.js');
+                    logAction(client, { action: 'Canal do Formulário configurado', details: `Slot \`${slotId}\`: <#${interaction.values[0]}>`, userId: interaction.user.id, guildId });
                 }
                 await interaction.deferUpdate();
                 await interaction.editReply(buildChannelConfigPayload(guildId, slotId));
@@ -499,6 +504,8 @@ module.exports = {
                 if (slots[slotId]) {
                     slots[slotId].channel_output = interaction.values[0] || null;
                     formularios.set(guildId, slots);
+                    const { logAction } = require('../../Functions/AuditLog.js');
+                    logAction(client, { action: 'Canal de Logs do Formulário configurado', details: `Slot \`${slotId}\`: <#${interaction.values[0]}>`, userId: interaction.user.id, guildId });
                 }
                 await interaction.deferUpdate();
                 await interaction.editReply(buildChannelConfigPayload(guildId, slotId));
@@ -514,6 +521,8 @@ module.exports = {
                 if (slots[slotId]) {
                     slots[slotId].roles_responsible = interaction.values;
                     formularios.set(guildId, slots);
+                    const { logAction } = require('../../Functions/AuditLog.js');
+                    logAction(client, { action: 'Cargos Responsáveis do Formulário configurados', details: `Slot \`${slotId}\`: ${interaction.values.map(r => `<@&${r}>`).join(', ')}`, userId: interaction.user.id, guildId });
                 }
                 await interaction.deferUpdate();
                 await interaction.editReply(buildStaffConfigPayload(guildId, slotId));
@@ -529,6 +538,8 @@ module.exports = {
                 if (slots[slotId]) {
                     slots[slotId].role_approved = interaction.values[0] || null;
                     formularios.set(guildId, slots);
+                    const { logAction } = require('../../Functions/AuditLog.js');
+                    logAction(client, { action: 'Cargo de Aprovação do Formulário configurado', details: `Slot \`${slotId}\`: <@&${interaction.values[0]}>`, userId: interaction.user.id, guildId });
                 }
                 await interaction.deferUpdate();
                 await interaction.editReply(buildAprovadoConfigPayload(guildId, slotId));
@@ -574,8 +585,11 @@ module.exports = {
                 if (action === 'delperg') {
                     const slots = formularios.get(guildId) || {};
                     if (slots[slotId]?.questions?.length > 0) {
+                        const removedQ = slots[slotId].questions[slots[slotId].questions.length - 1];
                         slots[slotId].questions.pop();
                         formularios.set(guildId, slots);
+                        const { logAction } = require('../../Functions/AuditLog.js');
+                        logAction(client, { action: 'Pergunta do Formulário removida', details: `Slot \`${slotId}\`: \`${removedQ?.text || 'desconhecida'}\``, userId: interaction.user.id, guildId });
                     }
                     await interaction.deferUpdate();
                     await interaction.editReply(buildQuestionsPanelPayload(guildId, slotId));
@@ -625,8 +639,11 @@ module.exports = {
                 // Confirmar deleção
                 if (action === 'confirmdel') {
                     const slots = formularios.get(guildId) || {};
+                    const formName = slots[slotId]?.name || `Formulário ${slotId}`;
                     delete slots[slotId];
                     formularios.set(guildId, slots);
+                    const { logAction } = require('../../Functions/AuditLog.js');
+                    logAction(client, { action: 'Formulário deletado', details: `Nome: \`${formName}\`, Slot: \`${slotId}\``, userId: interaction.user.id, guildId });
                     await interaction.deferUpdate();
                     await interaction.editReply(buildFormManagePayload(guildId, interaction.user.id));
                     return;
@@ -678,6 +695,8 @@ module.exports = {
                         await channel.send({ components: [fc], flags: MessageFlags.IsComponentsV2 });
                         slots[slotId].active = true;
                         formularios.set(guildId, slots);
+                        const { logAction } = require('../../Functions/AuditLog.js');
+                        logAction(client, { action: 'Formulário postado', details: `Nome: \`${form.name}\`, Canal: <#${form.channel_input}>`, userId: interaction.user.id, guildId });
                         await interaction.reply({
                             content: `${Emojis.get('confirmed_emoji')} Formulário postado em ${channel} com sucesso!`,
                             ephemeral: true,
@@ -828,10 +847,13 @@ module.exports = {
                 if (!slots[slotId])
                     return interaction.reply({ content: `${Emojis.get('negative_emoji')} Formulário não encontrado.`, ephemeral: true });
 
+                const { logAction } = require('../../Functions/AuditLog.js');
+
                 if (action === 'botao') {
                     slots[slotId].button_label = interaction.fields.getTextInputValue('button_label').trim() || 'Iniciar Aplicação';
                     slots[slotId].button_emoji = interaction.fields.getTextInputValue('button_emoji').trim() || null;
                     formularios.set(guildId, slots);
+                    logAction(client, { action: 'Botão do Formulário configurado', details: `Slot \`${slotId}\`: \`${slots[slotId].button_label}\``, userId: interaction.user.id, guildId });
                     await interaction.update(buildFormPanelPayload(guildId, slotId));
 
                 } else if (action === 'limite') {
@@ -840,6 +862,7 @@ module.exports = {
                         return interaction.reply({ content: `${Emojis.get('negative_emoji')} Valor inválido. Use um número inteiro positivo.`, ephemeral: true });
                     slots[slotId].limit_per_user = limit === 0 ? null : limit;
                     formularios.set(guildId, slots);
+                    logAction(client, { action: 'Limite de envios do Formulário configurado', details: `Slot \`${slotId}\`: \`${limit === 0 ? 'ilimitado' : limit}\``, userId: interaction.user.id, guildId });
                     await interaction.update(buildFormPanelPayload(guildId, slotId));
 
                 } else if (action === 'timelimit') {
@@ -848,12 +871,14 @@ module.exports = {
                     tl = Math.min(Math.max(tl, 30), 600);
                     slots[slotId].time_limit = tl;
                     formularios.set(guildId, slots);
+                    logAction(client, { action: 'Tempo limite do Formulário configurado', details: `Slot \`${slotId}\`: \`${tl}s\``, userId: interaction.user.id, guildId });
                     await interaction.update(buildFormPanelPayload(guildId, slotId));
 
                 } else if (action === 'nome') {
                     const nome = interaction.fields.getTextInputValue('nome').trim();
                     if (nome) slots[slotId].name = nome;
                     formularios.set(guildId, slots);
+                    logAction(client, { action: 'Formulário renomeado', details: `Slot \`${slotId}\` → \`${nome}\``, userId: interaction.user.id, guildId });
                     await interaction.update(buildFormPanelPayload(guildId, slotId));
 
                 } else if (action === 'addperg') {
@@ -871,6 +896,7 @@ module.exports = {
                             return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 10 perguntas atingido.`, ephemeral: true });
                         freshSlots[slotId].questions.push({ text });
                         formularios.set(guildId, freshSlots);
+                        logAction(client, { action: 'Pergunta adicionada ao Formulário', details: `Slot \`${slotId}\`: \`${text.slice(0, 80)}\``, userId: interaction.user.id, guildId });
                         await interaction.update(buildQuestionsPanelPayload(guildId, slotId));
                     } finally {
                         setTimeout(() => pergLock.delete(lockKey), 2000);
@@ -913,6 +939,8 @@ module.exports = {
                     slots[slotId].embed.image       = d.image       || null;
                     slots[slotId].embed.footer      = d.footer      || null;
                     formularios.set(guildId, slots);
+                    const { logAction } = require('../../Functions/AuditLog.js');
+                    logAction(client, { action: 'Aparência do Formulário salva', details: `Slot \`${slotId}\``, userId: interaction.user.id, guildId });
                 }
                 formEmbedSessions.delete(userId);
                 const savedC = new ContainerBuilder();

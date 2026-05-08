@@ -42,7 +42,6 @@ module.exports = {
                 }
 
                 if (sub === 'form_create' || sub === 'form_manage') {
-                    await interaction.deferReply({ ephemeral: true });
                     const { handleFormAction } = require('./formulariosHandler.js');
                     await handleFormAction(interaction, client, sub);
                     return;

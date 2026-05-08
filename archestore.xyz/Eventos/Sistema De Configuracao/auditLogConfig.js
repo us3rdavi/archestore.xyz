@@ -98,6 +98,13 @@ module.exports = {
                     content: `${Emojis.get('confirmed_emoji')} Canal de auditoria removido com sucesso.`,
                     ephemeral: true
                 });
+                const { logAction } = require('../../Functions/AuditLog.js');
+                await logAction(client, {
+                    action: 'Log de Auditoria removido',
+                    details: 'Canal de auditoria removido das configurações',
+                    userId: interaction.user.id,
+                    guildId: interaction.guildId
+                });
                 return;
             }
         } catch (err) {
