@@ -317,7 +317,7 @@ function infoContainer(secao, msg, extraButtons = []) {
 // ── Handler de eventos ────────────────────────────────────────────────────────
 module.exports = {
     name: 'interactionCreate',
-    run: async (client, interaction) => {
+    run: async (interaction, client) => {
 
         // ── Select menu de navegação ──────────────────────────────────────────
         if (interaction.isStringSelectMenu() && interaction.customId === 'ccpainel_nav') {

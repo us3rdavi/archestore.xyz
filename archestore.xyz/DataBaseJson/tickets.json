@@ -104,10 +104,27 @@
                 "msgid": "1501904836378103940",
                 "channelid": "1465571881758359700",
                 "guildid": "1396516441758367895"
+            },
+            {
+                "msgid": "1502432439686140069",
+                "channelid": "1465571881758359700",
+                "guildid": "1396516441758367895"
             }
         ],
-        "contador": 2,
-        "abertos": {},
+        "contador": 3,
+        "abertos": {
+            "804354181653463120": {
+                "threadId": "1502432509013790831",
+                "numero": 3,
+                "funcao": "Suporte",
+                "assumidoPor": null,
+                "staffMemberId": null,
+                "abertoPor": "804354181653463120",
+                "username": "us3r_davi",
+                "guildId": "1396516441758367895",
+                "messageId": "1502432515246264472"
+            }
+        },
         "staffRoles": [
             "1397274200032542810"
         ],

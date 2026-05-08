@@ -170,40 +170,34 @@ module.exports = {
             }
 
             if (logChannel) {
+                const closedTs = Math.floor(Date.now() / 1000);
+                const logEmbed = new EmbedBuilder()
+                    .setTitle(`Transcript — Ticket #${ticketData.numero}`)
+                    .setColor('#57F287')
+                    .setThumbnail(interaction.guild.iconURL({ dynamic: true }))
+                    .addFields(
+                        { name: 'Aberto por', value: `<@${ticketData.userId}>\n\`${ticketData.username || 'Desconhecido'}\``, inline: true },
+                        { name: 'Assumido por', value: ticketData.staffMemberId ? `<@${ticketData.staffMemberId}>` : '`Ninguém`', inline: true },
+                        { name: 'Categoria', value: `\`${ticketData.funcao || 'Desconhecida'}\``, inline: true },
+                        { name: 'Nº do Ticket', value: `\`#${ticketData.numero}\``, inline: true },
+                        { name: 'Encerrado por', value: `${interaction.user}\n\`Resolvido\``, inline: true },
+                        { name: 'Encerrado em', value: `<t:${closedTs}:F>`, inline: true }
+                    )
+                    .setFooter({ text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) })
+                    .setTimestamp();
+
                 try {
                     const transcriptModule = require('discord-html-transcripts');
                     const attachment = await transcriptModule.createTranscript(interaction.channel, {
                         limit: -1,
                         returnType: 'attachment',
                         filename: `transcript-ticket-${ticketData.numero}.html`,
-                        poweredBy: false
+                        poweredBy: false,
+                        saveImages: false,
                     });
-
-                    const logEmbed = new EmbedBuilder()
-                        .setTitle(`${Emojis.get('_messages_emoji')} Transcript — Ticket #${ticketData.numero}`)
-                        .setColor('#5865F2')
-                        .addFields(
-                            { name: `${Emojis.get('_silueta_emoji')} Aberto por`, value: `<@${ticketData.userId}> (\`${ticketData.username}\`)`, inline: true },
-                            { name: `${Emojis.get('_staff_emoji')} Assumido por`, value: ticketData.staffMemberId ? `<@${ticketData.staffMemberId}>` : 'Ninguém', inline: true },
-                            { name: `${Emojis.get('_messages_emoji')} Opção`, value: ticketData.funcao || 'Desconhecida', inline: true },
-                            { name: `${Emojis.get('information_emoji')} Nº do Ticket`, value: `#${ticketData.numero}`, inline: true },
-                            { name: `${Emojis.get('confirmed_emoji')} Encerrado por`, value: `${interaction.user} (\`Resolvido\`)`, inline: true },
-                            { name: `${Emojis.get('clock_emoji')} Encerrado em`, value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: true }
-                        )
-                        .setFooter({ text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) })
-                        .setTimestamp();
-
                     await logChannel.send({ embeds: [logEmbed], files: [attachment] });
                 } catch (err) {
                     console.error('[Ticket] Erro ao gerar transcript:', err.message);
-                    const logEmbed = new EmbedBuilder()
-                        .setTitle(`${Emojis.get('_messages_emoji')} Ticket #${ticketData.numero} Encerrado`)
-                        .setColor('#5865F2')
-                        .addFields(
-                            { name: `${Emojis.get('_silueta_emoji')} Aberto por`, value: `<@${ticketData.userId}>`, inline: true },
-                            { name: `${Emojis.get('confirmed_emoji')} Encerrado por`, value: `${interaction.user}`, inline: true }
-                        )
-                        .setTimestamp();
                     await logChannel.send({ embeds: [logEmbed] }).catch(() => {});
                 }
             }
@@ -244,11 +238,10 @@ module.exports = {
 
             const staffRoles = tickets.get('tickets.staffRoles') || [];
             const roleMentions = staffRoles.map(id => `<@&${id}>`).join(' ');
-            const cargoadm = configuracao.get('ConfigRoles.cargoadm');
-            const extraMention = cargoadm && !staffRoles.includes(cargoadm) ? `<@&${cargoadm}>` : '';
 
             await interaction.channel.send({
-                content: `${Emojis.get('warn_emoji')} <@${ticketData.userId}> ainda precisa de ajuda! ${roleMentions} ${extraMention}`.trim()
+                content: `${Emojis.get('warn_emoji')} <@${ticketData.userId}> ainda precisa de ajuda!${roleMentions ? ` ${roleMentions}` : ''}`.trim(),
+                allowedMentions: { users: [ticketData.userId], roles: staffRoles }
             });
         }
 

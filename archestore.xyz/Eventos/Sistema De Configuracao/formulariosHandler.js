@@ -2,6 +2,7 @@ const {
     ActionRowBuilder, ButtonBuilder, ButtonStyle,
     StringSelectMenuBuilder, RoleSelectMenuBuilder, ChannelSelectMenuBuilder,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder,
+    EmbedBuilder,
     ModalBuilder, TextInputBuilder, TextInputStyle,
     MessageFlags, ChannelType,
 } = require('discord.js');
@@ -9,6 +10,91 @@ const { formularios, Emojis, configuracao } = require('../../DataBaseJson');
 
 // Lock para evitar duplicação de perguntas por double-submit
 const pergLock = new Set();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EDITOR DE APARÊNCIA (LIVE PREVIEW) — estado por usuário
+// ─────────────────────────────────────────────────────────────────────────────
+const formEmbedSessions = new Map();
+
+const EMB_NAV_OPTIONS = [
+    { label: 'Menu Principal', description: 'Voltar ao menu principal', value: 'main',        emoji: { id: '1501804019184828507' } },
+    { label: 'Título',         description: 'Editar título do painel',  value: 'title',       emoji: { id: '1501804003850322052' } },
+    { label: 'Descrição',      description: 'Editar descrição',          value: 'description', emoji: { id: '1501804039451709441' } },
+    { label: 'Cor',            description: 'Editar cor de destaque',    value: 'color',       emoji: { id: '1501804122943389716' } },
+    { label: 'Imagem',         description: 'Editar imagem/banner',      value: 'image',       emoji: { id: '1501803928973476023' } },
+    { label: 'Footer',         description: 'Editar texto do rodapé',   value: 'footer',      emoji: { id: '1501804120615555132' } },
+];
+
+const EMB_SECTION_LABELS = {
+    title: 'Título', description: 'Descrição', color: 'Cor (hex ex: #5865F2)',
+    image: 'URL da Imagem', footer: 'Texto do Footer',
+};
+
+function buildFormEmbedPreview(data) {
+    const embed = new EmbedBuilder();
+    if (data.title)       embed.setTitle(data.title);
+    if (data.description) embed.setDescription(data.description);
+    try { embed.setColor(data.color || '#5865F2'); } catch (e) { embed.setColor('#5865F2'); }
+    if (data.image)  { try { embed.setImage(data.image); }  catch (e) {} }
+    if (data.footer) embed.setFooter({ text: data.footer });
+    if (!data.title && !data.description) {
+        embed.setDescription('-# Nenhum conteúdo configurado.\nUse o menu abaixo para editar.');
+    }
+    return embed;
+}
+
+function buildFormEmbedNav(userId, guildId, slotId, current) {
+    return new ActionRowBuilder().addComponents(
+        new StringSelectMenuBuilder()
+            .setCustomId(`form_emb_nav_${userId}_${guildId}_${slotId}`)
+            .setPlaceholder('Selecionar propriedade...')
+            .addOptions(EMB_NAV_OPTIONS.map(o => ({ ...o, default: o.value === current })))
+    );
+}
+
+function buildFormEmbedMainMenu(userId, guildId, slotId) {
+    const sess  = formEmbedSessions.get(userId) || { data: {} };
+    const embed = buildFormEmbedPreview(sess.data);
+    const nav   = buildFormEmbedNav(userId, guildId, slotId, 'main');
+    const btns  = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`form_emb_save_${userId}_${guildId}_${slotId}`)
+            .setLabel('Salvar Aparência')
+            .setEmoji({ id: '1501803932484108359' })
+            .setStyle(ButtonStyle.Success),
+        new ButtonBuilder()
+            .setCustomId(`form_emb_reset_${userId}_${guildId}_${slotId}`)
+            .setLabel('Resetar')
+            .setEmoji({ id: '1501803926180335727' })
+            .setStyle(ButtonStyle.Danger),
+    );
+    return { embeds: [embed], components: [nav, btns] };
+}
+
+function buildFormEmbedSection(userId, guildId, slotId, section) {
+    const sess  = formEmbedSessions.get(userId) || { data: {} };
+    const embed = buildFormEmbedPreview(sess.data);
+    const label = EMB_SECTION_LABELS[section] || section;
+    const nav   = buildFormEmbedNav(userId, guildId, slotId, section);
+    const btns  = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`form_emb_set_${section}_${userId}_${guildId}_${slotId}`)
+            .setLabel(`Definir ${label.split(' ')[0]}`)
+            .setEmoji({ id: '1501804003850322052' })
+            .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+            .setCustomId(`form_emb_remove_${section}_${userId}_${guildId}_${slotId}`)
+            .setLabel('Remover')
+            .setEmoji({ id: '1501803935453679616' })
+            .setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+            .setCustomId(`form_emb_save_${userId}_${guildId}_${slotId}`)
+            .setLabel('Salvar')
+            .setEmoji({ id: '1501803932484108359' })
+            .setStyle(ButtonStyle.Success),
+    );
+    return { embeds: [embed], components: [nav, btns] };
+}
 
 function getAccentColor() {
     const cor = configuracao.get('Cores.Principal') || '5865F2';
@@ -668,36 +754,20 @@ module.exports = {
                     embeds: async () => {
                         const form = (formularios.get(guildId) || {})[slotId] || {};
                         const emb  = form.embed || {};
-                        const modal = new ModalBuilder()
-                            .setCustomId(`form_modal_embeds_${guildId}_${slotId}`)
-                            .setTitle('Aparência do Formulário');
-                        modal.addComponents(
-                            new ActionRowBuilder().addComponents(
-                                new TextInputBuilder()
-                                    .setCustomId('embed_title')
-                                    .setLabel('Título')
-                                    .setValue(emb.title || '')
-                                    .setStyle(TextInputStyle.Short)
-                                    .setRequired(false)
-                            ),
-                            new ActionRowBuilder().addComponents(
-                                new TextInputBuilder()
-                                    .setCustomId('embed_description')
-                                    .setLabel('Descrição')
-                                    .setValue(emb.description || '')
-                                    .setStyle(TextInputStyle.Paragraph)
-                                    .setRequired(false)
-                            ),
-                            new ActionRowBuilder().addComponents(
-                                new TextInputBuilder()
-                                    .setCustomId('embed_color')
-                                    .setLabel('Cor Hex (ex: 5865F2)')
-                                    .setValue(emb.color || '5865F2')
-                                    .setStyle(TextInputStyle.Short)
-                                    .setRequired(false)
-                            )
-                        );
-                        await interaction.showModal(modal);
+                        formEmbedSessions.set(interaction.user.id, {
+                            guildId, slotId,
+                            data: {
+                                title:       emb.title       || null,
+                                description: emb.description || null,
+                                color:       emb.color ? `#${emb.color.replace('#', '')}` : null,
+                                image:       emb.image       || null,
+                                footer:      emb.footer      || null,
+                            }
+                        });
+                        await interaction.reply({
+                            ephemeral: true,
+                            ...buildFormEmbedMainMenu(interaction.user.id, guildId, slotId)
+                        });
                     },
                 };
 
@@ -764,18 +834,137 @@ module.exports = {
                         setTimeout(() => pergLock.delete(lockKey), 2000);
                     }
 
-                } else if (action === 'embeds') {
-                    const title = interaction.fields.getTextInputValue('embed_title').trim();
-                    const desc  = interaction.fields.getTextInputValue('embed_description').trim();
-                    const color = interaction.fields.getTextInputValue('embed_color').trim().replace('#', '');
-                    if (!slots[slotId].embed) slots[slotId].embed = {};
-                    slots[slotId].embed.title       = title || null;
-                    slots[slotId].embed.description = desc  || null;
-                    if (color && /^[0-9A-Fa-f]{6}$/.test(color))
-                        slots[slotId].embed.color = color;
-                    formularios.set(guildId, slots);
-                    await interaction.update(buildFormPanelPayload(guildId, slotId));
                 }
+                return;
+            }
+
+            // ── Editor de Aparência: select de navegação ──────────────────
+            if (interaction.isStringSelectMenu() && customId.startsWith('form_emb_nav_')) {
+                const parts   = customId.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const userId  = parts[parts.length - 3];
+                if (userId !== interaction.user.id) return;
+                const section = interaction.values[0];
+                if (section === 'main') {
+                    await interaction.update(buildFormEmbedMainMenu(userId, guildId, slotId));
+                } else {
+                    await interaction.update(buildFormEmbedSection(userId, guildId, slotId, section));
+                }
+                return;
+            }
+
+            // ── Editor de Aparência: botão salvar ────────────────────────
+            if (interaction.isButton() && customId.startsWith('form_emb_save_')) {
+                const parts   = customId.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const userId  = parts[parts.length - 3];
+                if (userId !== interaction.user.id) return;
+                const sess  = formEmbedSessions.get(userId);
+                const slots = formularios.get(guildId) || {};
+                if (slots[slotId]) {
+                    if (!slots[slotId].embed) slots[slotId].embed = {};
+                    const d = sess?.data || {};
+                    slots[slotId].embed.title       = d.title  || null;
+                    slots[slotId].embed.description = d.description || null;
+                    slots[slotId].embed.color       = d.color ? d.color.replace('#', '') : '5865F2';
+                    slots[slotId].embed.image       = d.image  || null;
+                    slots[slotId].embed.footer      = d.footer || null;
+                    formularios.set(guildId, slots);
+                }
+                formEmbedSessions.delete(userId);
+                await interaction.update({
+                    content: `${Emojis.get('confirmed_emoji')} Aparência salva com sucesso!`,
+                    embeds: [], components: []
+                });
+                return;
+            }
+
+            // ── Editor de Aparência: botão reset ─────────────────────────
+            if (interaction.isButton() && customId.startsWith('form_emb_reset_')) {
+                const parts   = customId.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const userId  = parts[parts.length - 3];
+                if (userId !== interaction.user.id) return;
+                formEmbedSessions.set(userId, { guildId, slotId, data: {} });
+                await interaction.update(buildFormEmbedMainMenu(userId, guildId, slotId));
+                return;
+            }
+
+            // ── Editor de Aparência: botão remover propriedade ───────────
+            if (interaction.isButton() && customId.startsWith('form_emb_remove_')) {
+                const withoutPrefix = customId.slice('form_emb_remove_'.length);
+                const parts   = withoutPrefix.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const userId  = parts[parts.length - 3];
+                const section = parts.slice(0, parts.length - 3).join('_');
+                if (userId !== interaction.user.id) return;
+                const sess = formEmbedSessions.get(userId) || { guildId, slotId, data: {} };
+                delete sess.data[section];
+                formEmbedSessions.set(userId, sess);
+                await interaction.update(buildFormEmbedSection(userId, guildId, slotId, section));
+                return;
+            }
+
+            // ── Editor de Aparência: botão definir (abre modal) ──────────
+            if (interaction.isButton() && customId.startsWith('form_emb_set_')) {
+                const withoutPrefix = customId.slice('form_emb_set_'.length);
+                const parts   = withoutPrefix.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const userId  = parts[parts.length - 3];
+                const section = parts.slice(0, parts.length - 3).join('_');
+                if (userId !== interaction.user.id) return;
+                const sess  = formEmbedSessions.get(userId) || { data: {} };
+                const label = EMB_SECTION_LABELS[section] || section;
+                const modal = new ModalBuilder()
+                    .setCustomId(`form_emb_modal_${section}_${userId}_${guildId}_${slotId}`)
+                    .setTitle(`Definir ${label.split(' ')[0]}`);
+                modal.addComponents(
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('section_value')
+                            .setLabel(label)
+                            .setStyle(section === 'description' ? TextInputStyle.Paragraph : TextInputStyle.Short)
+                            .setValue(sess.data[section] || '')
+                            .setRequired(false)
+                            .setMaxLength(section === 'description' ? 2000 : 256)
+                    )
+                );
+                await interaction.showModal(modal);
+                return;
+            }
+
+            // ── Editor de Aparência: submit do modal ─────────────────────
+            if (interaction.isModalSubmit() && customId.startsWith('form_emb_modal_')) {
+                const withoutPrefix = customId.slice('form_emb_modal_'.length);
+                const parts   = withoutPrefix.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const userId  = parts[parts.length - 3];
+                const section = parts.slice(0, parts.length - 3).join('_');
+                if (userId !== interaction.user.id) return;
+                const value = interaction.fields.getTextInputValue('section_value').trim();
+                const sess  = formEmbedSessions.get(userId) || { guildId, slotId, data: {} };
+                if (value) {
+                    if (section === 'color') {
+                        const clean = value.replace('#', '');
+                        if (/^[0-9A-Fa-f]{6}$/.test(clean)) {
+                            sess.data.color = `#${clean}`;
+                        } else {
+                            return interaction.reply({ content: `${Emojis.get('negative_emoji')} Cor inválida. Use formato hex, ex: \`#5865F2\``, ephemeral: true });
+                        }
+                    } else {
+                        sess.data[section] = value;
+                    }
+                } else {
+                    delete sess.data[section];
+                }
+                formEmbedSessions.set(userId, sess);
+                await interaction.update(buildFormEmbedSection(userId, guildId, slotId, section));
                 return;
             }
 

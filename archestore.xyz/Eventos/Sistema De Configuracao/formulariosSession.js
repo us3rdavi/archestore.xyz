@@ -4,7 +4,12 @@ const {
     ModalBuilder, TextInputBuilder, TextInputStyle,
     MessageFlags,
 } = require('discord.js');
-const { formularios, Emojis } = require('../../DataBaseJson');
+const { formularios, Emojis, configuracao } = require('../../DataBaseJson');
+
+function getAccentColor() {
+    const cor = configuracao.get('Cores.Principal') || '5865F2';
+    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
+}
 
 // Sessões ativas em memória
 const activeSessions = new Map();
@@ -31,7 +36,7 @@ async function sendFormLog(guild, form, slotId, guildId, user, answers) {
     ).join('\n\n');
     const timestamp  = Math.floor(Date.now() / 1000);
 
-    const c = new ContainerBuilder().setAccentColor(0x5865F2);
+    const c = new ContainerBuilder().setAccentColor(getAccentColor());
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('_messages_emoji')} Nova Aplicação — ${form.name}\n` +
         `${Emojis.get('_silueta_emoji')} **Candidato:** ${user.username} (<@${user.id}>)\n` +
@@ -71,7 +76,7 @@ async function runQuestionFlow(dmChannel, userId, questions, timeLimit) {
     for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
 
-        const qc = new ContainerBuilder().setAccentColor(0x5865F2);
+        const qc = new ContainerBuilder().setAccentColor(getAccentColor());
         qc.addTextDisplayComponents(new TextDisplayBuilder().setContent(
             `${Emojis.get('question_emoji')} **Pergunta ${i + 1} de ${questions.length}**\n\n` +
             `${q.text}\n\n` +
@@ -166,7 +171,7 @@ module.exports = {
 
                 // Mensagem de boas-vindas na DM
                 try {
-                    const wc = new ContainerBuilder().setAccentColor(0x5865F2);
+                    const wc = new ContainerBuilder().setAccentColor(getAccentColor());
                     wc.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                         `## ${Emojis.get('_messages_emoji')} ${form.name}\n` +
                         `Olá, **${interaction.user.username}**! Você iniciou o processo de aplicação.\n\n` +

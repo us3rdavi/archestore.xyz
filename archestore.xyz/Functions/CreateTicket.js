@@ -122,23 +122,13 @@ async function CreateTicket(interaction, valor) {
 
         const staffRoles = tickets.get('tickets.staffRoles') || [];
         const roleMentions = staffRoles.map(id => `<@&${id}>`).join(' ');
-        const cargoadmPing = configuracao.get('ConfigRoles.cargoadm');
-        const cargosupPing = configuracao.get('ConfigRoles.cargosup');
-        const extraMentions = [
-            cargoadmPing && !staffRoles.includes(cargoadmPing) ? `<@&${cargoadmPing}>` : '',
-            cargosupPing && !staffRoles.includes(cargosupPing) ? `<@&${cargosupPing}>` : ''
-        ].filter(Boolean).join(' ');
-
-        const pingContent = `${interaction.user} ${roleMentions} ${extraMentions}`.trim();
-        const pingRoles = [...staffRoles];
-        if (cargoadmPing && !pingRoles.includes(cargoadmPing)) pingRoles.push(cargoadmPing);
-        if (cargosupPing && !pingRoles.includes(cargosupPing)) pingRoles.push(cargosupPing);
+        const pingContent = `${interaction.user}${roleMentions ? ` ${roleMentions}` : ''}`.trim();
 
         await thread.send({
             content: pingContent,
             allowedMentions: {
                 users: [interaction.user.id],
-                roles: pingRoles
+                roles: staffRoles
             }
         });
 

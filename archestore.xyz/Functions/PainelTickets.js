@@ -7,6 +7,11 @@ const { tickets, configuracao } = require("../DataBaseJson");
 const emojis = require("../DataBaseJson/Emojis.json");
 const Emojis = { get: (name) => emojis[name] || "" };
 
+function getAccentColor() {
+    const cor = configuracao.get('Cores.Principal') || '5865F2';
+    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
+}
+
 async function painelTicket(interaction, useEditReply = false) {
     const atualstatus24 = tickets.get("statusmsg") || false;
 
@@ -15,7 +20,7 @@ async function painelTicket(interaction, useEditReply = false) {
         const bannerMensagem = tickets.get(`tickets.aparencia.bannermsg`) || null;
 
         const container = new ContainerBuilder();
-        container.setAccentColor(0x5865F2);
+        container.setAccentColor(getAccentColor());
 
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(mensagemConfigurada)
@@ -35,36 +40,36 @@ async function painelTicket(interaction, useEditReply = false) {
             new ButtonBuilder()
                 .setCustomId("definiraparencia")
                 .setLabel('Definir aparência')
-                .setEmoji("1371593617868591185")
+                .setEmoji({ id: '1501804122943389716' })
                 .setStyle(2)
         );
         const row2 = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId("addfuncaoticket")
                 .setLabel('Adicionar função')
-                .setEmoji("1371593623514124510")
+                .setEmoji({ id: '1501803905363869769' })
                 .setStyle(2),
             new ButtonBuilder()
                 .setCustomId("remfuncaoticket")
                 .setLabel('Remover função')
-                .setEmoji("1371593634029371432")
+                .setEmoji({ id: '1501803926180335727' })
                 .setStyle(4),
             new ButtonBuilder()
                 .setCustomId("definirhorarioatendimento24")
                 .setLabel('Horário de atendimento')
-                .setEmoji("1371593613665894562")
+                .setEmoji({ id: '1501804058699366470' })
                 .setStyle(2)
         );
         const row3 = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId("postarticket")
                 .setLabel('Postar')
-                .setEmoji("1371593628685832293")
+                .setEmoji({ id: '1501803923126747178' })
                 .setStyle(1),
             new ButtonBuilder()
                 .setCustomId("voltar1")
                 .setLabel('Voltar')
-                .setEmoji("1371593637179297923")
+                .setEmoji({ id: '1501803908589162537' })
                 .setStyle(2)
         );
 
@@ -92,7 +97,7 @@ async function painelTicket(interaction, useEditReply = false) {
     const aparenciaTitle = tickets.get('tickets.aparencia.title');
     const aparenciaColor = tickets.get('tickets.aparencia.color');
 
-    let accentColor = 0x5865F2;
+    let accentColor = getAccentColor();
     if (aparenciaColor) {
         try { accentColor = parseInt(aparenciaColor.replace('#', ''), 16); } catch (e) {}
     }
@@ -128,12 +133,12 @@ async function painelTicket(interaction, useEditReply = false) {
         new ButtonBuilder()
             .setCustomId("definiraparencia")
             .setLabel('Aparência do Painel')
-            .setEmoji("1371593617868591185")
+            .setEmoji({ id: '1501804122943389716' })
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("configuracaoticket")
             .setLabel('Configuração')
-            .setEmoji("1371593610339942493")
+            .setEmoji({ id: '1501804064596558017' })
             .setStyle(2)
     );
 
@@ -141,17 +146,17 @@ async function painelTicket(interaction, useEditReply = false) {
         new ButtonBuilder()
             .setCustomId("addfuncaoticket")
             .setLabel('Adicionar Função')
-            .setEmoji("1371593623514124510")
+            .setEmoji({ id: '1501803905363869769' })
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("remfuncaoticket")
             .setLabel('Remover Função')
-            .setEmoji("1371593634029371432")
+            .setEmoji({ id: '1501803926180335727' })
             .setStyle(4),
         new ButtonBuilder()
             .setCustomId("definirhorarioatendimento24")
             .setLabel('Horário de Atendimento')
-            .setEmoji("1371593613665894562")
+            .setEmoji({ id: '1501804058699366470' })
             .setStyle(2)
     );
 
@@ -159,12 +164,12 @@ async function painelTicket(interaction, useEditReply = false) {
         new ButtonBuilder()
             .setCustomId("postarticket")
             .setLabel('Postar Painel')
-            .setEmoji("1371593628685832293")
+            .setEmoji({ id: '1501803923126747178' })
             .setStyle(1),
         new ButtonBuilder()
             .setCustomId("voltar1")
             .setLabel('Voltar')
-            .setEmoji("1371593637179297923")
+            .setEmoji({ id: '1501803908589162537' })
             .setStyle(2)
     );
 
@@ -191,11 +196,8 @@ async function painelConfiguracaoTicket(interaction) {
     const mensagemInicial = tickets.get('tickets.mensagemInicial') || {};
     const mensagemFinal = tickets.get('tickets.mensagemFinalizacao') || {};
 
-    let accentColorCfg = 0x5865F2;
-    try { accentColorCfg = parseInt((configuracao.get('Cores.Principal') || '5865F2').replace('#', ''), 16); } catch (e) {}
-
     const container = new ContainerBuilder();
-    container.setAccentColor(accentColorCfg);
+    container.setAccentColor(getAccentColor());
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(`## ${Emojis.get('_settings_emoji')} Configuração\nGerencie canais, cargos e mensagens do sistema de tickets.`)
@@ -219,17 +221,17 @@ async function painelConfiguracaoTicket(interaction) {
         new ButtonBuilder()
             .setCustomId("canalticketconfigsystem")
             .setLabel('Canal de Tickets')
-            .setEmoji("1371593613665894562")
+            .setEmoji({ id: '1501804058699366470' })
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("canallogsticket2")
             .setLabel('Canal de Logs')
-            .setEmoji("1501804039451709441")
+            .setEmoji({ id: '1501804039451709441' })
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("cargosstaff")
             .setLabel('Cargos Staff')
-            .setEmoji("1371593623514124510")
+            .setEmoji({ id: '1501803902046048297' })
             .setStyle(2)
     );
 
@@ -237,12 +239,12 @@ async function painelConfiguracaoTicket(interaction) {
         new ButtonBuilder()
             .setCustomId("configmensageminicial")
             .setLabel('Mensagem Inicial')
-            .setEmoji("1371593617868591185")
+            .setEmoji({ id: '1501804122943389716' })
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("configmensagemfinal")
             .setLabel('Mensagem de Finalização')
-            .setEmoji("1501804067616325723")
+            .setEmoji({ id: '1501804067616325723' })
             .setStyle(2)
     );
 
@@ -250,12 +252,12 @@ async function painelConfiguracaoTicket(interaction) {
         new ButtonBuilder()
             .setCustomId("adicionarbotaoticket")
             .setLabel('Adicionar Botão')
-            .setEmoji("1371593623514124510")
+            .setEmoji({ id: '1501803905363869769' })
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("removerbotoesticket")
             .setLabel('Remover Botão')
-            .setEmoji("1371593634029371432")
+            .setEmoji({ id: '1501803926180335727' })
             .setStyle(4)
     );
 
@@ -263,7 +265,7 @@ async function painelConfiguracaoTicket(interaction) {
         new ButtonBuilder()
             .setCustomId("painelconfigticket")
             .setLabel('Voltar')
-            .setEmoji("1371593637179297923")
+            .setEmoji({ id: '1501803908589162537' })
             .setStyle(2)
     );
 
