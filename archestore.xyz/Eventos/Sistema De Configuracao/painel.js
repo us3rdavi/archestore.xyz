@@ -1,25 +1,19 @@
 const Discord = require("discord.js")
 const { ActionRowBuilder, EmbedBuilder, ButtonBuilder, InteractionType, StringSelectMenuBuilder, ChannelType, PermissionsBitField, RoleSelectMenuBuilder, ChannelSelectMenuBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags } = require('discord.js');
-const { Painel, Gerenciar2, definirduvidas } = require("../../Functions/Painel");
-const { configqrcode } = require("../../Functions/QRCode.js");
+const { Painel, definirduvidas } = require("../../Functions/Painel");
 const { AcoesAutomaticsConfigs, LimpezaAutomatica, msgbemvindo, msgbemvindocanais, GerenciarCanais, SistemaNukar, sistemaAntiRaid, SistemadeFiltro, SistemaAntiFake } = require("../../Functions/AcoesAutomatics.js");
 const { Gerenciar } = require("../../Functions/Gerenciar");
 const { automatico } = require("../../Functions/automaticos");
 const { ConfigRoles } = require("../../Functions/ConfigRoles");
 const { gerenciarPerms } = require("../../Functions/modUsersPerms");
-const { configrole24 } = require("../../Functions/cargocomprar.js")
-const { EstatisticasKing } = require("../../index.js");
-const { profileuser } = require("../../Functions/profile");
-const { produtos, configuracao, tickets,  estatisticas } = require("../../DataBaseJson");
+const { produtos, configuracao, tickets, estatisticas } = require("../../DataBaseJson");
 const { Avançados, Configcomandos24, Emojis24, Perms24 } = require("../../Functions/Avancados.js");
-const { Posicao1 } = require("../../Functions/PosicoesFunction.js");
 const { painelTicket } = require("../../Functions/PainelTickets.js");
 const { CreateMessageTicket, Checkarmensagensticket } = require("../../Functions/CreateMensagemTicket.js");
 const { PermsAvançados24 } = require("../../Functions/PermsAvancados.js")
 const { autoreact24 } = require("../../Functions/Autoreactfunction.js")
 const { CreateTicket } = require("../../Functions/CreateTicket.js");
 const { GerenciarCampos2 } = require("../../Functions/GerenciarCampos.js");
-const { MessageStock } = require("../../Functions/ConfigEstoque.js");
 const { AcoesMsgsAutomatics } = require("../../Functions/ConfigMsgsAutomatics.js");
 const { AcoesRepostAutomatics } = require("../../Functions/ConfigRepostAuto.js");
 const { moedaConfig } = require("../../Functions/moedaConfig.js");
@@ -29,7 +23,6 @@ const { owner } = require("../../config.json");
 const discordTranscripts = require('discord-html-transcripts');
 const { StringSelectMenuOptionBuilder } = require("discord.js");
 const { Emojis } = require("../../DataBaseJson");
-const { UpdateAllMessagesProduct } = require("../../Functions/SenderMessagesOrUpdates.js");
 
 
 module.exports = {
@@ -105,9 +98,7 @@ module.exports = {
                     configuracao.delete('Instrucoes.mensagem');
                 }
 
-                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
-                await Gerenciar2(interaction, client)
-                await interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Instruções definidas com sucesso!`, ephemeral: true });
+                await interaction.reply({ content: `${Emojis.get(`confirmed_emoji`)} Instruções definidas com sucesso!`, ephemeral: true });
             }
             if (interaction.customId == 'automaticTempo') {
                 const inatividade = interaction.fields.getTextInputValue('inatividade');
@@ -253,86 +244,6 @@ module.exports = {
 
 
 
-            if (interaction.customId === 'aslfdjauydvaw769dg7waajnwndjo') {
-
-                let VALOR = interaction.fields.getTextInputValue('tokenMP');
-                let CARGO = interaction.fields.getTextInputValue('tokenMP2');
-
-
-                if (CARGO !== '' && VALOR !== '') {
-                    const role = await interaction.guild.roles.fetch(CARGO);
-
-                    if (role === null) {
-                        return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Você escolheu incorretamente o ID do cargo!`, ephemeral: true });
-                    }
-
-                    if (isNaN(VALOR)) {
-                        return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Você escolheu incorretamente o valor!`, ephemeral: true });
-                    }
-
-                    configuracao.set(`posicoes.pos1.role`, CARGO);
-                    configuracao.set(`posicoes.pos1.valor`, VALOR);
-                } else {
-                    configuracao.delete(`posicoes.pos1`);
-                }
-
-                await Posicao1(interaction, client)
-                interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Posição definida com sucesso!`, ephemeral: true });
-
-            }
-
-            if (interaction.customId === 'awiohdbawudwdwhduawdnuaw') {
-
-                let VALOR = interaction.fields.getTextInputValue('tokenMP');
-                let CARGO = interaction.fields.getTextInputValue('tokenMP2');
-
-
-                if (CARGO !== '' && VALOR !== '') {
-                    const role = await interaction.guild.roles.fetch(CARGO);
-
-                    if (role === null) {
-                        return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Você escolheu incorretamente o ID do cargo!`, ephemeral: true });
-                    }
-
-                    if (isNaN(VALOR)) {
-                        return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Você escolheu incorretamente o valor!`, ephemeral: true });
-                    }
-
-                    configuracao.set(`posicoes.pos2.role`, CARGO);
-                    configuracao.set(`posicoes.pos2.valor`, VALOR);
-                } else {
-                    configuracao.delete(`posicoes.pos2`);
-                }
-
-                await Posicao1(interaction, client)
-                interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Posição definida com sucesso!`, ephemeral: true });
-            }
-
-            if (interaction.customId === 'uy82819171h172') {
-
-                let VALOR = interaction.fields.getTextInputValue('tokenMP');
-                let CARGO = interaction.fields.getTextInputValue('tokenMP2');
-
-                if (CARGO !== '' && VALOR !== '') {
-                    const role = await interaction.guild.roles.fetch(CARGO);
-
-                    if (role === null) {
-                        return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Você escolheu incorretamente o ID do cargo!`, ephemeral: true });
-                    }
-
-                    if (isNaN(VALOR)) {
-                        return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Você escolheu incorretamente o valor!`, ephemeral: true });
-                    }
-
-                    configuracao.set(`posicoes.pos3.role`, CARGO);
-                    configuracao.set(`posicoes.pos3.valor`, VALOR);
-                } else {
-                    configuracao.delete(`posicoes.pos3`);
-                }
-
-                await Posicao1(interaction, client)
-                interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Posição definida com sucesso!`, ephemeral: true });
-            }
 
 
         }
@@ -362,15 +273,6 @@ module.exports = {
 
             }
 
-            if (interaction.customId == 'stockhasdhvsudasd') {
-
-                const campo = interaction.values[0].split('_')[0]
-                const produto = interaction.values[0].split('_')[1]
-
-                MessageStock(interaction, 1, produto, campo, true)
-
-
-            }
 
             if (interaction.customId == 'deletarticketsfunction') {
                 const valordelete = interaction.values
@@ -383,17 +285,11 @@ module.exports = {
         }
 
         if (interaction.isStringSelectMenu() && interaction.customId == "selectMoedaC") {
-
             const option = interaction.values[0];
-
             if (option === "realBRL") {
-
-                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
-
-                Gerenciar2(interaction, client);
-
+                await interaction.deferUpdate();
+                await moedaConfig(interaction, client);
             }
-
         }
 
         if (interaction.isStringSelectMenu() && interaction.customId == "selectProtectBot") {
@@ -424,7 +320,7 @@ module.exports = {
         if (interaction.isChannelSelectMenu()) {
             if (interaction.customId == 'selectautoclearcanal') {
 
-                await relikia.set("autoclear.channel", interaction.values);
+                configuracao.set("autoclear.channel", interaction.values);
                 await AutoClear(interaction, client);
             }
 
@@ -458,7 +354,6 @@ module.exports = {
                 }
 
                 configuracao.set('BotaoDuvidas.status', !status);
-                UpdateAllMessagesProduct(client);
                 await definirduvidas(interaction, client);
                 await interaction.followUp({
                     content: `${Emojis.get('confirmed_emoji')} Status atualizado.\n${Emojis.get(`loading_emoji`)} Mensagens sendo atualizadas...`,
@@ -613,8 +508,6 @@ module.exports = {
                     await interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Ocorreu um erro ao tentar notificar o usuário. Verifique se o usuário ainda está no servidor ou se permite mensagens diretas.`, ephemeral: true });
                 }
             }
-
-            const { MessageActionRow, MessageButton } = require('discord.js');
 
             if (interaction.customId == 'assumir') {
                 let ticketId = interaction.message.id;
@@ -956,8 +849,8 @@ module.exports = {
             }
 
             if (interaction.customId.endsWith("autocleartempo")) {
-                const canalautoclear = await relikia.get("autoclear.channel");
-                const tempoclear = await relikia.get("autoclear.time")
+                const canalautoclear = configuracao.get("autoclear.channel");
+                const tempoclear = configuracao.get("autoclear.time");
                 await interaction.update({ embeds: [], content: 'Por favor, insira o tempo em segundos:', components: [], ephemeral: true });
 
                 const filter = m => m.author.id === interaction.user.id;
@@ -969,8 +862,7 @@ module.exports = {
                         return interaction.followUp({ content: 'Tempo inválido, deve ser um número maior que 10 segundos.', ephemeral: true });
                     }
 
-                    // Usando relikia.set para atualizar autoclear.time
-                    relikia.set("autoclear.time", time);
+                    configuracao.set("autoclear.time", time);
 
                     timeout = time * 1000;
 
@@ -1031,8 +923,8 @@ module.exports = {
 
 
             if (interaction.customId.endsWith("iniciarautoclear")) {
-                const canalAutoClear = await relikia.get("autoclear.channel");
-                const tempoAutoClear = await relikia.get("autoclear.time");
+                const canalAutoClear = configuracao.get("autoclear.channel");
+                const tempoAutoClear = configuracao.get("autoclear.time");
 
                 if (!canalAutoClear) {
                     await interaction.reply({ content: 'Canal AutoClear não configurado.', ephemeral: true });
@@ -1055,12 +947,12 @@ module.exports = {
 
             if (interaction.customId.endsWith("pararautoclear")) {
 
-                const canalautoclear = await relikia.get("autoclear.channel");
-                const tempoclear = await relikia.get("autoclear.time")
+                const canalautoclear = configuracao.get("autoclear.channel");
+                const tempoclear = configuracao.get("autoclear.time");
 
                 try {
-                    await relikia.delete("autoclear.channel");
-                    relikia.set("autoclear.time", 10);
+                    configuracao.delete("autoclear.channel");
+                    configuracao.set("autoclear.time", 10);
                     {
                         const acStopContainer = new ContainerBuilder();
                         { const _c = configuracao.get('Cores.Principal') || '5865F2'; acStopContainer.setAccentColor((() => { try { return parseInt(_c.replace('#',''),16); } catch(e){ return 0x5865F2; } })()); }
@@ -1079,264 +971,18 @@ module.exports = {
 
 
 
-            if (interaction.customId == 'rendimento') { //aqui
-                const row = new ActionRowBuilder()
-                    .addComponents(
-                        new ButtonBuilder()
-                            .setCustomId("todayyyy")
-                            .setLabel('Hoje')
-                            .setStyle(2)
-                            .setDisabled(false),
-                        new ButtonBuilder()
-                            .setCustomId("7daysss")
-                            .setLabel('Últimos 7 dias')
-                            .setStyle(2)
-                            .setDisabled(false),
-                        new ButtonBuilder()
-                            .setCustomId("30dayss")
-                            .setLabel('Últimos 30 dias')
-                            .setStyle(2)
-                            .setDisabled(false),
-                        // new ButtonBuilder()
-                        //     .setCustomId("twoHours")
-                        //     .setLabel('Últimas 2 horas')
-                        //     .setStyle(2)
-                        //     .setDisabled(false),   
-                        // new ButtonBuilder()
-                        //     .setCustomId("topProducts")
-                        //     .setLabel('Top produtos')
-                        //     .setStyle(2)
-                        //     .setDisabled(true),   
-                        new ButtonBuilder()
-                            .setCustomId("totalrendimento")
-                            .setLabel('Rendimento Total')
-                            .setStyle(3)
-                            .setDisabled(false),
-                    )
-                interaction.reply({ content: `Olá senhor **${interaction.user.username}**, selecione algum filtro.`, components: [row], ephemeral: true })
-            }
-
-            if (interaction.customId == 'gerenciarposicao') {
-
-                Posicao1(interaction, client)
-
-            }
-
-
-
-            if (interaction.customId == 'Editarprimeiraposição') {
-
-                const aa = configuracao.get(`posicoes`)
-
-                const modalaAA = new ModalBuilder()
-                    .setCustomId('aslfdjauydvaw769dg7waajnwndjo')
-                    .setTitle(`Definir primeira posição`);
-
-                const newnameboteN = new TextInputBuilder()
-                    .setCustomId('tokenMP')
-                    .setLabel(`VALOR`)
-                    .setPlaceholder(`Insira uma quantia, ex: 100`)
-                    .setValue(aa?.pos1?.valor == undefined ? '' : aa.pos1?.valor)
-                    .setStyle(TextInputStyle.Short)
-                    .setRequired(false)
-
-                const newnameboteN2 = new TextInputBuilder()
-                    .setCustomId('tokenMP2')
-                    .setLabel(`CARGO`)
-                    .setPlaceholder(`Insira um id de algum cargo`)
-                    .setValue(aa?.pos1?.role == undefined ? '' : aa.pos1?.role)
-                    .setStyle(TextInputStyle.Short)
-                    .setRequired(false)
-
-                const firstActionRow3 = new ActionRowBuilder().addComponents(newnameboteN);
-                const firstActionRow4 = new ActionRowBuilder().addComponents(newnameboteN2);
-
-                modalaAA.addComponents(firstActionRow3, firstActionRow4);
-
-                await interaction.showModal(modalaAA);
-            }
-
-            if (interaction.customId == 'Editarsegundaposição') {
-                const aa = configuracao.get(`posicoes`)
-
-                const modalaAA = new ModalBuilder()
-                    .setCustomId('awiohdbawudwdwhduawdnuaw')
-                    .setTitle(`Definir segunda posição`);
-
-                const newnameboteN = new TextInputBuilder()
-                    .setCustomId('tokenMP')
-                    .setLabel(`VALOR`)
-                    .setPlaceholder(`Insira uma quantia, ex: 100`)
-                    .setValue(aa?.pos2?.valor == undefined ? '' : aa.pos2?.valor)
-                    .setStyle(TextInputStyle.Short)
-                    .setRequired(false)
-
-                const newnameboteN2 = new TextInputBuilder()
-                    .setCustomId('tokenMP2')
-                    .setLabel(`CARGO`)
-                    .setPlaceholder(`Insira um id de algum cargo`)
-                    .setValue(aa?.pos2?.role == undefined ? '' : aa.pos2?.role)
-                    .setStyle(TextInputStyle.Short)
-                    .setRequired(false)
-
-                const firstActionRow3 = new ActionRowBuilder().addComponents(newnameboteN);
-                const firstActionRow4 = new ActionRowBuilder().addComponents(newnameboteN2);
-
-                modalaAA.addComponents(firstActionRow3, firstActionRow4);
-
-                await interaction.showModal(modalaAA);
-            }
-
-            if (interaction.customId == 'Editarterceiraposição') {
-                const aa = configuracao.get(`posicoes`)
-                const modalaAA = new ModalBuilder()
-                    .setCustomId('uy82819171h172')
-                    .setTitle(`Definir terceira posição`);
-
-                const newnameboteN = new TextInputBuilder()
-                    .setCustomId('tokenMP')
-                    .setLabel(`VALOR`)
-                    .setPlaceholder(`Insira uma quantia, ex: 100`)
-                    .setValue(aa?.pos3?.valor == undefined ? '' : aa.pos3?.valor)
-                    .setStyle(TextInputStyle.Short)
-                    .setRequired(false)
-
-                const newnameboteN2 = new TextInputBuilder()
-                    .setCustomId('tokenMP2')
-                    .setLabel(`CARGO`)
-                    .setPlaceholder(`Insira um id de algum cargo`)
-                    .setValue(aa?.pos3?.role == undefined ? '' : aa.pos3?.role)
-                    .setStyle(TextInputStyle.Short)
-                    .setRequired(false)
-
-                const firstActionRow3 = new ActionRowBuilder().addComponents(newnameboteN);
-                const firstActionRow4 = new ActionRowBuilder().addComponents(newnameboteN2);
-
-                modalaAA.addComponents(firstActionRow3, firstActionRow4);
-
-                await interaction.showModal(modalaAA);
-            }
-            if (interaction.customId == 'todayyyy' || interaction.customId == '7daysss' || interaction.customId == '30dayss' || interaction.customId == 'totalrendimento' || interaction.customId == 'twoHours') {
-                let rendimento;
-                let name;
-                let embed;
-
-                if (interaction.customId == 'todayyyy') {
-                    rendimento = await EstatisticasKing.SalesToday();
-                    name = 'Resumo das vendas de hoje';
-                } else if (interaction.customId == '7daysss') {
-                    rendimento = await EstatisticasKing.SalesWeek();
-                    name = 'Resumo das vendas nos últimos 7 dias';
-                } else if (interaction.customId == '30dayss') {
-                    rendimento = await EstatisticasKing.SalesMonth();
-                    name = 'Resumo das vendas nos últimos 30 dias';
-                } else if (interaction.customId == 'totalrendimento') {
-                    rendimento = await EstatisticasKing.SalesTotal();
-                    name = 'Resumo geral de todas as vendas';
-                } else if (interaction.customId == 'twoHours') {
-                    rendimento = await EstatisticasKing.SalesLastTwoHours();
-                    name = 'Resumo das vendas das últimas 2 horas';
-                    {
-                        const cor = configuracao.get('Cores.Principal') || '5865F2';
-                        const accentColor = (() => { try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; } })();
-                        const statsContainer = new ContainerBuilder();
-                        statsContainer.setAccentColor(accentColor);
-                        statsContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-                            `## ${name}\n` +
-                            `**Rendimento:** \`R$ ${Number(rendimento.rendimentoTotal).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`\n` +
-                            `**Pedidos aprovados:** \`${rendimento.quantidadeTotal}\`\n` +
-                            `**Produtos entregues:** \`${rendimento.produtosEntregue}\`\n` +
-                            `**Usuários únicos:** \`${rendimento.usuarios.length}\``
-                        ));
-                        interaction.update({ content: '', components: [statsContainer], flags: MessageFlags.IsComponentsV2, embeds: [] });
-                    }
-                    return;
-                }
-
-                {
-                    const cor = configuracao.get('Cores.Principal') || '5865F2';
-                    const accentColor = (() => { try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; } })();
-                    const statsContainer = new ContainerBuilder();
-                    statsContainer.setAccentColor(accentColor);
-                    statsContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-                        `## ${name}\n` +
-                        `**Rendimento:** \`R$ ${Number(rendimento.rendimentoTotal).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`\n` +
-                        `**Pedidos aprovados:** \`${rendimento.quantidadeTotal}\`\n` +
-                        `**Produtos entregues:** \`${rendimento.produtosEntregue}\``
-                    ));
-                    interaction.update({ content: '', components: [statsContainer], flags: MessageFlags.IsComponentsV2, embeds: [] });
-                }
-            }
-
-            if (interaction.customId.startsWith('criarrrr')) {
-
-                const modalaAA = new ModalBuilder()
-                    .setCustomId('sdaju11111idsjjsdua')
-                    .setTitle(`Criação`);
-
-                const newnameboteN = new TextInputBuilder()
-                    .setCustomId('tokenMP')
-                    .setLabel(`NOME`)
-                    .setPlaceholder(`Insira o nome do seu produto`)
-                    .setStyle(TextInputStyle.Short)
-                    .setRequired(true)
-
-                const newnameboteN2 = new TextInputBuilder()
-                    .setCustomId('tokenMP2')
-                    .setLabel(`DESCRIÇÃO`)
-                    .setPlaceholder(`Insira uma descrição para seu produto`)
-                    .setStyle(TextInputStyle.Paragraph)
-                    .setRequired(false)
-                    .setMaxLength(1024)
-
-                const newnameboteN4 = new TextInputBuilder()
-                    .setCustomId('tokenMP3')
-                    .setLabel(`ENTREGA AUTOMÁTICA?`)
-                    .setPlaceholder(`Digite "sim" ou "não"`)
-                    .setStyle(TextInputStyle.Short)
-                    .setMaxLength(3)
-                    .setRequired(true)
-
-                const newnameboteN5 = new TextInputBuilder()
-                    .setCustomId('tokenMP4')
-                    .setLabel(`ICONE (OPCIONAL)`)
-                    .setPlaceholder(`Insira uma URL de uma imagem ou gif`)
-                    .setStyle(TextInputStyle.Short)
-                    .setRequired(false)
-
-                const newnameboteN6 = new TextInputBuilder()
-                    .setCustomId('tokenMP5')
-                    .setLabel(`BANNER (OPCIONAL)`)
-                    .setPlaceholder(`Insira uma URL de uma imagem ou gif`)
-                    .setStyle(TextInputStyle.Short)
-                    .setRequired(false)
-
-                const firstActionRow3 = new ActionRowBuilder().addComponents(newnameboteN);
-                const firstActionRow4 = new ActionRowBuilder().addComponents(newnameboteN2);
-                const firstActionRow5 = new ActionRowBuilder().addComponents(newnameboteN4);
-                const firstActionRow6 = new ActionRowBuilder().addComponents(newnameboteN5);
-                const firstActionRow7 = new ActionRowBuilder().addComponents(newnameboteN6);
-
-
-
-                modalaAA.addComponents(firstActionRow3, firstActionRow4, firstActionRow5, firstActionRow6, firstActionRow7);
-                await interaction.showModal(modalaAA);
-
-            }
 
             if (interaction.customId.startsWith('voltar1')) {
-
-                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
-
-                Painel(interaction, client)
-
+                const { buildEmbed, buildMainDropdown } = require('../../Functions/ConfigPainelBuilder');
+                const embed = buildEmbed(interaction, client);
+                await interaction.update({
+                    embeds: [embed],
+                    components: [buildMainDropdown(interaction.user.id)],
+                    content: '',
+                    flags: 0
+                });
             }
             
-            if (interaction.customId.startsWith('permcomprar')) {
-
-                configrole24(interaction, client)
-
-            }
 
             if (interaction.customId.startsWith('voltarMsgsConfig')) { //exemplo
 
@@ -1751,9 +1397,6 @@ module.exports = {
             if (interaction.customId === 'voltar_AcoesAutomaticsConfigs') {
                 AcoesAutomaticsConfigs(interaction, client)
             }
-            if (interaction.customId.startsWith('marca-qrcode')) {
-                configqrcode(interaction, client)
-            }
             if (interaction.customId.startsWith('actionsautomations')) { //exemplo
                 AcoesAutomaticsConfigs(interaction, client)
             }
@@ -1766,32 +1409,18 @@ module.exports = {
             }
 
             if (interaction.customId.startsWith('voltar3')) {
-
-                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
-
-                Gerenciar2(interaction, client)
-
+                await painelTicket(interaction, client);
             }
 
             if (interaction.customId.startsWith('voltar00')) {
-
-                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
-
-                Painel(interaction, client)
-
-            }
-
-
-            if (interaction.customId.startsWith('painelconfigvendas')) {
-
-                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
-
-                Gerenciar2(interaction, client)
-
-            }
-            if (interaction.customId.startsWith('voltarsendlogo')) {
-                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
-                Gerenciar2(interaction, client)
+                const { buildEmbed, buildMainDropdown } = require('../../Functions/ConfigPainelBuilder');
+                const embed = buildEmbed(interaction, client);
+                await interaction.update({
+                    embeds: [embed],
+                    components: [buildMainDropdown(interaction.user.id)],
+                    content: '',
+                    flags: 0
+                });
             }
             if (interaction.customId == "botaoduvidas") {
 
@@ -1872,27 +1501,6 @@ module.exports = {
 
                 modal.addComponents(mensagem, nomebotao, linkbotao)
                 await interaction.showModal(modal)
-            }
-            if (interaction.customId == "qrcode-pisicao") {
-
-                const selectmenu = new ActionRowBuilder().addComponents(
-                    new StringSelectMenuBuilder()
-                        .setCustomId(`qrcode-posicao`)
-                        .setPlaceholder('Selecione uma posição')
-                        .setMaxValues(1)
-                        .addOptions(
-                            new StringSelectMenuOptionBuilder()
-                                .setLabel(`Miniatura do Embed`)
-                                .setDescription(`O QR code ficará na miniatura do embed no checkout.`)
-                                .setValue('miniatura'),
-                            new StringSelectMenuOptionBuilder()
-                                .setLabel(`Imagem do Embed`)
-                                .setDescription(`O QR code ficará na imagem do embed no checkout.`)
-                                .setValue('imagem'),
-                        )
-                )
-
-                await interaction.update({ content: ``, embeds: [], components: [selectmenu] })
             }
             if (interaction.customId == "voltarProtect") {
                 await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
@@ -2440,12 +2048,6 @@ module.exports = {
             }
         }
         if (interaction.isStringSelectMenu()) {
-            if (interaction.customId === 'qrcode-posicao') {
-                let posicao = interaction.values[0];
-                configuracao.set(`pagamentos.QRCode`, posicao);
-                await configqrcode(interaction, client);
-                await interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Posição do QR Code alterada.`, ephemeral: true });
-            }
             if (interaction.customId === 'select_AcoesAutomaticsConfigs') {
                 const customId = interaction.values[0];
                 if (customId === 'automaticRepostar') {

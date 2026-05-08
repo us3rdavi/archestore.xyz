@@ -1,6 +1,5 @@
 const { ButtonBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require("discord.js");
 const { configuracao } = require("../DataBaseJson");
-const { Painel, Gerenciar2 } = require("../Functions/Painel");
 
 async function protectConfig(interaction, client) {
 

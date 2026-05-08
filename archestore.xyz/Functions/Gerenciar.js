@@ -52,9 +52,8 @@ async function Gerenciar(interaction, client) {
                 .setStyle(2),
             new ButtonBuilder()
                 .setCustomId('voltar1')
-                .setEmoji('1371580875615113307')
-                .setDisabled(true)
-                .setStyle(1)
+                .setEmoji({ id: '1371593637179297923' })
+                .setStyle(2)
         );
 
         container.addActionRowComponents(row1);

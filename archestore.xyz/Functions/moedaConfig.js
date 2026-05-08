@@ -2,15 +2,21 @@ const {
     ActionRowBuilder, StringSelectMenuBuilder,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require("discord.js");
-const { configuracao } = require("../DataBaseJson");
+const { configuracao, Emojis } = require("../DataBaseJson");
+
+function getAccentColor() {
+    const cor = configuracao.get('Cores.Principal') || '5865F2';
+    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
+}
 
 async function moedaConfig(interaction, client) {
     const container = new ContainerBuilder();
-    container.setAccentColor(0x5865F2);
+    container.setAccentColor(getAccentColor());
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-            `## Configuração de Moeda\nSelecione a moeda padrão para os pagamentos.`
+            `## ${Emojis.get('_money_emoji')} Configuração de Moeda\n` +
+            `Selecione a moeda padrão para os pagamentos do servidor.`
         )
     );
 
@@ -22,13 +28,15 @@ async function moedaConfig(interaction, client) {
             .addOptions(
                 {
                     value: 'realBRL',
-                    label: 'Real Brasileiro',
-                    emoji: '<:loja:1371559113905016914>'
+                    label: 'Real Brasileiro (BRL)',
+                    description: 'Pagamentos em Real Brasileiro via Pix/EFI',
+                    emoji: { id: '1501803982849445998' }
                 },
                 {
                     value: 'dolarUSD',
                     label: 'Dólar Americano (indisponível)',
-                    emoji: '<:_money_emoji:1371605504601882664>'
+                    description: 'Em breve disponível',
+                    emoji: { id: '1501803982849445998' }
                 }
             )
             .setPlaceholder('Clique aqui para selecionar a moeda')
@@ -37,7 +45,7 @@ async function moedaConfig(interaction, client) {
 
     container.addActionRowComponents(selectRow);
 
-    interaction.editReply({
+    await interaction.editReply({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
         content: '',

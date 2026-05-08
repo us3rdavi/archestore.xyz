@@ -2,7 +2,7 @@ const {
     ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require("discord.js");
-const { configuracao, perms } = require("../DataBaseJson");
+const { configuracao, perms, Emojis } = require("../DataBaseJson");
 
 function getAccentColor() {
     const cor = configuracao.get('Cores.Principal') || '5865F2';
@@ -20,7 +20,7 @@ async function gerenciarPerms(interaction, client) {
         : `${interaction.user}, abaixo você pode gerenciar as pessoas que podem gerenciar o **${client.user.username}**.\n\n**Usuários com permissão:**\n${permsusers}`;
 
     container.addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`## Permissões\n${descricao}`)
+        new TextDisplayBuilder().setContent(`## ${Emojis.get('permissions_emoji')} Permissões\n${descricao}`)
     );
 
     container.addSeparatorComponents(new SeparatorBuilder());

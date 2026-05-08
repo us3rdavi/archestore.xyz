@@ -4,9 +4,7 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ModalBuilder, TextInputBu
 const { produtos, configuracao, Emojis } = require("../../DataBaseJson");
 const { QuickDB } = require("quick.db");
 const { GerenciarCampos, GerenciarCampos2 } = require("../../Functions/GerenciarCampos");
-const { MessageStock } = require("../../Functions/ConfigEstoque.js");
 const { UpdateMessageProduto } = require("../../Functions/SenderMessagesOrUpdates");
-const { Gerenciar2 } = require("../../Functions/Painel.js");
 const axios = require("axios")
 const db = new QuickDB();
 
@@ -858,19 +856,6 @@ if (interaction.customId === 'estoquearquivo') {
             }
 
 
-            if (interaction.customId == 'addestoquecampos') {
-
-
-                MessageStock(interaction)
-            }
-
-            if (interaction.customId == 'excluirproduto') {
-                const ggg = await db.get(interaction.message.id)
-
-                await produtos.delete(`${ggg.name}`)
-                await Gerenciar2(interaction, client)
-                interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} | Produto excluído com sucesso!`, ephemeral: true })
-            }
 
 
             if (interaction.customId == 'gwdawdwadawawderenciarcampossss') {

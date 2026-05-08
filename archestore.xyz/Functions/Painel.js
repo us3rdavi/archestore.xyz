@@ -2,93 +2,66 @@ const {
     ActionRowBuilder, ButtonBuilder,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require("discord.js");
-const { produtos, configuracao, Emojis } = require("../DataBaseJson");
-const startTime = Date.now();
-const maxMemory = 100;
-const usedMemory = process.memoryUsage().heapUsed / 1024 / 1024;
-const memoryUsagePercentage = (usedMemory / maxMemory) * 100;
-const roundedPercentage = Math.min(100, Math.round(memoryUsagePercentage));
+const { configuracao, Emojis } = require("../DataBaseJson");
 
-async function Painel(interaction, client, config = { email: "" }) {
+function getAccentColor() {
+    const cor = configuracao.get('Cores.Principal') || '5865F2';
+    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
+}
+
+async function Painel(interaction, client) {
     try {
-        const status = configuracao.get("vendasstatus") || false;
-        const corPrincipal = configuracao.get('Cores.Principal') || '5865F2';
-        let accentColor = 0x5865F2;
-        try { accentColor = parseInt(corPrincipal.replace('#', ''), 16); } catch (e) {}
-
         const container = new ContainerBuilder();
-        container.setAccentColor(accentColor);
+        container.setAccentColor(getAccentColor());
 
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(
-                `## ${Emojis.get('dream')} Painel de Configuração\n` +
+                `## ${Emojis.get('_settings_emoji')} Painel de Configuração\n` +
                 `Olá **${interaction.user.displayName || interaction.user.username}**, bem-vindo ao painel de configuração.\n\n` +
-                `-# Loja: \`${status ? 'Ativa' : 'Inativa'}\``
+                `-# Use o menu abaixo para navegar pelas categorias.`
             )
         );
 
         container.addSeparatorComponents(new SeparatorBuilder());
 
-        const row2 = new ActionRowBuilder()
-            .addComponents(
-                new ButtonBuilder()
-                    .setCustomId("onoffvendas")
-                    .setLabel(status ? "Desativar Loja" : "Ativar Loja")
-                    .setEmoji("1371605368827940875")
-                    .setStyle(status ? 4 : 3),
-                new ButtonBuilder()
-                    .setCustomId("painelconfigvendas")
-                    .setLabel('Loja')
-                    .setEmoji("1371593620515328114")
-                    .setStyle(1),
-                new ButtonBuilder()
-                    .setCustomId("painelconfigticket")
-                    .setLabel("Central de Atendimento")
-                    .setEmoji("1371593631328243713")
-                    .setStyle(1),
-                new ButtonBuilder()
-                    .setCustomId("painelpersonalizar")
-                    .setLabel('Meu Bot Designer')
-                    .setEmoji("1371577449321726002")
-                    .setStyle(1),
-            );
+        const row1 = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId("painelconfigticket")
+                .setLabel("Central de Atendimento")
+                .setEmoji("1371593631328243713")
+                .setStyle(1),
+            new ButtonBuilder()
+                .setCustomId("painelpersonalizar")
+                .setLabel('Meu Bot Designer')
+                .setEmoji("1501804122943389716")
+                .setStyle(1),
+        );
 
-        const row3 = new ActionRowBuilder()
-            .addComponents(
-                new ButtonBuilder()
-                    .setCustomId("gerenciarconfigs")
-                    .setLabel('Definições')
-                    .setEmoji("1371571230041178125")
-                    .setStyle(2),
-                new ButtonBuilder()
-                    .setCustomId("permcomprar")
-                    .setLabel("Autorização")
-                    .setEmoji("1371577447031640124")
-                    .setStyle(2),
-                new ButtonBuilder()
-                    .setCustomId("configavançadas24")
-                    .setLabel('Proteção')
-                    .setEmoji("1371593625112285208")
-                    .setStyle(2),
-            );
+        const row2 = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId("gerenciarconfigs")
+                .setLabel('Definições')
+                .setEmoji("1371571230041178125")
+                .setStyle(2),
+            new ButtonBuilder()
+                .setCustomId("configavançadas24")
+                .setLabel('Proteção')
+                .setEmoji("1371593625112285208")
+                .setStyle(2),
+            new ButtonBuilder()
+                .setCustomId("eaffaawwawa")
+                .setLabel('Automações')
+                .setEmoji("1371572539213611090")
+                .setStyle(2),
+            new ButtonBuilder()
+                .setCustomId("actionsautomations")
+                .setLabel('Moderação')
+                .setEmoji("1501804067616325723")
+                .setStyle(2),
+        );
 
-        const row4 = new ActionRowBuilder()
-            .addComponents(
-                new ButtonBuilder()
-                    .setCustomId("eaffaawwawa")
-                    .setLabel('Automações')
-                    .setEmoji("1371572539213611090")
-                    .setStyle(2),
-                new ButtonBuilder()
-                    .setCustomId("actionsautomations")
-                    .setLabel('Moderação')
-                    .setEmoji("1501804067616325723")
-                    .setStyle(2),
-            );
-
+        container.addActionRowComponents(row1);
         container.addActionRowComponents(row2);
-        container.addActionRowComponents(row3);
-        container.addActionRowComponents(row4);
 
         await interaction.editReply({
             components: [container],
@@ -107,149 +80,25 @@ async function Painel(interaction, client, config = { email: "" }) {
 
 async function Gerenciar2(interaction, client) {
     try {
-        const ggg = produtos.valueArray();
-        const corPrincipal = configuracao.get('Cores.Principal') || '#5865F2';
-        let accentColor = 0x5865F2;
-        try { accentColor = parseInt(corPrincipal.replace('#', ''), 16); } catch (e) {}
-
-        const container = new ContainerBuilder();
-        container.setAccentColor(accentColor);
-
-        container.addTextDisplayComponents(
-            new TextDisplayBuilder().setContent(
-                `## ${Emojis.get('dream')} - **Painel De Administração**\n` +
-                `Senhor(a) **${interaction.user.username}**, escolha o que deseja fazer.\n\n` +
-                `**${Emojis.get('deliveredorder_emoji')} Total de produtos fornecidos:** ${ggg.length}\n` +
-                `**${Emojis.get('brand_emoji')} Moeda Padrão:** ${configuracao.get("pagamentos.moeda") === "BRL" ? "\`BRL\` - \`pt_BR\`" : "\`USD\` - \`es_CO\`"}`
-            )
-        );
-
-        if (configuracao.get(`Instrucoes.mensagem`)) {
-            const instrucoes = configuracao.get(`Instrucoes`);
-            container.addSeparatorComponents(new SeparatorBuilder());
-            container.addTextDisplayComponents(
-                new TextDisplayBuilder().setContent(
-                    `**Instruções ao Cliente**\n-# Mensagem Após a Entrega\n${instrucoes.mensagem}\n-# Nome do Botão:\n${instrucoes.nomebotao}\n-# Link do Botão:\n${instrucoes.linkbotao}`
-                )
-            );
-        }
-
-        container.addSeparatorComponents(new SeparatorBuilder());
-
-        const row2 = new ActionRowBuilder()
-            .addComponents(
-                new ButtonBuilder()
-                    .setCustomId("criarrrr")
-                    .setLabel('Criar')
-                    .setEmoji("1371593623514124510")
-                    .setStyle(1),
-                new ButtonBuilder()
-                    .setCustomId("gerenciarotemae")
-                    .setLabel('Gerenciar')
-                    .setEmoji("1371593617868591185")
-                    .setStyle(1),
-                new ButtonBuilder()
-                    .setCustomId("gerenciarposicao")
-                    .setLabel('Posições')
-                    .setEmoji("1371593619584192613")
-                    .setStyle(1)
-            );
-
-        const row3 = new ActionRowBuilder()
-            .addComponents(
-                new ButtonBuilder()
-                    .setCustomId("marca-qrcode")
-                    .setLabel("Marca")
-                    .setEmoji("1371593616325218334")
-                    .setStyle(1),
-                new ButtonBuilder()
-                    .setCustomId(`altMoeda`)
-                    .setLabel(`Moeda`)
-                    .setEmoji("1371593627477737502")
-                    .setStyle(1),
-                new ButtonBuilder()
-                    .setCustomId(`${interaction.user.id}_discohookconfig`)
-                    .setLabel("Termos")
-                    .setEmoji("1371593612386635887")
-                    .setStyle(1),
-                new ButtonBuilder()
-                    .setCustomId(`extensoes`)
-                    .setLabel(`Extensões`)
-                    .setEmoji("1371593612277710890")
-                    .setDisabled(true)
-                    .setStyle(1),
-            );
-
-        const row4 = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setCustomId("definirinstrucoes")
-                .setLabel(`instruções Para o Cliente`)
-                .setEmoji("1371593624852234280")
-                .setStyle(2),
-            new ButtonBuilder()
-                .setCustomId("definirduvidas")
-                .setLabel(`Botão de Dúvidas`)
-                .setEmoji("1501804124277051593")
-                .setStyle(2),
-        );
-
-        const row5 = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setCustomId("rendimento")
-                .setLabel('Registros De Vendas')
-                .setEmoji("1371593628069396591")
-                .setStyle(2),
-        );
-
-        const botoesvoltar = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setCustomId("voltar00")
-                .setEmoji("1371593637179297923")
-                .setStyle(2),
-            new ButtonBuilder()
-                .setCustomId(`voltar1`)
-                .setEmoji("1371580875615113307")
-                .setDisabled(true)
-                .setStyle(1)
-        );
-
-        container.addActionRowComponents(row2);
-        container.addActionRowComponents(row3);
-        container.addActionRowComponents(row4);
-        container.addActionRowComponents(row5);
-        container.addActionRowComponents(botoesvoltar);
-
-        await interaction.editReply({
-            components: [container],
-            flags: MessageFlags.IsComponentsV2,
-            content: '',
-            embeds: []
-        });
+        await interaction.editReply({ content: `${Emojis.get('negative_emoji')} Sistema de loja interna foi desativado.`, embeds: [], components: [] });
     } catch (error) {
         console.error("Erro na função Gerenciar2:", error);
-        try {
-            await interaction.editReply("Ocorreu um erro ao carregar o painel.");
-        } catch (e) {}
     }
 }
 
 async function definirduvidas(interaction, client) {
     try {
         const infoduvidas = configuracao.get(`BotaoDuvidas`);
-        const corPrincipal = configuracao.get('Cores.Principal') || '#5865F2';
-        let accentColor = 0x5865F2;
-        try { accentColor = parseInt(corPrincipal.replace('#', ''), 16); } catch (e) {}
-
         const container = new ContainerBuilder();
-        container.setAccentColor(accentColor);
+        container.setAccentColor(getAccentColor());
 
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(
-                `## ${Emojis.get('dream')} - Botão de Dúvidas\n` +
+                `## ${Emojis.get('question_emoji')} Botão de Dúvidas\n` +
                 `Senhor(a) **${interaction.user.username}**, configure o botão de dúvidas.\n\n` +
-                `**Nome do Botão:** \`${infoduvidas?.nomebotao ? infoduvidas.nomebotao : 'Não Defindo'}\`\n` +
-                `**Emoji do Botão:** ${infoduvidas?.emoji ? infoduvidas.emoji : '`Sem Emoji`'}\n` +
-                `**Link do Botão:** ${infoduvidas?.linkbotao ? infoduvidas.linkbotao : '`Não Defindo`'}`
+                `**${Emojis.get('_text_emoji')} Nome do Botão:** \`${infoduvidas?.nomebotao ? infoduvidas.nomebotao : 'Não Definido'}\`\n` +
+                `**${Emojis.get('_lapis_emoji')} Emoji do Botão:** ${infoduvidas?.emoji ? infoduvidas.emoji : '`Sem Emoji`'}\n` +
+                `**${Emojis.get('_send_emoji')} Link do Botão:** ${infoduvidas?.linkbotao ? infoduvidas.linkbotao : '`Não Definido`'}`
             )
         );
 
@@ -258,36 +107,42 @@ async function definirduvidas(interaction, client) {
         const botao = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId('ativarbotaoduvidas')
-                .setLabel(`${infoduvidas?.status ? `Botão Ativado` : `Botão Desativado`} `)
-                .setEmoji(Emojis.get(`_transfer_emoji`))
+                .setLabel(`${infoduvidas?.status ? `Botão Ativado` : `Botão Desativado`}`)
+                .setEmoji({ id: '1371605368827940875' })
                 .setStyle(infoduvidas?.status ? 3 : 4),
             new ButtonBuilder()
                 .setCustomId('botaoduvidas')
                 .setLabel('Definir botão de dúvidas')
-                .setEmoji(Emojis.get(`_staff_emoji`))
+                .setEmoji({ id: '1501804003850322052' })
                 .setStyle(2),
         );
 
         const botao2 = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId("voltar3")
-                .setEmoji(`1238413255886639104`)
+                .setEmoji({ id: '1501803908589162537' })
                 .setStyle(2),
             new ButtonBuilder()
                 .setCustomId(`voltar1`)
-                .setEmoji('1371580875615113307')
-                .setStyle(1)
+                .setEmoji({ id: '1371593637179297923' })
+                .setStyle(2)
         );
 
         container.addActionRowComponents(botao);
         container.addActionRowComponents(botao2);
 
-        await interaction.update({
+        const payload = {
             components: [container],
             flags: MessageFlags.IsComponentsV2,
             content: '',
             embeds: []
-        });
+        };
+
+        if (interaction.deferred || interaction.replied) {
+            await interaction.editReply(payload);
+        } else {
+            await interaction.update(payload);
+        }
     } catch (error) {
         console.error("Erro na função definirduvidas:", error);
         try {
@@ -295,19 +150,6 @@ async function definirduvidas(interaction, client) {
                 await interaction.reply({ content: "Ocorreu um erro.", ephemeral: true });
             }
         } catch (e) {}
-    }
-}
-
-function getGreeting() {
-    const now = new Date();
-    const brtHours = (now.getUTCHours() - 3 + 24) % 24;
-
-    if (brtHours >= 18 || brtHours < 4) {
-        return 'Boa noite';
-    } else if (brtHours >= 12) {
-        return 'Boa tarde';
-    } else {
-        return 'Bom dia';
     }
 }
 
