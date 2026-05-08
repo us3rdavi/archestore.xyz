@@ -3,7 +3,7 @@ const {
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MediaGalleryBuilder,
     MessageFlags
 } = require("discord.js");
-const { tickets } = require("../DataBaseJson");
+const { tickets, configuracao } = require("../DataBaseJson");
 const emojis = require("../DataBaseJson/Emojis.json");
 const Emojis = { get: (name) => emojis[name] || "" };
 
@@ -191,8 +191,11 @@ async function painelConfiguracaoTicket(interaction) {
     const mensagemInicial = tickets.get('tickets.mensagemInicial') || {};
     const mensagemFinal = tickets.get('tickets.mensagemFinalizacao') || {};
 
+    let accentColorCfg = 0x5865F2;
+    try { accentColorCfg = parseInt((configuracao.get('Cores.Principal') || '5865F2').replace('#', ''), 16); } catch (e) {}
+
     const container = new ContainerBuilder();
-    container.setAccentColor(0x5865F2);
+    container.setAccentColor(accentColorCfg);
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(`## ${Emojis.get('_settings_emoji')} Configuração\nGerencie canais, cargos e mensagens do sistema de tickets.`)

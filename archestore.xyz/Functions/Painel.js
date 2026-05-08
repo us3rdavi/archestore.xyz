@@ -120,11 +120,8 @@ async function definirduvidas(interaction, client) {
         const botao2 = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId("voltar3")
+                .setLabel('Voltar ao Atendimento')
                 .setEmoji({ id: '1501803908589162537' })
-                .setStyle(2),
-            new ButtonBuilder()
-                .setCustomId(`voltar1`)
-                .setEmoji({ id: '1371593637179297923' })
                 .setStyle(2)
         );
 

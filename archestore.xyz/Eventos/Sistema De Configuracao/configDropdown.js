@@ -1,5 +1,5 @@
-const { buildEmbed, buildMainDropdown, buildSubDropdown, getAccentColor } = require('../../Functions/ConfigPainelBuilder');
-const { Emojis, tickets, configuracao } = require('../../DataBaseJson');
+const { buildMainPanel, buildSubPanel, getAccentColor } = require('../../Functions/ConfigPainelBuilder');
+const { Emojis, tickets } = require('../../DataBaseJson');
 const {
     ActionRowBuilder, ChannelSelectMenuBuilder, ChannelType,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, ButtonBuilder, MessageFlags
@@ -13,39 +13,34 @@ module.exports = {
             const { customId } = interaction;
             if (!customId) return;
 
-            // Nível 1: seleção de categoria principal
             if (interaction.isStringSelectMenu() && customId.startsWith('config_main_')) {
                 const userId = customId.slice('config_main_'.length);
                 if (userId !== interaction.user.id) return;
-
                 const category = interaction.values[0];
-                const embed = buildEmbed(interaction, client);
-
                 await interaction.update({
-                    embeds: [embed],
-                    components: [buildSubDropdown(userId, category)],
+                    components: [buildSubPanel(userId, category)],
+                    flags: MessageFlags.IsComponentsV2,
+                    embeds: [],
+                    content: ''
                 });
                 return;
             }
 
-            // Nível 2: seleção de sub-opção
             if (interaction.isStringSelectMenu() && customId.startsWith('config_sub_')) {
                 const userId = customId.slice('config_sub_'.length);
                 if (userId !== interaction.user.id) return;
-
                 const sub = interaction.values[0];
 
-                // Voltar ao menu principal
                 if (sub === 'home') {
-                    const embed = buildEmbed(interaction, client);
                     await interaction.update({
-                        embeds: [embed],
-                        components: [buildMainDropdown(userId)],
+                        components: [buildMainPanel(userId, interaction)],
+                        flags: MessageFlags.IsComponentsV2,
+                        embeds: [],
+                        content: ''
                     });
                     return;
                 }
 
-                // Sistema de formulários — ephemeral separado
                 if (sub === 'form_create' || sub === 'form_manage') {
                     await interaction.deferReply({ ephemeral: true });
                     const { handleFormAction } = require('./formulariosHandler.js');
@@ -53,7 +48,6 @@ module.exports = {
                     return;
                 }
 
-                // --- ATENDIMENTO ---
                 if (sub === 'atendimento_config') {
                     const { painelTicket } = require('../../Functions/PainelTickets.js');
                     await painelTicket(interaction, false);
@@ -64,7 +58,6 @@ module.exports = {
                     const funcoes = tickets.get('tickets.funcoes');
                     const aparencia = tickets.get('tickets.aparencia');
                     if (!funcoes || Object.keys(funcoes).length === 0 || !aparencia || Object.keys(aparencia).length === 0) {
-                        await interaction.deferUpdate();
                         const container = new ContainerBuilder();
                         container.setAccentColor(getAccentColor());
                         container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
@@ -72,29 +65,47 @@ module.exports = {
                             `${Emojis.get('negative_emoji')} Configure as funções e aparência do ticket antes de postar.\n\n` +
                             `-# Acesse **Configurar Tickets** primeiro.`
                         ));
-                        await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] });
+                        container.addSeparatorComponents(new SeparatorBuilder());
+                        container.addActionRowComponents(new ActionRowBuilder().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId('voltar1')
+                                .setLabel('Menu Principal')
+                                .setEmoji({ id: '1371593637179297923' })
+                                .setStyle(2)
+                        ));
+                        await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] });
                         return;
                     }
-                    const selectCanal = new ChannelSelectMenuBuilder()
-                        .setCustomId('canalpostarticket')
-                        .setPlaceholder('Selecione o canal para postar o painel de tickets')
-                        .setChannelTypes(ChannelType.GuildText);
-                    await interaction.update({
-                        content: `${Emojis.get('_ticket_emoji')} Selecione o canal onde quer postar o painel de tickets.`,
-                        components: [new ActionRowBuilder().addComponents(selectCanal)],
-                        embeds: []
-                    });
+                    const container = new ContainerBuilder();
+                    container.setAccentColor(getAccentColor());
+                    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                        `## ${Emojis.get('_ticket_emoji')} Postar Painel de Tickets\n` +
+                        `Selecione o canal onde deseja postar o painel de abertura de tickets.`
+                    ));
+                    container.addSeparatorComponents(new SeparatorBuilder());
+                    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+                        new ChannelSelectMenuBuilder()
+                            .setCustomId('canalpostarticket')
+                            .setPlaceholder('Selecione o canal...')
+                            .setChannelTypes(ChannelType.GuildText)
+                    ));
+                    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId('voltar1')
+                            .setLabel('Menu Principal')
+                            .setEmoji({ id: '1371593637179297923' })
+                            .setStyle(2)
+                    ));
+                    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] });
                     return;
                 }
 
-                // --- PROTEÇÃO ---
                 if (sub === 'protecao_config') {
                     const { Avançados } = require('../../Functions/Avancados.js');
                     await Avançados(interaction, client);
                     return;
                 }
 
-                // --- AUTOMAÇÕES ---
                 if (sub === 'automacoes_msgs') {
                     const { AcoesMsgsAutomatics } = require('../../Functions/ConfigMsgsAutomatics.js');
                     await AcoesMsgsAutomatics(interaction, client);
@@ -107,14 +118,12 @@ module.exports = {
                     return;
                 }
 
-                // --- MODERAÇÃO ---
                 if (sub === 'moderacao_config') {
                     const { AcoesAutomaticsConfigs } = require('../../Functions/AcoesAutomatics.js');
                     await AcoesAutomaticsConfigs(interaction, client);
                     return;
                 }
 
-                // --- PERSONALIZAÇÃO ---
                 if (sub === 'personalizacao_designer') {
                     const container = new ContainerBuilder();
                     container.setAccentColor(getAccentColor());
@@ -133,7 +142,14 @@ module.exports = {
                             .setCustomId('coresembeds')
                             .setLabel('Cores dos Embeds')
                             .setEmoji({ id: '1501804003850322052' })
-                            .setStyle(2),
+                            .setStyle(2)
+                    ));
+                    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId('voltar1')
+                            .setLabel('Menu Principal')
+                            .setEmoji({ id: '1371593637179297923' })
+                            .setStyle(2)
                     ));
                     await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] });
                     return;
@@ -145,7 +161,6 @@ module.exports = {
                     return;
                 }
 
-                // --- PERMISSÕES ---
                 if (sub === 'permissoes_config') {
                     await interaction.deferUpdate();
                     const { gerenciarPerms } = require('../../Functions/modUsersPerms.js');
@@ -153,7 +168,6 @@ module.exports = {
                     return;
                 }
 
-                // --- DEFINIÇÕES ---
                 if (sub === 'definicoes_gerais') {
                     const { Gerenciar } = require('../../Functions/Gerenciar.js');
                     await Gerenciar(interaction, client);
@@ -164,6 +178,12 @@ module.exports = {
                     await interaction.deferUpdate();
                     const { moedaConfig } = require('../../Functions/moedaConfig.js');
                     await moedaConfig(interaction, client);
+                    return;
+                }
+
+                if (sub === 'definicoes_auditlog') {
+                    const { showAuditLogPanel } = require('./auditLogConfig.js');
+                    await showAuditLogPanel(interaction, client);
                     return;
                 }
             }

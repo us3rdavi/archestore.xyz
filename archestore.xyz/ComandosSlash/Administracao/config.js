@@ -1,7 +1,7 @@
-const { PermissionFlagsBits, ApplicationCommandType } = require('discord.js');
+const { PermissionFlagsBits, ApplicationCommandType, MessageFlags } = require('discord.js');
 const { getPermissions } = require('../../Functions/PermissionsCache.js');
 const { Emojis } = require('../../DataBaseJson');
-const { buildEmbed, buildMainDropdown } = require('../../Functions/ConfigPainelBuilder');
+const { buildMainPanel } = require('../../Functions/ConfigPainelBuilder');
 
 module.exports = {
     name: 'config',
@@ -21,10 +21,11 @@ module.exports = {
 
             await interaction.deferReply({ ephemeral: true });
 
-            const embed = buildEmbed(interaction, client);
             await interaction.editReply({
-                embeds: [embed],
-                components: [buildMainDropdown(interaction.user.id)],
+                components: [buildMainPanel(interaction.user.id, interaction)],
+                flags: MessageFlags.IsComponentsV2,
+                embeds: [],
+                content: ''
             });
         } catch (err) {
             console.error('[Config] Erro:', err);

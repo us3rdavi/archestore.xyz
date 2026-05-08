@@ -42,33 +42,30 @@ async function AcoesRepostAutomatics(interaction, client) {
 
     container.addSeparatorComponents(new SeparatorBuilder());
 
-    const row2 = new ActionRowBuilder().addComponents(
+    const row1 = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId("setTimeRepost")
             .setLabel('Definir horário')
-            .setEmoji('1371605573296193656')
+            .setEmoji({ id: '1371605573296193656' })
             .setStyle(ButtonStyle.Primary)
             .setDisabled(!currentStatus),
         new ButtonBuilder()
             .setCustomId(currentStatus ? "desabilityRepost" : "enableRepost")
             .setLabel(currentStatus ? 'Desabilitar função' : 'Habilitar função')
-            .setEmoji('1371605573296193656')
+            .setEmoji({ id: '1371605573296193656' })
             .setStyle(currentStatus ? ButtonStyle.Danger : ButtonStyle.Success)
     );
 
-    const botoesvoltar = new ActionRowBuilder().addComponents(
+    const row2 = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId("voltar_AcoesAutomaticsConfigs")
-            .setEmoji('1371605354605051996')
-            .setStyle(2),
-        new ButtonBuilder()
-            .setCustomId('voltar1')
-            .setEmoji('1371605354605051996')
-            .setStyle(1)
+            .setLabel('Voltar')
+            .setEmoji({ id: '1371605354605051996' })
+            .setStyle(2)
     );
 
+    container.addActionRowComponents(row1);
     container.addActionRowComponents(row2);
-    container.addActionRowComponents(botoesvoltar);
 
     await interaction.update({
         components: [container],
@@ -78,4 +75,4 @@ async function AcoesRepostAutomatics(interaction, client) {
     });
 }
 
-module.exports = { AcoesRepostAutomatics }
+module.exports = { AcoesRepostAutomatics };

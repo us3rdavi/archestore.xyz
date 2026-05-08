@@ -16,42 +16,37 @@ async function Gerenciar(interaction, client) {
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(
                 `## ${Emojis.get('_settings_emoji')} Definições\n` +
-                `Gerencie as configurações do bot.`
+                `Gerencie as configurações gerais do bot.`
             )
         );
 
         container.addSeparatorComponents(new SeparatorBuilder());
 
-        const row1 = new ActionRowBuilder()
-            .addComponents(
-                new ButtonBuilder()
-                    .setCustomId('configcargos')
-                    .setLabel('Cargos')
-                    .setEmoji(Emojis.get('_multi_silueta_emoji'))
-                    .setStyle(2),
-                new ButtonBuilder()
-                    .setCustomId('personalizarcanais')
-                    .setLabel('Canais')
-                    .setEmoji(Emojis.get('_camp_emoji'))
-                    .setStyle(2),
-            );
+        const row1 = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId('configcargos')
+                .setLabel('Cargos')
+                .setEmoji({ id: '1371593623514124510' })
+                .setStyle(2),
+            new ButtonBuilder()
+                .setCustomId('personalizarcanais')
+                .setLabel('Canais')
+                .setEmoji({ id: '1371593613665894562' })
+                .setStyle(2)
+        );
 
-        const row2 = new ActionRowBuilder()
-            .addComponents(
-                new ButtonBuilder()
-                    .setCustomId('formasdepagamentos')
-                    .setLabel('Formas de Pagamento')
-                    .setEmoji(Emojis.get('_money_emoji'))
-                    .setStyle(1),
-            );
+        const row2 = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId('formasdepagamentos')
+                .setLabel('Formas de Pagamento')
+                .setEmoji({ id: '1371593627477737502' })
+                .setStyle(1)
+        );
 
         const row3 = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
-                .setCustomId('voltar00')
-                .setEmoji(Emojis.get('_back_emoji'))
-                .setStyle(2),
-            new ButtonBuilder()
                 .setCustomId('voltar1')
+                .setLabel('Menu Principal')
                 .setEmoji({ id: '1371593637179297923' })
                 .setStyle(2)
         );

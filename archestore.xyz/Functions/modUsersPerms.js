@@ -10,7 +10,7 @@ function getAccentColor() {
 }
 
 async function gerenciarPerms(interaction, client) {
-    const permsusers = perms.all().map((entry, index) => `**${index + 1}** - (<@${entry.ID}> | \`${entry.ID}\`)`).join('\n');
+    const permsusers = perms.all().map((entry, index) => `**${index + 1}** — (<@${entry.ID}> | \`${entry.ID}\`)`).join('\n');
 
     const container = new ContainerBuilder();
     container.setAccentColor(getAccentColor());
@@ -29,22 +29,31 @@ async function gerenciarPerms(interaction, client) {
         new StringSelectMenuBuilder()
             .setCustomId('selectAdd&RemPerm')
             .addOptions(
-                { value: 'addPermUser', label: 'Adicionar', description: 'Adicionar um usuário que ainda não tem permissão', emoji: '1238417761554927617' },
-                { value: 'remPermUser', label: 'Remover', description: 'Remover um usuário que tem permissão', emoji: '1237188370116120606' }
+                { value: 'addPermUser', label: 'Adicionar', description: 'Adicionar um usuário que ainda não tem permissão', emoji: { id: '1238417761554927617' } },
+                { value: 'remPermUser', label: 'Remover', description: 'Remover um usuário que tem permissão', emoji: { id: '1237188370116120606' } }
             )
             .setPlaceholder('Clique aqui para redefinir as permissões')
             .setMaxValues(1)
     );
 
     const rowConfigUsers2 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId("resetPerms").setLabel('Resetar').setEmoji("1371593630707613846").setStyle(4).setDisabled(false),
-        new ButtonBuilder().setCustomId("voltarProtect").setLabel("Voltar").setEmoji("1371593637179297923").setStyle(2)
+        new ButtonBuilder()
+            .setCustomId("resetPerms")
+            .setLabel('Resetar')
+            .setEmoji({ id: '1371593630707613846' })
+            .setStyle(4)
+            .setDisabled(false),
+        new ButtonBuilder()
+            .setCustomId("voltar1")
+            .setLabel("Menu Principal")
+            .setEmoji({ id: '1371593637179297923' })
+            .setStyle(2)
     );
 
     container.addActionRowComponents(rowConfigUsers);
     container.addActionRowComponents(rowConfigUsers2);
 
-    interaction.editReply({
+    await interaction.editReply({
         content: '',
         components: [container],
         flags: MessageFlags.IsComponentsV2,

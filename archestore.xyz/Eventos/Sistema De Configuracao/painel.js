@@ -973,13 +973,12 @@ module.exports = {
 
 
             if (interaction.customId.startsWith('voltar1')) {
-                const { buildEmbed, buildMainDropdown } = require('../../Functions/ConfigPainelBuilder');
-                const embed = buildEmbed(interaction, client);
+                const { buildMainPanel } = require('../../Functions/ConfigPainelBuilder');
                 await interaction.update({
-                    embeds: [embed],
-                    components: [buildMainDropdown(interaction.user.id)],
-                    content: '',
-                    flags: 0
+                    components: [buildMainPanel(interaction.user.id, interaction)],
+                    flags: MessageFlags.IsComponentsV2,
+                    embeds: [],
+                    content: ''
                 });
             }
             
@@ -1409,17 +1408,16 @@ module.exports = {
             }
 
             if (interaction.customId.startsWith('voltar3')) {
-                await painelTicket(interaction, client);
+                await painelTicket(interaction, false);
             }
 
             if (interaction.customId.startsWith('voltar00')) {
-                const { buildEmbed, buildMainDropdown } = require('../../Functions/ConfigPainelBuilder');
-                const embed = buildEmbed(interaction, client);
+                const { buildMainPanel } = require('../../Functions/ConfigPainelBuilder');
                 await interaction.update({
-                    embeds: [embed],
-                    components: [buildMainDropdown(interaction.user.id)],
-                    content: '',
-                    flags: 0
+                    components: [buildMainPanel(interaction.user.id, interaction)],
+                    flags: MessageFlags.IsComponentsV2,
+                    embeds: [],
+                    content: ''
                 });
             }
             if (interaction.customId == "botaoduvidas") {
@@ -1503,8 +1501,13 @@ module.exports = {
                 await interaction.showModal(modal)
             }
             if (interaction.customId == "voltarProtect") {
-                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
-                protectConfig(interaction, client);
+                const { buildMainPanel } = require('../../Functions/ConfigPainelBuilder');
+                await interaction.update({
+                    components: [buildMainPanel(interaction.user.id, interaction)],
+                    flags: MessageFlags.IsComponentsV2,
+                    embeds: [],
+                    content: ''
+                });
             }
             if (interaction.customId == "addcanalboasvindas") {
                 const maxChannels = interaction.guild.channels.cache.filter(channel => channel.type === ChannelType.GuildText).size;
