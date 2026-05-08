@@ -57,29 +57,41 @@ const dbembed = new JsonDatabase({
 const entregaslog = new JsonDatabase({
   databasePath: "./DataBaseJson/entregaslog.json"
 });
+
 const SystemMod = new JsonDatabase({
   databasePath: "./DataBaseJson/SystemMod.json"
 });
+
 const Temporario = new JsonDatabase({
   databasePath: "./DataBaseJson/Temporario.json"
 });
+
 const Convites = new JsonDatabase({
   databasePath: "./DataBaseJson/Convites.json"
 });
+
 const GuildsInvites = new JsonDatabase({
   databasePath: "./DataBaseJson/GuildsInvites.json"
 });
+
 const Emojis = new JsonDatabase({
   databasePath: "./DataBaseJson/Emojis.json"
 });
+
 const refounds = new JsonDatabase({
   databasePath: "./DataBaseJson/refounds.json"
 });
+
 const Compras = new JsonDatabase({
   databasePath: "./DataBaseJson/Compras.json"
 });
+
 const painelCards = new JsonDatabase({
   databasePath: "./DataBaseJson/painelCards.json"
+});
+
+const formularios = new JsonDatabase({
+  databasePath: "./DataBaseJson/formularios.json"
 });
 
 module.exports = {
@@ -102,5 +114,6 @@ module.exports = {
   refounds,
   Compras,
   dbembed,
-  painelCards
+  painelCards,
+  formularios,
 }

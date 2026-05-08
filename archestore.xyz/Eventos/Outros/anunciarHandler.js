@@ -1,6 +1,6 @@
 const {
     ModalBuilder, TextInputBuilder, TextInputStyle,
-    ActionRowBuilder, ChannelSelectMenuBuilder, MessageFlags
+    ActionRowBuilder, ChannelSelectMenuBuilder
 } = require('discord.js');
 const {
     getEmbedData, setEmbedData, clearEmbedData,
@@ -46,7 +46,6 @@ module.exports = {
                 }
 
                 try {
-                    const msgComponents = [];
                     await channel.send({ embeds: [embed], content: data.content || null });
                     await interaction.reply({ content: `${Emojis.get('confirmed_emoji')} Embed enviada com sucesso em <#${channel.id}>!`, ephemeral: true });
                 } catch (e) {
@@ -102,18 +101,6 @@ module.exports = {
             }
 
             if (!interaction.isButton()) return;
-
-            if (customId === `anunciar_preview_${userId}`) {
-                const data = getEmbedData(userId);
-                const embed = buildDiscordEmbed(data);
-                if (!embed) {
-                    return interaction.reply({ content: `${Emojis.get('negative_emoji')} Nenhuma embed configurada.`, ephemeral: true });
-                }
-                const replyData = { embeds: [embed], ephemeral: true };
-                if (data.content) replyData.content = data.content;
-                await interaction.reply(replyData);
-                return;
-            }
 
             if (customId === `anunciar_post_${userId}`) {
                 const canalMenu = new ChannelSelectMenuBuilder()
@@ -232,7 +219,7 @@ module.exports = {
                 const sectionLabels = {
                     title: 'Título', description: 'Descrição', author: 'Autor',
                     color: 'Cor (ex: #5865F2)', url: 'URL da mensagem',
-                    thumbnail: 'URL da Thumbnail', image: 'URL da Imagem', footer: 'Texto do Footer'
+                    thumbnail: 'URL da Thumbnail', image: 'URL da Imagem', footer: 'Texto do Footer',
                 };
                 const data = getEmbedData(userId);
                 const modal = new ModalBuilder()
