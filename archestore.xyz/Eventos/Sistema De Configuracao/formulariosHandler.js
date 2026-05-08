@@ -1,8 +1,7 @@
 const {
     ActionRowBuilder, ButtonBuilder, ButtonStyle,
     StringSelectMenuBuilder, RoleSelectMenuBuilder, ChannelSelectMenuBuilder,
-    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder,
-    EmbedBuilder,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MediaGalleryBuilder,
     ModalBuilder, TextInputBuilder, TextInputStyle,
     MessageFlags, ChannelType,
 } = require('discord.js');
@@ -12,88 +11,131 @@ const { formularios, Emojis, configuracao } = require('../../DataBaseJson');
 const pergLock = new Set();
 
 // ─────────────────────────────────────────────────────────────────────────────
-// EDITOR DE APARÊNCIA (LIVE PREVIEW) — estado por usuário
+// EDITOR DE APARÊNCIA (LIVE PREVIEW — Component V2) — estado por usuário
 // ─────────────────────────────────────────────────────────────────────────────
 const formEmbedSessions = new Map();
 
 const EMB_NAV_OPTIONS = [
-    { label: 'Menu Principal', description: 'Voltar ao menu principal', value: 'main',        emoji: { id: '1501804019184828507' } },
-    { label: 'Título',         description: 'Editar título do painel',  value: 'title',       emoji: { id: '1501804003850322052' } },
-    { label: 'Descrição',      description: 'Editar descrição',          value: 'description', emoji: { id: '1501804039451709441' } },
-    { label: 'Cor',            description: 'Editar cor de destaque',    value: 'color',       emoji: { id: '1501804122943389716' } },
-    { label: 'Imagem',         description: 'Editar imagem/banner',      value: 'image',       emoji: { id: '1501803928973476023' } },
-    { label: 'Footer',         description: 'Editar texto do rodapé',   value: 'footer',      emoji: { id: '1501804120615555132' } },
+    { label: 'Menu Principal', value: 'main',        description: 'Voltar ao menu do editor',      emoji: { id: '1501804019184828507' } },
+    { label: 'Título',         value: 'title',       description: 'Editar título do formulário',   emoji: { id: '1501804003850322052' } },
+    { label: 'Descrição',      value: 'description', description: 'Editar texto de descrição',     emoji: { id: '1501804039451709441' } },
+    { label: 'Imagem',         value: 'image',       description: 'Editar banner/imagem',          emoji: { id: '1501803928973476023' } },
+    { label: 'Footer',         value: 'footer',      description: 'Editar texto do rodapé',        emoji: { id: '1501804120615555132' } },
 ];
 
 const EMB_SECTION_LABELS = {
-    title: 'Título', description: 'Descrição', color: 'Cor (hex ex: #5865F2)',
-    image: 'URL da Imagem', footer: 'Texto do Footer',
+    title: 'Título', description: 'Descrição', image: 'URL da Imagem', footer: 'Texto do Footer',
 };
 
-function buildFormEmbedPreview(data) {
-    const embed = new EmbedBuilder();
-    if (data.title)       embed.setTitle(data.title);
-    if (data.description) embed.setDescription(data.description);
-    try { embed.setColor(data.color || '#5865F2'); } catch (e) { embed.setColor('#5865F2'); }
-    if (data.image)  { try { embed.setImage(data.image); }  catch (e) {} }
-    if (data.footer) embed.setFooter({ text: data.footer });
-    if (!data.title && !data.description) {
-        embed.setDescription('-# Nenhum conteúdo configurado.\nUse o menu abaixo para editar.');
+function buildFormEmbedPreviewContainer(data, formName) {
+    const title = data.title || formName || 'Formulário';
+    const desc  = data.description || 'Clique no botão abaixo para iniciar sua aplicação.';
+    const c = new ContainerBuilder();
+    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `-# ${Emojis.get('_search_emoji')} Pré-visualização — como o formulário aparecerá no servidor\n\n` +
+        `## ${Emojis.get('_messages_emoji')} ${title}\n${desc}`
+    ));
+    c.addSeparatorComponents(new SeparatorBuilder());
+    if (data.image) {
+        try {
+            c.addMediaGalleryComponents(new MediaGalleryBuilder().addItems({ media: { url: data.image } }));
+        } catch (e) {}
     }
-    return embed;
+    if (data.footer) {
+        c.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${data.footer}`));
+    }
+    c.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId('_form_prev_disabled')
+            .setLabel('Iniciar Aplicação')
+            .setStyle(ButtonStyle.Primary)
+            .setDisabled(true)
+    ));
+    return c;
 }
 
-function buildFormEmbedNav(userId, guildId, slotId, current) {
-    return new ActionRowBuilder().addComponents(
+function buildFormEmbedEditorContainer(userId, guildId, slotId, section, data) {
+    const titleVal = data.title       ? `\`${data.title.slice(0, 45)}\``              : '`Não definido`';
+    const descVal  = data.description ? `\`${data.description.slice(0, 35)}...\``     : '`Não definida`';
+    const imgVal   = data.image       ? `${Emojis.get('confirmed_emoji')} Definida`   : `${Emojis.get('negative_emoji')} Nenhuma`;
+    const ftrVal   = data.footer      ? `\`${data.footer.slice(0, 45)}\``             : '`Nenhum`';
+
+    const c = new ContainerBuilder();
+    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('_lapis_emoji')} Editor de Aparência\n` +
+        `-# As alterações são refletidas na pré-visualização acima em tempo real.\n\n` +
+        `${Emojis.get('_text_emoji')} **Título:** ${titleVal}\n` +
+        `${Emojis.get('_messages_emoji')} **Descrição:** ${descVal}\n` +
+        `${Emojis.get('_search_emoji')} **Imagem:** ${imgVal}\n` +
+        `${Emojis.get('_fixe_emoji')} **Footer:** ${ftrVal}`
+    ));
+    c.addSeparatorComponents(new SeparatorBuilder());
+    c.addActionRowComponents(new ActionRowBuilder().addComponents(
         new StringSelectMenuBuilder()
             .setCustomId(`form_emb_nav_${userId}_${guildId}_${slotId}`)
-            .setPlaceholder('Selecionar propriedade...')
-            .addOptions(EMB_NAV_OPTIONS.map(o => ({ ...o, default: o.value === current })))
-    );
+            .setPlaceholder('Selecionar propriedade para editar...')
+            .addOptions(EMB_NAV_OPTIONS.map(o => ({ ...o, default: o.value === (section || 'main') })))
+    ));
+    if (section && section !== 'main') {
+        const label = EMB_SECTION_LABELS[section] || section;
+        c.addActionRowComponents(new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId(`form_emb_set_${section}_${userId}_${guildId}_${slotId}`)
+                .setLabel(`Definir ${label.split(' ')[0]}`)
+                .setEmoji({ id: '1501804003850322052' })
+                .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
+                .setCustomId(`form_emb_remove_${section}_${userId}_${guildId}_${slotId}`)
+                .setLabel('Remover')
+                .setEmoji({ id: '1501803935453679616' })
+                .setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder()
+                .setCustomId(`form_emb_save_${userId}_${guildId}_${slotId}`)
+                .setLabel('Salvar')
+                .setEmoji({ id: '1501803932484108359' })
+                .setStyle(ButtonStyle.Success),
+        ));
+    } else {
+        c.addActionRowComponents(new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId(`form_emb_save_${userId}_${guildId}_${slotId}`)
+                .setLabel('Salvar Aparência')
+                .setEmoji({ id: '1501803932484108359' })
+                .setStyle(ButtonStyle.Success),
+            new ButtonBuilder()
+                .setCustomId(`form_emb_reset_${userId}_${guildId}_${slotId}`)
+                .setLabel('Resetar')
+                .setEmoji({ id: '1501803926180335727' })
+                .setStyle(ButtonStyle.Danger),
+        ));
+    }
+    return c;
 }
 
+const EMB_CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+
 function buildFormEmbedMainMenu(userId, guildId, slotId) {
-    const sess  = formEmbedSessions.get(userId) || { data: {} };
-    const embed = buildFormEmbedPreview(sess.data);
-    const nav   = buildFormEmbedNav(userId, guildId, slotId, 'main');
-    const btns  = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId(`form_emb_save_${userId}_${guildId}_${slotId}`)
-            .setLabel('Salvar Aparência')
-            .setEmoji({ id: '1501803932484108359' })
-            .setStyle(ButtonStyle.Success),
-        new ButtonBuilder()
-            .setCustomId(`form_emb_reset_${userId}_${guildId}_${slotId}`)
-            .setLabel('Resetar')
-            .setEmoji({ id: '1501803926180335727' })
-            .setStyle(ButtonStyle.Danger),
-    );
-    return { embeds: [embed], components: [nav, btns] };
+    const sess     = formEmbedSessions.get(userId) || { data: {} };
+    const formName = sess.formName || `Formulário ${slotId}`;
+    return {
+        components: [
+            buildFormEmbedPreviewContainer(sess.data, formName),
+            buildFormEmbedEditorContainer(userId, guildId, slotId, 'main', sess.data),
+        ],
+        ...EMB_CV2,
+    };
 }
 
 function buildFormEmbedSection(userId, guildId, slotId, section) {
-    const sess  = formEmbedSessions.get(userId) || { data: {} };
-    const embed = buildFormEmbedPreview(sess.data);
-    const label = EMB_SECTION_LABELS[section] || section;
-    const nav   = buildFormEmbedNav(userId, guildId, slotId, section);
-    const btns  = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId(`form_emb_set_${section}_${userId}_${guildId}_${slotId}`)
-            .setLabel(`Definir ${label.split(' ')[0]}`)
-            .setEmoji({ id: '1501804003850322052' })
-            .setStyle(ButtonStyle.Primary),
-        new ButtonBuilder()
-            .setCustomId(`form_emb_remove_${section}_${userId}_${guildId}_${slotId}`)
-            .setLabel('Remover')
-            .setEmoji({ id: '1501803935453679616' })
-            .setStyle(ButtonStyle.Secondary),
-        new ButtonBuilder()
-            .setCustomId(`form_emb_save_${userId}_${guildId}_${slotId}`)
-            .setLabel('Salvar')
-            .setEmoji({ id: '1501803932484108359' })
-            .setStyle(ButtonStyle.Success),
-    );
-    return { embeds: [embed], components: [nav, btns] };
+    const sess     = formEmbedSessions.get(userId) || { data: {} };
+    const formName = sess.formName || `Formulário ${slotId}`;
+    return {
+        components: [
+            buildFormEmbedPreviewContainer(sess.data, formName),
+            buildFormEmbedEditorContainer(userId, guildId, slotId, section, sess.data),
+        ],
+        ...EMB_CV2,
+    };
 }
 
 function getAccentColor() {
@@ -756,10 +798,10 @@ module.exports = {
                         const emb  = form.embed || {};
                         formEmbedSessions.set(interaction.user.id, {
                             guildId, slotId,
+                            formName: form.name || `Formulário ${slotId}`,
                             data: {
                                 title:       emb.title       || null,
                                 description: emb.description || null,
-                                color:       emb.color ? `#${emb.color.replace('#', '')}` : null,
                                 image:       emb.image       || null,
                                 footer:      emb.footer      || null,
                             }
@@ -866,17 +908,24 @@ module.exports = {
                 if (slots[slotId]) {
                     if (!slots[slotId].embed) slots[slotId].embed = {};
                     const d = sess?.data || {};
-                    slots[slotId].embed.title       = d.title  || null;
+                    slots[slotId].embed.title       = d.title       || null;
                     slots[slotId].embed.description = d.description || null;
-                    slots[slotId].embed.color       = d.color ? d.color.replace('#', '') : '5865F2';
-                    slots[slotId].embed.image       = d.image  || null;
-                    slots[slotId].embed.footer      = d.footer || null;
+                    slots[slotId].embed.image       = d.image       || null;
+                    slots[slotId].embed.footer      = d.footer      || null;
                     formularios.set(guildId, slots);
                 }
                 formEmbedSessions.delete(userId);
+                const savedC = new ContainerBuilder();
+                savedC.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                    `## ${Emojis.get('confirmed_emoji')} Aparência Salva!\n` +
+                    `A aparência do formulário foi atualizada com sucesso.\n\n` +
+                    `-# Feche esta mensagem ou reabra o editor para continuar editando.`
+                ));
                 await interaction.update({
-                    content: `${Emojis.get('confirmed_emoji')} Aparência salva com sucesso!`,
-                    embeds: [], components: []
+                    components: [savedC],
+                    flags: MessageFlags.IsComponentsV2,
+                    embeds: [],
+                    content: '',
                 });
                 return;
             }
@@ -888,7 +937,8 @@ module.exports = {
                 const guildId = parts[parts.length - 2];
                 const userId  = parts[parts.length - 3];
                 if (userId !== interaction.user.id) return;
-                formEmbedSessions.set(userId, { guildId, slotId, data: {} });
+                const prevSess = formEmbedSessions.get(userId) || {};
+                formEmbedSessions.set(userId, { guildId, slotId, formName: prevSess.formName, data: {} });
                 await interaction.update(buildFormEmbedMainMenu(userId, guildId, slotId));
                 return;
             }
@@ -950,16 +1000,7 @@ module.exports = {
                 const value = interaction.fields.getTextInputValue('section_value').trim();
                 const sess  = formEmbedSessions.get(userId) || { guildId, slotId, data: {} };
                 if (value) {
-                    if (section === 'color') {
-                        const clean = value.replace('#', '');
-                        if (/^[0-9A-Fa-f]{6}$/.test(clean)) {
-                            sess.data.color = `#${clean}`;
-                        } else {
-                            return interaction.reply({ content: `${Emojis.get('negative_emoji')} Cor inválida. Use formato hex, ex: \`#5865F2\``, ephemeral: true });
-                        }
-                    } else {
-                        sess.data[section] = value;
-                    }
+                    sess.data[section] = value;
                 } else {
                     delete sess.data[section];
                 }
