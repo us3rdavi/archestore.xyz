@@ -58,7 +58,8 @@ process.on('unhandledRejection', (err) => {
     console.log(`${colors.red(`[UNHANDLED]`)} ${err?.message || err}`);
 });
 
-client.login(config.token).catch((err) => {
+const botToken = process.env.DISCORD_BOT_TOKEN || config.token;
+client.login(botToken).catch((err) => {
     if (err?.message?.includes("intent")) return console.log(`${colors.red(`[LOG]`)} Ativa as Intents do Bot`);
     if (err?.message?.includes("invalid")) return console.log(`${colors.red(`[LOG]`)} Token Incorreto`);
 });
