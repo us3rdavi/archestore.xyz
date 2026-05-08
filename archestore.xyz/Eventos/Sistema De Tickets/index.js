@@ -147,7 +147,7 @@ module.exports = {
             await interaction.deferUpdate();
 
             const confirmContainer = new ContainerBuilder();
-            confirmContainer.setAccentColor(0x57F287);
+            confirmContainer;
             confirmContainer.addTextDisplayComponents(
                 new TextDisplayBuilder().setContent(`## ${Emojis.get('confirmed_emoji')} Ticket Encerrado\nEste ticket foi marcado como **resolvido**. Obrigado pelo contato!`)
             );
@@ -224,7 +224,7 @@ module.exports = {
             await interaction.deferUpdate();
 
             const reabertoContainer = new ContainerBuilder();
-            reabertoContainer.setAccentColor(0xED4245);
+            reabertoContainer;
             reabertoContainer.addTextDisplayComponents(
                 new TextDisplayBuilder().setContent(`## ${Emojis.get('warn_emoji')} Ticket Reaberto\nO usuário ainda precisa de ajuda. Um membro da equipe entrará em contato em breve.`)
             );

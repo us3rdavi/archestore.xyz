@@ -19,7 +19,7 @@ async function profileuser(interaction, userID = null) {
     if (PrimeiraCompra == null) return interaction.reply({ content: `Sem dados salvos`, ephemeral: true });
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(

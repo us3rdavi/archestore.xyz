@@ -11,7 +11,7 @@ function getAccentColor() {
 
 async function AcoesAutomaticsConfigs(interaction, client) {
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
@@ -96,7 +96,7 @@ async function AcoesAutomaticsConfigs(interaction, client) {
 async function SistemaAntiFake(interaction, client) {
     const AntiFake = configuracao.get(`AntiFake`);
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     let desc = `## ${Emojis.get('_support_emoji')} Painel De Anti-Fake\nGerencie o sistema de Anti-Fake do seu servidor.`;
 
@@ -149,7 +149,7 @@ async function sistemaAntiRaid(interaction, client) {
             : 'Remover Todos os Cargos';
 
     const container = new ContainerBuilder();
-    container.setAccentColor(AntiRaid?.status ? 0x57F287 : 0xED4245);
+    container;
 
     let desc = `## Anti-Raid — ${AntiRaid?.status ? `HABILITADO` : `DESABILITADO`}\n` +
         `Gerencie o sistema de Anti-Raid do seu servidor.\n\n` +
@@ -261,7 +261,7 @@ async function LimpezaAutomatica(interaction, client) {
     const execucoes = configuracao.get(`AutomaticSettings.LimpezaAutomatica`);
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     let desc = `## ${Emojis.get('_support_emoji')} Painel De Limpeza Automática\n` +
         `Seu Bot realizará a limpeza automática das mensagens nos canais selecionados conforme o horário estabelecido.`;
@@ -331,7 +331,7 @@ async function GerenciarCanais(interaction, client) {
     const execucoes = configuracao.get(`AutomaticSettings.GerenciarCanais`);
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     let desc = `## ${Emojis.get('_support_emoji')} Painel De Canais\nAqui você pode gerenciar os canais que o bot irá atuar.`;
 
@@ -401,7 +401,7 @@ async function SistemaNukar(interaction, client) {
     const execucoes = configuracao.get(`AutomaticSettings.SistemaNukar`);
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     let desc = `## ${Emojis.get('_support_emoji')} Painel De Nuke Automático\nAqui você pode configurar o sistema de nukar.`;
 
@@ -469,7 +469,7 @@ async function SistemadeFiltro(interaction, client) {
     let info = configuracao.get(`AutomaticSettings.SistemadeFiltro`);
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     let desc = `## ${Emojis.get('_support_emoji')} Painel De Sistema De Filtros\nAqui você pode configurar o sistema de filtro.`;
 
@@ -548,7 +548,7 @@ async function msgbemvindo(interaction, client) {
     let msg = configuracao.get(`Entradas.msg`);
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     let preview = msg;
     if (msg) {
@@ -613,7 +613,7 @@ async function msgbemvindocanais(interaction, client) {
     const canais = configuracao.get(`Entradas.canais`) || [];
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     let desc = `## ${Emojis.get('_support_emoji')} Canais de Boas Vindas\nGerencie os canais onde as mensagens de boas vindas serão enviadas.\n\n` +
         `**Canais configurados:** \`${canais.length}\``;

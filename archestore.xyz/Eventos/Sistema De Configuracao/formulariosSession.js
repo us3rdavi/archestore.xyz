@@ -13,6 +13,8 @@ function getAccentColor() {
 
 // Sessões ativas em memória
 const activeSessions = new Map();
+// Lock anti-duplicação para início de sessão
+const startLock = new Set();
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Verifica permissão de staff
@@ -36,7 +38,7 @@ async function sendFormLog(guild, form, slotId, guildId, user, answers) {
     ).join('\n\n');
     const timestamp  = Math.floor(Date.now() / 1000);
 
-    const c = new ContainerBuilder().setAccentColor(getAccentColor());
+    const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('_messages_emoji')} Nova Aplicação — ${form.name}\n` +
         `${Emojis.get('_silueta_emoji')} **Candidato:** ${user.username} (<@${user.id}>)\n` +
@@ -76,7 +78,7 @@ async function runQuestionFlow(dmChannel, userId, questions, timeLimit) {
     for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
 
-        const qc = new ContainerBuilder().setAccentColor(getAccentColor());
+        const qc = new ContainerBuilder();
         qc.addTextDisplayComponents(new TextDisplayBuilder().setContent(
             `${Emojis.get('question_emoji')} **Pergunta ${i + 1} de ${questions.length}**\n\n` +
             `${q.text}\n\n` +
@@ -143,7 +145,7 @@ module.exports = {
                     });
                 }
 
-                if (activeSessions.has(userId)) {
+                if (startLock.has(userId) || activeSessions.has(userId)) {
                     return interaction.reply({
                         content: `${Emojis.get('warn_emoji')} Você já tem um formulário em andamento. Verifique sua DM!`,
                         ephemeral: true,
@@ -151,7 +153,7 @@ module.exports = {
                 }
 
                 if (form.limit_per_user) {
-                    const count = formularios.get(`${guildId}.submissions.${userId}.${slotId}`) || 0;
+                    const count = formularios.get(`sub_${guildId}_${slotId}_${userId}`) || 0;
                     if (count >= form.limit_per_user) {
                         return interaction.reply({
                             content: `${Emojis.get('negative_emoji')} Você já atingiu o limite de ${form.limit_per_user} envio(s) para este formulário.`,
@@ -160,9 +162,13 @@ module.exports = {
                     }
                 }
 
+                // Lock anti-duplicação imediato
+                startLock.add(userId);
+
                 // Abrir DM
                 let dmChannel;
                 try { dmChannel = await interaction.user.createDM(); } catch (e) {
+                    startLock.delete(userId);
                     return interaction.reply({
                         content: `${Emojis.get('negative_emoji')} Não consegui abrir sua DM. Habilite as mensagens diretas e tente novamente.`,
                         ephemeral: true,
@@ -171,7 +177,7 @@ module.exports = {
 
                 // Mensagem de boas-vindas na DM
                 try {
-                    const wc = new ContainerBuilder().setAccentColor(getAccentColor());
+                    const wc = new ContainerBuilder();
                     wc.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                         `## ${Emojis.get('_messages_emoji')} ${form.name}\n` +
                         `Olá, **${interaction.user.username}**! Você iniciou o processo de aplicação.\n\n` +
@@ -183,6 +189,7 @@ module.exports = {
                     ));
                     await dmChannel.send({ components: [wc], flags: MessageFlags.IsComponentsV2 });
                 } catch (e) {
+                    startLock.delete(userId);
                     return interaction.reply({
                         content: `${Emojis.get('negative_emoji')} Não consegui abrir sua DM. Habilite as mensagens diretas e tente novamente.`,
                         ephemeral: true,
@@ -195,6 +202,7 @@ module.exports = {
                 });
 
                 activeSessions.set(userId, { guildId, slotId });
+                startLock.delete(userId);
 
                 // ── Fluxo de perguntas ────────────────────────────────────
                 const timeLimit = form.time_limit || 120;
@@ -204,7 +212,7 @@ module.exports = {
                     answers = await runQuestionFlow(dmChannel, userId, questions, timeLimit);
                 } catch (e) {
                     activeSessions.delete(userId);
-                    const tc = new ContainerBuilder().setAccentColor(0xFF4444);
+                    const tc = new ContainerBuilder();
                     tc.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                         `## ${Emojis.get('warn_emoji')} Tempo Esgotado\n` +
                         `Você demorou para responder e o formulário foi **cancelado**.\n\n` +
@@ -218,8 +226,8 @@ module.exports = {
 
                 // Incrementar contagem
                 if (form.limit_per_user) {
-                    const count = formularios.get(`${guildId}.submissions.${userId}.${slotId}`) || 0;
-                    formularios.set(`${guildId}.submissions.${userId}.${slotId}`, count + 1);
+                    const count = formularios.get(`sub_${guildId}_${slotId}_${userId}`) || 0;
+                    formularios.set(`sub_${guildId}_${slotId}_${userId}`, count + 1);
                 }
 
                 // Salvar respostas para uso no accept/reject
@@ -234,7 +242,7 @@ module.exports = {
                 });
 
                 // Mensagem de conclusão na DM
-                const dc = new ContainerBuilder().setAccentColor(0x00C06B);
+                const dc = new ContainerBuilder();
                 dc.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                     `## ${Emojis.get('confirmed_emoji')} Formulário Finalizado!\n` +
                     `Suas respostas foram **registradas** com sucesso.\n\n` +
@@ -286,7 +294,7 @@ module.exports = {
                 // DM ao candidato
                 try {
                     const targetUser = await client.users.fetch(targetUserId);
-                    const ac = new ContainerBuilder().setAccentColor(0x00C06B);
+                    const ac = new ContainerBuilder();
                     ac.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                         `## ${Emojis.get('confirmed_emoji')} Aplicação Aceita!\n` +
                         `Parabéns, **${targetUser.username}**! Sua aplicação para **${form.name}** foi **aceita**.\n\n` +
@@ -300,7 +308,7 @@ module.exports = {
                 const saved  = formularios.get(`${guildId}.responses.${targetUserId}.${slotId}`);
                 const qaText = saved?.qaText || '*Respostas não disponíveis*';
 
-                const lc = new ContainerBuilder().setAccentColor(0x00C06B);
+                const lc = new ContainerBuilder();
                 lc.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                     `## ${Emojis.get('confirmed_emoji')} Aplicação Aceita — ${form.name}\n` +
                     `${Emojis.get('_silueta_emoji')} **Candidato:** ${saved?.username || 'Usuário'} (<@${targetUserId}>)\n` +
@@ -379,7 +387,7 @@ module.exports = {
                 // DM ao candidato
                 try {
                     const targetUser = await client.users.fetch(targetUserId);
-                    const rc = new ContainerBuilder().setAccentColor(0xFF4444);
+                    const rc = new ContainerBuilder();
                     rc.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                         `## ${Emojis.get('negative_emoji')} Aplicação Recusada\n` +
                         `Infelizmente, **${targetUser.username}**, sua aplicação para **${form.name}** foi **recusada**.\n\n` +
@@ -394,7 +402,7 @@ module.exports = {
                 const saved  = formularios.get(`${guildId}.responses.${targetUserId}.${slotId}`);
                 const qaText = saved?.qaText || '*Respostas não disponíveis*';
 
-                const lc = new ContainerBuilder().setAccentColor(0xFF4444);
+                const lc = new ContainerBuilder();
                 lc.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                     `## ${Emojis.get('negative_emoji')} Aplicação Recusada — ${form.name}\n` +
                     `${Emojis.get('_silueta_emoji')} **Candidato:** ${saved?.username || 'Usuário'} (<@${targetUserId}>)\n` +

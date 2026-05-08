@@ -20,7 +20,7 @@ async function painelTicket(interaction, useEditReply = false) {
         const bannerMensagem = tickets.get(`tickets.aparencia.bannermsg`) || null;
 
         const container = new ContainerBuilder();
-        container.setAccentColor(getAccentColor());
+        container;
 
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(mensagemConfigurada)
@@ -103,7 +103,7 @@ async function painelTicket(interaction, useEditReply = false) {
     }
 
     const container = new ContainerBuilder();
-    container.setAccentColor(accentColor);
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(`## ${Emojis.get('_settings_emoji')} Central de Atendimento`)
@@ -197,7 +197,7 @@ async function painelConfiguracaoTicket(interaction) {
     const mensagemFinal = tickets.get('tickets.mensagemFinalizacao') || {};
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(`## ${Emojis.get('_settings_emoji')} Configuração\nGerencie canais, cargos e mensagens do sistema de tickets.`)

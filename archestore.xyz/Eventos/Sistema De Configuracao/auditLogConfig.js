@@ -15,7 +15,7 @@ async function showAuditLogPanel(interaction, client) {
     const enabled = !!channelId;
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(

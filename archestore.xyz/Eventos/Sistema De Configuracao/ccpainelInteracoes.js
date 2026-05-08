@@ -277,7 +277,7 @@ async function loadSecao(secao, extraData = {}) {
 // ── Container principal da seção ──────────────────────────────────────────────
 async function buildPainel(secao, extraData = {}) {
     const { title, text, buttons } = await loadSecao(secao, extraData);
-    const c = new ContainerBuilder().setAccentColor(getAccentColor());
+    const c = new ContainerBuilder();
 
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${title}\n-# CentralCart — Painel`
@@ -294,7 +294,7 @@ async function buildPainel(secao, extraData = {}) {
 }
 
 function errContainer(msg) {
-    const c = new ContainerBuilder().setAccentColor(0xED4245);
+    const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `${Emojis.get('negative_emoji')} ${msg}`
     ));
@@ -304,7 +304,7 @@ function errContainer(msg) {
 }
 
 function infoContainer(secao, msg, extraButtons = []) {
-    const c = new ContainerBuilder().setAccentColor(0x57F287);
+    const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(msg));
     c.addSeparatorComponents(new SeparatorBuilder());
     c.addActionRowComponents(buildNav(secao));
@@ -326,12 +326,18 @@ module.exports = {
             state.secao     = secao;
             state.extraData = {};
 
-            await interaction.deferUpdate();
+            try {
+                await interaction.deferUpdate();
+            } catch (e) {
+                return;
+            }
             try {
                 const c = await buildPainel(secao, {});
                 await interaction.editReply({ components: [c], ...CV2 });
             } catch (err) {
-                await interaction.editReply({ components: [errContainer(err.message)], ...CV2 });
+                try {
+                    await interaction.editReply({ components: [errContainer(String(err.message || err))], ...CV2 });
+                } catch (_) {}
             }
             return;
         }
@@ -524,7 +530,7 @@ module.exports = {
                     `${Emojis.get('date_emoji')} **Criado em:** ${criadoEm}\n` +
                     `${Emojis.get('confirmed_emoji')} **Pago em:** ${pagoEm}`;
 
-                const viewC = new ContainerBuilder().setAccentColor(getAccentColor());
+                const viewC = new ContainerBuilder();
                 viewC.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                     `## ${Emojis.get('neworder_emoji')} Pedido \`${p.id}\`\n-# CentralCart — Painel`
                 ));

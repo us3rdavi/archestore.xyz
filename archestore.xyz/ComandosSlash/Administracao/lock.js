@@ -26,7 +26,7 @@ module.exports = {
         interaction.channel.permissionOverwrites.edit(interaction.guild.id, { SendMessages: false });
 
         const container = new ContainerBuilder();
-        container.setAccentColor(getAccentColor());
+        container;
 
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(

@@ -42,7 +42,7 @@ async function ConfigChannels(interaction, client) {
     );
 
     const container = new ContainerBuilder();
-    container.setAccentColor(accentColor);
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
@@ -104,7 +104,7 @@ async function ConfigRoles(interaction, client) {
     );
 
     const container = new ContainerBuilder();
-    container.setAccentColor(accentColor);
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(

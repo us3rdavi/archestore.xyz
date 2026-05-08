@@ -28,7 +28,7 @@ module.exports = {
             {
                 const { ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
                 const unlockContainer = new ContainerBuilder();
-                unlockContainer.setAccentColor(0x00FF00);
+                unlockContainer;
                 unlockContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`Este canal ${interaction.channel} foi destrancado por (${interaction.user})`));
                 unlockContainer.addActionRowComponents(new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('unlockChannel').setLabel('Destrancar').setStyle(2).setDisabled(true)));
                 interaction.update({ components: [unlockContainer], flags: MessageFlags.IsComponentsV2, embeds: [] });

@@ -16,7 +16,7 @@ function buildAutoReactContainer(interaction, mudarstatus) {
     const autoReactCanais = configuracao.get('AutoReact.Canais') || ['Nenhum canal configurado'];
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
@@ -117,7 +117,7 @@ module.exports = {
 
                 if (!emojivalido24 || !emojiNoServer24 || invalidoscanais24.length > 0) {
                     const errContainer = new ContainerBuilder();
-                    errContainer.setAccentColor(0x5865F2);
+                    errContainer;
                     errContainer.addTextDisplayComponents(
                         new TextDisplayBuilder().setContent(
                             `## Aviso de Erro\nForam encontrados os seguintes problemas:\n` +

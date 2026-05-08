@@ -26,7 +26,7 @@ async function AcoesRepostAutomatics(interaction, client) {
     const todosProdutos = await produtos.all();
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(

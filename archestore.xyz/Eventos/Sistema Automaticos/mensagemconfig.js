@@ -112,7 +112,7 @@ async function updateConfigContainer(interaction, client) {
     const accentColor = (() => { try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; } })();
 
     const container = new ContainerBuilder();
-    container.setAccentColor(accentColor);
+    container;
 
     let content = `## Configurações de Mensagens Automáticas\n`;
     if (msgData.length === 0) {

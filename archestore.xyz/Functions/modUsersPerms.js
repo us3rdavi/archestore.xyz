@@ -13,7 +13,7 @@ async function gerenciarPerms(interaction, client) {
     const permsusers = perms.all().map((entry, index) => `**${index + 1}** — (<@${entry.ID}> | \`${entry.ID}\`)`).join('\n');
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     const descricao = perms.all().length === 0
         ? `\n${interaction.user}, nenhum usuário possui permissão de gerenciar o ${client.user.username}.`

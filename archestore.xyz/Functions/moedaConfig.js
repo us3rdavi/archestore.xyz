@@ -11,7 +11,7 @@ function getAccentColor() {
 
 async function moedaConfig(interaction, client) {
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(

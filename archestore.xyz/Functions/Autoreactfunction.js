@@ -21,7 +21,7 @@ async function autoreact24(interaction, client) {
     const botaoemoji = mudarstatus ? "1248300875978641419" : "1248300851282579552";
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(

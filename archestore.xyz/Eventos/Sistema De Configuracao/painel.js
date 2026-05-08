@@ -298,7 +298,7 @@ module.exports = {
 
             if (option == "permsConfig") {
 
-                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
+                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
 
                 gerenciarPerms(interaction, client);
 
@@ -556,7 +556,7 @@ module.exports = {
                         const cor = configuracao.get('Cores.Principal') || '5865F2';
                         const accentColor = (() => { try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; } })();
                         const assumirContainer = new ContainerBuilder();
-                        assumirContainer.setAccentColor(accentColor);
+                        assumirContainer;
                         assumirContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('_staff_emoji')} Olá <@!${ultimosNumeros}>, Seu Ticket foi Assumido Pelo Staff ${staffMember}.`));
                         await interaction.editReply({ components: [assumirContainer], flags: MessageFlags.IsComponentsV2, embeds: [] });
                     }
@@ -939,7 +939,7 @@ module.exports = {
 
                 {
                     const acClearContainer = new ContainerBuilder();
-                    { const _c = configuracao.get('Cores.Principal') || '5865F2'; acClearContainer.setAccentColor((() => { try { return parseInt(_c.replace('#',''),16); } catch(e){ return 0x5865F2; } })()); }
+                    { const _c = configuracao.get('Cores.Principal') || '5865F2'; acClearContainer; }
                     acClearContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('confirmed_emoji')} Seu AutoClear foi iniciado corretamente no canal <#${canalAutoClear}>`));
                     await interaction.reply({ content: `${interaction.user}`, components: [acClearContainer], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
                 }
@@ -955,14 +955,14 @@ module.exports = {
                     configuracao.set("autoclear.time", 10);
                     {
                         const acStopContainer = new ContainerBuilder();
-                        { const _c = configuracao.get('Cores.Principal') || '5865F2'; acStopContainer.setAccentColor((() => { try { return parseInt(_c.replace('#',''),16); } catch(e){ return 0x5865F2; } })()); }
+                        { const _c = configuracao.get('Cores.Principal') || '5865F2'; acStopContainer; }
                         acStopContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('confirmed_emoji')} Seu AutoClear foi parado e as configurações foram resetadas.`));
                         await interaction.reply({ content: `${interaction.user}`, components: [acStopContainer], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
                     }
                 } catch (error) {
                     {
                         const acErrContainer = new ContainerBuilder();
-                        acErrContainer.setAccentColor(0x5865F2);
+                        acErrContainer;
                         acErrContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('negative_emoji')} Ocorreu um erro ao parar o AutoClear.`));
                         await interaction.reply({ content: `${interaction.user}`, components: [acErrContainer], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
                     }
@@ -1277,7 +1277,7 @@ module.exports = {
 
             if (interaction.customId == "altMoeda") {
 
-                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 });
+                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 });
 
                 moedaConfig(interaction, client);
 
@@ -1285,7 +1285,7 @@ module.exports = {
 
             if (interaction.customId == "protecaoBot") {
 
-                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().setAccentColor(parseInt((configuracao.get('Cores.Principal')||'5865F2').replace('#',''),16)).addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 });
+                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 });
 
                 const owners = owner.map(rs => `<@${rs}>`).join(', ')
 
@@ -1330,7 +1330,7 @@ module.exports = {
                 try { _ac = parseInt(_cor.replace('#', ''), 16); } catch (e) {}
 
                 const _cont = new ContainerBuilder();
-                _cont.setAccentColor(_ac);
+                _cont;
 
                 _cont.addTextDisplayComponents(
                     new TextDisplayBuilder().setContent(

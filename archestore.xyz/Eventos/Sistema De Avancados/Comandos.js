@@ -11,7 +11,7 @@ function getAccentColor() {
 
 function buildCommandPanel(title, desc, rows) {
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(`## ${title}\n${desc}`)
     );

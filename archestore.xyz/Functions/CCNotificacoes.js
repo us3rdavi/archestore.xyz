@@ -58,7 +58,7 @@ async function enviarDMCompra(client, order) {
         const valor = order.formatted_price || `R$ ${order.price || '0,00'}`;
 
         const container = new ContainerBuilder();
-        container.setAccentColor(0x57F287);
+        container;
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(
                 `## ${Emojis.get('confirmedpayment_emoji')} Sua compra foi concluída!\nAgradecemos pela sua compra! Abaixo estão os detalhes do seu pedido.`
@@ -95,7 +95,7 @@ async function enviarDMExpirando(client, order, nomePacote, diasRestantes) {
         const dataCompra = formatarData(order.paid_at);
 
         const container = new ContainerBuilder();
-        container.setAccentColor(0xFFA500);
+        container;
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(
                 `## ${Emojis.get('clock_emoji')} Seu pacote expira em ${diasRestantes} dia${diasRestantes !== 1 ? 's' : ''}!\nMas não se preocupe! Você pode renová-lo na nossa loja.`
@@ -132,7 +132,7 @@ async function enviarDMExpirado(client, order, nomePacote) {
         const dataCompra = formatarData(order.paid_at);
 
         const container = new ContainerBuilder();
-        container.setAccentColor(0xED4245);
+        container;
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(
                 `## ${Emojis.get('negative_emoji')} Seu pacote expirou!\nMas não se preocupe! Você pode obtê-lo novamente na nossa loja.`

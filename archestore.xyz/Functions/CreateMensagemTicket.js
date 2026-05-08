@@ -16,12 +16,12 @@ function buildTicketComponents(ggg, aparencia) {
 
     if (aparencia.color) {
         try {
-            container.setAccentColor(parseInt(aparencia.color.replace('#', ''), 16));
+            container;
         } catch (e) {
-            container.setAccentColor(0x5865F2);
+            container;
         }
     } else {
-        container.setAccentColor(0x5865F2);
+        container;
     }
 
     const tituloEmoji = aparencia.emoji ? `${aparencia.emoji} ` : `${Emojis.get('_support_emoji')} `;

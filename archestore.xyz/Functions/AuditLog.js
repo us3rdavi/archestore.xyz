@@ -21,7 +21,7 @@ async function logAction(client, { action, details, userId, guildId }) {
         const unixTs = Math.floor(Date.now() / 1000);
 
         const container = new ContainerBuilder();
-        container.setAccentColor(getAccentColor());
+        container;
 
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(

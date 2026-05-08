@@ -8,7 +8,7 @@ function getAccentColor() {
 
 function buildContainer(text, rowComponent) {
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(text));
     if (rowComponent) container.addActionRowComponents(rowComponent);
     return container;

@@ -51,7 +51,7 @@ function getAccentColor() {
 
 function buildConfigContainer(title, fields) {
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     let content = `## ${title}`;
     for (const [label, value] of fields) {

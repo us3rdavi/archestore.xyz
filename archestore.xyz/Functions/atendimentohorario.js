@@ -10,7 +10,7 @@ async function Atendimentohorario(interaction, client) {
     const atendimentohorario24 = tickets.get(`statushorario`) || false;
 
     const container = new ContainerBuilder();
-    container.setAccentColor(atendimentohorario24 ? 0x57F287 : 0xED4245);
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(`## Horário de Atendimento`)

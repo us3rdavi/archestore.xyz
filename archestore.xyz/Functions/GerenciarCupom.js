@@ -44,7 +44,7 @@ async function GerenciarCupom(interaction, produtoname, ggg222) {
     }
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(

@@ -13,7 +13,7 @@ async function AcoesMsgsAutomatics(interaction, client) {
     const intervalMinutes = msgsauto.get('intervalMinutes') || 3;
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(

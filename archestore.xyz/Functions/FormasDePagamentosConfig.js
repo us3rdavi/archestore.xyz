@@ -21,7 +21,7 @@ async function FormasDePagamentos(interaction) {
     const no = Emojis.get('negative_emoji');
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
@@ -95,7 +95,7 @@ async function EfiBankConfiguracao(client, interaction, a) {
     const chavepix = configuracao.get('pagamentos.EfiAPI.chavepix');
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     let desc =
         `## ${Emojis.get('_efi_emoji')} Configurar Efi Bank\n` +

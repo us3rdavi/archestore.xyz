@@ -23,7 +23,7 @@ async function mpConfigs(interaction) {
     const siteStatus = configuracao.get('pagamentos.MpSite');
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## Configurar Mercado Pago\n` +
@@ -88,7 +88,7 @@ async function BloquearConta(client, interaction) {
     let contas = configuracao.get('pagamentos.ContasBloqueados') || [];
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## Contas Bloqueadas\nConfigure as contas que serão bloqueadas no sistema de pagamento Mercado Pago.\n\n` +

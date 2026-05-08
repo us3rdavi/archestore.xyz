@@ -121,7 +121,7 @@ function buildMainPanel(userId, interaction) {
     const guildName = interaction?.guild?.name || '';
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
@@ -154,7 +154,7 @@ function buildSubPanel(userId, category) {
     const header = getCategoryHeader(category);
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(

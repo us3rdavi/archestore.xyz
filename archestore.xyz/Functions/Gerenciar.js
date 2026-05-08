@@ -11,7 +11,7 @@ async function Gerenciar(interaction, client) {
         try { accentColor = parseInt(corPrincipal.replace('#', ''), 16); } catch (e) {}
 
         const container = new ContainerBuilder();
-        container.setAccentColor(accentColor);
+        container;
 
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(

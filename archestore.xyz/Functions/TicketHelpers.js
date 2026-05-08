@@ -23,12 +23,8 @@ function findTicketByThreadId(threadId) {
 }
 
 function isStaff(member) {
+    if (member.permissions.has('Administrator')) return true;
     const staffRoles = tickets.get('tickets.staffRoles') || [];
-    const cargoadm = configuracao.get('ConfigRoles.cargoadm');
-    const cargosup = configuracao.get('ConfigRoles.cargosup');
-
-    if (cargoadm && member.roles.cache.has(cargoadm)) return true;
-    if (cargosup && member.roles.cache.has(cargosup)) return true;
     for (const roleId of staffRoles) {
         if (member.roles.cache.has(roleId)) return true;
     }
@@ -40,12 +36,12 @@ function buildTicketContainer(ticketData, aparencia, botoesAdicionais) {
 
     if (aparencia.msgCor) {
         try {
-            container.setAccentColor(parseInt(aparencia.msgCor.replace('#', ''), 16));
+            container;
         } catch (e) {
-            container.setAccentColor(0x5865F2);
+            container;
         }
     } else {
-        container.setAccentColor(0x5865F2);
+        container;
     }
 
     const emoji = aparencia.msgEmoji ? `${aparencia.msgEmoji} ` : `${Emojis.get('_ticket_emoji')} `;
@@ -66,7 +62,7 @@ function buildTicketContainer(ticketData, aparencia, botoesAdicionais) {
             `${Emojis.get('_ticket_emoji')} **Opção Selecionada:** ${ticketData.funcao}\n` +
             `${Emojis.get('_silueta_emoji')} **Assumido por:** ${assumidoPorText}\n` +
             `${Emojis.get('information_emoji')} **Nº do Ticket:** #${ticketData.numero}\n` +
-            `${Emojis.get('_silueta_emoji')} **Aberto por:** ${ticketData.username || 'Desconhecido'}`
+            `${Emojis.get('_silueta_emoji')} **Aberto por:** <@${ticketData.userId || ticketData.abertoPor}>`
         )
     );
 
@@ -131,12 +127,12 @@ function buildFinalizacaoContainer(config) {
 
     if (config && config.cor) {
         try {
-            container.setAccentColor(parseInt(config.cor.replace('#', ''), 16));
+            container;
         } catch (e) {
-            container.setAccentColor(0x57F287);
+            container;
         }
     } else {
-        container.setAccentColor(0x57F287);
+        container;
     }
 
     const emoji = (config && config.emoji) || Emojis.get('_confirm_emoji');
@@ -187,7 +183,7 @@ function buildFinalizacaoContainer(config) {
 
 function buildStaffPanelContainer(ticketData) {
     const container = new ContainerBuilder();
-    container.setAccentColor(0x5865F2);
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(`## ${Emojis.get('_tool_emoji')} Painel Staff`)

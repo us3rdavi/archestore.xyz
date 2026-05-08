@@ -1,0 +1,44 @@
+Faça com que, em vez de aparecer apenas o nome do administrador, o sistema marque o administrador corretamente. E, em vez de aparecer “Arche Store” na frente do usuário, deve aparecer a posição de staff dele, por exemplo: Administrador, Gerente, Owner ou Ajudante.
+
+Você vai fazer isso em todos os menus response que aparecem ao usar os comandos /ccpainel e /config.
+
+Ao selecionar alguma coisa no select menu do /ccpainel, está aparecendo “Esta interação falhou”. Corrija isso completamente.
+
+Agora faça o seguinte com todas as embeds/components V2 do projeto: saiba que existe uma cor na lateral esquerda das mensagens. Você vai verificar todos os arquivos e códigos do projeto para encontrar onde essa cor está definida ou utilizada.
+
+Na imagem anexada, a lateral esquerda da mensagem component V2, onde deveria existir a cor, está transparente/sem cor. Quero que você corrija isso em todas as embeds e components V2 do projeto inteiro.
+
+Além disso, está dando erro no sistema de “Limitar Envios” do formulário. Corrija completamente.
+
+Na opção de editar aparência do painel de formulário, remova o sistema atual de edição. Em vez disso, faça um sistema igual ao do /anunciar, com visualização em tempo real/live.
+
+Deve existir uma seção mostrando exatamente como o painel ficará, atualizando automaticamente conforme as seções forem sendo editadas, sem sistema baseado em botões.
+
+O sistema de formulário está usando o emoji com ponto de interrogação azul. Troque todos os emojis de perguntas do sistema de formulário pelo emoji já enviado/uploadado no bot:
+
+question_emoji
+
+O sistema de formulário também está enviando várias mensagens dizendo que o usuário iniciou o processo de aplicação, em vez de apenas uma. Corrija isso.
+
+O sistema de formulário às vezes está fazendo duplicações. Corrija todas as duplicações possíveis.
+
+O sistema de tickets está marcando cargos desconhecidos que não foram selecionados como cargos staff. Corrija isso.
+
+Faça com que o sistema marque apenas:
+
+* Os cargos staff selecionados
+* O usuário que abriu o ticket
+
+Melhore o visual completo de todos os sistemas, responses e menus. Tudo deve ficar impecável, muito bonito, profissional e perfeito, assim como foi feito no /ccpainel e /config.
+
+O sistema de transcript dos tickets deve ficar mais detalhado, profissional e bonito, incluindo também o arquivo HTML.
+
+O transcript deve ficar impecável, exatamente como foi o ticket original, contendo:
+
+* Todas as mensagens exatas
+* Hora de cada mensagem
+* Dia/data
+* Todos os detalhes possíveis
+* Layout profissional e bonito
+
+Pense sempre antes de fazer qualquer alteração e teste tudo antes de implementar qualquer coisa.

@@ -28,17 +28,16 @@ module.exports = {
 
         await interaction.deferReply({ ephemeral: true });
 
-        const cor    = configuracao.get('Cores.Principal') || '5865F2';
-        const accent = (() => { try { return parseInt(cor.replace('#', ''), 16); } catch { return 0x5865F2; } })();
-        const userName  = interaction.user.displayName || interaction.user.username;
-        const guildName = interaction.guild.name;
+        const adminRoleId = configuracao.get('ConfigRoles.cargoadm');
+        const adminRole = adminRoleId ? interaction.guild.roles.cache.get(adminRoleId) : null;
+        const staffLabel = adminRole ? adminRole.name : 'Staff';
 
-        const c = new ContainerBuilder().setAccentColor(accent);
+        const c = new ContainerBuilder();
 
         // ── Cabeçalho ─────────────────────────────────────────────────────────
         c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
             `## ${Emojis.get('store_emoji')} CentralCart — Painel\n` +
-            `${Emojis.get('_silueta_emoji')} **${userName}** · ${guildName}\n\n` +
+            `${Emojis.get('_silueta_emoji')} <@${interaction.user.id}> · ${staffLabel}\n\n` +
             `${Emojis.get('information_emoji')} Selecione uma seção abaixo para visualizar e gerenciar.\n` +
             `-# Apenas usuários autorizados podem realizar alterações.`
         ));

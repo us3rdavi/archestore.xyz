@@ -109,7 +109,7 @@ function buildFormPanelPayload(guildId, slotId) {
     const form  = slots[slotId];
 
     if (!form) {
-        const c = new ContainerBuilder().setAccentColor(0xFF4444);
+        const c = new ContainerBuilder();
         c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
             `${Emojis.get('negative_emoji')} Formulário não encontrado.`
         ));
@@ -128,7 +128,7 @@ function buildFormPanelPayload(guildId, slotId) {
     const qtdPerguntas = (form.questions || []).length;
     const limite       = form.limit_per_user ? `${form.limit_per_user} envio(s)` : `Ilimitado`;
 
-    const c = new ContainerBuilder().setAccentColor(getAccentColor());
+    const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('_messages_emoji')} ${form.name}\n` +
         `-# ${statusIcon} ${statusText}\n\n` +
@@ -233,7 +233,7 @@ function buildChannelConfigPayload(guildId, slotId) {
     const chInput  = form.channel_input  ? `<#${form.channel_input}>`  : `\`Não definido\``;
     const chOutput = form.channel_output ? `<#${form.channel_output}>` : `\`Não definido\``;
 
-    const c = new ContainerBuilder().setAccentColor(getAccentColor());
+    const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('_transfer_emoji')} Configurar Canais\n` +
         `Configure os canais do formulário usando os menus abaixo.\n\n` +
@@ -286,7 +286,7 @@ function buildFormManagePayload(guildId, userId) {
         !k.startsWith('submissions') && !k.startsWith('responses')
     );
 
-    const c = new ContainerBuilder().setAccentColor(getAccentColor());
+    const c = new ContainerBuilder();
 
     if (existing.length === 0) {
         c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
@@ -330,7 +330,7 @@ function buildQuestionsPanelPayload(guildId, slotId) {
         ? questions.map((q, i) => `-# ${i + 1}. ${q.text}`).join('\n')
         : `-# Nenhuma pergunta adicionada ainda.`;
 
-    const c = new ContainerBuilder().setAccentColor(getAccentColor());
+    const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('_lapis_emoji')} Perguntas — ${form.name || `Formulário ${slotId}`}\n` +
         `${qLines}\n\n` +
@@ -557,7 +557,7 @@ module.exports = {
                 // Deletar — confirmação
                 if (action === 'deletar') {
                     const form = (formularios.get(guildId) || {})[slotId];
-                    const c = new ContainerBuilder().setAccentColor(0xFF4444);
+                    const c = new ContainerBuilder();
                     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                         `## ${Emojis.get('warn_emoji')} Deletar Formulário\n` +
                         `Tem certeza que deseja deletar **${form?.name || `Formulário ${slotId}`}**?\n\n` +
@@ -611,7 +611,7 @@ module.exports = {
                     const formTitle  = form.embed?.title || form.name;
                     const formDesc   = form.embed?.description || `Clique no botão abaixo para iniciar sua aplicação.`;
 
-                    const fc = new ContainerBuilder().setAccentColor(embedColor);
+                    const fc = new ContainerBuilder();
                     fc.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                         `## ${Emojis.get('_messages_emoji')} ${formTitle}\n${formDesc}`
                     ));
@@ -987,7 +987,7 @@ function buildStaffConfigPayload(guildId, slotId) {
         ? form.roles_responsible.map(r => `<@&${r}>`).join(', ')
         : `\`Nenhum\``;
 
-    const c = new ContainerBuilder().setAccentColor(getAccentColor());
+    const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('_staff_emoji')} Staff Responsável\n` +
         `Selecione os cargos que poderão aceitar e rejeitar as aplicações.\n\n` +
@@ -1015,7 +1015,7 @@ function buildAprovadoConfigPayload(guildId, slotId) {
     const form  = (formularios.get(guildId) || {})[slotId] || {};
     const atual = form.role_approved ? `<@&${form.role_approved}>` : `\`Não definido\``;
 
-    const c = new ContainerBuilder().setAccentColor(getAccentColor());
+    const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('permissions_emoji')} Cargo ao Aprovar\n` +
         `Selecione o cargo entregue automaticamente quando o candidato for aceito.\n\n` +

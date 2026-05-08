@@ -12,7 +12,7 @@ function getAccentColor() {
 async function Painel(interaction, client) {
     try {
         const container = new ContainerBuilder();
-        container.setAccentColor(getAccentColor());
+        container;
 
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(
@@ -90,7 +90,7 @@ async function definirduvidas(interaction, client) {
     try {
         const infoduvidas = configuracao.get(`BotaoDuvidas`);
         const container = new ContainerBuilder();
-        container.setAccentColor(getAccentColor());
+        container;
 
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(

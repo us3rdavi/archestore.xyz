@@ -22,7 +22,7 @@ function Posicao1(interaction, client) {
     const pos3 = aa?.pos3;
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(

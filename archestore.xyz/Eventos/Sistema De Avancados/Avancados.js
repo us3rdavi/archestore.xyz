@@ -19,7 +19,7 @@ function getSaudacao() {
 
 function buildPanel(title, desc, fields) {
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     let content = `## ${title}\n${desc}`;
     for (const [label, value] of fields) {

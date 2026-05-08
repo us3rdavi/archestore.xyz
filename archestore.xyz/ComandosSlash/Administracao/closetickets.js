@@ -49,7 +49,7 @@ module.exports = {
                 }
 
                 const container = new ContainerBuilder();
-                container.setAccentColor(getAccentColor());
+                container;
                 container.addTextDisplayComponents(
                     new TextDisplayBuilder().setContent(
                         `## Tickets Deletados\n${Emojis.get('confirmed_emoji')} Todos os **${count}** tickets foram deletados com sucesso`

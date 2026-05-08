@@ -8,7 +8,7 @@ async function configrole24(interaction, client) {
     const statusComprar = configuracao.get('ConfigRoles.statuscomprar') || false;
 
     const container = new ContainerBuilder();
-    container.setAccentColor(0x5865F2);
+    container;
 
     const cargoId = configuracao.get("ConfigRoles.cargocarrinho");
     const link = configuracao.get("ConfigLinks.link");

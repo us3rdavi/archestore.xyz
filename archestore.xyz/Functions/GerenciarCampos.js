@@ -40,7 +40,7 @@ async function GerenciarCampos2(interaction, campo, produtoname, update, reply) 
         : `Criado <t:${Math.ceil(gggaaa.criado / 1000)}:R>`;
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     let content =
         `## ${gggaaa.Nome} — ${ggg.name}\n` +
@@ -129,7 +129,7 @@ async function GerenciarCampos(interaction, produtoname) {
     }
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(

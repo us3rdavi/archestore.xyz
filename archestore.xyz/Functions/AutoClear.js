@@ -15,7 +15,7 @@ async function AutoClear(interaction, client) {
         const tempoclear = await relikia.get("autoclear.time") || 0;
 
         const container = new ContainerBuilder();
-        container.setAccentColor(0x5865F2);
+        container;
 
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(

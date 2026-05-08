@@ -15,7 +15,7 @@ async function semiConfigs(interaction, client) {
     const msgAuxilio = configuracao.get("pagamentos.SemiAutomatico.msg") || "Não configurado";
 
     const container = new ContainerBuilder();
-    container.setAccentColor(getAccentColor());
+    container;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(

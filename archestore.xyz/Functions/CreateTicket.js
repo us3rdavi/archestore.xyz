@@ -7,7 +7,7 @@ const {
     ChannelType,
     MessageFlags
 } = require("discord.js");
-const { configuracao, tickets } = require("../DataBaseJson");
+const { tickets } = require("../DataBaseJson");
 const emojis = require("../DataBaseJson/Emojis.json");
 const { buildTicketContainer } = require("./TicketHelpers");
 const fs = require('fs');
@@ -79,10 +79,7 @@ async function CreateTicket(interaction, valor) {
         await thread.members.add(interaction.user.id).catch(() => {});
 
         // Adicionar todos os membros com cargos staff ao tópico privado
-        const staffRoleIds = tickets.get('tickets.staffRoles') || [];
-        const cargoadm = configuracao.get('ConfigRoles.cargoadm');
-        const cargosup = configuracao.get('ConfigRoles.cargosup');
-        const allStaffRoleIds = [...new Set([...staffRoleIds, cargoadm, cargosup].filter(Boolean))];
+        const allStaffRoleIds = tickets.get('tickets.staffRoles') || [];
 
         try {
             await interaction.guild.members.fetch();

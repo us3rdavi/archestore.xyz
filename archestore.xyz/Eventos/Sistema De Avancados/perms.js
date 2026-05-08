@@ -116,7 +116,7 @@ module.exports = {
             }
 
             const container = new ContainerBuilder();
-            container.setAccentColor(0x5865F2);
+            container;
             container.addTextDisplayComponents(
                 new TextDisplayBuilder().setContent(
                     `## ${Emojis.get('confirmed_emoji')} Membros Autorizados (${mempegarperm24.length})\n${mempegarperm24.join('\n')}`

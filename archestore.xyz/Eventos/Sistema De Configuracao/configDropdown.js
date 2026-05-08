@@ -59,7 +59,7 @@ module.exports = {
                     const aparencia = tickets.get('tickets.aparencia');
                     if (!funcoes || Object.keys(funcoes).length === 0 || !aparencia || Object.keys(aparencia).length === 0) {
                         const container = new ContainerBuilder();
-                        container.setAccentColor(getAccentColor());
+                        container;
                         container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                             `## ${Emojis.get('_ticket_emoji')} Postar Painel\n` +
                             `${Emojis.get('negative_emoji')} Configure as funções e aparência do ticket antes de postar.\n\n` +
@@ -77,7 +77,7 @@ module.exports = {
                         return;
                     }
                     const container = new ContainerBuilder();
-                    container.setAccentColor(getAccentColor());
+                    container;
                     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                         `## ${Emojis.get('_ticket_emoji')} Postar Painel de Tickets\n` +
                         `Selecione o canal onde deseja postar o painel de abertura de tickets.`
@@ -126,7 +126,7 @@ module.exports = {
 
                 if (sub === 'personalizacao_designer') {
                     const container = new ContainerBuilder();
-                    container.setAccentColor(getAccentColor());
+                    container;
                     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                         `## ${Emojis.get('_pincel_emoji')} Meu Bot Designer\n` +
                         `Personalize a aparência e identidade do **${client.user.username}**.`
