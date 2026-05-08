@@ -1,5 +1,6 @@
 const {
-    EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder
+    EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder
 } = require('discord.js');
 const { configuracao, Emojis } = require('../DataBaseJson');
 
@@ -119,12 +120,30 @@ function buildMainPanel(userId, interaction) {
     const userName = interaction?.user?.displayName || interaction?.user?.username || 'Administrador';
     const guildName = interaction?.guild?.name || '';
 
-    return new ActionRowBuilder().addComponents(
-        new StringSelectMenuBuilder()
-            .setCustomId(`config_main_${userId}`)
-            .setPlaceholder('Selecione uma categoria...')
-            .addOptions(MAIN_OPTIONS)
+    const container = new ContainerBuilder();
+    container;
+
+    container.addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(
+            `## ${Emojis.get('_settings_emoji')} Central de Configurações\n` +
+            `${Emojis.get('_silueta_emoji')} **${userName}** — ${guildName}\n\n` +
+            `${Emojis.get('information_emoji')} Use o menu abaixo para navegar entre as **${MAIN_OPTIONS.length} categorias** disponíveis.\n` +
+            `-# Apenas usuários autorizados podem realizar alterações.`
+        )
     );
+
+    container.addSeparatorComponents(new SeparatorBuilder());
+
+    container.addActionRowComponents(
+        new ActionRowBuilder().addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId(`config_main_${userId}`)
+                .setPlaceholder('Selecione uma categoria...')
+                .addOptions(MAIN_OPTIONS)
+        )
+    );
+
+    return container;
 }
 
 function buildSubPanel(userId, category) {
@@ -132,13 +151,30 @@ function buildSubPanel(userId, category) {
         { label: 'Página Inicial', value: 'home', description: 'Voltar ao menu principal', emoji: { id: '1371593637179297923' } },
     ];
     const label = CATEGORY_LABELS[category] || category;
+    const header = getCategoryHeader(category);
 
-    return new ActionRowBuilder().addComponents(
-        new StringSelectMenuBuilder()
-            .setCustomId(`config_sub_${userId}`)
-            .setPlaceholder(`${label} — selecione uma opção`)
-            .addOptions(options)
+    const container = new ContainerBuilder();
+    container;
+
+    container.addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(
+            `## ${header}\n` +
+            `-# Selecione uma opção abaixo para continuar.`
+        )
     );
+
+    container.addSeparatorComponents(new SeparatorBuilder());
+
+    container.addActionRowComponents(
+        new ActionRowBuilder().addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId(`config_sub_${userId}`)
+                .setPlaceholder(`${label} — selecione uma opção`)
+                .addOptions(options)
+        )
+    );
+
+    return container;
 }
 
 module.exports = { buildEmbed, buildMainDropdown, buildSubDropdown, buildMainPanel, buildSubPanel, CATEGORY_LABELS, getAccentColor };
