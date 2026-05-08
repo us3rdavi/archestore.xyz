@@ -14,6 +14,7 @@ const {
     MediaGalleryBuilder,
     MediaGalleryItemBuilder,
 } = require('discord.js');
+const QRCode = require('qrcode');
 const { configuracao, tickets, Emojis, painelCards } = require('../../DataBaseJson');
 const centralCart = require('../../Functions/centralCartService');
 const { CreateTicket } = require('../../Functions/CreateTicket');
@@ -221,21 +222,19 @@ async function processarCompra(interaction, dadosCompra) {
             `**${Emojis.get('pix_stamp_emoji')} Código PIX — Copia e Cola:**\n\`\`\`\n${pixCode}\n\`\`\``
         ));
 
-        if (qrBase64) {
-            try {
-                const qrBuffer = Buffer.from(qrBase64, 'base64');
-                extraFiles.push(new AttachmentBuilder(qrBuffer, { name: 'qrcode.png' }));
-                result.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-                    `-# ${Emojis.get('information_emoji')} Escaneie o QR Code para pagar:`
-                ));
-                result.addMediaGalleryComponents(
-                    new MediaGalleryBuilder().addItems(
-                        new MediaGalleryItemBuilder().setURL('attachment://qrcode.png')
-                    )
-                );
-            } catch (e) {
-                console.log('[Checkout] Erro ao gerar QR Code:', e.message);
-            }
+        try {
+            const qrBuffer = await QRCode.toBuffer(pixCode, { type: 'png', width: 512, margin: 2 });
+            extraFiles.push(new AttachmentBuilder(qrBuffer, { name: 'qrcode.png' }));
+            result.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                `-# ${Emojis.get('information_emoji')} Escaneie o QR Code para pagar:`
+            ));
+            result.addMediaGalleryComponents(
+                new MediaGalleryBuilder().addItems(
+                    new MediaGalleryItemBuilder().setURL('attachment://qrcode.png')
+                )
+            );
+        } catch (e) {
+            console.log('[Checkout] Erro ao gerar QR Code:', e.message);
         }
 
         result.addSeparatorComponents(new SeparatorBuilder());
@@ -406,11 +405,7 @@ module.exports = {
                 entregaAuto: variante ? isEntregaAuto(variante) : msgDados.entregaAuto,
             });
 
-            const c = new ContainerBuilder().setAccentColor(getAccentColor());
-            c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-                `${Emojis.get('confirmed_emoji')} **${variante?.name || 'Variante'}** selecionada — ${variante ? formatarPreco(variante) : msgDados.preco}\nAgora clique em **Comprar**.`
-            ));
-            await interaction.reply({ components: [c], flags: MessageFlags.IsComponentsV2, embeds: [], content: '', ephemeral: true });
+            await interaction.deferUpdate();
         }
 
         // ── [USUÁRIO] Clicou em Comprar → pede nome e email via modal ─────────
