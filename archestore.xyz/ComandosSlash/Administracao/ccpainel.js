@@ -26,8 +26,6 @@ module.exports = {
             });
         }
 
-        await interaction.deferReply({ ephemeral: true });
-
         const adminRoleId = configuracao.get('ConfigRoles.cargoadm');
         const adminRole = adminRoleId ? interaction.guild.roles.cache.get(adminRoleId) : null;
         const staffLabel = adminRole ? adminRole.name : 'Staff';
@@ -75,11 +73,20 @@ module.exports = {
             )
         );
 
-        await interaction.editReply({
-            components: [c],
-            flags: MessageFlags.IsComponentsV2,
-            embeds: [],
-            content: '',
-        });
+        try {
+            await interaction.reply({
+                ephemeral: true,
+                components: [c],
+                flags: MessageFlags.IsComponentsV2,
+                embeds: [],
+                content: '',
+            });
+        } catch (err) {
+            console.error('[CCPainel] Erro:', err);
+            try {
+                if (!interaction.replied && !interaction.deferred)
+                    await interaction.reply({ content: `${Emojis.get('negative_emoji')} Ocorreu um erro.`, ephemeral: true });
+            } catch (e) {}
+        }
     },
 };

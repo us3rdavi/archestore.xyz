@@ -19,13 +19,12 @@ module.exports = {
                 });
             }
 
-            await interaction.deferReply({ ephemeral: true });
-
-            await interaction.editReply({
+            await interaction.reply({
+                ephemeral: true,
                 components: [buildMainPanel(interaction.user.id, interaction)],
                 flags: MessageFlags.IsComponentsV2,
                 embeds: [],
-                content: ''
+                content: '',
             });
         } catch (err) {
             console.error('[Config] Erro:', err);
