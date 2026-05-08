@@ -30,7 +30,7 @@ const {
 
 const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
 
-// Per-user state
+// ── Estado por usuário ────────────────────────────────────────────────────────
 const ccState = new Map();
 function getState(userId) {
     if (!ccState.has(userId)) ccState.set(userId, { secao: null, extraData: {} });
@@ -42,14 +42,15 @@ function getAccentColor() {
     try { return parseInt(cor.replace('#', ''), 16); } catch { return 0x5865F2; }
 }
 
+// ── Seções com emojis ─────────────────────────────────────────────────────────
 const SECOES = [
-    { value: 'loja',         label: 'Loja',         description: 'Informações da loja' },
-    { value: 'receita',      label: 'Receita',      description: 'Resumo de receita e operações' },
-    { value: 'produtos',     label: 'Produtos',     description: 'Lista de produtos da loja' },
-    { value: 'pedidos',      label: 'Pedidos',      description: 'Pedidos recentes' },
-    { value: 'estoque',      label: 'Estoque',      description: 'Chaves de licença por produto' },
-    { value: 'cupons',       label: 'Cupons',       description: 'Cupons de desconto' },
-    { value: 'top_clientes', label: 'Top Clientes', description: 'Maiores compradores' },
+    { value: 'loja',         label: 'Loja',         description: 'Informações e plano da loja',          emoji: { id: '1501803947898306724' } },
+    { value: 'receita',      label: 'Receita',       description: 'Resumo financeiro e operações do dia', emoji: { id: '1501803982849445998' } },
+    { value: 'produtos',     label: 'Produtos',      description: 'Catálogo de produtos da loja',         emoji: { id: '1501803960393269298' } },
+    { value: 'pedidos',      label: 'Pedidos',       description: 'Histórico e gestão de pedidos',        emoji: { id: '1501803951161479208' } },
+    { value: 'estoque',      label: 'Estoque',       description: 'Chaves de licença por produto',        emoji: { id: '1501804010049634426' } },
+    { value: 'cupons',       label: 'Cupons',        description: 'Criação e gestão de cupons',           emoji: { id: '1501804052827209768' } },
+    { value: 'top_clientes', label: 'Top Clientes',  description: 'Ranking dos maiores compradores',      emoji: { id: '1501804049563910285' } },
 ];
 
 const STATUS_LABEL = {
@@ -61,7 +62,7 @@ function fmtBRL(v) {
     return `R$ ${Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-// ── Navigation menu ──────────────────────────────────────────────────────────
+// ── Menu de navegação ─────────────────────────────────────────────────────────
 function buildNav(secaoAtiva) {
     return new ActionRowBuilder().addComponents(
         new StringSelectMenuBuilder()
@@ -71,23 +72,23 @@ function buildNav(secaoAtiva) {
     );
 }
 
-// ── Section content builders ─────────────────────────────────────────────────
+// ── Builders de seção ─────────────────────────────────────────────────────────
 async function buildLoja() {
     const loja = await getAppDetails();
     const vencimento = loja.overdue_date
         ? `<t:${Math.floor(new Date(loja.overdue_date).getTime() / 1000)}:D>`
-        : 'N/A';
+        : '`N/A`';
 
     return {
         title: `${Emojis.get('store_emoji')} Loja`,
         text:
-            `**Nome:** ${loja.name}\n` +
-            `**ID:** \`${loja.id}\`\n` +
-            `**Plano:** \`${loja.plan}\`\n` +
-            `**URL:** ${loja.url}\n` +
-            `**Assinatura até:** ${vencimento}`,
+            `${Emojis.get('_text_emoji')} **Nome:** ${loja.name}\n` +
+            `${Emojis.get('information_emoji')} **ID:** \`${loja.id}\`\n` +
+            `${Emojis.get('_diamond_emoji')} **Plano:** \`${loja.plan}\`\n` +
+            `${Emojis.get('_send_emoji')} **URL:** ${loja.url}\n` +
+            `${Emojis.get('date_emoji')} **Assinatura até:** ${vencimento}`,
         buttons: [
-            new ButtonBuilder().setCustomId('ccpainel_refresh_loja').setLabel('Atualizar').setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder().setCustomId('ccpainel_refresh_loja').setLabel('Atualizar').setEmoji({ id: '1501803920576745522' }).setStyle(ButtonStyle.Secondary),
         ],
     };
 }
@@ -102,22 +103,22 @@ async function buildReceita() {
     return {
         title: `${Emojis.get('_money_emoji')} Receita`,
         text:
-            `**Hoje**\n` +
-            `Líquido: \`${fmtBRL(receita.today)}\` — Vendas: \`${receita.today_sales ?? 0}\`\n\n` +
-            `**Mês atual**\n` +
-            `Líquido: \`${fmtBRL(receita.month)}\` — Vendas: \`${receita.month_sales ?? 0}\`\n\n` +
-            `**Total geral:** \`${fmtBRL(receita.all_time)}\`\n\n` +
-            `**Operações de hoje**\n` +
-            `${Emojis.get('confirmedpayment_emoji')} Aprovados: \`${ops.approved ?? 0}\`   ` +
+            `${Emojis.get('date_emoji')} **Hoje**\n` +
+            `> Líquido: \`${fmtBRL(receita.today)}\` — Vendas: \`${receita.today_sales ?? 0}\`\n\n` +
+            `${Emojis.get('_messages_emoji')} **Mês atual**\n` +
+            `> Líquido: \`${fmtBRL(receita.month)}\` — Vendas: \`${receita.month_sales ?? 0}\`\n\n` +
+            `${Emojis.get('_star_emoji')} **Total geral:** \`${fmtBRL(receita.all_time)}\`\n\n` +
+            `${Emojis.get('information_emoji')} **Operações de hoje**\n` +
+            `> ${Emojis.get('confirmedpayment_emoji')} Aprovados: \`${ops.approved ?? 0}\`   ` +
             `${Emojis.get('failpayment_emoji')} Chargebacks: \`${ops.charged_back ?? 0}\``,
         buttons: [
-            new ButtonBuilder().setCustomId('ccpainel_refresh_receita').setLabel('Atualizar').setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder().setCustomId('ccpainel_refresh_receita').setLabel('Atualizar').setEmoji({ id: '1501803920576745522' }).setStyle(ButtonStyle.Secondary),
         ],
     };
 }
 
 async function buildProdutos(busca = null) {
-    const res = await listPackages({ search: busca || null });
+    const res     = await listPackages({ search: busca || null });
     const pacotes = res.data || [];
 
     let text;
@@ -126,7 +127,7 @@ async function buildProdutos(busca = null) {
     } else {
         const linhas = pacotes.slice(0, 15).map(p => {
             const estoque = p.inventory_amount === null ? '∞' : p.inventory_amount;
-            const status = p.enabled ? Emojis.get('confirmed_emoji') : Emojis.get('negative_emoji');
+            const status  = p.enabled ? Emojis.get('confirmed_emoji') : Emojis.get('negative_emoji');
             return `${status} \`${p.id}\` **${p.name}** — \`${p.formatted_price}\` — estoque: \`${estoque}\``;
         });
         const total = res.meta?.total ?? pacotes.length;
@@ -137,14 +138,14 @@ async function buildProdutos(busca = null) {
         title: `${Emojis.get('_cart_emoji')} Produtos`,
         text,
         buttons: [
-            new ButtonBuilder().setCustomId('ccpainel_btn_buscar_produto').setLabel('Buscar').setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId('ccpainel_refresh_produtos').setLabel('Atualizar').setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder().setCustomId('ccpainel_btn_buscar_produto').setLabel('Buscar').setEmoji({ id: '1501803928973476023' }).setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setCustomId('ccpainel_refresh_produtos').setLabel('Atualizar').setEmoji({ id: '1501803920576745522' }).setStyle(ButtonStyle.Secondary),
         ],
     };
 }
 
 async function buildPedidos(opts = {}) {
-    const res = await listOrders({ status: opts.status || null, search: opts.busca || null });
+    const res     = await listOrders({ status: opts.status || null, search: opts.busca || null });
     const pedidos = res.data || [];
 
     let text;
@@ -153,7 +154,7 @@ async function buildPedidos(opts = {}) {
     } else {
         const linhas = pedidos.slice(0, 8).map(p => {
             const statusLabel = STATUS_LABEL[p.status] || p.status;
-            const data = p.created_at ? `<t:${Math.floor(new Date(p.created_at).getTime() / 1000)}:d>` : 'N/A';
+            const data    = p.created_at ? `<t:${Math.floor(new Date(p.created_at).getTime() / 1000)}:d>` : 'N/A';
             const cliente = p.client_name || p.client_email || p.discord_id || 'Desconhecido';
             return `**${cliente}** — \`${p.formatted_price}\` — ${statusLabel} — ${data}\n-# ID: \`${p.id}\``;
         });
@@ -165,10 +166,10 @@ async function buildPedidos(opts = {}) {
         title: `${Emojis.get('neworder_emoji')} Pedidos`,
         text,
         buttons: [
-            new ButtonBuilder().setCustomId('ccpainel_btn_ver_pedido').setLabel('Ver por ID').setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId('ccpainel_btn_reembolso').setLabel('Reembolsar').setStyle(ButtonStyle.Danger),
-            new ButtonBuilder().setCustomId('ccpainel_btn_filtrar_pedidos').setLabel('Filtrar').setStyle(ButtonStyle.Secondary),
-            new ButtonBuilder().setCustomId('ccpainel_refresh_pedidos').setLabel('Atualizar').setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder().setCustomId('ccpainel_btn_ver_pedido').setLabel('Ver por ID').setEmoji({ id: '1501803928973476023' }).setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setCustomId('ccpainel_btn_reembolso').setLabel('Reembolsar').setEmoji({ id: '1501803982849445998' }).setStyle(ButtonStyle.Danger),
+            new ButtonBuilder().setCustomId('ccpainel_btn_filtrar_pedidos').setLabel('Filtrar').setEmoji({ id: '1501804030605922346' }).setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder().setCustomId('ccpainel_refresh_pedidos').setLabel('Atualizar').setEmoji({ id: '1501803920576745522' }).setStyle(ButtonStyle.Secondary),
         ],
     };
 }
@@ -182,27 +183,27 @@ async function buildEstoque(opts = {}) {
             text = `${Emojis.get('_search_emoji')} Nenhuma chave no produto \`${opts.produtoId}\`.`;
         } else {
             const linhas = chaves.slice(0, 20).map((c, i) => `**${i + 1}.** ||${c.value}||`);
-            text = `**Produto \`${opts.produtoId}\`** — ${chaves.length} chave(s)\n\n${linhas.join('\n')}`;
+            text = `${Emojis.get('_folder_emoji')} **Produto \`${opts.produtoId}\`** — ${chaves.length} chave(s)\n\n${linhas.join('\n')}`;
         }
     } else {
         text =
-            `Selecione uma ação abaixo.\n\n` +
-            `**Ver chaves** — lista as chaves de licença de um produto\n` +
-            `**Adicionar chaves** — adiciona chaves a um produto`;
+            `${Emojis.get('information_emoji')} Selecione uma ação abaixo.\n\n` +
+            `${Emojis.get('_folder_emoji')} **Ver chaves** — lista as chaves de licença de um produto\n` +
+            `${Emojis.get('_add_emoji')} **Adicionar chaves** — adiciona novas chaves a um produto`;
     }
 
     return {
         title: `${Emojis.get('_folder_emoji')} Estoque`,
         text,
         buttons: [
-            new ButtonBuilder().setCustomId('ccpainel_btn_ver_estoque').setLabel('Ver chaves').setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId('ccpainel_btn_add_estoque').setLabel('Adicionar chaves').setStyle(ButtonStyle.Success),
+            new ButtonBuilder().setCustomId('ccpainel_btn_ver_estoque').setLabel('Ver chaves').setEmoji({ id: '1501803928973476023' }).setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setCustomId('ccpainel_btn_add_estoque').setLabel('Adicionar chaves').setEmoji({ id: '1501803905363869769' }).setStyle(ButtonStyle.Success),
         ],
     };
 }
 
 async function buildCupons(busca = null) {
-    const res = await listDiscounts({ coupon: busca || undefined });
+    const res    = await listDiscounts({ coupon: busca || undefined });
     const cupons = res.data || [];
 
     let text;
@@ -223,15 +224,15 @@ async function buildCupons(busca = null) {
         title: `${Emojis.get('_diamond_emoji')} Cupons`,
         text,
         buttons: [
-            new ButtonBuilder().setCustomId('ccpainel_btn_criar_cupom').setLabel('Criar cupom').setStyle(ButtonStyle.Success),
-            new ButtonBuilder().setCustomId('ccpainel_btn_deletar_cupom').setLabel('Deletar cupom').setStyle(ButtonStyle.Danger),
-            new ButtonBuilder().setCustomId('ccpainel_refresh_cupons').setLabel('Atualizar').setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder().setCustomId('ccpainel_btn_criar_cupom').setLabel('Criar cupom').setEmoji({ id: '1501803905363869769' }).setStyle(ButtonStyle.Success),
+            new ButtonBuilder().setCustomId('ccpainel_btn_deletar_cupom').setLabel('Deletar cupom').setEmoji({ id: '1501803926180335727' }).setStyle(ButtonStyle.Danger),
+            new ButtonBuilder().setCustomId('ccpainel_refresh_cupons').setLabel('Atualizar').setEmoji({ id: '1501803920576745522' }).setStyle(ButtonStyle.Secondary),
         ],
     };
 }
 
 async function buildTopClientes(opts = {}) {
-    const res = await getTopCustomers({ from: opts.from, to: opts.to });
+    const res      = await getTopCustomers({ from: opts.from, to: opts.to });
     const clientes = res.data || [];
 
     let text;
@@ -249,34 +250,35 @@ async function buildTopClientes(opts = {}) {
         title: `${Emojis.get('_star_emoji')} Top Clientes`,
         text,
         buttons: [
-            new ButtonBuilder().setCustomId('ccpainel_btn_top_periodo').setLabel('Filtrar período').setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId('ccpainel_refresh_top_clientes').setLabel('Atualizar').setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder().setCustomId('ccpainel_btn_top_periodo').setLabel('Filtrar período').setEmoji({ id: '1501804055826141246' }).setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setCustomId('ccpainel_refresh_top_clientes').setLabel('Atualizar').setEmoji({ id: '1501803920576745522' }).setStyle(ButtonStyle.Secondary),
         ],
     };
 }
 
-// ── Section dispatcher ───────────────────────────────────────────────────────
+// ── Dispatcher ────────────────────────────────────────────────────────────────
 async function loadSecao(secao, extraData = {}) {
     switch (secao) {
-        case 'loja':        return buildLoja();
-        case 'receita':     return buildReceita();
-        case 'produtos':    return buildProdutos(extraData.busca);
-        case 'pedidos':     return buildPedidos(extraData);
-        case 'estoque':     return buildEstoque(extraData);
-        case 'cupons':      return buildCupons(extraData.busca);
-        case 'top_clientes':return buildTopClientes(extraData);
+        case 'loja':         return buildLoja();
+        case 'receita':      return buildReceita();
+        case 'produtos':     return buildProdutos(extraData.busca);
+        case 'pedidos':      return buildPedidos(extraData);
+        case 'estoque':      return buildEstoque(extraData);
+        case 'cupons':       return buildCupons(extraData.busca);
+        case 'top_clientes': return buildTopClientes(extraData);
         default: return {
             title: `${Emojis.get('store_emoji')} CentralCart`,
-            text: 'Selecione uma seção no menu abaixo.',
+            text: `${Emojis.get('information_emoji')} Selecione uma seção no menu abaixo.`,
             buttons: [],
         };
     }
 }
 
-// ── Container builders ───────────────────────────────────────────────────────
+// ── Container principal da seção ──────────────────────────────────────────────
 async function buildPainel(secao, extraData = {}) {
     const { title, text, buttons } = await loadSecao(secao, extraData);
     const c = new ContainerBuilder().setAccentColor(getAccentColor());
+
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${title}\n-# CentralCart — Painel`
     ));
@@ -284,6 +286,7 @@ async function buildPainel(secao, extraData = {}) {
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(text));
     c.addSeparatorComponents(new SeparatorBuilder());
     c.addActionRowComponents(buildNav(secao));
+
     if (buttons.length) {
         c.addActionRowComponents(new ActionRowBuilder().addComponents(...buttons));
     }
@@ -311,16 +314,16 @@ function infoContainer(secao, msg, extraButtons = []) {
     return c;
 }
 
-// ── Event handler ────────────────────────────────────────────────────────────
+// ── Handler de eventos ────────────────────────────────────────────────────────
 module.exports = {
     name: 'interactionCreate',
     run: async (client, interaction) => {
 
-        // ── Nav select menu ──────────────────────────────────────────────────
+        // ── Select menu de navegação ──────────────────────────────────────────
         if (interaction.isStringSelectMenu() && interaction.customId === 'ccpainel_nav') {
             const secao = interaction.values[0];
             const state = getState(interaction.user.id);
-            state.secao = secao;
+            state.secao     = secao;
             state.extraData = {};
 
             await interaction.deferUpdate();
@@ -333,7 +336,7 @@ module.exports = {
             return;
         }
 
-        // ── Refresh buttons ──────────────────────────────────────────────────
+        // ── Botões de atualizar ───────────────────────────────────────────────
         if (interaction.isButton() && interaction.customId.startsWith('ccpainel_refresh_')) {
             const secao = interaction.customId.replace('ccpainel_refresh_', '');
             const state = getState(interaction.user.id);
@@ -349,7 +352,7 @@ module.exports = {
             return;
         }
 
-        // ── Action buttons → open modals ─────────────────────────────────────
+        // ── Botões que abrem modais ───────────────────────────────────────────
 
         if (interaction.isButton() && interaction.customId === 'ccpainel_btn_buscar_produto') {
             const modal = new ModalBuilder().setCustomId('ccpainel_modal_buscar_produto').setTitle('Buscar Produto');
@@ -363,7 +366,7 @@ module.exports = {
         }
 
         if (interaction.isButton() && interaction.customId === 'ccpainel_btn_ver_pedido') {
-            const modal = new ModalBuilder().setCustomId('ccpainel_modal_ver_pedido').setTitle('Ver Pedido');
+            const modal = new ModalBuilder().setCustomId('ccpainel_modal_ver_pedido').setTitle('Ver Pedido por ID');
             modal.addComponents(
                 new ActionRowBuilder().addComponents(
                     new TextInputBuilder().setCustomId('pedido_id').setLabel('ID do pedido')
@@ -483,47 +486,43 @@ module.exports = {
             return interaction.showModal(modal);
         }
 
-        // ── Modal submissions ────────────────────────────────────────────────
+        // ── Submissões de modal ───────────────────────────────────────────────
         if (!interaction.isModalSubmit() || !interaction.customId.startsWith('ccpainel_modal_')) return;
 
         const modalId = interaction.customId;
-        const state = getState(interaction.user.id);
+        const state   = getState(interaction.user.id);
 
-        // Modals triggered by buttons (isFromMessage = true) can deferUpdate + editReply
         await interaction.deferUpdate();
 
         try {
             let c;
 
-            // ─ Buscar produto ────────────────────────────────────────────────
+            // ─ Buscar produto ─────────────────────────────────────────────────
             if (modalId === 'ccpainel_modal_buscar_produto') {
                 const busca = interaction.fields.getTextInputValue('busca').trim() || null;
-                state.secao = 'produtos';
+                state.secao     = 'produtos';
                 state.extraData = { busca };
                 c = await buildPainel('produtos', { busca });
             }
 
-            // ─ Ver pedido por ID ─────────────────────────────────────────────
+            // ─ Ver pedido por ID ──────────────────────────────────────────────
             else if (modalId === 'ccpainel_modal_ver_pedido') {
                 const pedidoId = interaction.fields.getTextInputValue('pedido_id').trim();
-                const p = await getOrder(pedidoId);
+                const p        = await getOrder(pedidoId);
 
-                const criadoEm = p.created_at
-                    ? `<t:${Math.floor(new Date(p.created_at).getTime() / 1000)}:f>` : 'N/A';
-                const pagoEm = p.paid_at
-                    ? `<t:${Math.floor(new Date(p.paid_at).getTime() / 1000)}:f>` : 'N/A';
-                const pacotesNomes = (p.packages || [])
-                    .map(pkg => `\`${pkg.quantity}x\` ${pkg.name}`).join('\n') || 'N/A';
+                const criadoEm  = p.created_at ? `<t:${Math.floor(new Date(p.created_at).getTime() / 1000)}:f>` : 'N/A';
+                const pagoEm    = p.paid_at    ? `<t:${Math.floor(new Date(p.paid_at).getTime() / 1000)}:f>`    : 'N/A';
+                const pacotesNomes = (p.packages || []).map(pkg => `\`${pkg.quantity}x\` ${pkg.name}`).join('\n') || 'N/A';
 
                 const text =
                     `-# ${p.formatted_status || p.status} — ${p.formatted_gateway || p.gateway || 'N/A'}\n\n` +
-                    `**Cliente:** ${p.client_name || 'N/A'}\n` +
-                    `**Email:** \`${p.client_email || 'N/A'}\`\n` +
-                    `**Discord ID:** \`${p.discord_id || 'N/A'}\`\n` +
-                    `**Valor:** \`${p.formatted_price || 'N/A'}\`\n\n` +
-                    `**Pacotes:**\n${pacotesNomes}\n\n` +
-                    `**Criado em:** ${criadoEm}\n` +
-                    `**Pago em:** ${pagoEm}`;
+                    `${Emojis.get('_silueta_emoji')} **Cliente:** ${p.client_name || 'N/A'}\n` +
+                    `${Emojis.get('_mail_emoji')} **Email:** \`${p.client_email || 'N/A'}\`\n` +
+                    `${Emojis.get('_staff_emoji')} **Discord ID:** \`${p.discord_id || 'N/A'}\`\n` +
+                    `${Emojis.get('_money_emoji')} **Valor:** \`${p.formatted_price || 'N/A'}\`\n\n` +
+                    `${Emojis.get('_cart_emoji')} **Pacotes:**\n${pacotesNomes}\n\n` +
+                    `${Emojis.get('date_emoji')} **Criado em:** ${criadoEm}\n` +
+                    `${Emojis.get('confirmed_emoji')} **Pago em:** ${pagoEm}`;
 
                 const viewC = new ContainerBuilder().setAccentColor(getAccentColor());
                 viewC.addTextDisplayComponents(new TextDisplayBuilder().setContent(
@@ -534,46 +533,46 @@ module.exports = {
                 viewC.addSeparatorComponents(new SeparatorBuilder());
                 viewC.addActionRowComponents(buildNav('pedidos'));
                 viewC.addActionRowComponents(new ActionRowBuilder().addComponents(
-                    new ButtonBuilder().setCustomId('ccpainel_refresh_pedidos').setLabel('← Voltar').setStyle(ButtonStyle.Secondary),
-                    new ButtonBuilder().setCustomId('ccpainel_btn_reembolso').setLabel('Reembolsar este pedido').setStyle(ButtonStyle.Danger),
+                    new ButtonBuilder().setCustomId('ccpainel_refresh_pedidos').setLabel('Voltar').setEmoji({ id: '1501803908589162537' }).setStyle(ButtonStyle.Secondary),
+                    new ButtonBuilder().setCustomId('ccpainel_btn_reembolso').setLabel('Reembolsar este pedido').setEmoji({ id: '1501803982849445998' }).setStyle(ButtonStyle.Danger),
                 ));
                 c = viewC;
             }
 
-            // ─ Reembolsar ────────────────────────────────────────────────────
+            // ─ Reembolsar ─────────────────────────────────────────────────────
             else if (modalId === 'ccpainel_modal_reembolso') {
                 const pedidoId = interaction.fields.getTextInputValue('pedido_id').trim();
-                const res = await updateOrder(pedidoId, { status: 'REFUNDED', manually_refunded: true });
+                const res      = await updateOrder(pedidoId, { status: 'REFUNDED', manually_refunded: true });
                 const msg =
-                    `${Emojis.get('confirmed_emoji')} Pedido \`${pedidoId}\` reembolsado.\n\n` +
-                    `**Status:** \`${res.formatted_status || 'REFUNDED'}\`\n` +
-                    `**Cliente:** ${res.client_name || res.client_email || 'N/A'}`;
-                state.secao = 'pedidos';
+                    `${Emojis.get('confirmed_emoji')} Pedido \`${pedidoId}\` reembolsado com sucesso.\n\n` +
+                    `${Emojis.get('information_emoji')} **Status:** \`${res.formatted_status || 'REFUNDED'}\`\n` +
+                    `${Emojis.get('_silueta_emoji')} **Cliente:** ${res.client_name || res.client_email || 'N/A'}`;
+                state.secao     = 'pedidos';
                 state.extraData = {};
                 c = infoContainer('pedidos', msg, [
-                    new ButtonBuilder().setCustomId('ccpainel_refresh_pedidos').setLabel('← Voltar aos Pedidos').setStyle(ButtonStyle.Secondary),
+                    new ButtonBuilder().setCustomId('ccpainel_refresh_pedidos').setLabel('Voltar aos Pedidos').setEmoji({ id: '1501803908589162537' }).setStyle(ButtonStyle.Secondary),
                 ]);
             }
 
-            // ─ Filtrar pedidos ───────────────────────────────────────────────
+            // ─ Filtrar pedidos ────────────────────────────────────────────────
             else if (modalId === 'ccpainel_modal_filtrar_pedidos') {
                 const statusRaw = interaction.fields.getTextInputValue('status').trim().toUpperCase() || null;
-                const busca = interaction.fields.getTextInputValue('busca').trim() || null;
-                const status = statusRaw && STATUS_LABEL[statusRaw] ? statusRaw : null;
-                state.secao = 'pedidos';
+                const busca     = interaction.fields.getTextInputValue('busca').trim() || null;
+                const status    = statusRaw && STATUS_LABEL[statusRaw] ? statusRaw : null;
+                state.secao     = 'pedidos';
                 state.extraData = { status, busca };
                 c = await buildPainel('pedidos', { status, busca });
             }
 
-            // ─ Ver estoque ───────────────────────────────────────────────────
+            // ─ Ver estoque ────────────────────────────────────────────────────
             else if (modalId === 'ccpainel_modal_ver_estoque') {
                 const produtoId = interaction.fields.getTextInputValue('produto_id').trim();
-                state.secao = 'estoque';
+                state.secao     = 'estoque';
                 state.extraData = { produtoId };
                 c = await buildPainel('estoque', { produtoId });
             }
 
-            // ─ Adicionar chaves ──────────────────────────────────────────────
+            // ─ Adicionar chaves ───────────────────────────────────────────────
             else if (modalId === 'ccpainel_modal_add_estoque') {
                 const produtoId = interaction.fields.getTextInputValue('produto_id').trim();
                 const chavesRaw = interaction.fields.getTextInputValue('chaves');
@@ -585,25 +584,25 @@ module.exports = {
                     const res = await addLicenseKeys(parseInt(produtoId), chavesArr);
                     const msg =
                         `${Emojis.get('confirmed_emoji')} Chaves adicionadas ao produto \`${produtoId}\`.\n\n` +
-                        `**Adicionadas:** \`${res.added_count ?? chavesArr.length}\`` +
-                        (res.message ? `\n**Info:** ${res.message}` : '');
-                    state.secao = 'estoque';
+                        `${Emojis.get('_folder_emoji')} **Adicionadas:** \`${res.added_count ?? chavesArr.length}\`` +
+                        (res.message ? `\n${Emojis.get('information_emoji')} **Info:** ${res.message}` : '');
+                    state.secao     = 'estoque';
                     state.extraData = {};
                     c = infoContainer('estoque', msg, [
-                        new ButtonBuilder().setCustomId('ccpainel_btn_ver_estoque').setLabel('Ver chaves').setStyle(ButtonStyle.Primary),
-                        new ButtonBuilder().setCustomId('ccpainel_btn_add_estoque').setLabel('Adicionar mais').setStyle(ButtonStyle.Success),
+                        new ButtonBuilder().setCustomId('ccpainel_btn_ver_estoque').setLabel('Ver chaves').setEmoji({ id: '1501803928973476023' }).setStyle(ButtonStyle.Primary),
+                        new ButtonBuilder().setCustomId('ccpainel_btn_add_estoque').setLabel('Adicionar mais').setEmoji({ id: '1501803905363869769' }).setStyle(ButtonStyle.Success),
                     ]);
                 }
             }
 
-            // ─ Criar cupom ───────────────────────────────────────────────────
+            // ─ Criar cupom ────────────────────────────────────────────────────
             else if (modalId === 'ccpainel_modal_criar_cupom') {
-                const codigo   = interaction.fields.getTextInputValue('codigo').trim();
-                const tipoRaw  = interaction.fields.getTextInputValue('tipo').trim().toUpperCase();
-                const tipo     = ['PERCENTAGE', 'PRICE'].includes(tipoRaw) ? tipoRaw : 'PERCENTAGE';
-                const valor    = parseFloat(interaction.fields.getTextInputValue('valor').trim()) || 0;
-                const maxUsos  = parseInt(interaction.fields.getTextInputValue('max_usos').trim()) || null;
-                const expira   = interaction.fields.getTextInputValue('expira_em').trim() || null;
+                const codigo  = interaction.fields.getTextInputValue('codigo').trim();
+                const tipoRaw = interaction.fields.getTextInputValue('tipo').trim().toUpperCase();
+                const tipo    = ['PERCENTAGE', 'PRICE'].includes(tipoRaw) ? tipoRaw : 'PERCENTAGE';
+                const valor   = parseFloat(interaction.fields.getTextInputValue('valor').trim()) || 0;
+                const maxUsos = parseInt(interaction.fields.getTextInputValue('max_usos').trim()) || null;
+                const expira  = interaction.fields.getTextInputValue('expira_em').trim() || null;
 
                 const body = { coupon: codigo, type: tipo, value: valor, applies_to: [-1] };
                 if (maxUsos) body.max_uses = maxUsos;
@@ -615,36 +614,36 @@ module.exports = {
                     : `R$ ${(valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
 
                 const msg =
-                    `${Emojis.get('confirmed_emoji')} Cupom **${res.coupon || codigo}** criado.\n\n` +
-                    `**Desconto:** \`${valorFmt}\`\n` +
-                    `**Máx. usos:** ${maxUsos ? `\`${maxUsos}\`` : '`Ilimitado`'}\n` +
-                    `**Expira em:** ${expira ? `\`${expira}\`` : '`Sem expiração`'}`;
+                    `${Emojis.get('confirmed_emoji')} Cupom **${res.coupon || codigo}** criado com sucesso.\n\n` +
+                    `${Emojis.get('_diamond_emoji')} **Desconto:** \`${valorFmt}\`\n` +
+                    `${Emojis.get('_messages_emoji')} **Máx. usos:** ${maxUsos ? `\`${maxUsos}\`` : '`Ilimitado`'}\n` +
+                    `${Emojis.get('date_emoji')} **Expira em:** ${expira ? `\`${expira}\`` : '`Sem expiração`'}`;
 
-                state.secao = 'cupons';
+                state.secao     = 'cupons';
                 state.extraData = {};
                 c = infoContainer('cupons', msg, [
-                    new ButtonBuilder().setCustomId('ccpainel_refresh_cupons').setLabel('← Ver Cupons').setStyle(ButtonStyle.Secondary),
+                    new ButtonBuilder().setCustomId('ccpainel_refresh_cupons').setLabel('Ver Cupons').setEmoji({ id: '1501803908589162537' }).setStyle(ButtonStyle.Secondary),
                 ]);
             }
 
-            // ─ Deletar cupom ─────────────────────────────────────────────────
+            // ─ Deletar cupom ──────────────────────────────────────────────────
             else if (modalId === 'ccpainel_modal_deletar_cupom') {
                 const cupomId = parseInt(interaction.fields.getTextInputValue('cupom_id').trim());
                 await deleteDiscount(cupomId);
 
                 const msg = `${Emojis.get('confirmed_emoji')} Cupom \`${cupomId}\` deletado com sucesso.`;
-                state.secao = 'cupons';
+                state.secao     = 'cupons';
                 state.extraData = {};
                 c = infoContainer('cupons', msg, [
-                    new ButtonBuilder().setCustomId('ccpainel_refresh_cupons').setLabel('← Ver Cupons').setStyle(ButtonStyle.Secondary),
+                    new ButtonBuilder().setCustomId('ccpainel_refresh_cupons').setLabel('Ver Cupons').setEmoji({ id: '1501803908589162537' }).setStyle(ButtonStyle.Secondary),
                 ]);
             }
 
-            // ─ Filtrar Top Clientes ──────────────────────────────────────────
+            // ─ Filtrar Top Clientes ───────────────────────────────────────────
             else if (modalId === 'ccpainel_modal_top_periodo') {
                 const from = interaction.fields.getTextInputValue('from').trim() || null;
-                const to   = interaction.fields.getTextInputValue('to').trim() || null;
-                state.secao = 'top_clientes';
+                const to   = interaction.fields.getTextInputValue('to').trim()   || null;
+                state.secao     = 'top_clientes';
                 state.extraData = { from, to };
                 c = await buildPainel('top_clientes', { from, to });
             }

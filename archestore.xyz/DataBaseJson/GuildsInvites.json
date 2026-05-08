@@ -761,36 +761,6 @@
             "url": "https://discord.gg/ZCU3RXKmZQ",
             "expiresTimestamp": null,
             "uses": 0
-        },
-        {
-            "code": "gVQw8hNkjS",
-            "temporary": false,
-            "maxAge": 0,
-            "maxUses": 0,
-            "inviterId": "804354181653463120",
-            "targetUser": null,
-            "targetApplication": null,
-            "targetType": null,
-            "channelId": "1492286870816686150",
-            "createdTimestamp": 1775859337586,
-            "url": "https://discord.gg/gVQw8hNkjS",
-            "expiresTimestamp": null,
-            "uses": 0
-        },
-        {
-            "code": "tR6AryzMr",
-            "temporary": false,
-            "maxAge": 2592000,
-            "maxUses": 0,
-            "inviterId": "804354181653463120",
-            "targetUser": null,
-            "targetApplication": null,
-            "targetType": null,
-            "channelId": "1492286870816686150",
-            "createdTimestamp": 1775859322822,
-            "url": "https://discord.gg/tR6AryzMr",
-            "expiresTimestamp": 1778451322000,
-            "uses": 0
         }
     ]
 }
