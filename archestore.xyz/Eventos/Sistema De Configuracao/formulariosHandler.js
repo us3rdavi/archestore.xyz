@@ -51,7 +51,7 @@ function buildFormPanelPayload(guildId, slotId) {
         `${Emojis.get('_staff_emoji')} **Staff Responsável:** ${staffRoles}\n` +
         `${Emojis.get('permissions_emoji')} **Cargo ao Aprovar:** ${roleAprovado}\n` +
         `${Emojis.get('_lapis_emoji')} **Botão:** \`${form.button_label || 'Iniciar Aplicação'}\`\n` +
-        `${Emojis.get('question_emoji')} **Perguntas:** ${qtdPerguntas}/10\n` +
+        `${Emojis.get('_lapis_emoji')} **Perguntas:** ${qtdPerguntas}/10\n` +
         `${Emojis.get('clock_emoji')} **Tempo por Pergunta:** ${timeLimit}s\n` +
         `${Emojis.get('_fixe_emoji')} **Limite por Usuário:** ${limite}`
     ));
@@ -81,7 +81,6 @@ function buildFormPanelPayload(guildId, slotId) {
         new ButtonBuilder()
             .setCustomId(`form_btn_perguntas_${guildId}_${slotId}`)
             .setLabel('Perguntas')
-            .setEmoji({ id: '1501804124277051593' })
             .setStyle(ButtonStyle.Secondary),
         new ButtonBuilder()
             .setCustomId(`form_btn_cargoaprovado_${guildId}_${slotId}`)
@@ -247,7 +246,7 @@ function buildQuestionsPanelPayload(guildId, slotId) {
 
     const c = new ContainerBuilder().setAccentColor(getAccentColor());
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('question_emoji')} Perguntas — ${form.name || `Formulário ${slotId}`}\n` +
+        `## ${Emojis.get('_lapis_emoji')} Perguntas — ${form.name || `Formulário ${slotId}`}\n` +
         `${qLines}\n\n` +
         `-# ${questions.length}/10 perguntas configuradas`
     ));
