@@ -1,4 +1,5 @@
-const fetch = require('node-fetch');
+const _nodeFetch = require('node-fetch');
+const fetch = _nodeFetch.default || _nodeFetch;
 const config = require('../config.json');
 
 const BASE_URL = 'https://api.centralcart.com.br/v1';
