@@ -1,11 +1,14 @@
 const {
     ActionRowBuilder, ButtonBuilder, ButtonStyle,
-    StringSelectMenuBuilder, RoleSelectMenuBuilder,
+    StringSelectMenuBuilder, RoleSelectMenuBuilder, ChannelSelectMenuBuilder,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder,
     ModalBuilder, TextInputBuilder, TextInputStyle,
-    MessageFlags,
+    MessageFlags, ChannelType,
 } = require('discord.js');
 const { formularios, Emojis, configuracao } = require('../../DataBaseJson');
+
+// Lock para evitar duplicação de perguntas por double-submit
+const pergLock = new Set();
 
 function getAccentColor() {
     const cor = configuracao.get('Cores.Principal') || '5865F2';
@@ -27,17 +30,17 @@ function buildFormPanelPayload(guildId, slotId) {
         return { components: [c], flags: MessageFlags.IsComponentsV2 };
     }
 
-    const statusIcon    = form.active ? Emojis.get('confirmed_emoji') : Emojis.get('error');
-    const statusText    = form.active ? 'Ativo' : 'Inativo';
-    const chInput       = form.channel_input  ? `<#${form.channel_input}>`  : `\`Não definido\``;
-    const chOutput      = form.channel_output ? `<#${form.channel_output}>` : `\`Não definido\``;
-    const staffRoles    = (form.roles_responsible || []).length > 0
+    const statusIcon   = form.active ? Emojis.get('confirmed_emoji') : Emojis.get('error');
+    const statusText   = form.active ? 'Ativo' : 'Inativo';
+    const chInput      = form.channel_input  ? `<#${form.channel_input}>`  : `\`Não definido\``;
+    const chOutput     = form.channel_output ? `<#${form.channel_output}>` : `\`Não definido\``;
+    const staffRoles   = (form.roles_responsible || []).length > 0
         ? form.roles_responsible.map(r => `<@&${r}>`).join(', ')
         : `\`Nenhum\``;
-    const roleAprovado  = form.role_approved ? `<@&${form.role_approved}>` : `\`Não definido\``;
-    const timeLimit     = form.time_limit || 120;
-    const qtdPerguntas  = (form.questions || []).length;
-    const limite        = form.limit_per_user ? `${form.limit_per_user} envio(s)` : `Ilimitado`;
+    const roleAprovado = form.role_approved ? `<@&${form.role_approved}>` : `\`Não definido\``;
+    const timeLimit    = form.time_limit || 120;
+    const qtdPerguntas = (form.questions || []).length;
+    const limite       = form.limit_per_user ? `${form.limit_per_user} envio(s)` : `Ilimitado`;
 
     const c = new ContainerBuilder().setAccentColor(getAccentColor());
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
@@ -56,34 +59,133 @@ function buildFormPanelPayload(guildId, slotId) {
 
     // Linha 1 — canais, staff, botão
     c.addActionRowComponents(new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId(`form_btn_canais_${guildId}_${slotId}`).setLabel('Configurar Canais').setEmoji({ id: '1501803997583904810' }).setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId(`form_btn_cargos_${guildId}_${slotId}`).setLabel('Staff Responsável').setEmoji({ id: '1501803902046048297' }).setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId(`form_btn_botao_${guildId}_${slotId}`).setLabel('Configurar Botão').setEmoji({ id: '1501804003850322052' }).setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+            .setCustomId(`form_btn_canais_${guildId}_${slotId}`)
+            .setLabel('Configurar Canais')
+            .setEmoji({ id: '1501803997583904810' })
+            .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+            .setCustomId(`form_btn_cargos_${guildId}_${slotId}`)
+            .setLabel('Staff Responsável')
+            .setEmoji({ id: '1501803902046048297' })
+            .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+            .setCustomId(`form_btn_botao_${guildId}_${slotId}`)
+            .setLabel('Configurar Botão')
+            .setEmoji({ id: '1501804003850322052' })
+            .setStyle(ButtonStyle.Primary),
     ));
 
     // Linha 2 — perguntas, cargo aprovado, tempo
     c.addActionRowComponents(new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId(`form_btn_perguntas_${guildId}_${slotId}`).setLabel('Perguntas').setEmoji({ id: '1501804003850322052' }).setStyle(ButtonStyle.Secondary),
-        new ButtonBuilder().setCustomId(`form_btn_cargoaprovado_${guildId}_${slotId}`).setLabel('Cargo ao Aprovar').setEmoji({ id: '1501804064596558017' }).setStyle(ButtonStyle.Secondary),
-        new ButtonBuilder().setCustomId(`form_btn_timelimit_${guildId}_${slotId}`).setLabel(`Tempo: ${timeLimit}s`).setEmoji({ id: '1501804058699366470' }).setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+            .setCustomId(`form_btn_perguntas_${guildId}_${slotId}`)
+            .setLabel('Perguntas')
+            .setEmoji({ id: '1501804124277051593' })
+            .setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+            .setCustomId(`form_btn_cargoaprovado_${guildId}_${slotId}`)
+            .setLabel('Cargo ao Aprovar')
+            .setEmoji({ id: '1501804064596558017' })
+            .setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+            .setCustomId(`form_btn_timelimit_${guildId}_${slotId}`)
+            .setLabel(`Tempo: ${timeLimit}s`)
+            .setEmoji({ id: '1501804058699366470' })
+            .setStyle(ButtonStyle.Secondary),
     ));
 
     // Linha 3 — limite, aparência, nome
     c.addActionRowComponents(new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId(`form_btn_limite_${guildId}_${slotId}`).setLabel('Limitar Envios').setEmoji({ id: '1371593625112285208' }).setStyle(ButtonStyle.Secondary),
-        new ButtonBuilder().setCustomId(`form_btn_embeds_${guildId}_${slotId}`).setLabel('Aparência').setEmoji({ id: '1501804122943389716' }).setStyle(ButtonStyle.Secondary),
-        new ButtonBuilder().setCustomId(`form_btn_nome_${guildId}_${slotId}`).setLabel('Renomear').setEmoji({ id: '1371593617868591185' }).setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+            .setCustomId(`form_btn_limite_${guildId}_${slotId}`)
+            .setLabel('Limitar Envios')
+            .setEmoji({ id: '1501804061719007232' })
+            .setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+            .setCustomId(`form_btn_embeds_${guildId}_${slotId}`)
+            .setLabel('Aparência')
+            .setEmoji({ id: '1501804122943389716' })
+            .setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+            .setCustomId(`form_btn_nome_${guildId}_${slotId}`)
+            .setLabel('Renomear')
+            .setEmoji({ id: '1501804003850322052' })
+            .setStyle(ButtonStyle.Secondary),
     ));
 
     // Linha 4 — postar
     c.addActionRowComponents(new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId(`form_btn_postar_${guildId}_${slotId}`).setLabel('Postar Formulário').setEmoji({ id: '1501803923126747178' }).setStyle(ButtonStyle.Success),
+        new ButtonBuilder()
+            .setCustomId(`form_btn_postar_${guildId}_${slotId}`)
+            .setLabel('Postar Formulário')
+            .setEmoji({ id: '1501803923126747178' })
+            .setStyle(ButtonStyle.Success),
     ));
 
     // Linha 5 — voltar, deletar
     c.addActionRowComponents(new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId(`form_btn_voltar_${guildId}_${slotId}`).setLabel('Voltar').setEmoji({ id: '1371593637179297923' }).setStyle(ButtonStyle.Secondary),
-        new ButtonBuilder().setCustomId(`form_btn_deletar_${guildId}_${slotId}`).setLabel('Deletar Formulário').setEmoji({ id: '1501803935453679616' }).setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+            .setCustomId(`form_btn_voltar_${guildId}_${slotId}`)
+            .setLabel('Voltar')
+            .setEmoji({ id: '1501803908589162537' })
+            .setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+            .setCustomId(`form_btn_deletar_${guildId}_${slotId}`)
+            .setLabel('Deletar Formulário')
+            .setEmoji({ id: '1501803926180335727' })
+            .setStyle(ButtonStyle.Danger),
+    ));
+
+    return { components: [c], flags: MessageFlags.IsComponentsV2 };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PAINEL DE CONFIGURAÇÃO DE CANAIS (ChannelSelectMenu)
+// ─────────────────────────────────────────────────────────────────────────────
+function buildChannelConfigPayload(guildId, slotId) {
+    const form = (formularios.get(guildId) || {})[slotId] || {};
+    const chInput  = form.channel_input  ? `<#${form.channel_input}>`  : `\`Não definido\``;
+    const chOutput = form.channel_output ? `<#${form.channel_output}>` : `\`Não definido\``;
+
+    const c = new ContainerBuilder().setAccentColor(getAccentColor());
+    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('_transfer_emoji')} Configurar Canais\n` +
+        `Configure os canais do formulário usando os menus abaixo.\n\n` +
+        `${Emojis.get('_messages_emoji')} **Canal do Formulário:** ${chInput}\n` +
+        `-# O painel com o botão de aplicação será postado neste canal.\n\n` +
+        `${Emojis.get('_folder_emoji')} **Canal de Logs:** ${chOutput}\n` +
+        `-# As respostas dos candidatos aparecerão neste canal.`
+    ));
+    c.addSeparatorComponents(new SeparatorBuilder());
+
+    // Select canal do formulário
+    c.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ChannelSelectMenuBuilder()
+            .setCustomId(`form_chanin_${guildId}_${slotId}`)
+            .setPlaceholder('Selecionar canal do formulário...')
+            .addChannelTypes(ChannelType.GuildText)
+            .setMinValues(1)
+            .setMaxValues(1)
+    ));
+
+    // Select canal de logs
+    c.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ChannelSelectMenuBuilder()
+            .setCustomId(`form_chanout_${guildId}_${slotId}`)
+            .setPlaceholder('Selecionar canal de logs...')
+            .addChannelTypes(ChannelType.GuildText)
+            .setMinValues(1)
+            .setMaxValues(1)
+    ));
+
+    // Voltar
+    c.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`form_btn_voltarform_${guildId}_${slotId}`)
+            .setLabel('Voltar')
+            .setEmoji({ id: '1501803908589162537' })
+            .setStyle(ButtonStyle.Secondary),
     ));
 
     return { components: [c], flags: MessageFlags.IsComponentsV2 };
@@ -93,9 +195,10 @@ function buildFormPanelPayload(guildId, slotId) {
 // LISTA DE FORMULÁRIOS
 // ─────────────────────────────────────────────────────────────────────────────
 function buildFormManagePayload(guildId, userId) {
-    const slots = formularios.get(guildId) || {};
+    const slots    = formularios.get(guildId) || {};
     const existing = Object.entries(slots).filter(([k, v]) =>
-        v !== null && v !== undefined && !k.startsWith('submissions') && !k.startsWith('responses')
+        v !== null && v !== undefined &&
+        !k.startsWith('submissions') && !k.startsWith('responses')
     );
 
     const c = new ContainerBuilder().setAccentColor(getAccentColor());
@@ -144,7 +247,7 @@ function buildQuestionsPanelPayload(guildId, slotId) {
 
     const c = new ContainerBuilder().setAccentColor(getAccentColor());
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('_lapis_emoji')} Perguntas — ${form.name || `Formulário ${slotId}`}\n` +
+        `## ${Emojis.get('question_emoji')} Perguntas — ${form.name || `Formulário ${slotId}`}\n` +
         `${qLines}\n\n` +
         `-# ${questions.length}/10 perguntas configuradas`
     ));
@@ -165,7 +268,7 @@ function buildQuestionsPanelPayload(guildId, slotId) {
         new ButtonBuilder()
             .setCustomId(`form_btn_voltarform_${guildId}_${slotId}`)
             .setLabel('Voltar')
-            .setEmoji({ id: '1371593637179297923' })
+            .setEmoji({ id: '1501803908589162537' })
             .setStyle(ButtonStyle.Secondary),
     ));
 
@@ -180,12 +283,15 @@ async function handleFormAction(interaction, client, action) {
     const userId  = interaction.user.id;
 
     if (action === 'form_create') {
-        const slots = formularios.get(guildId) || {};
+        const slots     = formularios.get(guildId) || {};
         const dataSlots = Object.entries(slots).filter(([k, v]) =>
-            v !== null && v !== undefined && !k.startsWith('submissions') && !k.startsWith('responses')
+            v !== null && v !== undefined &&
+            !k.startsWith('submissions') && !k.startsWith('responses')
         );
         if (dataSlots.length >= 5) {
-            await interaction.editReply({ content: `${Emojis.get('negative_emoji')} Limite de 5 formulários atingido. Delete um antes de criar outro.` });
+            await interaction.editReply({
+                content: `${Emojis.get('negative_emoji')} Limite de 5 formulários atingido. Delete um antes de criar outro.`,
+            });
             return;
         }
 
@@ -229,11 +335,10 @@ module.exports = {
             const { customId } = interaction;
             if (!customId) return;
 
-            // ── Select: lista de formulários ────────────────────────────
+            // ── Select: lista de formulários ─────────────────────────────
             if (interaction.isStringSelectMenu() && customId.startsWith('form_select_')) {
                 const userId = customId.slice('form_select_'.length);
                 if (userId !== interaction.user.id) return;
-                const [guildId, slotId] = interaction.values[0].split('_').slice(-2).reverse().concat([]).reverse();
                 const val   = interaction.values[0];
                 const parts = val.split('_');
                 const sid   = parts[parts.length - 1];
@@ -243,7 +348,37 @@ module.exports = {
                 return;
             }
 
-            // ── Role select: staff responsável ──────────────────────────
+            // ── ChannelSelect: canal do formulário ────────────────────────
+            if (interaction.isChannelSelectMenu() && customId.startsWith('form_chanin_')) {
+                const parts   = customId.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const slots   = formularios.get(guildId) || {};
+                if (slots[slotId]) {
+                    slots[slotId].channel_input = interaction.values[0] || null;
+                    formularios.set(guildId, slots);
+                }
+                await interaction.deferUpdate();
+                await interaction.editReply(buildChannelConfigPayload(guildId, slotId));
+                return;
+            }
+
+            // ── ChannelSelect: canal de logs ──────────────────────────────
+            if (interaction.isChannelSelectMenu() && customId.startsWith('form_chanout_')) {
+                const parts   = customId.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const slots   = formularios.get(guildId) || {};
+                if (slots[slotId]) {
+                    slots[slotId].channel_output = interaction.values[0] || null;
+                    formularios.set(guildId, slots);
+                }
+                await interaction.deferUpdate();
+                await interaction.editReply(buildChannelConfigPayload(guildId, slotId));
+                return;
+            }
+
+            // ── RoleSelect: staff responsável ─────────────────────────────
             if (interaction.isRoleSelectMenu() && customId.startsWith('form_roles_resp_')) {
                 const parts   = customId.split('_');
                 const slotId  = parts[parts.length - 1];
@@ -254,11 +389,11 @@ module.exports = {
                     formularios.set(guildId, slots);
                 }
                 await interaction.deferUpdate();
-                await interaction.editReply(buildFormPanelPayload(guildId, slotId));
+                await interaction.editReply(buildStaffConfigPayload(guildId, slotId));
                 return;
             }
 
-            // ── Role select: cargo ao aprovar ───────────────────────────
+            // ── RoleSelect: cargo ao aprovar ──────────────────────────────
             if (interaction.isRoleSelectMenu() && customId.startsWith('form_roles_aprov_')) {
                 const parts   = customId.split('_');
                 const slotId  = parts[parts.length - 1];
@@ -269,30 +404,39 @@ module.exports = {
                     formularios.set(guildId, slots);
                 }
                 await interaction.deferUpdate();
-                await interaction.editReply(buildFormPanelPayload(guildId, slotId));
+                await interaction.editReply(buildAprovadoConfigPayload(guildId, slotId));
                 return;
             }
 
-            // ── Botões form_btn_* ────────────────────────────────────────
+            // ── Botões form_btn_* ─────────────────────────────────────────
             if (interaction.isButton() && customId.startsWith('form_btn_')) {
                 const parts   = customId.split('_');
                 const slotId  = parts[parts.length - 1];
                 const guildId = parts[parts.length - 2];
                 const action  = parts.slice(2, parts.length - 2).join('_');
 
-                // Navegação
+                // Navegação — voltar para lista
                 if (action === 'voltar') {
                     await interaction.deferUpdate();
                     await interaction.editReply(buildFormManagePayload(guildId, interaction.user.id));
                     return;
                 }
+
+                // Navegação — voltar para painel do form
                 if (action === 'voltarform') {
                     await interaction.deferUpdate();
                     await interaction.editReply(buildFormPanelPayload(guildId, slotId));
                     return;
                 }
 
-                // Perguntas
+                // Canais — abre painel com ChannelSelectMenus
+                if (action === 'canais') {
+                    await interaction.deferUpdate();
+                    await interaction.editReply(buildChannelConfigPayload(guildId, slotId));
+                    return;
+                }
+
+                // Perguntas — abre painel
                 if (action === 'perguntas') {
                     await interaction.deferUpdate();
                     await interaction.editReply(buildQuestionsPanelPayload(guildId, slotId));
@@ -311,10 +455,23 @@ module.exports = {
                     return;
                 }
 
+                // Cargos do staff
+                if (action === 'cargos') {
+                    await interaction.deferUpdate();
+                    await interaction.editReply(buildStaffConfigPayload(guildId, slotId));
+                    return;
+                }
+
+                // Cargo ao aprovar
+                if (action === 'cargoaprovado') {
+                    await interaction.deferUpdate();
+                    await interaction.editReply(buildAprovadoConfigPayload(guildId, slotId));
+                    return;
+                }
+
                 // Deletar — confirmação
                 if (action === 'deletar') {
-                    const slots = formularios.get(guildId) || {};
-                    const form  = slots[slotId];
+                    const form = (formularios.get(guildId) || {})[slotId];
                     const c = new ContainerBuilder().setAccentColor(0xFF4444);
                     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                         `## ${Emojis.get('warn_emoji')} Deletar Formulário\n` +
@@ -323,8 +480,16 @@ module.exports = {
                     ));
                     c.addSeparatorComponents(new SeparatorBuilder());
                     c.addActionRowComponents(new ActionRowBuilder().addComponents(
-                        new ButtonBuilder().setCustomId(`form_btn_confirmdel_${guildId}_${slotId}`).setLabel('Confirmar Deleção').setEmoji({ id: '1501803935453679616' }).setStyle(ButtonStyle.Danger),
-                        new ButtonBuilder().setCustomId(`form_btn_voltarform_${guildId}_${slotId}`).setLabel('Cancelar').setEmoji({ id: '1371593637179297923' }).setStyle(ButtonStyle.Secondary),
+                        new ButtonBuilder()
+                            .setCustomId(`form_btn_confirmdel_${guildId}_${slotId}`)
+                            .setLabel('Confirmar Deleção')
+                            .setEmoji({ id: '1501803926180335727' })
+                            .setStyle(ButtonStyle.Danger),
+                        new ButtonBuilder()
+                            .setCustomId(`form_btn_voltarform_${guildId}_${slotId}`)
+                            .setLabel('Cancelar')
+                            .setEmoji({ id: '1501803908589162537' })
+                            .setStyle(ButtonStyle.Secondary),
                     ));
                     await interaction.update({ components: [c], flags: MessageFlags.IsComponentsV2 });
                     return;
@@ -340,82 +505,26 @@ module.exports = {
                     return;
                 }
 
-                // Cargos responsáveis
-                if (action === 'cargos') {
-                    const slots = formularios.get(guildId) || {};
-                    const form  = slots[slotId] || {};
-                    const atual = (form.roles_responsible || []).length > 0
-                        ? form.roles_responsible.map(r => `<@&${r}>`).join(', ')
-                        : `\`Nenhum\``;
-                    const c = new ContainerBuilder().setAccentColor(getAccentColor());
-                    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-                        `## ${Emojis.get('_staff_emoji')} Staff Responsável\n` +
-                        `Selecione os cargos que poderão aceitar e rejeitar as aplicações.\n\n` +
-                        `${Emojis.get('information_emoji')} **Atual:** ${atual}`
-                    ));
-                    c.addSeparatorComponents(new SeparatorBuilder());
-                    c.addActionRowComponents(new ActionRowBuilder().addComponents(
-                        new RoleSelectMenuBuilder()
-                            .setCustomId(`form_roles_resp_${guildId}_${slotId}`)
-                            .setPlaceholder('Selecionar cargos do staff...')
-                            .setMinValues(0).setMaxValues(5)
-                    ));
-                    c.addActionRowComponents(new ActionRowBuilder().addComponents(
-                        new ButtonBuilder().setCustomId(`form_btn_voltarform_${guildId}_${slotId}`).setLabel('Voltar').setEmoji({ id: '1371593637179297923' }).setStyle(ButtonStyle.Secondary)
-                    ));
-                    await interaction.update({ components: [c], flags: MessageFlags.IsComponentsV2 });
-                    return;
-                }
-
-                // Cargo ao aprovar
-                if (action === 'cargoaprovado') {
-                    const slots = formularios.get(guildId) || {};
-                    const form  = slots[slotId] || {};
-                    const atual = form.role_approved ? `<@&${form.role_approved}>` : `\`Não definido\``;
-                    const c = new ContainerBuilder().setAccentColor(getAccentColor());
-                    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-                        `## ${Emojis.get('permissions_emoji')} Cargo ao Aprovar\n` +
-                        `Selecione o cargo entregue automaticamente ao candidato ser aceito.\n\n` +
-                        `${Emojis.get('information_emoji')} **Atual:** ${atual}`
-                    ));
-                    c.addSeparatorComponents(new SeparatorBuilder());
-                    c.addActionRowComponents(new ActionRowBuilder().addComponents(
-                        new RoleSelectMenuBuilder()
-                            .setCustomId(`form_roles_aprov_${guildId}_${slotId}`)
-                            .setPlaceholder('Selecionar cargo ao aprovar...')
-                            .setMinValues(0).setMaxValues(1)
-                    ));
-                    c.addActionRowComponents(new ActionRowBuilder().addComponents(
-                        new ButtonBuilder().setCustomId(`form_btn_voltarform_${guildId}_${slotId}`).setLabel('Voltar').setEmoji({ id: '1371593637179297923' }).setStyle(ButtonStyle.Secondary)
-                    ));
-                    await interaction.update({ components: [c], flags: MessageFlags.IsComponentsV2 });
-                    return;
-                }
-
                 // Postar formulário
                 if (action === 'postar') {
                     const slots = formularios.get(guildId) || {};
                     const form  = slots[slotId];
                     if (!form) return;
 
-                    if (!form.channel_input) {
+                    if (!form.channel_input)
                         return interaction.reply({ content: `${Emojis.get('negative_emoji')} Configure o **Canal do Formulário** antes de postar.`, ephemeral: true });
-                    }
-                    if (!form.channel_output) {
+                    if (!form.channel_output)
                         return interaction.reply({ content: `${Emojis.get('negative_emoji')} Configure o **Canal de Logs** antes de postar.`, ephemeral: true });
-                    }
-                    if ((form.questions || []).length === 0) {
+                    if ((form.questions || []).length === 0)
                         return interaction.reply({ content: `${Emojis.get('negative_emoji')} Adicione pelo menos **uma pergunta** antes de postar.`, ephemeral: true });
-                    }
 
                     const channel = interaction.guild.channels.cache.get(form.channel_input);
-                    if (!channel) {
+                    if (!channel)
                         return interaction.reply({ content: `${Emojis.get('negative_emoji')} Canal do formulário não encontrado. Reconfigure.`, ephemeral: true });
-                    }
 
-                    const embedColor  = parseInt((form.embed?.color || '5865F2').replace('#', ''), 16);
-                    const formTitle   = form.embed?.title || form.name;
-                    const formDesc    = form.embed?.description || `Clique no botão abaixo para iniciar sua aplicação.`;
+                    const embedColor = parseInt((form.embed?.color || '5865F2').replace('#', ''), 16);
+                    const formTitle  = form.embed?.title || form.name;
+                    const formDesc   = form.embed?.description || `Clique no botão abaixo para iniciar sua aplicação.`;
 
                     const fc = new ContainerBuilder().setAccentColor(embedColor);
                     fc.addTextDisplayComponents(new TextDisplayBuilder().setContent(
@@ -429,9 +538,10 @@ module.exports = {
                         .setStyle(ButtonStyle.Primary);
 
                     if (form.button_emoji) {
-                        startBtn.setEmoji(/^\d+$/.test(form.button_emoji)
-                            ? { id: form.button_emoji }
-                            : form.button_emoji
+                        startBtn.setEmoji(
+                            /^\d+$/.test(form.button_emoji)
+                                ? { id: form.button_emoji }
+                                : form.button_emoji
                         );
                     }
 
@@ -441,54 +551,98 @@ module.exports = {
                         await channel.send({ components: [fc], flags: MessageFlags.IsComponentsV2 });
                         slots[slotId].active = true;
                         formularios.set(guildId, slots);
-                        await interaction.reply({ content: `${Emojis.get('confirmed_emoji')} Formulário postado em ${channel} com sucesso!`, ephemeral: true });
+                        await interaction.reply({
+                            content: `${Emojis.get('confirmed_emoji')} Formulário postado em ${channel} com sucesso!`,
+                            ephemeral: true,
+                        });
                     } catch (e) {
-                        await interaction.reply({ content: `${Emojis.get('negative_emoji')} Não consegui postar no canal. Verifique as permissões do bot.`, ephemeral: true });
+                        await interaction.reply({
+                            content: `${Emojis.get('negative_emoji')} Não consegui postar no canal. Verifique as permissões do bot.`,
+                            ephemeral: true,
+                        });
                     }
                     return;
                 }
 
                 // ── Modais ────────────────────────────────────────────────
                 const modalHandlers = {
-                    canais: async () => {
-                        const form = (formularios.get(guildId) || {})[slotId] || {};
-                        const modal = new ModalBuilder().setCustomId(`form_modal_canais_${guildId}_${slotId}`).setTitle('Configurar Canais');
-                        modal.addComponents(
-                            new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('channel_input').setLabel('Canal do Formulário (ID)').setValue(form.channel_input || '').setStyle(TextInputStyle.Short).setRequired(false).setPlaceholder('ID do canal onde o painel será postado')),
-                            new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('channel_output').setLabel('Canal de Logs (ID)').setValue(form.channel_output || '').setStyle(TextInputStyle.Short).setRequired(false).setPlaceholder('ID do canal onde as respostas chegarão'))
-                        );
-                        await interaction.showModal(modal);
-                    },
                     botao: async () => {
                         const form = (formularios.get(guildId) || {})[slotId] || {};
-                        const modal = new ModalBuilder().setCustomId(`form_modal_botao_${guildId}_${slotId}`).setTitle('Configurar Botão');
+                        const modal = new ModalBuilder()
+                            .setCustomId(`form_modal_botao_${guildId}_${slotId}`)
+                            .setTitle('Configurar Botão');
                         modal.addComponents(
-                            new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('button_label').setLabel('Texto do Botão').setValue(form.button_label || 'Iniciar Aplicação').setStyle(TextInputStyle.Short).setMaxLength(80).setRequired(true)),
-                            new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('button_emoji').setLabel('ID do Emoji (deixe vazio para nenhum)').setValue(form.button_emoji || '').setStyle(TextInputStyle.Short).setRequired(false))
+                            new ActionRowBuilder().addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('button_label')
+                                    .setLabel('Texto do Botão')
+                                    .setValue(form.button_label || 'Iniciar Aplicação')
+                                    .setStyle(TextInputStyle.Short)
+                                    .setMaxLength(80)
+                                    .setRequired(true)
+                            ),
+                            new ActionRowBuilder().addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('button_emoji')
+                                    .setLabel('ID do Emoji do bot (deixe vazio p/ nenhum)')
+                                    .setValue(form.button_emoji || '')
+                                    .setStyle(TextInputStyle.Short)
+                                    .setRequired(false)
+                            )
                         );
                         await interaction.showModal(modal);
                     },
                     limite: async () => {
                         const form = (formularios.get(guildId) || {})[slotId] || {};
-                        const modal = new ModalBuilder().setCustomId(`form_modal_limite_${guildId}_${slotId}`).setTitle('Limitar Envios por Usuário');
+                        const modal = new ModalBuilder()
+                            .setCustomId(`form_modal_limite_${guildId}_${slotId}`)
+                            .setTitle('Limitar Envios por Usuário');
                         modal.addComponents(
-                            new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('limit').setLabel('Limite (0 = ilimitado)').setValue(form.limit_per_user ? String(form.limit_per_user) : '0').setStyle(TextInputStyle.Short).setRequired(true).setPlaceholder('Ex: 1 para permitir apenas um envio'))
+                            new ActionRowBuilder().addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('limit')
+                                    .setLabel('Limite (0 = ilimitado)')
+                                    .setValue(form.limit_per_user ? String(form.limit_per_user) : '0')
+                                    .setStyle(TextInputStyle.Short)
+                                    .setRequired(true)
+                                    .setPlaceholder('Ex: 1 para permitir somente um envio')
+                            )
                         );
                         await interaction.showModal(modal);
                     },
                     timelimit: async () => {
                         const form = (formularios.get(guildId) || {})[slotId] || {};
-                        const modal = new ModalBuilder().setCustomId(`form_modal_timelimit_${guildId}_${slotId}`).setTitle('Tempo Limite por Pergunta');
+                        const modal = new ModalBuilder()
+                            .setCustomId(`form_modal_timelimit_${guildId}_${slotId}`)
+                            .setTitle('Tempo Limite por Pergunta');
                         modal.addComponents(
-                            new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('timelimit').setLabel('Segundos por Pergunta (30 a 600)').setValue(String(form.time_limit || 120)).setStyle(TextInputStyle.Short).setRequired(true).setPlaceholder('Ex: 120'))
+                            new ActionRowBuilder().addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('timelimit')
+                                    .setLabel('Segundos por Pergunta (30 — 600)')
+                                    .setValue(String(form.time_limit || 120))
+                                    .setStyle(TextInputStyle.Short)
+                                    .setRequired(true)
+                                    .setPlaceholder('Ex: 120')
+                            )
                         );
                         await interaction.showModal(modal);
                     },
                     nome: async () => {
                         const form = (formularios.get(guildId) || {})[slotId] || {};
-                        const modal = new ModalBuilder().setCustomId(`form_modal_nome_${guildId}_${slotId}`).setTitle('Renomear Formulário');
+                        const modal = new ModalBuilder()
+                            .setCustomId(`form_modal_nome_${guildId}_${slotId}`)
+                            .setTitle('Renomear Formulário');
                         modal.addComponents(
-                            new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('nome').setLabel('Nome do Formulário').setValue(form.name || '').setStyle(TextInputStyle.Short).setMaxLength(80).setRequired(true))
+                            new ActionRowBuilder().addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('nome')
+                                    .setLabel('Nome do Formulário')
+                                    .setValue(form.name || '')
+                                    .setStyle(TextInputStyle.Short)
+                                    .setMaxLength(80)
+                                    .setRequired(true)
+                            )
                         );
                         await interaction.showModal(modal);
                     },
@@ -496,20 +650,53 @@ module.exports = {
                         const form = (formularios.get(guildId) || {})[slotId] || {};
                         if ((form.questions || []).length >= 10)
                             return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 10 perguntas atingido.`, ephemeral: true });
-                        const modal = new ModalBuilder().setCustomId(`form_modal_addperg_${guildId}_${slotId}`).setTitle('Adicionar Pergunta');
+                        const modal = new ModalBuilder()
+                            .setCustomId(`form_modal_addperg_${guildId}_${slotId}`)
+                            .setTitle('Adicionar Pergunta');
                         modal.addComponents(
-                            new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('question_text').setLabel('Texto da Pergunta').setStyle(TextInputStyle.Paragraph).setMaxLength(300).setRequired(true).setPlaceholder('Digite a pergunta que será feita ao candidato...'))
+                            new ActionRowBuilder().addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('question_text')
+                                    .setLabel('Texto da Pergunta')
+                                    .setStyle(TextInputStyle.Paragraph)
+                                    .setMaxLength(300)
+                                    .setRequired(true)
+                                    .setPlaceholder('Digite a pergunta que será feita ao candidato...')
+                            )
                         );
                         await interaction.showModal(modal);
                     },
                     embeds: async () => {
                         const form = (formularios.get(guildId) || {})[slotId] || {};
                         const emb  = form.embed || {};
-                        const modal = new ModalBuilder().setCustomId(`form_modal_embeds_${guildId}_${slotId}`).setTitle('Aparência do Formulário');
+                        const modal = new ModalBuilder()
+                            .setCustomId(`form_modal_embeds_${guildId}_${slotId}`)
+                            .setTitle('Aparência do Formulário');
                         modal.addComponents(
-                            new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('embed_title').setLabel('Título').setValue(emb.title || '').setStyle(TextInputStyle.Short).setRequired(false)),
-                            new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('embed_description').setLabel('Descrição').setValue(emb.description || '').setStyle(TextInputStyle.Paragraph).setRequired(false)),
-                            new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('embed_color').setLabel('Cor Hex (ex: 5865F2)').setValue(emb.color || '5865F2').setStyle(TextInputStyle.Short).setRequired(false))
+                            new ActionRowBuilder().addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('embed_title')
+                                    .setLabel('Título')
+                                    .setValue(emb.title || '')
+                                    .setStyle(TextInputStyle.Short)
+                                    .setRequired(false)
+                            ),
+                            new ActionRowBuilder().addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('embed_description')
+                                    .setLabel('Descrição')
+                                    .setValue(emb.description || '')
+                                    .setStyle(TextInputStyle.Paragraph)
+                                    .setRequired(false)
+                            ),
+                            new ActionRowBuilder().addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('embed_color')
+                                    .setLabel('Cor Hex (ex: 5865F2)')
+                                    .setValue(emb.color || '5865F2')
+                                    .setStyle(TextInputStyle.Short)
+                                    .setRequired(false)
+                            )
                         );
                         await interaction.showModal(modal);
                     },
@@ -530,23 +717,7 @@ module.exports = {
                 if (!slots[slotId])
                     return interaction.reply({ content: `${Emojis.get('negative_emoji')} Formulário não encontrado.`, ephemeral: true });
 
-                if (action === 'canais') {
-                    const ci = interaction.fields.getTextInputValue('channel_input').trim();
-                    const co = interaction.fields.getTextInputValue('channel_output').trim();
-                    if (ci) {
-                        if (!interaction.guild.channels.cache.get(ci))
-                            return interaction.reply({ content: `${Emojis.get('negative_emoji')} Canal do formulário não encontrado.`, ephemeral: true });
-                        slots[slotId].channel_input = ci;
-                    } else { slots[slotId].channel_input = null; }
-                    if (co) {
-                        if (!interaction.guild.channels.cache.get(co))
-                            return interaction.reply({ content: `${Emojis.get('negative_emoji')} Canal de logs não encontrado.`, ephemeral: true });
-                        slots[slotId].channel_output = co;
-                    } else { slots[slotId].channel_output = null; }
-                    formularios.set(guildId, slots);
-                    await interaction.update(buildFormPanelPayload(guildId, slotId));
-
-                } else if (action === 'botao') {
+                if (action === 'botao') {
                     slots[slotId].button_label = interaction.fields.getTextInputValue('button_label').trim() || 'Iniciar Aplicação';
                     slots[slotId].button_emoji = interaction.fields.getTextInputValue('button_emoji').trim() || null;
                     formularios.set(guildId, slots);
@@ -555,7 +726,7 @@ module.exports = {
                 } else if (action === 'limite') {
                     const limit = parseInt(interaction.fields.getTextInputValue('limit').trim());
                     if (isNaN(limit) || limit < 0)
-                        return interaction.reply({ content: `${Emojis.get('negative_emoji')} Valor inválido. Use um número inteiro.`, ephemeral: true });
+                        return interaction.reply({ content: `${Emojis.get('negative_emoji')} Valor inválido. Use um número inteiro positivo.`, ephemeral: true });
                     slots[slotId].limit_per_user = limit === 0 ? null : limit;
                     formularios.set(guildId, slots);
                     await interaction.update(buildFormPanelPayload(guildId, slotId));
@@ -575,21 +746,34 @@ module.exports = {
                     await interaction.update(buildFormPanelPayload(guildId, slotId));
 
                 } else if (action === 'addperg') {
-                    const text = interaction.fields.getTextInputValue('question_text').trim();
-                    if (!slots[slotId].questions) slots[slotId].questions = [];
-                    slots[slotId].questions.push({ text });
-                    formularios.set(guildId, slots);
-                    await interaction.update(buildQuestionsPanelPayload(guildId, slotId));
+                    // Lock anti-duplicação
+                    const lockKey = `${guildId}_${slotId}_${interaction.user.id}`;
+                    if (pergLock.has(lockKey)) return;
+                    pergLock.add(lockKey);
+                    try {
+                        const text = interaction.fields.getTextInputValue('question_text').trim();
+                        if (!text) return;
+                        const freshSlots = formularios.get(guildId) || {};
+                        if (!freshSlots[slotId]) return;
+                        if (!freshSlots[slotId].questions) freshSlots[slotId].questions = [];
+                        if (freshSlots[slotId].questions.length >= 10)
+                            return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 10 perguntas atingido.`, ephemeral: true });
+                        freshSlots[slotId].questions.push({ text });
+                        formularios.set(guildId, freshSlots);
+                        await interaction.update(buildQuestionsPanelPayload(guildId, slotId));
+                    } finally {
+                        setTimeout(() => pergLock.delete(lockKey), 2000);
+                    }
 
                 } else if (action === 'embeds') {
                     const title = interaction.fields.getTextInputValue('embed_title').trim();
                     const desc  = interaction.fields.getTextInputValue('embed_description').trim();
-                    const color = interaction.fields.getTextInputValue('embed_color').trim();
+                    const color = interaction.fields.getTextInputValue('embed_color').trim().replace('#', '');
                     if (!slots[slotId].embed) slots[slotId].embed = {};
                     slots[slotId].embed.title       = title || null;
                     slots[slotId].embed.description = desc  || null;
-                    if (color && /^#?[0-9A-Fa-f]{6}$/.test(color))
-                        slots[slotId].embed.color = color.replace('#', '');
+                    if (color && /^[0-9A-Fa-f]{6}$/.test(color))
+                        slots[slotId].embed.color = color;
                     formularios.set(guildId, slots);
                     await interaction.update(buildFormPanelPayload(guildId, slotId));
                 }
@@ -605,3 +789,64 @@ module.exports = {
         }
     },
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SUBPAINÉIS INTERNOS
+// ─────────────────────────────────────────────────────────────────────────────
+function buildStaffConfigPayload(guildId, slotId) {
+    const form  = (formularios.get(guildId) || {})[slotId] || {};
+    const atual = (form.roles_responsible || []).length > 0
+        ? form.roles_responsible.map(r => `<@&${r}>`).join(', ')
+        : `\`Nenhum\``;
+
+    const c = new ContainerBuilder().setAccentColor(getAccentColor());
+    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('_staff_emoji')} Staff Responsável\n` +
+        `Selecione os cargos que poderão aceitar e rejeitar as aplicações.\n\n` +
+        `${Emojis.get('information_emoji')} **Atual:** ${atual}`
+    ));
+    c.addSeparatorComponents(new SeparatorBuilder());
+    c.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new RoleSelectMenuBuilder()
+            .setCustomId(`form_roles_resp_${guildId}_${slotId}`)
+            .setPlaceholder('Selecionar cargos do staff...')
+            .setMinValues(0)
+            .setMaxValues(5)
+    ));
+    c.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`form_btn_voltarform_${guildId}_${slotId}`)
+            .setLabel('Voltar')
+            .setEmoji({ id: '1501803908589162537' })
+            .setStyle(ButtonStyle.Secondary)
+    ));
+    return { components: [c], flags: MessageFlags.IsComponentsV2 };
+}
+
+function buildAprovadoConfigPayload(guildId, slotId) {
+    const form  = (formularios.get(guildId) || {})[slotId] || {};
+    const atual = form.role_approved ? `<@&${form.role_approved}>` : `\`Não definido\``;
+
+    const c = new ContainerBuilder().setAccentColor(getAccentColor());
+    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('permissions_emoji')} Cargo ao Aprovar\n` +
+        `Selecione o cargo entregue automaticamente quando o candidato for aceito.\n\n` +
+        `${Emojis.get('information_emoji')} **Atual:** ${atual}`
+    ));
+    c.addSeparatorComponents(new SeparatorBuilder());
+    c.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new RoleSelectMenuBuilder()
+            .setCustomId(`form_roles_aprov_${guildId}_${slotId}`)
+            .setPlaceholder('Selecionar cargo ao aprovar...')
+            .setMinValues(0)
+            .setMaxValues(1)
+    ));
+    c.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`form_btn_voltarform_${guildId}_${slotId}`)
+            .setLabel('Voltar')
+            .setEmoji({ id: '1501803908589162537' })
+            .setStyle(ButtonStyle.Secondary)
+    ));
+    return { components: [c], flags: MessageFlags.IsComponentsV2 };
+}
