@@ -46,7 +46,7 @@ async function Painel(interaction, client) {
             new ButtonBuilder()
                 .setCustomId("configavançadas24")
                 .setLabel('Proteção')
-                .setEmoji("1501804118292037765")
+                .setEmoji("1501804019184828507")
                 .setStyle(2),
             new ButtonBuilder()
                 .setCustomId("eaffaawwawa")

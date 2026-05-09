@@ -29,7 +29,7 @@ async function Avançados(interaction, client) {
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-            `## ${Emojis.get('defense_emoji')} Painel de Proteção\n` +
+            `## ${Emojis.get('system_emoji')} Painel de Proteção\n` +
             `${getSaudacao()} **${interaction.user.displayName || interaction.user.username}**, gerencie a proteção e configurações avançadas do bot.`
         )
     );

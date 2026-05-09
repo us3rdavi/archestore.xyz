@@ -6,7 +6,7 @@ const { configuracao, Emojis } = require('../Database');
 
 const MAIN_OPTIONS = [
     { label: 'Atendimento',    value: 'atendimento',    description: 'Sistema de tickets e suporte',          emoji: { id: '1501804043121725490' } },
-    { label: 'Proteção',       value: 'protecao',       description: 'Anti-raid e segurança avançada',        emoji: { id: '1501804118292037765' } },
+    { label: 'Proteção',       value: 'protecao',       description: 'Anti-raid e segurança avançada',        emoji: { id: '1501804019184828507' } },
     { label: 'Automações',     value: 'automacoes',     description: 'Mensagens e repost automáticos',        emoji: { id: '1501804019184828507' } },
     { label: 'Moderação',      value: 'moderacao',      description: 'Ferramentas de moderação',              emoji: { id: '1501804067616325723' } },
     { label: 'Personalização', value: 'personalizacao', description: 'Bot designer e aparência do bot',       emoji: { id: '1501804122943389716' } },
@@ -23,7 +23,7 @@ const SUB_OPTIONS = {
     ],
     protecao: [
         { label: 'Página Inicial',      value: 'home',            description: 'Voltar ao menu principal',         emoji: { id: '1501803908589162537' } },
-        { label: 'Proteção do Servidor', value: 'protecao_config', description: 'Anti-raid e filtros de segurança', emoji: { id: '1501804118292037765' } },
+        { label: 'Proteção do Servidor', value: 'protecao_config', description: 'Anti-raid e filtros de segurança', emoji: { id: '1501804019184828507' } },
     ],
     automacoes: [
         { label: 'Página Inicial',        value: 'home',             description: 'Voltar ao menu principal',        emoji: { id: '1501803908589162537' } },
@@ -71,7 +71,7 @@ function getAccentColor() {
 function getCategoryHeader(category) {
     const map = {
         atendimento:    () => `${Emojis.get('_ticket_emoji')} Atendimento`,
-        protecao:       () => `${Emojis.get('defense_emoji')} Proteção`,
+        protecao:       () => `${Emojis.get('system_emoji')} Proteção`,
         automacoes:     () => `${Emojis.get('system_emoji')} Automações`,
         moderacao:      () => `${Emojis.get('_ban_emoji')} Moderação`,
         personalizacao: () => `${Emojis.get('_pincel_emoji')} Personalização`,
