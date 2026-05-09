@@ -28,7 +28,7 @@ async function Painel(interaction, client) {
             new ButtonBuilder()
                 .setCustomId("painelconfigticket")
                 .setLabel("Central de Atendimento")
-                .setEmoji("1371593631328243713")
+                .setEmoji("1501804043121725490")
                 .setStyle(1),
             new ButtonBuilder()
                 .setCustomId("painelpersonalizar")
@@ -41,17 +41,17 @@ async function Painel(interaction, client) {
             new ButtonBuilder()
                 .setCustomId("gerenciarconfigs")
                 .setLabel('Definições')
-                .setEmoji("1371571230041178125")
+                .setEmoji("1501804030605922346")
                 .setStyle(2),
             new ButtonBuilder()
                 .setCustomId("configavançadas24")
                 .setLabel('Proteção')
-                .setEmoji("1371593625112285208")
+                .setEmoji("1501804118292037765")
                 .setStyle(2),
             new ButtonBuilder()
                 .setCustomId("eaffaawwawa")
                 .setLabel('Automações')
-                .setEmoji("1371572539213611090")
+                .setEmoji("1501804019184828507")
                 .setStyle(2),
             new ButtonBuilder()
                 .setCustomId("actionsautomations")
@@ -108,7 +108,7 @@ async function definirduvidas(interaction, client) {
             new ButtonBuilder()
                 .setCustomId('ativarbotaoduvidas')
                 .setLabel(`${infoduvidas?.status ? `Botão Ativado` : `Botão Desativado`}`)
-                .setEmoji({ id: '1371605368827940875' })
+                .setEmoji({ id: '1501804030605922346' })
                 .setStyle(infoduvidas?.status ? 3 : 4),
             new ButtonBuilder()
                 .setCustomId('botaoduvidas')

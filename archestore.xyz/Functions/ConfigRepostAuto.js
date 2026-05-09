@@ -46,13 +46,13 @@ async function AcoesRepostAutomatics(interaction, client) {
         new ButtonBuilder()
             .setCustomId("setTimeRepost")
             .setLabel('Definir horário')
-            .setEmoji({ id: '1371605573296193656' })
+            .setEmoji({ id: '1501804058699366470' })
             .setStyle(ButtonStyle.Primary)
             .setDisabled(!currentStatus),
         new ButtonBuilder()
             .setCustomId(currentStatus ? "desabilityRepost" : "enableRepost")
             .setLabel(currentStatus ? 'Desabilitar função' : 'Habilitar função')
-            .setEmoji({ id: '1371605573296193656' })
+            .setEmoji({ id: '1501804058699366470' })
             .setStyle(currentStatus ? ButtonStyle.Danger : ButtonStyle.Success)
     );
 
@@ -60,7 +60,7 @@ async function AcoesRepostAutomatics(interaction, client) {
         new ButtonBuilder()
             .setCustomId("voltar_AcoesAutomaticsConfigs")
             .setLabel('Voltar')
-            .setEmoji({ id: '1371605354605051996' })
+            .setEmoji({ id: '1501804030605922346' })
             .setStyle(2)
     );
 

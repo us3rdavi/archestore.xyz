@@ -5,53 +5,53 @@ const {
 const { configuracao, Emojis } = require('../DataBaseJson');
 
 const MAIN_OPTIONS = [
-    { label: 'Atendimento',    value: 'atendimento',    description: 'Sistema de tickets e suporte',          emoji: { id: '1371593631328243713' } },
-    { label: 'Proteção',       value: 'protecao',       description: 'Anti-raid e segurança avançada',        emoji: { id: '1371593625112285208' } },
-    { label: 'Automações',     value: 'automacoes',     description: 'Mensagens e repost automáticos',        emoji: { id: '1371572539213611090' } },
+    { label: 'Atendimento',    value: 'atendimento',    description: 'Sistema de tickets e suporte',          emoji: { id: '1501804043121725490' } },
+    { label: 'Proteção',       value: 'protecao',       description: 'Anti-raid e segurança avançada',        emoji: { id: '1501804118292037765' } },
+    { label: 'Automações',     value: 'automacoes',     description: 'Mensagens e repost automáticos',        emoji: { id: '1501804019184828507' } },
     { label: 'Moderação',      value: 'moderacao',      description: 'Ferramentas de moderação',              emoji: { id: '1501804067616325723' } },
     { label: 'Personalização', value: 'personalizacao', description: 'Bot designer e aparência do bot',       emoji: { id: '1501804122943389716' } },
-    { label: 'Permissões',     value: 'permissoes',     description: 'Autorização e controle de acesso',      emoji: { id: '1371577447031640124' } },
-    { label: 'Formulários',    value: 'formularios',    description: 'Sistema de formulários personalizados', emoji: { id: '1371593612386635887' } },
-    { label: 'Definições',     value: 'definicoes',     description: 'Configurações gerais do sistema',       emoji: { id: '1371571230041178125' } },
+    { label: 'Permissões',     value: 'permissoes',     description: 'Autorização e controle de acesso',      emoji: { id: '1501804064596558017' } },
+    { label: 'Formulários',    value: 'formularios',    description: 'Sistema de formulários personalizados', emoji: { id: '1501804039451709441' } },
+    { label: 'Definições',     value: 'definicoes',     description: 'Configurações gerais do sistema',       emoji: { id: '1501804030605922346' } },
 ];
 
 const SUB_OPTIONS = {
     atendimento: [
-        { label: 'Página Inicial',          value: 'home',               description: 'Voltar ao menu principal',                    emoji: { id: '1371593637179297923' } },
-        { label: 'Configurar Tickets',       value: 'atendimento_config', description: 'Configurações do sistema de tickets',         emoji: { id: '1371593631328243713' } },
-        { label: 'Postar Painel de Tickets', value: 'atendimento_postar', description: 'Enviar o painel de abertura de tickets',      emoji: { id: '1371593623514124510' } },
+        { label: 'Página Inicial',          value: 'home',               description: 'Voltar ao menu principal',                    emoji: { id: '1501803908589162537' } },
+        { label: 'Configurar Tickets',       value: 'atendimento_config', description: 'Configurações do sistema de tickets',         emoji: { id: '1501804043121725490' } },
+        { label: 'Postar Painel de Tickets', value: 'atendimento_postar', description: 'Enviar o painel de abertura de tickets',      emoji: { id: '1501803923126747178' } },
     ],
     protecao: [
-        { label: 'Página Inicial',      value: 'home',            description: 'Voltar ao menu principal',         emoji: { id: '1371593637179297923' } },
-        { label: 'Proteção do Servidor', value: 'protecao_config', description: 'Anti-raid e filtros de segurança', emoji: { id: '1371593625112285208' } },
+        { label: 'Página Inicial',      value: 'home',            description: 'Voltar ao menu principal',         emoji: { id: '1501803908589162537' } },
+        { label: 'Proteção do Servidor', value: 'protecao_config', description: 'Anti-raid e filtros de segurança', emoji: { id: '1501804118292037765' } },
     ],
     automacoes: [
-        { label: 'Página Inicial',        value: 'home',             description: 'Voltar ao menu principal',        emoji: { id: '1371593637179297923' } },
-        { label: 'Mensagens Automáticas', value: 'automacoes_msgs',  description: 'Configurar mensagens automáticas', emoji: { id: '1371572539213611090' } },
-        { label: 'Repostagem Automática', value: 'automacoes_repost', description: 'Configurar repostagem automática', emoji: { id: '1371593628069396591' } },
+        { label: 'Página Inicial',        value: 'home',             description: 'Voltar ao menu principal',        emoji: { id: '1501803908589162537' } },
+        { label: 'Mensagens Automáticas', value: 'automacoes_msgs',  description: 'Configurar mensagens automáticas', emoji: { id: '1501804019184828507' } },
+        { label: 'Repostagem Automática', value: 'automacoes_repost', description: 'Configurar repostagem automática', emoji: { id: '1501803917640732722' } },
     ],
     moderacao: [
-        { label: 'Página Inicial',      value: 'home',            description: 'Voltar ao menu principal',          emoji: { id: '1371593637179297923' } },
+        { label: 'Página Inicial',      value: 'home',            description: 'Voltar ao menu principal',          emoji: { id: '1501803908589162537' } },
         { label: 'Painel de Moderação', value: 'moderacao_config', description: 'Ferramentas e ações de moderação', emoji: { id: '1501804067616325723' } },
     ],
     personalizacao: [
-        { label: 'Página Inicial',   value: 'home',                   description: 'Voltar ao menu principal',            emoji: { id: '1371593637179297923' } },
+        { label: 'Página Inicial',   value: 'home',                   description: 'Voltar ao menu principal',            emoji: { id: '1501803908589162537' } },
         { label: 'Meu Bot Designer', value: 'personalizacao_designer', description: 'Aparência e personalização do bot',   emoji: { id: '1501804122943389716' } },
-        { label: 'Definições',       value: 'personalizacao_def',      description: 'Configurações gerais e integrações',  emoji: { id: '1371571230041178125' } },
+        { label: 'Definições',       value: 'personalizacao_def',      description: 'Configurações gerais e integrações',  emoji: { id: '1501804030605922346' } },
     ],
     permissoes: [
-        { label: 'Página Inicial',       value: 'home',             description: 'Voltar ao menu principal',       emoji: { id: '1371593637179297923' } },
-        { label: 'Gerenciar Permissões', value: 'permissoes_config', description: 'Adicionar e remover permissões', emoji: { id: '1371577447031640124' } },
+        { label: 'Página Inicial',       value: 'home',             description: 'Voltar ao menu principal',       emoji: { id: '1501803908589162537' } },
+        { label: 'Gerenciar Permissões', value: 'permissoes_config', description: 'Adicionar e remover permissões', emoji: { id: '1501804064596558017' } },
     ],
     formularios: [
-        { label: 'Página Inicial',        value: 'home',        description: 'Voltar ao menu principal',                     emoji: { id: '1371593637179297923' } },
-        { label: 'Gerenciar Formulários', value: 'form_manage', description: 'Editar formulários existentes (máx. 5 slots)',  emoji: { id: '1371593617868591185' } },
-        { label: 'Criar Formulário',      value: 'form_create', description: 'Criar um novo formulário personalizado',        emoji: { id: '1371593623514124510' } },
+        { label: 'Página Inicial',        value: 'home',        description: 'Voltar ao menu principal',                     emoji: { id: '1501803908589162537' } },
+        { label: 'Gerenciar Formulários', value: 'form_manage', description: 'Editar formulários existentes (máx. 5 slots)',  emoji: { id: '1501804003850322052' } },
+        { label: 'Criar Formulário',      value: 'form_create', description: 'Criar um novo formulário personalizado',        emoji: { id: '1501803923126747178' } },
     ],
     definicoes: [
-        { label: 'Página Inicial',       value: 'home',               description: 'Voltar ao menu principal',              emoji: { id: '1371593637179297923' } },
-        { label: 'Configurações Gerais', value: 'definicoes_gerais',   description: 'Configurações diversas do servidor',    emoji: { id: '1371571230041178125' } },
-        { label: 'Moeda',                value: 'definicoes_moeda',    description: 'Configurar moeda e formato de preços',  emoji: { id: '1371593627477737502' } },
+        { label: 'Página Inicial',       value: 'home',               description: 'Voltar ao menu principal',              emoji: { id: '1501803908589162537' } },
+        { label: 'Configurações Gerais', value: 'definicoes_gerais',   description: 'Configurações diversas do servidor',    emoji: { id: '1501804030605922346' } },
+        { label: 'Moeda',                value: 'definicoes_moeda',    description: 'Configurar moeda e formato de preços',  emoji: { id: '1501803982849445998' } },
         { label: 'Log de Auditoria',     value: 'definicoes_auditlog', description: 'Canal de log para ações de configuração', emoji: { id: '1501804019184828507' } },
     ],
 };
@@ -105,7 +105,7 @@ function buildMainDropdown(userId) {
 
 function buildSubDropdown(userId, category) {
     const options = SUB_OPTIONS[category] || [
-        { label: 'Página Inicial', value: 'home', description: 'Voltar ao menu principal', emoji: { id: '1371593637179297923' } },
+        { label: 'Página Inicial', value: 'home', description: 'Voltar ao menu principal', emoji: { id: '1501803908589162537' } },
     ];
     const label = CATEGORY_LABELS[category] || category;
     return new ActionRowBuilder().addComponents(
@@ -148,7 +148,7 @@ function buildMainPanel(userId, interaction) {
 
 function buildSubPanel(userId, category) {
     const options = SUB_OPTIONS[category] || [
-        { label: 'Página Inicial', value: 'home', description: 'Voltar ao menu principal', emoji: { id: '1371593637179297923' } },
+        { label: 'Página Inicial', value: 'home', description: 'Voltar ao menu principal', emoji: { id: '1501803908589162537' } },
     ];
     const label = CATEGORY_LABELS[category] || category;
     const header = getCategoryHeader(category);

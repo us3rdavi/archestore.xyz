@@ -28,22 +28,22 @@ async function configrole24(interaction, client) {
         new ButtonBuilder()
             .setCustomId("onoffcargo24")
             .setLabel(statusComprar ? "On" : "Off")
-            .setEmoji(statusComprar ? "1371568433321214092" : "1371569230901936258")
+            .setEmoji(statusComprar ? "1501803935453679616" : "1501803932484108359")
             .setStyle(statusComprar ? 3 : 4),
         new ButtonBuilder()
             .setCustomId("configurarcargocomprar")
             .setLabel("Configurar Cargo")
-            .setEmoji("1371605431868457032")
+            .setEmoji("1501804030605922346")
             .setStyle(1),
         new ButtonBuilder()
             .setCustomId("configurarlink")
             .setLabel("Configurar Link")
-            .setEmoji("1371605431868457032")
+            .setEmoji("1501804030605922346")
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("voltar1")
             .setLabel('Voltar')
-            .setEmoji("1371605354605051996")
+            .setEmoji("1501804030605922346")
             .setStyle(2),
     );
 

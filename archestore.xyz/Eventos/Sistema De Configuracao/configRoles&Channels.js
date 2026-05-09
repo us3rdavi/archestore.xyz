@@ -37,7 +37,7 @@ module.exports = {
                 const dd = new ButtonBuilder()
                     .setCustomId("voltar77roles")
                     .setLabel('Voltar')
-                    .setEmoji(`1371580877598887996`)
+                    .setEmoji(`1501804013262475275`)
                     .setStyle(2)
 
                 const row2 = new ActionRowBuilder()
@@ -59,7 +59,7 @@ module.exports = {
                 const dd = new ButtonBuilder()
                     .setCustomId("voltar77roles")
                     .setLabel('Voltar')
-                    .setEmoji(`1371580877598887996`)
+                    .setEmoji(`1501804013262475275`)
                     .setStyle(2)
 
                 const row2 = new ActionRowBuilder()
@@ -81,7 +81,7 @@ module.exports = {
                 const dd = new ButtonBuilder()
                     .setCustomId("voltar77roles")
                     .setLabel('Voltar')
-                    .setEmoji(`1371580877598887996`)
+                    .setEmoji(`1501804013262475275`)
                     .setStyle(2)
 
                 const row2 = new ActionRowBuilder()
@@ -103,7 +103,7 @@ module.exports = {
                 const dd = new ButtonBuilder()
                     .setCustomId("voltar77roles")
                     .setLabel('Voltar')
-                    .setEmoji(`1371580877598887996`)
+                    .setEmoji(`1501804013262475275`)
                     .setStyle(2)
 
                 const row2 = new ActionRowBuilder()
@@ -134,7 +134,7 @@ module.exports = {
                     new ButtonBuilder()
                         .setCustomId("voltar77channels")
                         .setLabel('Voltar')
-                        .setEmoji(`1371580877598887996`)
+                        .setEmoji(`1501804013262475275`)
                         .setStyle(2)
                 )
 
@@ -155,7 +155,7 @@ module.exports = {
                 const dd = new ButtonBuilder()
                     .setCustomId("voltar77channels")
                     .setLabel('Voltar')
-                    .setEmoji(`1371580877598887996`)
+                    .setEmoji(`1501804013262475275`)
                     .setStyle(2)
 
                 const row2 = new ActionRowBuilder()
@@ -180,7 +180,7 @@ module.exports = {
                 const dd = new ButtonBuilder()
                     .setCustomId("voltar77channels")
                     .setLabel('Voltar')
-                    .setEmoji(`1371580877598887996`)
+                    .setEmoji(`1501804013262475275`)
                     .setStyle(2)
 
                 const row2 = new ActionRowBuilder()
@@ -208,7 +208,7 @@ module.exports = {
                 const dd = new ButtonBuilder()
                     .setCustomId("voltar77channels")
                     .setLabel('Voltar')
-                    .setEmoji(`1371580877598887996`)
+                    .setEmoji(`1501804013262475275`)
                     .setStyle(2)
 
                 const row2 = new ActionRowBuilder()
@@ -232,7 +232,7 @@ module.exports = {
                 const dd = new ButtonBuilder()
                     .setCustomId("voltar77channels")
                     .setLabel('Voltar')
-                    .setEmoji(`1371580877598887996`)
+                    .setEmoji(`1501804013262475275`)
                     .setStyle(2)
 
                 const row2 = new ActionRowBuilder()
@@ -256,7 +256,7 @@ module.exports = {
                 const dd = new ButtonBuilder()
                     .setCustomId("voltar77channels")
                     .setLabel('Voltar')
-                    .setEmoji(`1371580877598887996`)
+                    .setEmoji(`1501804013262475275`)
                     .setStyle(2)
 
                 const row2 = new ActionRowBuilder()
@@ -281,7 +281,7 @@ module.exports = {
                 const dd = new ButtonBuilder()
                     .setCustomId("voltar77channels")
                     .setLabel('Voltar')
-                    .setEmoji(`1371580877598887996`)
+                    .setEmoji(`1501804013262475275`)
                     .setStyle(2)
 
                 const row2 = new ActionRowBuilder()
@@ -306,7 +306,7 @@ module.exports = {
                 const dd = new ButtonBuilder()
                     .setCustomId("voltar77channels")
                     .setLabel('Voltar')
-                    .setEmoji(`1371580877598887996`)
+                    .setEmoji(`1501804013262475275`)
                     .setStyle(2)
 
                 const row2 = new ActionRowBuilder()
@@ -331,7 +331,7 @@ module.exports = {
                 const dd = new ButtonBuilder()
                     .setCustomId("voltar77channels")
                     .setLabel('Voltar')
-                    .setEmoji(`1371580877598887996`)
+                    .setEmoji(`1501804013262475275`)
                     .setStyle(2)
 
                 const row2 = new ActionRowBuilder()
@@ -356,7 +356,7 @@ module.exports = {
                 const dd = new ButtonBuilder()
                     .setCustomId("voltar77channels")
                     .setLabel('Voltar')
-                    .setEmoji(`1371580877598887996`)
+                    .setEmoji(`1501804013262475275`)
                     .setStyle(2)
 
                 const row2 = new ActionRowBuilder()
@@ -379,7 +379,7 @@ module.exports = {
                         const dd = new ButtonBuilder()
                             .setCustomId("voltar77channels")
                             .setLabel('Voltar')
-                            .setEmoji(`1371580877598887996`)
+                            .setEmoji(`1501804013262475275`)
                             .setStyle(2)
         
                         const row2 = new ActionRowBuilder()

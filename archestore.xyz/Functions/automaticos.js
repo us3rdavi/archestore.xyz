@@ -25,24 +25,24 @@ async function automatico(interaction, client) {
         new ButtonBuilder()
             .setCustomId("autoreact24")
             .setLabel('Auto React')
-            .setEmoji("1371605384565096499")
+            .setEmoji("1501804030605922346")
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("configmsgauto")
             .setLabel('Mensagem Automática')
-            .setEmoji("1371605445155885127")
+            .setEmoji("1501803905363869769")
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("configlock")
             .setLabel('Lock Automático')
-            .setEmoji("1371605629218721892")
+            .setEmoji("1501803926180335727")
             .setStyle(1),
     );
 
     const row3 = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId("voltar1")
-            .setEmoji("1371605354605051996")
+            .setEmoji("1501804030605922346")
             .setLabel('Voltar')
             .setStyle(2)
     );

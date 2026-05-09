@@ -26,12 +26,12 @@ async function Gerenciar(interaction, client) {
             new ButtonBuilder()
                 .setCustomId('configcargos')
                 .setLabel('Cargos')
-                .setEmoji({ id: '1371593623514124510' })
+                .setEmoji({ id: '1501803923126747178' })
                 .setStyle(2),
             new ButtonBuilder()
                 .setCustomId('personalizarcanais')
                 .setLabel('Canais')
-                .setEmoji({ id: '1371593613665894562' })
+                .setEmoji({ id: '1501804058699366470' })
                 .setStyle(2)
         );
 
@@ -39,7 +39,7 @@ async function Gerenciar(interaction, client) {
             new ButtonBuilder()
                 .setCustomId('formasdepagamentos')
                 .setLabel('Formas de Pagamento')
-                .setEmoji({ id: '1371593627477737502' })
+                .setEmoji({ id: '1501803982849445998' })
                 .setStyle(1)
         );
 
@@ -47,7 +47,7 @@ async function Gerenciar(interaction, client) {
             new ButtonBuilder()
                 .setCustomId('voltar1')
                 .setLabel('Menu Principal')
-                .setEmoji({ id: '1371593637179297923' })
+                .setEmoji({ id: '1501803908589162537' })
                 .setStyle(2)
         );
 

@@ -69,7 +69,7 @@ module.exports = {
                             new ButtonBuilder()
                                 .setCustomId('voltar1')
                                 .setLabel('Menu Principal')
-                                .setEmoji({ id: '1371593637179297923' })
+                                .setEmoji({ id: '1501803908589162537' })
                                 .setStyle(2)
                         ));
                         await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] });
@@ -92,7 +92,7 @@ module.exports = {
                         new ButtonBuilder()
                             .setCustomId('voltar1')
                             .setLabel('Menu Principal')
-                            .setEmoji({ id: '1371593637179297923' })
+                            .setEmoji({ id: '1501803908589162537' })
                             .setStyle(2)
                     ));
                     await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] });
@@ -147,7 +147,7 @@ module.exports = {
                         new ButtonBuilder()
                             .setCustomId('voltar1')
                             .setLabel('Menu Principal')
-                            .setEmoji({ id: '1371593637179297923' })
+                            .setEmoji({ id: '1501803908589162537' })
                             .setStyle(2)
                     ));
                     await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] });

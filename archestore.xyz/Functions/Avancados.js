@@ -40,7 +40,7 @@ async function Avançados(interaction, client) {
         new ButtonBuilder()
             .setCustomId("comandosperm")
             .setLabel('Comandos')
-            .setEmoji({ id: '1371593610339942493' })
+            .setEmoji({ id: '1501803905363869769' })
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("permissaoadm")
@@ -50,17 +50,17 @@ async function Avançados(interaction, client) {
         new ButtonBuilder()
             .setCustomId("configemojis24")
             .setLabel('Configurar Emojis')
-            .setEmoji({ id: '1371593613665894562' })
+            .setEmoji({ id: '1501804058699366470' })
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("limpardm")
             .setLabel("Limpar Dm")
-            .setEmoji({ id: '1371593634029371432' })
+            .setEmoji({ id: '1501803926180335727' })
             .setStyle(4),
         new ButtonBuilder()
             .setCustomId("voltar1")
             .setLabel('Menu Principal')
-            .setEmoji({ id: '1371593637179297923' })
+            .setEmoji({ id: '1501803908589162537' })
             .setStyle(2)
     );
 
@@ -121,7 +121,7 @@ async function Configcomandos24(interaction, client) {
         new ButtonBuilder()
             .setCustomId('configavançadas24')
             .setLabel('Voltar')
-            .setEmoji({ id: '1371593637179297923' })
+            .setEmoji({ id: '1501803908589162537' })
             .setStyle(2)
     );
 
@@ -158,17 +158,17 @@ async function Emojis24(interaction, client) {
         new ButtonBuilder()
             .setCustomId("create_emojis")
             .setLabel('Adicionar Emojis')
-            .setEmoji({ id: '1371593623514124510' })
+            .setEmoji({ id: '1501803923126747178' })
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("remove_emojis")
             .setLabel('Remover Emojis')
-            .setEmoji({ id: '1371593634029371432' })
+            .setEmoji({ id: '1501803926180335727' })
             .setStyle(4),
         new ButtonBuilder()
             .setCustomId('configavançadas24')
             .setLabel('Voltar')
-            .setEmoji({ id: '1371593637179297923' })
+            .setEmoji({ id: '1501803908589162537' })
             .setStyle(2)
     );
 
@@ -204,22 +204,22 @@ async function Perms24(interaction, client) {
         new ButtonBuilder()
             .setCustomId("perm_add")
             .setLabel('Adicionar Perm')
-            .setEmoji({ id: '1371593623514124510' })
+            .setEmoji({ id: '1501803923126747178' })
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("perm_remove")
             .setLabel('Remover Permissão')
-            .setEmoji({ id: '1371593634029371432' })
+            .setEmoji({ id: '1501803926180335727' })
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("perm_list")
             .setLabel('Lista De Permissões')
-            .setEmoji({ id: '1371593613665894562' })
+            .setEmoji({ id: '1501804058699366470' })
             .setStyle(1),
         new ButtonBuilder()
             .setCustomId('configavançadas24')
             .setLabel('Voltar')
-            .setEmoji({ id: '1371593637179297923' })
+            .setEmoji({ id: '1501803908589162537' })
             .setStyle(2)
     );
 

@@ -42,17 +42,17 @@ async function autoreact24(interaction, client) {
         new ButtonBuilder()
             .setCustomId("configautoreact")
             .setLabel("Configurar Auto Reação")
-            .setEmoji("<:_fixe_emoji:1371605411777482803>")
+            .setEmoji("<:_fixe_emoji:1501804030605922346>")
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("resetautoreact")
             .setLabel("Resetar Configuração")
-            .setEmoji("<:_trash_emoji:1371605645597478953>")
+            .setEmoji("<:_trash_emoji:1501803926180335727>")
             .setStyle(4),
         new ButtonBuilder()
             .setCustomId("atualizarembed24")
             .setLabel("Aplicar alterações")
-            .setEmoji("<:_fixe_emoji:1371605411777482803>")
+            .setEmoji("<:_fixe_emoji:1501804030605922346>")
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("eaffaawwawa")

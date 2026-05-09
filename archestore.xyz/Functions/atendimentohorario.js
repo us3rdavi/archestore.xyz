@@ -36,17 +36,17 @@ async function Atendimentohorario(interaction, client) {
         new ButtonBuilder()
             .setCustomId("onoffatendimentohorario24")
             .setLabel(atendimentohorario24 ? "On" : "Off")
-            .setEmoji(atendimentohorario24 ? "1371593609891283115" : "1371593615155134535")
+            .setEmoji(atendimentohorario24 ? "1501803932484108359" : "1501803935453679616")
             .setStyle(atendimentohorario24 ? 3 : 4),
         new ButtonBuilder()
             .setCustomId("confighorarioatendimento24")
             .setLabel("Configurar")
-            .setEmoji("1371593610339942493")
+            .setEmoji("1501803905363869769")
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId("painelconfigticket")
             .setLabel('Voltar')
-            .setEmoji("1371593637179297923")
+            .setEmoji("1501803908589162537")
             .setStyle(2),
     );
 

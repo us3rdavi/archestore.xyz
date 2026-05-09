@@ -43,13 +43,13 @@ async function showAuditLogPanel(interaction, client) {
             new ButtonBuilder()
                 .setCustomId('removeauditlogchannel')
                 .setLabel('Remover Canal')
-                .setEmoji({ id: '1371593634029371432' })
+                .setEmoji({ id: '1501803926180335727' })
                 .setStyle(4)
                 .setDisabled(!enabled),
             new ButtonBuilder()
                 .setCustomId('voltar1')
                 .setLabel('Menu Principal')
-                .setEmoji({ id: '1371593637179297923' })
+                .setEmoji({ id: '1501803908589162537' })
                 .setStyle(2)
         )
     );

@@ -20,11 +20,8 @@ module.exports = {
             }
 
             await interaction.reply({
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
                 components: [buildMainPanel(interaction.user.id, interaction)],
-                flags: MessageFlags.IsComponentsV2,
-                embeds: [],
-                content: '',
             });
         } catch (err) {
             console.error('[Config] Erro:', err);

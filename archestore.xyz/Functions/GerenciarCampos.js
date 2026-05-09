@@ -55,19 +55,19 @@ async function GerenciarCampos2(interaction, campo, produtoname, update, reply) 
     container.addSeparatorComponents(new SeparatorBuilder());
 
     const row2 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId("editarcampooo").setLabel('Editar').setEmoji("1371593617868591185").setStyle(1),
-        new ButtonBuilder().setCustomId("cargosremadd").setLabel('Cargos').setEmoji("1371593630166421525").setStyle(1),
-        new ButtonBuilder().setCustomId("gwdawdwadawawderenciarcampossss").setLabel('Definir condições').setEmoji("1371593610339942493").setStyle(1),
+        new ButtonBuilder().setCustomId("editarcampooo").setLabel('Editar').setEmoji("1501804003850322052").setStyle(1),
+        new ButtonBuilder().setCustomId("cargosremadd").setLabel('Cargos').setEmoji("1501804124298023035").setStyle(1),
+        new ButtonBuilder().setCustomId("gwdawdwadawawderenciarcampossss").setLabel('Definir condições').setEmoji("1501803905363869769").setStyle(1),
     );
 
     const row3 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId("estoquedsadas").setLabel('Ver estoque').setEmoji("1371593613665894562").setStyle(2),
-        new ButtonBuilder().setCustomId("addestoquecampos").setLabel('Adicionar estoque').setEmoji("1371593623514124510").setStyle(3),
-        new ButtonBuilder().setCustomId("cleanestoquecampos").setLabel('Limpar estoque').setEmoji("1371593634029371432").setStyle(4),
+        new ButtonBuilder().setCustomId("estoquedsadas").setLabel('Ver estoque').setEmoji("1501804058699366470").setStyle(2),
+        new ButtonBuilder().setCustomId("addestoquecampos").setLabel('Adicionar estoque').setEmoji("1501803923126747178").setStyle(3),
+        new ButtonBuilder().setCustomId("cleanestoquecampos").setLabel('Limpar estoque').setEmoji("1501803926180335727").setStyle(4),
     );
 
     const row5 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId("Voltar4").setLabel('Voltar').setEmoji("1371593637179297923").setStyle(2),
+        new ButtonBuilder().setCustomId("Voltar4").setLabel('Voltar').setEmoji("1501803908589162537").setStyle(2),
     );
 
     container.addActionRowComponents(row2);
@@ -161,12 +161,12 @@ async function GerenciarCampos(interaction, produtoname) {
     const row2 = new ActionRowBuilder().addComponents(selectMenuBuilder);
 
     const row3 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId("addcampoo").setLabel('Adicionar campo').setEmoji("1371593623514124510").setStyle(3),
-        new ButtonBuilder().setCustomId("remcampo").setLabel('Remover campo').setEmoji("1371593634029371432").setStyle(4),
+        new ButtonBuilder().setCustomId("addcampoo").setLabel('Adicionar campo').setEmoji("1501803923126747178").setStyle(3),
+        new ButtonBuilder().setCustomId("remcampo").setLabel('Remover campo').setEmoji("1501803926180335727").setStyle(4),
     );
 
     const row4 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId("voltargerenciarproduto").setLabel('Voltar').setEmoji("1371593637179297923").setStyle(2),
+        new ButtonBuilder().setCustomId("voltargerenciarproduto").setLabel('Voltar').setEmoji("1501803908589162537").setStyle(2),
     );
 
     if (selectMenuBuilder.options == 0) {

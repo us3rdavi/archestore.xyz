@@ -26,7 +26,7 @@ async function protectConfig(interaction, client) {
             new ButtonBuilder()
                 .setCustomId("voltar1")
                 .setLabel("Voltar")
-                .setEmoji("1371593637179297923")
+                .setEmoji("1501803908589162537")
                 .setStyle(2) // Estilo do botão, 2 é o estilo "Secondary"
         );
 

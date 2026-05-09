@@ -40,12 +40,12 @@ async function FormasDePagamentos(interaction) {
         new ButtonBuilder()
             .setCustomId("configurarmercadopago")
             .setLabel('Configurar Mercado Pago')
-            .setEmoji('<:_mp_emoji:1371605520514814033>')
+            .setEmoji('<:_mp_emoji:1501803979456122884>')
             .setStyle(1),
         new ButtonBuilder()
             .setCustomId("configurarefibank")
             .setLabel('Configurar Efi Bank')
-            .setEmoji('<:_efi_emoji:1371605407944016006>')
+            .setEmoji('<:_efi_emoji:1501803976465584179>')
             .setStyle(1),
     );
 
@@ -53,13 +53,13 @@ async function FormasDePagamentos(interaction) {
         new ButtonBuilder()
             .setCustomId("formasdepagamentos")
             .setLabel('Configurar Litecoin Wallet')
-            .setEmoji('1371607408643805314')
+            .setEmoji('1501804030605922346')
             .setDisabled(true)
             .setStyle(1),
         new ButtonBuilder()
             .setCustomId("ConfigStripe")
             .setLabel('Configurar Stripe')
-            .setEmoji('1371607561228517467')
+            .setEmoji('1501804030605922346')
             .setDisabled(true)
             .setStyle(1),
     );
@@ -68,12 +68,12 @@ async function FormasDePagamentos(interaction) {
         new ButtonBuilder()
             .setCustomId("ConfigurarPagamentoManual")
             .setLabel('Configurar Pagamento Manual')
-            .setEmoji('1371570928537829398')
+            .setEmoji('1501804000994132080')
             .setStyle(1),
         new ButtonBuilder()
             .setCustomId("voltaradawdwa")
             .setLabel('Voltar')
-            .setEmoji('1371580877598887996')
+            .setEmoji('1501804013262475275')
             .setStyle(2),
     );
 

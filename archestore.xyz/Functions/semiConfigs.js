@@ -49,7 +49,7 @@ async function semiConfigs(interaction, client) {
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId('voltar1')
-            .setEmoji('1371580875615113307')
+            .setEmoji('1501803928973476023')
             .setStyle(1)
     );
 

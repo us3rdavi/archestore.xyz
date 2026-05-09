@@ -30,15 +30,15 @@ function buildAutoReactContainer(interaction, mudarstatus) {
     container.addSeparatorComponents(new SeparatorBuilder());
 
     const botaostyolo = autoReactStatus ? 4 : 3;
-    const botaoemoji = autoReactStatus ? "1371569230901936258" : "1371568433321214092";
+    const botaoemoji = autoReactStatus ? "1501803932484108359" : "1501803935453679616";
 
     container.addActionRowComponents(
         new ActionRowBuilder().addComponents(
             new ButtonBuilder().setCustomId(`${interaction.user.id}_onoff`).setEmoji(botaoemoji).setStyle(botaostyolo),
-            new ButtonBuilder().setCustomId("configautoreact").setLabel("Configurar Auto Reação").setStyle(2).setEmoji("1371605431868457032"),
-            new ButtonBuilder().setCustomId("resetautoreact").setLabel("Resetar Configuração").setStyle(4).setEmoji("1371605645597478953"),
-            new ButtonBuilder().setCustomId("atualizarembed24").setLabel("Aplicar alterações").setStyle(2).setEmoji("1371605411777482803"),
-            new ButtonBuilder().setCustomId("eaffaawwawa").setEmoji("1371605354605051996").setLabel('Voltar').setStyle(2)
+            new ButtonBuilder().setCustomId("configautoreact").setLabel("Configurar Auto Reação").setStyle(2).setEmoji("1501804030605922346"),
+            new ButtonBuilder().setCustomId("resetautoreact").setLabel("Resetar Configuração").setStyle(4).setEmoji("1501803926180335727"),
+            new ButtonBuilder().setCustomId("atualizarembed24").setLabel("Aplicar alterações").setStyle(2).setEmoji("1501804030605922346"),
+            new ButtonBuilder().setCustomId("eaffaawwawa").setEmoji("1501804030605922346").setLabel('Voltar').setStyle(2)
         )
     );
 

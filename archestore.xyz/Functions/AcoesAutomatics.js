@@ -114,18 +114,18 @@ async function SistemaAntiFake(interaction, client) {
         new ButtonBuilder()
             .setCustomId("personalizarantifake")
             .setLabel('Anti-Fake')
-            .setEmoji("1371593625112285208")
+            .setEmoji("1501804118292037765")
             .setStyle(1),
     );
 
     const botoesvoltar = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId("voltar_AcoesAutomaticsConfigs")
-            .setEmoji("1371593637179297923")
+            .setEmoji("1501803908589162537")
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId(`voltar1`)
-            .setEmoji("1371593617868591185")
+            .setEmoji("1501804003850322052")
             .setStyle(1)
     );
 
@@ -177,12 +177,12 @@ async function sistemaAntiRaid(interaction, client) {
         new ButtonBuilder()
             .setCustomId(`statusantiraid`)
             .setLabel(`${AntiRaid?.status ? `Desativar` : `Ativar`} Sistema`)
-            .setEmoji("1371593609891283115")
+            .setEmoji("1501803932484108359")
             .setStyle(AntiRaid?.status ? 4 : 3),
         new ButtonBuilder()
             .setCustomId(`statusconvitepersonalizado`)
             .setLabel(`${AntiRaid?.convitepersonalizado ? `Desativar` : `Ativar`} Proteção de Convite`)
-            .setEmoji("1371593609891283115")
+            .setEmoji("1501803932484108359")
             .setStyle(AntiRaid?.convitepersonalizado ? 4 : 3),
     );
 
@@ -235,11 +235,11 @@ async function sistemaAntiRaid(interaction, client) {
     const botoesvoltar = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId("voltar_AcoesAutomaticsConfigs")
-            .setEmoji("1371593637179297923")
+            .setEmoji("1501803908589162537")
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId(`voltar1`)
-            .setEmoji("1371593617868591185")
+            .setEmoji("1501804003850322052")
             .setStyle(1)
     );
 

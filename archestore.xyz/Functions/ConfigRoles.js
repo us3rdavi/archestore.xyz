@@ -15,16 +15,16 @@ async function ConfigChannels(interaction, client) {
             new StringSelectMenuBuilder()
                 .setCustomId(`selectChannelC`)
                 .addOptions(
-                    { value: `logpedidos`, label: `Definir canal de logs de pedidos`, emoji: `1371607279195127909` },
-                    { value: `eventbuy`, label: `Definir canal de evento de compras`, emoji: `1371607279195127909` },
+                    { value: `logpedidos`, label: `Definir canal de logs de pedidos`, emoji: `1501804013262475275` },
+                    { value: `eventbuy`, label: `Definir canal de evento de compras`, emoji: `1501804013262475275` },
                     { value: `systemlogs`, label: `Definir canal de logs do sistema`, emoji: `${Emojis.get('_staff_emoji')}` },
                     { value: `antiraidlogschannel`, label: `Definir canal de logs do AntiRaid`, emoji: `${Emojis.get('_staff_emoji')}` },
-                    { value: `logentrada`, label: `Definir canal de logs de entradas`, emoji: `1371607279195127909` },
-                    { value: `logsaida`, label: `Definir canal de logs de saídas`, emoji: `1371607279195127909` },
-                    { value: `logmensagem`, label: `Definir canal de logs de mensagens`, emoji: `1371607279195127909` },
-                    { value: `trafegocall`, label: `Definir canal de logs de tráfego de call`, emoji: `1371607279195127909` },
-                    { value: `feedback`, label: `Definir canal de logs de feedback`, emoji: `1371607279195127909` },
-                    { value: `feedbackticket24`, label: `Definir canal de logs de feedback de ticket`, emoji: `1371607279195127909` }
+                    { value: `logentrada`, label: `Definir canal de logs de entradas`, emoji: `1501804013262475275` },
+                    { value: `logsaida`, label: `Definir canal de logs de saídas`, emoji: `1501804013262475275` },
+                    { value: `logmensagem`, label: `Definir canal de logs de mensagens`, emoji: `1501804013262475275` },
+                    { value: `trafegocall`, label: `Definir canal de logs de tráfego de call`, emoji: `1501804013262475275` },
+                    { value: `feedback`, label: `Definir canal de logs de feedback`, emoji: `1501804013262475275` },
+                    { value: `feedbackticket24`, label: `Definir canal de logs de feedback de ticket`, emoji: `1501804013262475275` }
                 )
                 .setPlaceholder(`Clique aqui para redefinir algum canal`)
                 .setMaxValues(1)
@@ -33,11 +33,11 @@ async function ConfigChannels(interaction, client) {
     const row2 = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId("voltar2")
-            .setEmoji(`1371605354605051996`)
+            .setEmoji(`1501804030605922346`)
             .setStyle(2),
         new ButtonBuilder()
             .setCustomId(`voltar1`)
-            .setEmoji('1371605354605051996')
+            .setEmoji('1501804030605922346')
             .setStyle(1)
     );
 

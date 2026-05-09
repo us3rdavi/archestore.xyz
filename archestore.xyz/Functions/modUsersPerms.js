@@ -40,13 +40,13 @@ async function gerenciarPerms(interaction, client) {
         new ButtonBuilder()
             .setCustomId("resetPerms")
             .setLabel('Resetar')
-            .setEmoji({ id: '1371593630707613846' })
+            .setEmoji({ id: '1501804124298023035' })
             .setStyle(4)
             .setDisabled(false),
         new ButtonBuilder()
             .setCustomId("voltar1")
             .setLabel("Menu Principal")
-            .setEmoji({ id: '1371593637179297923' })
+            .setEmoji({ id: '1501803908589162537' })
             .setStyle(2)
     );
 

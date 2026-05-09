@@ -105,13 +105,13 @@ function createUpdatedRow(currentStatus) {
             new ButtonBuilder()
                 .setCustomId("setTimeRepost")
                 .setLabel('Definir horário')
-                .setEmoji("1371593613665894562")
+                .setEmoji("1501804058699366470")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
             new ButtonBuilder()
                 .setCustomId(currentStatus ? "desabilityRepost" : "enableRepost")
                 .setLabel(currentStatus ? 'Desabilitar função' : 'Habilitar função')
-                .setEmoji(currentStatus ? "1371593615155134535" : "1371593609891283115")
+                .setEmoji(currentStatus ? "1501803935453679616" : "1501803932484108359")
                 .setStyle(currentStatus ? ButtonStyle.Danger : ButtonStyle.Success)
         );
 }
