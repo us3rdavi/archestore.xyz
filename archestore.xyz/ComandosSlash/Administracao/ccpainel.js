@@ -9,7 +9,7 @@ const {
     MessageFlags,
 } = require('discord.js');
 const { configuracao, Emojis } = require('../../DataBaseJson');
-const { getPermissions } = require('../../Functions/PermissionsCache');
+const { hasPermission } = require('../../Functions/PermissionsCache');
 
 module.exports = {
     name: 'ccpainel',
@@ -18,8 +18,7 @@ module.exports = {
     default_member_permissions: PermissionFlagsBits.Administrator,
 
     run: async (client, interaction) => {
-        const perm = await getPermissions(client.user.id);
-        if (perm === null || !perm.includes(interaction.user.id)) {
+        if (!hasPermission(interaction.user.id)) {
             return interaction.reply({
                 content: `${Emojis.get('negative_emoji')} Você não tem permissão para acessar este painel.`,
                 ephemeral: true,
@@ -27,35 +26,24 @@ module.exports = {
         }
 
         const adminRoleId = configuracao.get('ConfigRoles.cargoadm');
-        const adminRole = adminRoleId ? interaction.guild.roles.cache.get(adminRoleId) : null;
-        const staffLabel = adminRole ? adminRole.name : 'Owner';
+        const adminRole   = adminRoleId ? interaction.guild.roles.cache.get(adminRoleId) : null;
+        const staffLabel  = adminRole ? adminRole.name : 'Owner';
+
+        const userName = interaction.member?.displayName
+            || interaction.user?.displayName
+            || interaction.user?.username;
 
         const c = new ContainerBuilder();
 
-        // ── Cabeçalho ─────────────────────────────────────────────────────────
         c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
             `## ${Emojis.get('store_emoji')} CentralCart — Painel\n` +
-            `**${interaction.member?.displayName || interaction.user.displayName || interaction.user.username}** · ${staffLabel}\n\n` +
+            `**${userName}** · ${staffLabel}\n\n` +
             `${Emojis.get('information_emoji')} Selecione uma seção abaixo para visualizar e gerenciar.\n` +
             `-# Apenas usuários autorizados podem realizar alterações.`
         ));
 
         c.addSeparatorComponents(new SeparatorBuilder());
 
-        // ── Descrição das seções ───────────────────────────────────────────────
-        c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-            `${Emojis.get('store_emoji')} **Loja** — informações e plano da loja\n` +
-            `${Emojis.get('_money_emoji')} **Receita** — resumo financeiro e operações do dia\n` +
-            `${Emojis.get('_cart_emoji')} **Produtos** — catálogo de produtos disponíveis\n` +
-            `${Emojis.get('neworder_emoji')} **Pedidos** — histórico e gestão de pedidos\n` +
-            `${Emojis.get('_folder_emoji')} **Estoque** — chaves de licença por produto\n` +
-            `${Emojis.get('_diamond_emoji')} **Cupons** — criação e gestão de cupons\n` +
-            `${Emojis.get('_star_emoji')} **Top Clientes** — ranking dos maiores compradores`
-        ));
-
-        c.addSeparatorComponents(new SeparatorBuilder());
-
-        // ── Menu de navegação ─────────────────────────────────────────────────
         c.addActionRowComponents(
             new ActionRowBuilder().addComponents(
                 new StringSelectMenuBuilder()
@@ -75,9 +63,8 @@ module.exports = {
 
         try {
             await interaction.reply({
-                ephemeral: true,
                 components: [c],
-                flags: MessageFlags.IsComponentsV2,
+                flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
                 embeds: [],
                 content: '',
             });

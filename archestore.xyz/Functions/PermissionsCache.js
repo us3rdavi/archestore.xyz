@@ -1,13 +1,40 @@
-const perms = require("../DataBaseJson/perms.json");
+const fs   = require('fs');
+const path = require('path');
+const config = require('../config.json');
 
-async function getPermissions() {
-    const idAdmin = perms;
+const PERMS_FILE = path.join(__dirname, '../DataBaseJson/perms.json');
 
-    const permissions = Object.values(idAdmin);
-
-    return permissions;
+function readPerms() {
+    try {
+        return JSON.parse(fs.readFileSync(PERMS_FILE, 'utf8'));
+    } catch {
+        return { [config.owner]: config.owner };
+    }
 }
 
-module.exports = {
-    getPermissions
-};
+function writePerms(obj) {
+    fs.writeFileSync(PERMS_FILE, JSON.stringify(obj, null, 2));
+}
+
+function getPermissions() {
+    return Object.values(readPerms()).map(String);
+}
+
+function addPermission(userId) {
+    const p = readPerms();
+    p[String(userId)] = String(userId);
+    writePerms(p);
+}
+
+function removePermission(userId) {
+    const p = readPerms();
+    delete p[String(userId)];
+    writePerms(p);
+}
+
+function hasPermission(userId) {
+    if (String(userId) === String(config.owner)) return true;
+    return getPermissions().includes(String(userId));
+}
+
+module.exports = { getPermissions, addPermission, removePermission, hasPermission };
