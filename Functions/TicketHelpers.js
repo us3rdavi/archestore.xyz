@@ -13,10 +13,22 @@ const emojis = require("../Database/emojis.json");
 const Emojis = { get: (name) => emojis[name] || "" };
 
 function findTicketByThreadId(threadId) {
+    if (!threadId) return null;
+
+    // Lookup direto pelo índice threadId → userId
+    const userId = tickets.get(`tickets.threads.${threadId}`);
+    if (userId) {
+        const data = tickets.get(`tickets.abertos.${userId}`);
+        if (data) return { userId, ...data };
+    }
+
+    // Fallback: busca linear (tickets criados antes do índice)
     const abertos = tickets.get('tickets.abertos') || {};
-    for (const [userId, data] of Object.entries(abertos)) {
+    for (const [uid, data] of Object.entries(abertos)) {
         if (data && data.threadId === threadId) {
-            return { userId, ...data };
+            // Cria o índice agora para acelerar próximas buscas
+            tickets.set(`tickets.threads.${threadId}`, uid);
+            return { userId: uid, ...data };
         }
     }
     return null;

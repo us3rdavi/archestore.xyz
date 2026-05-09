@@ -203,6 +203,7 @@ module.exports = {
             }
 
             tickets.delete(`tickets.abertos.${ticketData.userId}`);
+            tickets.delete(`tickets.threads.${interaction.channel.id}`);
 
             await new Promise(resolve => setTimeout(resolve, 4000));
 

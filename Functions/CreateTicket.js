@@ -105,6 +105,7 @@ async function CreateTicket(interaction, valor) {
             messageId: null
         };
         tickets.set(`tickets.abertos.${interaction.user.id}`, ticketData);
+        tickets.set(`tickets.threads.${thread.id}`, interaction.user.id);
 
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder()

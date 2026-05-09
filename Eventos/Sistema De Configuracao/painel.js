@@ -285,8 +285,16 @@ module.exports = {
                 for (const iterator of valordelete) {
                     tickets.delete(`tickets.funcoes.${iterator}`)
                 }
-                painelTicket(interaction)
+                await interaction.update({
+                    content: `${Emojis.get('confirmed_emoji')} \`${valordelete.length}\` função(ões) removida(s) com sucesso!`,
+                    components: [],
+                    embeds: []
+                });
                 logAction(client, { action: 'Funções de Ticket removidas', details: `Funções: \`${valordelete.join(', ')}\``, userId: interaction.user.id, guildId: interaction.guildId });
+            }
+
+            if (interaction.customId == 'cancelarremoverfuncao') {
+                await interaction.update({ content: `${Emojis.get('confirmed_emoji')} Cancelado.`, components: [], embeds: [] });
             }
 
         }
@@ -806,30 +814,35 @@ module.exports = {
 
                     const selectMenuBuilder = new Discord.StringSelectMenuBuilder()
                         .setCustomId('deletarticketsfunction')
-                        .setPlaceholder('Clique aqui para selecionar')
-                        .setMinValues(0)
+                        .setPlaceholder('Selecione a(s) função(ões) que deseja remover')
+                        .setMinValues(1)
 
                     for (const chave in ggg) {
                         const item = ggg[chave];
 
                         const option = {
                             label: `${item.nome}`,
-                            description: `${item.predescricao}`,
+                            description: `${item.predescricao}`.slice(0, 100),
                             value: item.nome
                         };
 
                         selectMenuBuilder.addOptions(option);
-
-
                     }
 
                     selectMenuBuilder.setMaxValues(Object.keys(ggg).length)
 
                     const style2row = new ActionRowBuilder().addComponents(selectMenuBuilder);
-                    try {
-                        await interaction.update({ components: [style2row], content: `${interaction.user} Qual funções deseja remover?`, embeds: [] })
-                    } catch (error) {
-                    }
+                    const cancelRow = new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId('cancelarremoverfuncao')
+                            .setLabel('Cancelar')
+                            .setStyle(2)
+                    );
+                    await interaction.reply({
+                        content: `Selecione as funções que deseja remover:`,
+                        components: [style2row, cancelRow],
+                        ephemeral: true
+                    });
                 }
 
             }
