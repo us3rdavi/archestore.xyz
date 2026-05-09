@@ -70,9 +70,9 @@ let _mongoClient = null;
 
 async function initDatabase() {
     const config = require('../config.json');
-    const uri = config.MONGODB_URI;
+    const uri = process.env.MONGODB_URI || config.MONGODB_URI;
 
-    if (!uri || uri === 'SUA-MONGODB-URI-AQUI') {
+    if (!uri || uri === 'SUA-MONGODB-URI-AQUI' || uri === '') {
         console.warn('[DB] MONGODB_URI não configurado — rodando somente em memória (dados não persistidos).');
         return;
     }

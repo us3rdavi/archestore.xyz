@@ -5,7 +5,7 @@ const config = require('../config.json');
 const BASE_URL = 'https://api.centralcart.com.br/v1';
 
 function getHeaders() {
-    const token = config.CENTRALCART_API_KEY || process.env.CENTRALCART_API_KEY;
+    const token = process.env.CENTRALCART_API_KEY || config.CENTRALCART_API_KEY;
     if (!token) throw new Error('CENTRALCART_API_KEY não configurada.');
     return {
         'Authorization': `Bearer ${token}`,
