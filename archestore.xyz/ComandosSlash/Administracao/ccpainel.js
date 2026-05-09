@@ -35,7 +35,7 @@ module.exports = {
         // ── Cabeçalho ─────────────────────────────────────────────────────────
         c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
             `## ${Emojis.get('store_emoji')} CentralCart — Painel\n` +
-            `<@${interaction.user.id}> · ${staffLabel}\n\n` +
+            `**${interaction.member?.displayName || interaction.user.displayName || interaction.user.username}** · ${staffLabel}\n\n` +
             `${Emojis.get('information_emoji')} Selecione uma seção abaixo para visualizar e gerenciar.\n` +
             `-# Apenas usuários autorizados podem realizar alterações.`
         ));

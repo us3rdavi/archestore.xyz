@@ -68,7 +68,7 @@ async function BackupFunction(client, interaction) {
 
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('ecloud_emoji')} Backup do Servidor\n` +
-        `${Emojis.get('_silueta_emoji')} **${userName}** · ${interaction.guild?.name || ''}\n\n` +
+        `**${userName}** · Owner\n\n` +
         `${Emojis.get('information_emoji')} Gerencie os backups e dados do servidor abaixo.\n` +
         `-# Apenas o dono do servidor pode realizar alterações.`
     ));

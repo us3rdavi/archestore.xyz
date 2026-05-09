@@ -126,7 +126,7 @@ function buildMainPanel(userId, interaction) {
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
             `## ${Emojis.get('_settings_emoji')} Central de Configurações\n` +
-            `${Emojis.get('_silueta_emoji')} **${userName}** — ${guildName}\n\n` +
+            `**${userName}** · Owner\n\n` +
             `${Emojis.get('information_emoji')} Use o menu abaixo para navegar entre as **${MAIN_OPTIONS.length} categorias** disponíveis.\n` +
             `-# Apenas usuários autorizados podem realizar alterações.`
         )
