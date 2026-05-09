@@ -209,7 +209,7 @@ function buildFormPanelPayload(guildId, slotId) {
         new ButtonBuilder()
             .setCustomId(`form_btn_perguntas_${guildId}_${slotId}`)
             .setLabel('Perguntas')
-            .setEmoji({ id: '1501804124277051593' })
+            .setEmoji({ id: '1502520447340777482' })
             .setStyle(ButtonStyle.Secondary),
         new ButtonBuilder()
             .setCustomId(`form_btn_cargoaprovado_${guildId}_${slotId}`)
