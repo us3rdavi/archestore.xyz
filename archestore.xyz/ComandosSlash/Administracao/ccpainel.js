@@ -12,7 +12,7 @@ const { configuracao, Emojis } = require('../../DataBaseJson');
 const { hasPermission } = require('../../Functions/PermissionsCache');
 
 module.exports = {
-    name: 'ccpainel',
+    name: 'cc-config',
     description: 'Abre o painel de gerenciamento da CentralCart.',
     type: ApplicationCommandType.ChatInput,
     default_member_permissions: PermissionFlagsBits.Administrator,
