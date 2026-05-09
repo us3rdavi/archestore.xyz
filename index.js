@@ -9,6 +9,12 @@ process.on('unhandledRejection', (err) => {
     const { initDatabase } = require('./Database');
     await initDatabase();
 
+    // Garantir que o owner sempre tenha permissão no banco
+    const { addPermission } = require('./Functions/PermissionsCache');
+    const _cfg = require('./config.json');
+    const ownerId = process.env.OWNER_ID || _cfg.owner;
+    if (ownerId) addPermission(ownerId);
+
     // 2. Agora é seguro carregar tudo
     const { GatewayIntentBits, Client, Collection } = require("discord.js");
     const { AtivarIntents } = require("./Functions/StartIntents");

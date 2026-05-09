@@ -4,8 +4,9 @@ const Emojis = { get: (name) => emojis[name] || "" };
 
 module.exports = {
     name: "cargo-all",
-    description:"Atribuir um cargo específico a todos os membros do servidor",
+    description: "Atribuir um cargo específico a todos os membros do servidor",
     type: Discord.ApplicationCommandType.ChatInput,
+    default_member_permissions: Discord.PermissionFlagsBits.Administrator,
     options: [
         {
             name: 'cargo',
