@@ -28,14 +28,14 @@ module.exports = {
 
         const adminRoleId = configuracao.get('ConfigRoles.cargoadm');
         const adminRole = adminRoleId ? interaction.guild.roles.cache.get(adminRoleId) : null;
-        const staffLabel = adminRole ? adminRole.name : 'Staff';
+        const staffLabel = adminRole ? adminRole.name : 'Owner';
 
         const c = new ContainerBuilder();
 
         // ── Cabeçalho ─────────────────────────────────────────────────────────
         c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
             `## ${Emojis.get('store_emoji')} CentralCart — Painel\n` +
-            `${Emojis.get('_silueta_emoji')} <@${interaction.user.id}> · ${staffLabel}\n\n` +
+            `${Emojis.get('_silueta_emoji')} **${interaction.member?.displayName || interaction.user.displayName || interaction.user.username}** · ${staffLabel}\n\n` +
             `${Emojis.get('information_emoji')} Selecione uma seção abaixo para visualizar e gerenciar.\n` +
             `-# Apenas usuários autorizados podem realizar alterações.`
         ));
