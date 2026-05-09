@@ -1,466 +1,392 @@
-const { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, InteractionType, EmbedBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, ChannelType } = require('discord.js');
-const { configuracao, produtos, Emojis, BackupStorag, BackupStorage } = require("../../DataBaseJson");
+const {
+    ActionRowBuilder,
+    ModalBuilder,
+    TextInputBuilder,
+    TextInputStyle,
+    InteractionType,
+    ButtonBuilder,
+    ButtonStyle,
+    StringSelectMenuBuilder,
+    ChannelType,
+    ContainerBuilder,
+    TextDisplayBuilder,
+    SeparatorBuilder,
+    MessageFlags,
+} = require('discord.js');
+const { configuracao, produtos, Emojis } = require("../../DataBaseJson");
 const { SincronizarDados, SalvarTemplate } = require('../../Functions/SincronizarDados');
-const { BackupFunction, description } = require('../../ComandosSlash/Administracao/backup');
+const { BackupFunction } = require('../../ComandosSlash/Administracao/backup');
 const { default: axios } = require('axios');
+
+let BackupStorage;
+try {
+    BackupStorage = require("../../DataBaseJson").BackupStorage;
+} catch (_) {}
+
+const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+
+function loadingContainer(msg) {
+    const c = new ContainerBuilder();
+    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `${Emojis.get('loading_emoji')} ${msg}`
+    ));
+    return c;
+}
+
+function infoContainer(msg) {
+    const c = new ContainerBuilder();
+    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(msg));
+    return c;
+}
+
+function selectContainer(titulo, texto, selectRow) {
+    const c = new ContainerBuilder();
+    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('ecloud_emoji')} ${titulo}`
+    ));
+    c.addSeparatorComponents(new SeparatorBuilder());
+    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(texto));
+    c.addSeparatorComponents(new SeparatorBuilder());
+    c.addActionRowComponents(selectRow);
+    return c;
+}
 
 module.exports = {
     name: 'interactionCreate',
 
     run: async (interaction, client) => {
         if (interaction.isButton()) {
+
             if (interaction.customId === 'sincronizardados') {
-                await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Aguarde...`, components: [], ephemeral: true });
+                await interaction.update({
+                    components: [loadingContainer('Sincronizando dados do servidor...')],
+                    ...CV2,
+                });
                 await SincronizarDados(client);
                 await BackupFunction(client, interaction);
             }
+
             if (interaction.customId === 'salvartemplate') {
-                await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Aguarde...`, components: [], ephemeral: true });
+                await interaction.update({
+                    components: [loadingContainer('Salvando template do servidor...')],
+                    ...CV2,
+                });
                 await SalvarTemplate(client);
                 await BackupFunction(client, interaction);
             }
+
             if (interaction.customId === 'apagarbackup') {
-                await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Aguarde...`, components: [], ephemeral: true });
-                let opcoes = []
-                let backups = BackupStorage.fetchAll();
+                await interaction.update({
+                    components: [loadingContainer('Carregando backups...')],
+                    ...CV2,
+                });
 
-                for (const key in backups) {
-                    const element = backups[key];
-                    opcoes.push({
-                        label: `Nome: ${element.data[0].name} ID: ${element.ID?.startsWith(`Template_`) ? `template_` : ``}${element.data[0].id}`,
-                        description: `Canais: ${element.data[0].channels.length} Cargos: ${element.data[0].roles.length}`,
-                        emoji: `${Emojis.get(`ecloud_emoji`)}`,
-                        value: element.ID
-                    })
-                }
+                const backups = BackupStorage?.fetchAll?.() || {};
+                const opcoes = Object.values(backups).map(element => ({
+                    label: `${element.data[0].name} — ID: ${element.ID?.startsWith('Template_') ? 'template_' : ''}${element.data[0].id}`,
+                    description: `Canais: ${element.data[0].channels.length} · Cargos: ${element.data[0].roles.length}`,
+                    emoji: { id: '1501804046229438585' },
+                    value: element.ID,
+                }));
 
-                const select = new ActionRowBuilder().addComponents(
+                const selectRow = new ActionRowBuilder().addComponents(
                     new StringSelectMenuBuilder()
                         .setCustomId('apagarbackup')
-                        .setPlaceholder('Clique aqui para ver os backups')
+                        .setPlaceholder('Selecione o backup a apagar...')
                         .addOptions(opcoes)
-                )
+                );
 
-                await interaction.editReply({ content: ``, components: [select], ephemeral: true });
+                const c = selectContainer(
+                    'Apagar Backup',
+                    `${Emojis.get('_trash_emoji')} Selecione abaixo qual backup deseja remover permanentemente.\n-# Esta ação não pode ser desfeita.`,
+                    selectRow
+                );
+
+                await interaction.editReply({ components: [c], ...CV2 });
             }
+
             if (interaction.customId === 'restaurarservidor') {
-                await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Aguarde...`, components: [], ephemeral: true });
-                let opcoes = []
-                let backups = BackupStorage.fetchAll();
+                await interaction.update({
+                    components: [loadingContainer('Carregando backups...')],
+                    ...CV2,
+                });
 
-                for (const key in backups) {
-                    const element = backups[key];
-                    opcoes.push({
-                        label: `Nome: ${element.data[0].name} ID: ${element.ID?.startsWith(`Template_`) ? `template_` : ``}${element.data[0].id}`,
-                        description: `Canais: ${element.data[0].channels.length} Cargos: ${element.data[0].roles.length}`,
-                        emoji: `${Emojis.get(`ecloud_emoji`)}`,
-                        value: element.ID
-                    })
-                }
+                const backups = BackupStorage?.fetchAll?.() || {};
+                const opcoes = Object.values(backups).map(element => ({
+                    label: `${element.data[0].name} — ID: ${element.ID?.startsWith('Template_') ? 'template_' : ''}${element.data[0].id}`,
+                    description: `Canais: ${element.data[0].channels.length} · Cargos: ${element.data[0].roles.length}`,
+                    emoji: { id: '1501804046229438585' },
+                    value: element.ID,
+                }));
 
-                const select = new ActionRowBuilder().addComponents(
+                const selectRow = new ActionRowBuilder().addComponents(
                     new StringSelectMenuBuilder()
                         .setCustomId('restaurarservidor')
-                        .setPlaceholder('Clique aqui para ver os backups')
+                        .setPlaceholder('Selecione o backup a restaurar...')
                         .addOptions(opcoes)
-                )
+                );
 
-                await interaction.editReply({ content: ``, components: [select], ephemeral: true });
+                const c = selectContainer(
+                    'Restaurar Servidor',
+                    `${Emojis.get('_transfer_emoji')} Selecione abaixo qual backup deseja restaurar.\n-# Canais, cargos e configurações do servidor serão substituídos.`,
+                    selectRow
+                );
+
+                await interaction.editReply({ components: [c], ...CV2 });
             }
         }
+
         if (interaction.isStringSelectMenu()) {
             if (interaction.customId === 'apagarbackup') {
                 const modal = new ModalBuilder()
-                    .setTitle(`Apagando o backup`)
-                    .setCustomId(`apagarbackup_${interaction.values[0]}`)
+                    .setTitle('Apagar backup')
+                    .setCustomId(`apagarbackup_${interaction.values[0]}`);
 
-                const confirmacao = new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setCustomId(`confirmacao`)
-                        .setLabel(`CONFIRMAÇÃO`)
-                        .setPlaceholder(`Ao digitar "sim" o processo iniciará`)
-                        .setStyle(TextInputStyle.Short)
-                        .setMaxLength(3)
-                        .setRequired(true)
-                )
-                modal.addComponents(confirmacao);
-                await interaction.showModal(modal);
+                modal.addComponents(
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('confirmacao')
+                            .setLabel('CONFIRMAÇÃO')
+                            .setPlaceholder('Digite "sim" para confirmar')
+                            .setStyle(TextInputStyle.Short)
+                            .setMaxLength(3)
+                            .setRequired(true)
+                    )
+                );
+                return interaction.showModal(modal);
             }
+
             if (interaction.customId === 'restaurarservidor') {
                 const modal = new ModalBuilder()
-                    .setTitle(`Restaurando o backup`)
-                    .setCustomId(`restaurarservidor_${interaction.values[0]}`)
+                    .setTitle('Restaurar servidor')
+                    .setCustomId(`restaurarservidor_${interaction.values[0]}`);
 
-                const confirmacao = new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setCustomId(`confirmacao`)
-                        .setLabel(`CONFIRMAÇÃO`)
-                        .setPlaceholder(`Ao digitar "sim" o processo iniciará`)
-                        .setStyle(TextInputStyle.Short)
-                        .setMaxLength(3)
-                        .setRequired(true)
-                )
-                modal.addComponents(confirmacao);
-                await interaction.showModal(modal);
+                modal.addComponents(
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('confirmacao')
+                            .setLabel('CONFIRMAÇÃO')
+                            .setPlaceholder('Digite "sim" para confirmar')
+                            .setStyle(TextInputStyle.Short)
+                            .setMaxLength(3)
+                            .setRequired(true)
+                    )
+                );
+                return interaction.showModal(modal);
             }
         }
+
         if (interaction.type === InteractionType.ModalSubmit) {
-            if (interaction.customId.startsWith(`apagarbackup_`)) {
-                const confirmacao = interaction.fields.getTextInputValue(`confirmacao`);
-                if (confirmacao.toLowerCase() !== `sim`) {
-                    await interaction.update({ content: `${Emojis.get(`negative_emoji`)} Processo cancelado.`, components: [], ephemeral: true });
-                    setTimeout(() => {
-                        BackupFunction(client, interaction);
-                    }, 1000);
+            if (interaction.customId.startsWith('apagarbackup_')) {
+                const confirmacao = interaction.fields.getTextInputValue('confirmacao');
+                if (confirmacao.toLowerCase() !== 'sim') {
+                    await interaction.deferUpdate();
+                    await interaction.editReply({
+                        components: [infoContainer(`${Emojis.get('negative_emoji')} Processo cancelado.`)],
+                        ...CV2,
+                    });
+                    setTimeout(() => BackupFunction(client, interaction), 1500);
                     return;
                 }
 
-                BackupStorage.delete(`${interaction.customId.split(`_`)[1]}_${interaction.customId.split(`_`)[2]}`);
-                await interaction.update({ content: `${Emojis.get(`confirmed_emoji`)} Backup apagado com sucesso.`, components: [], ephemeral: true });
-                setTimeout(() => {
-                    BackupFunction(client, interaction);
-                }, 1000);
+                const parts = interaction.customId.split('_');
+                BackupStorage.delete(`${parts[1]}_${parts[2]}`);
+
+                await interaction.deferUpdate();
+                await interaction.editReply({
+                    components: [infoContainer(`${Emojis.get('confirmed_emoji')} Backup apagado com sucesso.`)],
+                    ...CV2,
+                });
+                setTimeout(() => BackupFunction(client, interaction), 1500);
             }
-            if (interaction.customId.startsWith(`restaurarservidor_`)) {
-                const confirmacao = interaction.fields.getTextInputValue(`confirmacao`);
-                if (confirmacao.toLowerCase() !== `sim`) {
-                    await interaction.update({ content: `${Emojis.get(`negative_emoji`)} Processo cancelado.`, components: [], ephemeral: true });
-                    setTimeout(() => {
-                        BackupFunction(client, interaction);
-                    }, 1000);
-                    return;
-                }
-                await interaction.update({ content: `${Emojis.get(`loading_emoji`)} Aguarde...`, components: [], ephemeral: true });
-                let selecionado = `${interaction.customId.split(`_`)[1]}_${interaction.customId.split(`_`)[2]}`
-                let backup = BackupStorage.get(selecionado)[0]
-                if (!backup) {
-                    await interaction.editReply({ content: `${Emojis.get(`negative_emoji`)} Backup/Template não encontrado.`, ephemeral: true });
-                    setTimeout(() => {
-                        BackupFunction(client, interaction);
-                    }, 1000);
+
+            if (interaction.customId.startsWith('restaurarservidor_')) {
+                const confirmacao = interaction.fields.getTextInputValue('confirmacao');
+                if (confirmacao.toLowerCase() !== 'sim') {
+                    await interaction.deferUpdate();
+                    await interaction.editReply({
+                        components: [infoContainer(`${Emojis.get('negative_emoji')} Processo cancelado.`)],
+                        ...CV2,
+                    });
+                    setTimeout(() => BackupFunction(client, interaction), 1500);
                     return;
                 }
 
-                interaction.editReply({ content: `${Emojis.get(`loading_emoji`)} Verificando permissões...`, ephemeral: true });
+                await interaction.deferUpdate();
+                await interaction.editReply({
+                    components: [loadingContainer('Verificando permissões...')],
+                    ...CV2,
+                });
+
+                const parts = interaction.customId.split('_');
+                const selecionado = `${parts[1]}_${parts[2]}`;
+                const backup = BackupStorage.get(selecionado)?.[0];
+
+                if (!backup) {
+                    await interaction.editReply({
+                        components: [infoContainer(`${Emojis.get('negative_emoji')} Backup/Template não encontrado.`)],
+                        ...CV2,
+                    });
+                    setTimeout(() => BackupFunction(client, interaction), 1500);
+                    return;
+                }
 
                 try {
-                    await client.guilds.fetch(interaction.guild.id).then(async (guild) => {
-                        const botMember = await guild.members.fetch(client.user.id);
-                        let perm = botMember.permissions.has('ADMINISTRATOR');
-                        if (!perm) {
-                            await interaction.editReply({ content: `${Emojis.get('negative_emoji')} Faltam permissões.`, ephemeral: true });
-                            setTimeout(() => {
-                                BackupFunction(client, interaction);
-                            }, 1000);
-                            return;
-                        }
+                    const guild = await client.guilds.fetch(interaction.guild.id);
+                    const botMember = await guild.members.fetch(client.user.id);
+                    const perm = botMember.permissions.has('Administrator');
+                    if (!perm) {
+                        await interaction.editReply({
+                            components: [infoContainer(`${Emojis.get('negative_emoji')} Faltam permissões de administrador.`)],
+                            ...CV2,
+                        });
+                        setTimeout(() => BackupFunction(client, interaction), 1500);
+                        return;
+                    }
 
-                        let highestRole = guild.roles.highest;
-                        let highestRoleInCache = botMember.roles.cache.sort((a, b) => b.position - a.position).first();
-
-                        if (highestRole.position < highestRoleInCache.position) {
-                            await interaction.editReply({ content: `${Emojis.get('negative_emoji')} Faltam permissões, adicione-me o maior cargo.`, ephemeral: true });
-                            setTimeout(() => {
-                                BackupFunction(client, interaction);
-                            }, 1000);
-                            return;
-                        }
-                    });
+                    const highestRole = guild.roles.highest;
+                    const highestBot = botMember.roles.cache.sort((a, b) => b.position - a.position).first();
+                    if (highestRole.position < highestBot.position) {
+                        await interaction.editReply({
+                            components: [infoContainer(`${Emojis.get('negative_emoji')} Adicione-me o cargo mais alto para restaurar.`)],
+                            ...CV2,
+                        });
+                        setTimeout(() => BackupFunction(client, interaction), 1500);
+                        return;
+                    }
                 } catch (error) {
-                    console.log(error)
-                    interaction.editReply({ content: `${Emojis.get(`negative_emoji`)} Houve um erro ao processar permissões, processo de restauração cancelado.`, ephemeral: true });
-                    setTimeout(() => {
-                        BackupFunction(client, interaction);
-                    }, 1000);
-                    return
+                    console.log(error);
+                    await interaction.editReply({
+                        components: [infoContainer(`${Emojis.get('negative_emoji')} Erro ao verificar permissões. Processo cancelado.`)],
+                        ...CV2,
+                    });
+                    setTimeout(() => BackupFunction(client, interaction), 1500);
+                    return;
                 }
 
-                interaction.editReply({ content: `${Emojis.get(`loading_emoji`)} Restaurando... Atualizações serão enviadas no seu privado.`, ephemeral: true });
+                await interaction.editReply({
+                    components: [loadingContainer('Restaurando servidor... Atualizações serão enviadas no seu privado.')],
+                    ...CV2,
+                });
+
                 await RestaurandoServidor(client, interaction, selecionado);
             }
         }
     }
-}
+};
 
 async function RestaurandoServidor(client, interaction, selecionado) {
     try {
-        await interaction.user.send({ content: `${Emojis.get(`loading_emoji`)} Restaurando servidor...` }).then(async (msg) => {
-            await configuracao.set(`RestaurandoBackup`, {
-                status: `Iniciando`,
+        await interaction.user.send({ content: `${Emojis.get('loading_emoji')} Restaurando servidor...` }).then(async (msg) => {
+            await configuracao.set('RestaurandoBackup', {
+                status: 'Iniciando',
                 mensagem: msg.id,
                 canal: msg.channel.id,
-            })
-        })
+            });
+        });
     } catch (error) {
-        interaction.editReply({ content: `${Emojis.get(`negative_emoji`)} Não foi possível enviar mensagem privada, entretanto o processo de restauração continuará.`, ephemeral: true });
+        await interaction.editReply({
+            components: [loadingContainer('Não foi possível enviar DM, mas a restauração continuará...')],
+            flags: MessageFlags.IsComponentsV2,
+        });
     }
 
-    let guild = await client.guilds.fetch(interaction.guild.id).catch(() => { });
+    const guild = await client.guilds.fetch(interaction.guild.id).catch(() => null);
     if (!guild) {
-        interaction.editReply({ content: `${Emojis.get(`negative_emoji`)} Não foi possível encontrar o servidor, processo de restauração`, ephemeral: true });
-        setTimeout(() => {
-            BackupFunction(client, interaction);
-        }, 1000);
+        await interaction.editReply({
+            components: [infoContainer(`${Emojis.get('negative_emoji')} Servidor não encontrado. Processo cancelado.`)],
+            flags: MessageFlags.IsComponentsV2,
+        });
+        setTimeout(() => BackupFunction(client, interaction), 1500);
         return;
     }
 
-    let DM_message
-
+    let DM_message;
     try {
-        let DM = await client.channels.fetch(configuracao.get(`RestaurandoBackup.canal`)).catch(() => { });
-        DM_message = await DM.messages.fetch(configuracao.get(`RestaurandoBackup.mensagem`)).catch(() => { });
-    } catch (error) {
-        DM_message = false
-    }
+        const DM = await client.channels.fetch(configuracao.get('RestaurandoBackup.canal')).catch(() => null);
+        DM_message = DM ? await DM.messages.fetch(configuracao.get('RestaurandoBackup.mensagem')).catch(() => null) : null;
+    } catch { DM_message = null; }
 
-    if (DM_message) {
-        await DM_message.edit({ content: `${Emojis.get(`loading_emoji`)} Deletando canais...` })
-    }
+    const step = async (msg) => { if (DM_message) await DM_message.edit({ content: msg }).catch(() => {}); };
 
-    let canaisdeletar = guild.channels.cache
+    await step(`${Emojis.get('loading_emoji')} Deletando canais...`);
+    for (const [, ch] of guild.channels.cache) await ch.delete().catch(() => {});
 
-    for (const [key, value] of canaisdeletar) {
-        await value.delete().catch((error) => { console.log(error) });
-    }
+    await step(`${Emojis.get('confirmed_emoji')} Canais deletados.\n${Emojis.get('loading_emoji')} Deletando cargos...`);
+    for (const [, r] of guild.roles.cache.filter(r => r.id !== guild.id)) await r.delete().catch(() => {});
 
-    if (DM_message) {
-        await DM_message.edit({ content: `${Emojis.get(`confirmed_emoji`)} Canais Deletados.\n${Emojis.get(`loading_emoji`)} Deletando cargos...` })
-    }
+    await step(`${Emojis.get('confirmed_emoji')} Cargos deletados.\n${Emojis.get('loading_emoji')} Deletando emojis...`);
+    for (const [, e] of guild.emojis.cache) await e.delete().catch(() => {});
 
-    let roles = guild.roles.cache.filter(r => r.id !== guild.id);
+    await step(`${Emojis.get('confirmed_emoji')} Emojis deletados.\n${Emojis.get('loading_emoji')} Deletando stickers...`);
+    for (const [, s] of guild.stickers.cache) await s.delete().catch(() => {});
 
-    for (const [key, value] of roles) {
-        await value.delete().catch(() => { });
-    }
-
-    if (DM_message) {
-        await DM_message.edit({ content: `${Emojis.get(`confirmed_emoji`)} Cargos Deletados.\n${Emojis.get(`confirmed_emoji`)} Cargos Deletado.\n${Emojis.get(`loading_emoji`)} Deletando emojis...` })
-    }
-
-    let emojisdeletar = guild.emojis.cache.filter(e => e.id !== guild.id);
-
-    for (const [key, value] of emojisdeletar) {
-        await value.delete().catch(() => { });
-    }
-
-    if (DM_message) {
-        await DM_message.edit({ content: `${Emojis.get(`confirmed_emoji`)} Cargos Deletados.\n${Emojis.get(`confirmed_emoji`)} Cargos Deletado.\n${Emojis.get(`confirmed_emoji`)} Emojis Deletados.\n${Emojis.get(`loading_emoji`)} Deletando stickers...` })
-    }
-
-    let stickersdeletar = guild.stickers.cache.filter(s => s.id !== guild.id);
-
-    for (const [key, value] of stickersdeletar) {
-        await value.delete().catch(() => { });
-    }
-
-    if (DM_message) {
-        await DM_message.edit({ content: `${Emojis.get(`confirmed_emoji`)} Cargos Deletados.\n${Emojis.get(`confirmed_emoji`)} Cargos Deletado.\n${Emojis.get(`confirmed_emoji`)} Emojis Deletados.\n${Emojis.get(`confirmed_emoji`)} Stickers Deletados.\n${Emojis.get(`loading_emoji`)} Restaurando cargos...` })
-    }
-
-    let rolescriados = []
-    let cargos = BackupStorage.get(selecionado)[0].roles;
-
-    await Promise.all(cargos.map(async (element) => {
+    await step(`${Emojis.get('confirmed_emoji')} Stickers deletados.\n${Emojis.get('loading_emoji')} Restaurando cargos...`);
+    const rolescriados = [];
+    const cargos = BackupStorage.get(selecionado)[0].roles;
+    await Promise.all(cargos.map(async el => {
         try {
-            let cargo = await guild.roles.create({
-                name: element.name,
-                color: element.color,
-                hoist: element.hoist,
-                permissions: element.permissions,
-                mentionable: element.mentionable,
-            })
-            if (cargo) {
-                rolescriados.push(cargo.id);
-            }
-        } catch (error) {
-            console.log(`Erro ao criar cargo: ${element.name} - ${error.message}`)
+            const r = await guild.roles.create({ name: el.name, color: el.color, hoist: el.hoist, permissions: el.permissions, mentionable: el.mentionable });
+            if (r) rolescriados.push(r.id);
+        } catch (e) { console.log(`Erro ao criar cargo: ${el.name} - ${e.message}`); }
+    }));
+
+    await step(`${Emojis.get('confirmed_emoji')} \`${rolescriados.length}\` cargos criados.\n${Emojis.get('loading_emoji')} Criando categorias...`);
+    const categoriascriadas = [];
+    for (const el of BackupStorage.get(selecionado)[0].channels) {
+        if (el.type === 4) {
+            try {
+                const cat = await guild.channels.create({ name: el.name, type: ChannelType.GuildCategory, permissionOverwrites: el.permissionOverwrites || [] });
+                if (cat) categoriascriadas.push(cat.id);
+            } catch (e) { console.log(`Erro ao criar categoria: ${el.name} - ${e.message}`); }
         }
-    }))
-
-
-    if (DM_message) {
-        await DM_message.edit({ content: `${Emojis.get(`confirmed_emoji`)} \`${rolescriados.length}\` Cargos Criados.\n${Emojis.get(`loading_emoji`)} Criando Categorias...` })
     }
 
-    let categoriascriadas = []
-    let categorias = BackupStorage.get(selecionado)[0].channels
-
-    for (const key in categorias) {
-        const element = categorias[key];
-        if (element.type === 4) {
+    await step(`${Emojis.get('confirmed_emoji')} \`${rolescriados.length}\` cargos · \`${categoriascriadas.length}\` categorias.\n${Emojis.get('loading_emoji')} Criando canais...`);
+    const canaiscriados = [];
+    const canais = BackupStorage.get(selecionado)[0].channels;
+    await Promise.all(canais.map(async el => {
+        if (el.type !== 4) {
             try {
-                let categoria = await guild.channels.create({
-                    name: element.name,
-                    type: ChannelType.GuildCategory,
-                    permissionOverwrites: element.permissionOverwrites || [],
+                const ch = await guild.channels.create({
+                    name: el.name, type: el.type,
+                    parent: guild.channels.cache.find(c => c.name === el.categoria)?.id || null,
+                    permissionOverwrites: el.permissionOverwrites || [],
                 });
-                if (categoria) {
-                    categoriascriadas.push(categoria.id);
-                }
-            } catch (error) {
-                console.log(`Erro ao criar categoria: ${element.name} - ${error.message}`)
-            }
-        }
-    }
-
-    if (DM_message) {
-        await DM_message.edit({ content: `${Emojis.get(`confirmed_emoji`)} \`${rolescriados.length}\` Cargos Criados.\n${Emojis.get(`confirmed_emoji`)} \`${categoriascriadas.length}\` Categorias Criadas.\n${Emojis.get(`loading_emoji`)} Criando canais...` })
-    }
-
-
-    let canaiscriados = []
-    let canais = BackupStorage.get(selecionado)[0].channels
-    await Promise.all(canais.map(async (element) => {
-        if (element.type != 4) {
-            try {
-                let canal = await guild.channels.create({
-                    name: element.name,
-                    type: element.type,
-                    parent: guild.channels.cache.find(categoria => categoria.name === element.categoria)?.id || null,
-                    permissionOverwrites: element.permissionOverwrites || [],
-                })
-                if (canal) {
-                    let novoset = configuracao.get(`ConfigChannels`)
-                    if (element.type === 0) {
-                        for (let key in novoset) {
-                            if (novoset[key] === element.id) {
-                                novoset[key] = canal.id;
-                            }
-                        }
-                        configuracao.set(`ConfigChannels`, novoset);
+                if (ch) {
+                    const novoset = configuracao.get('ConfigChannels');
+                    if (el.type === 0) {
+                        for (const key in novoset) { if (novoset[key] === el.id) novoset[key] = ch.id; }
+                        configuracao.set('ConfigChannels', novoset);
                     }
-
-
-                    canaiscriados.push(canal.id);
+                    canaiscriados.push(ch.id);
                 }
-            } catch (error) {
-                console.log(`Erro ao criar canal: ${element.name} - ${error.message}`)
-            }
+            } catch (e) { console.log(`Erro ao criar canal: ${el.name} - ${e.message}`); }
         }
-    }))
+    }));
 
-    if (DM_message) {
-        await DM_message.edit({ content: `${Emojis.get(`confirmed_emoji`)} \`${rolescriados.length}\` Cargos Criados.\n${Emojis.get(`confirmed_emoji`)} \`${categoriascriadas.length}\` Categorias Criadas.\n${Emojis.get(`confirmed_emoji`)} \`${canaiscriados.length}\` Canais Criados.\n${Emojis.get(`loading_emoji`)} Restaurando permissões...` })
+    await step(`${Emojis.get('confirmed_emoji')} \`${canaiscriados.length}\` canais criados.\n${Emojis.get('loading_emoji')} Restaurando emojis...`);
+    const emojisrestaurados = [];
+    for (const el of BackupStorage.get(selecionado)[0].emojis) {
+        const em = await guild.emojis.create({ attachment: el.url, name: el.name }).catch(() => null);
+        if (em) emojisrestaurados.push(em.id);
     }
 
-    let canaisrestaurados = []
-    let cargosrestaurados = []
-
-    for (const key in canais) {
-        const element = canais[key];
-        let canal = guild.channels.cache.get(canaiscriados.find(c => c.name === element.name)?.id);
-        if (!canal) {
-            continue;
-        }
-        let permissoes = element.permissionOverwrites;
-        for (const key2 in permissoes) {
-            const element2 = permissoes[key2];
-            let cargo = guild.roles.cache.get(rolescriados.find(r => r.name === element2.id));
-            if (!cargo) {
-                continue;
-            }
-            await canal.permissionOverwrites.create(cargo, element2);
-            cargosrestaurados.push(cargo.id);
-        }
-        canaisrestaurados.push(canal.id);
+    await step(`${Emojis.get('confirmed_emoji')} \`${emojisrestaurados.length}\` emojis restaurados.\n${Emojis.get('loading_emoji')} Restaurando stickers...`);
+    const stickersrestaurados = [];
+    for (const el of BackupStorage.get(selecionado)[0].stickers) {
+        const st = await guild.stickers.create({ file: el.url, name: el.name }).catch(() => null);
+        if (st) stickersrestaurados.push(st.id);
     }
 
-    if (DM_message) {
-        await DM_message.edit({ content: `${Emojis.get(`confirmed_emoji`)} \`${rolescriados.length}\` Cargos Criados.\n${Emojis.get(`confirmed_emoji`)} \`${categoriascriadas.length}\` Categorias Criadas.\n${Emojis.get(`confirmed_emoji`)} \`${canaiscriados.length}\` Canais Criados.\n${Emojis.get(`confirmed_emoji`)} \`${canaisrestaurados.length}\` Canais Restaurados.\n${Emojis.get(`confirmed_emoji`)} \`${cargosrestaurados.length}\` Permissões Restauradas.\n${Emojis.get(`loading_emoji`)} Restaurando emojis...` })
-    }
+    await step(
+        `${Emojis.get('confirmed_emoji')} \`${rolescriados.length}\` Cargos\n` +
+        `${Emojis.get('confirmed_emoji')} \`${categoriascriadas.length}\` Categorias\n` +
+        `${Emojis.get('confirmed_emoji')} \`${canaiscriados.length}\` Canais\n` +
+        `${Emojis.get('confirmed_emoji')} \`${emojisrestaurados.length}\` Emojis\n` +
+        `${Emojis.get('confirmed_emoji')} \`${stickersrestaurados.length}\` Stickers\n` +
+        `${Emojis.get('confirmed_emoji')} Restauração concluída.`
+    );
 
-    let emojis = BackupStorage.get(selecionado)[0].emojis;
-    let emojisrestaurados = []
-
-    for (const key in emojis) {
-        const element = emojis[key];
-        let emoji = await guild.emojis.create(element.url, element.name).catch(() => { });
-        if (emoji) {
-            emojisrestaurados.push(emoji.id);
-        }
-    }
-
-    if (DM_message) {
-        await DM_message.edit({ content: `${Emojis.get(`confirmed_emoji`)} \`${rolescriados.length}\` Cargos Criados.\n${Emojis.get(`confirmed_emoji`)} \`${categoriascriadas.length}\` Categorias Criadas.\n${Emojis.get(`confirmed_emoji`)} \`${canaiscriados.length}\` Canais Criados.\n${Emojis.get(`confirmed_emoji`)} \`${canaisrestaurados.length}\` Canais Restaurados.\n${Emojis.get(`confirmed_emoji`)} \`${cargosrestaurados.length}\` Permissões Restauradas.\n${Emojis.get(`confirmed_emoji`)} \`${emojisrestaurados.length}\` Emojis Restaurados.\n${Emojis.get(`loading_emoji`)} Restaurando stickers...` })
-    }
-
-    let stickers = BackupStorage.get(selecionado)[0].stickers;
-    let stickersrestaurados = []
-
-    for (const key in stickers) {
-        const element = stickers[key];
-        let sticker = await guild.stickers.create(element.url, element.name).catch(() => { });
-        if (sticker) {
-            stickersrestaurados.push(sticker.id);
-        }
-    }
-
-    if (DM_message) {
-        await DM_message.edit({ content: `${Emojis.get(`confirmed_emoji`)} \`${rolescriados.length}\` Cargos Criados.\n${Emojis.get(`confirmed_emoji`)} \`${categoriascriadas.length}\` Categorias Criadas.\n${Emojis.get(`confirmed_emoji`)} \`${canaiscriados.length}\` Canais Criados.\n${Emojis.get(`confirmed_emoji`)} \`${canaisrestaurados.length}\` Canais Restaurados.\n${Emojis.get(`confirmed_emoji`)} \`${cargosrestaurados.length}\` Permissões Restauradas.\n${Emojis.get(`confirmed_emoji`)} \`${emojisrestaurados.length}\` Emojis Restaurados.\n${Emojis.get(`confirmed_emoji`)} \`${stickersrestaurados.length}\` Stickers Restaurados.\n${Emojis.get(`loading_emoji`)} Restaurando mensagens...` })
-    }
-
-    let msgs = BackupStorage.get(selecionado)[0].msgs;
-    let msgsrestauradas = []
-    let produto = await produtos.fetchAll();
-    for (const key in msgs) {
-        let info = msgs[key];
-        let canal = await guild.channels.cache.find(x => x.name === info.channel);
-        if (info.message.authorId !== client.user.id) {
-            try {
-                let user = await client.users.fetch(info.message.authorId);
-                let webhook = await canal.createWebhook(user.username, { avatar: user.displayAvatarURL({ dynamic: true }) });
-                axios.post(`https://discord.com/api/webhooks/${webhook.id}/${webhook.token}`, {
-                    content: info.message.content,
-                    username: user.username,
-                    avatar_url: user.displayAvatarURL({ dynamic: true }),
-                    embeds: info.message.embeds,
-                    components: info.message.components,
-                    files: info.message.attachments
-                })
-                msgsrestauradas.push(info.id);
-            } catch (error) {
-            }
-        } else {
-            try {
-                produto = produto.forEach(element => {
-                    return element.data.mensagens.find(x => x.mesageid === info.message.id);
-                });
-
-                if (produto || canal.id === configuracao.get(`ConfigChannels.eventbuy`)) {
-                    canal.send({
-                        content: info.message.content,
-                        embeds: info.message.embeds,
-                        components: info.message.components,
-                        files: info.message.attachments
-                    })
-                    msgsrestauradas.push(info.id);
-                }
-            } catch (error) {
-
-            }
-        }
-    }
-
-    if (DM_message) {
-        await DM_message.edit({ content: `${Emojis.get(`confirmed_emoji`)} \`${rolescriados.length}\` Cargos Criados.\n${Emojis.get(`confirmed_emoji`)} \`${categoriascriadas.length}\` Categorias Criadas.\n${Emojis.get(`confirmed_emoji`)} \`${canaiscriados.length}\` Canais Criados.\n${Emojis.get(`confirmed_emoji`)} \`${canaisrestaurados.length}\` Canais Restaurados.\n${Emojis.get(`confirmed_emoji`)} \`${cargosrestaurados.length}\` Permissões Restauradas.\n${Emojis.get(`confirmed_emoji`)} \`${emojisrestaurados.length}\` Emojis Restaurados.\n${Emojis.get(`confirmed_emoji`)} \`${stickersrestaurados.length}\` Stickers Restaurados.\n${Emojis.get(`confirmed_emoji`)} \`${msgsrestauradas.length}\` Mensagens Restauradas.\n${Emojis.get(`loading_emoji`)} Restaurando configurações...` })
-    }
-
-    let config = BackupStorage.get(selecionado)[0].config;
-    let configrestaurada = []
-
-    for (const key in config) {
-        const element = config[key];
-        guild.edit({ [key]: element }).catch((error) => { console.log(error) });
-    }
-
-
-    if (DM_message) {
-        await DM_message.edit({
-            content: `${Emojis.get(`confirmed_emoji`)} \`${rolescriados.length}\` Cargos Criados.\n${Emojis.get(`confirmed_emoji`)} \`${categoriascriadas.length}\` Categorias Criadas.\n${Emojis.get(`confirmed_emoji`)} \`${canaiscriados.length}\` Canais Criados.\n${Emojis.get(`confirmed_emoji`)} \`${canaisrestaurados.length}\` Canais Restaurados.\n${Emojis.get(`confirmed_emoji`)} \`${cargosrestaurados.length}\` Permissões Restauradas.\n${Emojis.get(`confirmed_emoji`)} \`${emojisrestaurados.length}\` Emojis Restaurados.\n${Emojis.get(`confirmed_emoji`)} \`${stickersrestaurados.length}\` Stickers Restaurados.\n${Emojis.get(`confirmed_emoji`)} \`${configrestaurada.length}\` Configurações Restauradas.\n${Emojis.get(`confirmed_emoji`)} Restauração concluída.`
-        }).then((msg) => {
-            setTimeout(() => {
-                msg.delete().catch(() => { });
-            }, 10000);
-        })
-    }
+    if (DM_message) setTimeout(() => DM_message.delete().catch(() => {}), 10000);
 }
