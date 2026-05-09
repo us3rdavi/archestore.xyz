@@ -51,7 +51,7 @@ async function Painel(interaction, client) {
             new ButtonBuilder()
                 .setCustomId("eaffaawwawa")
                 .setLabel('Automações')
-                .setEmoji("1501804019184828507")
+                .setEmoji("1502541664579879072")
                 .setStyle(2),
             new ButtonBuilder()
                 .setCustomId("actionsautomations")

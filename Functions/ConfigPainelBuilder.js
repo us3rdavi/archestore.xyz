@@ -7,7 +7,7 @@ const { configuracao, Emojis } = require('../Database');
 const MAIN_OPTIONS = [
     { label: 'Atendimento',    value: 'atendimento',    description: 'Sistema de tickets e suporte',          emoji: { id: '1501804043121725490' } },
     { label: 'Proteção',       value: 'protecao',       description: 'Anti-raid e segurança avançada',        emoji: { id: '1501804019184828507' } },
-    { label: 'Automações',     value: 'automacoes',     description: 'Mensagens e repost automáticos',        emoji: { id: '1501804019184828507' } },
+    { label: 'Automações',     value: 'automacoes',     description: 'Mensagens e repost automáticos',        emoji: { id: '1502541664579879072' } },
     { label: 'Moderação',      value: 'moderacao',      description: 'Ferramentas de moderação',              emoji: { id: '1501804067616325723' } },
     { label: 'Personalização', value: 'personalizacao', description: 'Bot designer e aparência do bot',       emoji: { id: '1501804122943389716' } },
     { label: 'Permissões',     value: 'permissoes',     description: 'Autorização e controle de acesso',      emoji: { id: '1501804064596558017' } },
@@ -27,7 +27,7 @@ const SUB_OPTIONS = {
     ],
     automacoes: [
         { label: 'Página Inicial',        value: 'home',             description: 'Voltar ao menu principal',        emoji: { id: '1501803908589162537' } },
-        { label: 'Mensagens Automáticas', value: 'automacoes_msgs',  description: 'Configurar mensagens automáticas', emoji: { id: '1501804019184828507' } },
+        { label: 'Mensagens Automáticas', value: 'automacoes_msgs',  description: 'Configurar mensagens automáticas', emoji: { id: '1502541664579879072' } },
         { label: 'Repostagem Automática', value: 'automacoes_repost', description: 'Configurar repostagem automática', emoji: { id: '1501803917640732722' } },
     ],
     moderacao: [
@@ -72,7 +72,7 @@ function getCategoryHeader(category) {
     const map = {
         atendimento:    () => `${Emojis.get('_ticket_emoji')} Atendimento`,
         protecao:       () => `${Emojis.get('system_emoji')} Proteção`,
-        automacoes:     () => `${Emojis.get('system_emoji')} Automações`,
+        automacoes:     () => `<:console:1502541664579879072> Automações`,
         moderacao:      () => `${Emojis.get('_ban_emoji')} Moderação`,
         personalizacao: () => `${Emojis.get('_pincel_emoji')} Personalização`,
         permissoes:     () => `${Emojis.get('permissions_emoji')} Permissões`,
