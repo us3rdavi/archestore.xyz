@@ -1,7 +1,6 @@
 const { ActionRowBuilder, EmbedBuilder, ButtonBuilder } = require('discord.js');
 const { configuracao, estatisticas, Emojis, refounds, Compras, } = require('../Database');
 const axios = require('axios');
-const { JsonDatabase } = require('wio.db');
 const { payment } = require('mercadopago');
 
 async function Varredura(client) {

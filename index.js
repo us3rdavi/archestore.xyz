@@ -44,7 +44,7 @@ process.on('unhandledRejection', (err) => {
         ]
     });
 
-    client.setMaxListeners(30);
+    client.setMaxListeners(50);
     client.slashCommands = new Collection();
     module.exports.client = client;
 
