@@ -7,8 +7,8 @@ const {
     ButtonBuilder,
     MessageFlags
 } = require("discord.js");
-const { tickets } = require("../DataBaseJson");
-const emojis = require("../DataBaseJson/Emojis.json");
+const { tickets } = require("../Database");
+const emojis = require("../Database/emojis.json");
 const Emojis = { get: (name) => emojis[name] || "" };
 
 function buildTicketComponents(ggg, aparencia) {

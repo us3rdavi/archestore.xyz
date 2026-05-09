@@ -2,9 +2,9 @@ const {
     ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require("discord.js");
-const { produtos, configuracao } = require("../DataBaseJson");
-const { QuickDB } = require("quick.db");
-const db = new QuickDB();
+const { produtos, configuracao } = require("../Database");
+const db = require("../Database").quickStore;
+
 
 function getAccentColor() {
     const cor = configuracao.get('Cores.Principal') || '5865F2';

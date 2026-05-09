@@ -9,7 +9,7 @@ const {
     ButtonStyle,
     MessageFlags,
 } = require('discord.js');
-const { Emojis } = require('../../DataBaseJson');
+const { Emojis } = require('../../Database');
 const { getPermissions } = require('../../Functions/PermissionsCache.js');
 const config = require('../../config.json');
 

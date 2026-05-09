@@ -2,7 +2,7 @@ const {
     ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require("discord.js");
-const { configuracao, Emojis } = require("../DataBaseJson");
+const { configuracao, Emojis } = require("../Database");
 const { owner } = require("../config.json");
 
 function getSaudacao() {

@@ -1,4 +1,4 @@
-const { configuracao, tickets } = require("../../DataBaseJson");
+const { configuracao, tickets } = require("../../Database");
 const { ModalBuilder, TextInputBuilder, EmbedBuilder, ButtonBuilder, TextInputStyle, ActionRowBuilder } = require("discord.js");
 const { Atendimentohorario } = require("../../Functions/atendimentohorario.js");
 const moment = require("moment-timezone"); // Importa o moment-timezone para lidar com o fuso horário

@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const { carrinhos, pagamentos, configuracao } = require("../DataBaseJson");
+const { carrinhos, pagamentos, configuracao } = require("../Database");
 
 function CloseThreds(client) {
     client.guilds.cache.forEach((guild) => {

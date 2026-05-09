@@ -6,7 +6,7 @@ const { Gerenciar } = require("../../Functions/Gerenciar");
 const { automatico } = require("../../Functions/automaticos");
 const { ConfigRoles } = require("../../Functions/ConfigRoles");
 const { gerenciarPerms } = require("../../Functions/modUsersPerms");
-const { produtos, configuracao, tickets, estatisticas } = require("../../DataBaseJson");
+const { produtos, configuracao, tickets, estatisticas } = require("../../Database");
 const { Avançados, Configcomandos24, Emojis24, Perms24 } = require("../../Functions/Avancados.js");
 const { painelTicket } = require("../../Functions/PainelTickets.js");
 const { CreateMessageTicket, Checkarmensagensticket } = require("../../Functions/CreateMensagemTicket.js");
@@ -22,7 +22,7 @@ const { AutoClear } = require("../../Functions/AutoClear");
 const { owner } = require("../../config.json");
 const discordTranscripts = require('discord-html-transcripts');
 const { StringSelectMenuOptionBuilder } = require("discord.js");
-const { Emojis } = require("../../DataBaseJson");
+const { Emojis } = require("../../Database");
 const { logAction } = require('../../Functions/AuditLog.js');
 
 

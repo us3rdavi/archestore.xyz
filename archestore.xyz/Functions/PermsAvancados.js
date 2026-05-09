@@ -2,7 +2,7 @@ const {
     ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require("discord.js");
-const { configuracao, Emojis } = require("../DataBaseJson");
+const { configuracao, Emojis } = require("../Database");
 
 function getSaudacao() {
     const brazilTime = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });

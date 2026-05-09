@@ -1,5 +1,5 @@
 const { ButtonBuilder, ButtonStyle, ActionRowBuilder, AttachmentBuilder } = require("discord.js");
-const { msgsauto } = require("../DataBaseJson");
+const { msgsauto } = require("../Database");
 
 async function sendMessage(client) {
     const intervalMinutes = msgsauto.get('intervalMinutes') || 3; // Valor padrão de 3 minutos se não definido

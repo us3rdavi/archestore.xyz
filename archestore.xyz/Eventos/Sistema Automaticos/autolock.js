@@ -1,31 +1,21 @@
-const { ChannelType, Permissions, EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
+const { ChannelType, EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
 const schedule = require('node-schedule');
-const fs = require('fs');
-const path = require('path');
 const moment = require('moment-timezone');
-const { configuracao } = require("../../DataBaseJson");
-const automaticosPath = path.resolve(__dirname, '../../DataBaseJson/autolock.json');
+const { configuracao, autolock } = require("../../Database");
 
-function readAutomaticos() {
-    if (fs.existsSync(automaticosPath)) {
-        const rawData = fs.readFileSync(automaticosPath);
-        return JSON.parse(rawData);
-    }
-    return {};
+function getAllAutolocks() {
+    return Object.fromEntries(autolock.all().map(e => [e.id, e.value]));
 }
 
 const convertToCronExpression = (time, timezone = 'America/Sao_Paulo') => {
     const [hour, minute] = time.split(':');
-
     const currentTime = moment.tz(timezone).set({
         hour: parseInt(hour, 10),
         minute: parseInt(minute, 10),
         second: 0,
         millisecond: 0,
     });
-
     const utcTime = currentTime.clone().utc();
-
     return `${utcTime.minutes()} ${utcTime.hours()} * * *`;
 };
 
@@ -45,14 +35,11 @@ function scheduleJobs(client, automaticos) {
             schedule.scheduleJob(lockTimeExpression, async () => {
                 const guild = client.guilds.cache.get(guildId);
                 if (!guild) return;
-
                 const channel = guild.channels.cache.get(channelId);
                 if (!channel || channel.type !== ChannelType.GuildText) return;
 
                 try {
-                    await channel.permissionOverwrites.edit(guild.roles.everyone, {
-                        SendMessages: false
-                    });
+                    await channel.permissionOverwrites.edit(guild.roles.everyone, { SendMessages: false });
 
                     let messagesDeleted = 0;
                     let fetched;
@@ -75,16 +62,9 @@ function scheduleJobs(client, automaticos) {
 
                     await channel.send({
                         embeds: [embed_delet, embed],
-                        components: [
-                            new ActionRowBuilder()
-                                .addComponents(
-                                    new ButtonBuilder()
-                                        .setLabel("Mensagem Automática")
-                                        .setCustomId("disabledButton")
-                                        .setStyle("2")
-                                        .setDisabled(true),
-                                )
-                        ]
+                        components: [new ActionRowBuilder().addComponents(
+                            new ButtonBuilder().setLabel("Mensagem Automática").setCustomId("disabledButton").setStyle(2).setDisabled(true)
+                        )]
                     });
                 } catch (error) {
                     console.error("Erro ao bloquear canal:", error);
@@ -94,14 +74,11 @@ function scheduleJobs(client, automaticos) {
             schedule.scheduleJob(unlockTimeExpression, async () => {
                 const guild = client.guilds.cache.get(guildId);
                 if (!guild) return;
-
                 const channel = guild.channels.cache.get(channelId);
                 if (!channel || channel.type !== ChannelType.GuildText) return;
 
                 try {
-                    await channel.permissionOverwrites.edit(guild.roles.everyone, {
-                        SendMessages: true
-                    });
+                    await channel.permissionOverwrites.edit(guild.roles.everyone, { SendMessages: true });
 
                     let messagesDeleted = 0;
                     await channel.messages.fetch().then(messages => {
@@ -117,16 +94,9 @@ function scheduleJobs(client, automaticos) {
 
                     await channel.send({
                         embeds: [embed],
-                        components: [
-                            new ActionRowBuilder()
-                                .addComponents(
-                                    new ButtonBuilder()
-                                        .setLabel("Mensagem Automática")
-                                        .setCustomId("disabledButton")
-                                        .setStyle("2")
-                                        .setDisabled(true),
-                                )
-                        ]
+                        components: [new ActionRowBuilder().addComponents(
+                            new ButtonBuilder().setLabel("Mensagem Automática").setCustomId("disabledButton").setStyle(2).setDisabled(true)
+                        )]
                     });
                 } catch (error) {
                     console.error("Erro ao desbloquear canal:", error);
@@ -139,14 +109,10 @@ function scheduleJobs(client, automaticos) {
 module.exports = {
     name: "ready",
     run: async (client) => {
-        let automaticos = readAutomaticos();
-        scheduleJobs(client, automaticos);
+        scheduleJobs(client, getAllAutolocks());
 
-        fs.watch(automaticosPath, (eventType, filename) => {
-            if (eventType === 'change') {
-                automaticos = readAutomaticos();
-                scheduleJobs(client, automaticos);
-            }
-        });
+        setInterval(() => {
+            scheduleJobs(client, getAllAutolocks());
+        }, 60000);
     }
 };

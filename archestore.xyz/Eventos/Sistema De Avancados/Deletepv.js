@@ -1,5 +1,5 @@
 const { } = require("discord.js");
-const { Emojis } = require("../../DataBaseJson");
+const { Emojis } = require("../../Database");
 
 module.exports = {
     name:"interactionCreate",

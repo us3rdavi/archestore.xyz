@@ -6,7 +6,7 @@ const {
     getEmbedData, setEmbedData, clearEmbedData,
     buildMainMenu, buildSectionScreen, buildDiscordEmbed
 } = require('../../Functions/AnunciarBuilder');
-const { Emojis } = require('../../DataBaseJson');
+const { Emojis } = require('../../Database');
 
 module.exports = {
     name: 'interactionCreate',

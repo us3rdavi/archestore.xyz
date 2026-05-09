@@ -2,7 +2,7 @@ const {
     EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder
 } = require('discord.js');
-const { configuracao, Emojis } = require('../DataBaseJson');
+const { configuracao, Emojis } = require('../Database');
 
 const MAIN_OPTIONS = [
     { label: 'Atendimento',    value: 'atendimento',    description: 'Sistema de tickets e suporte',          emoji: { id: '1501804043121725490' } },

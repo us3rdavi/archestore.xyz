@@ -2,14 +2,14 @@ const {
     ActionRowBuilder, ButtonBuilder, ModalBuilder, TextInputBuilder, TextInputStyle,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require("discord.js");
-const fs = require('fs');
-const path = require('path');
-const mensagemPach = path.resolve(__dirname, '../../DataBaseJson/msgauto.json');
-const { configuracao } = require('../../DataBaseJson');
+const { configuracao, msgauto } = require('../../Database');
 
-function getAccentColor() {
-    const cor = configuracao.get('Cores.Principal') || '5865F2';
-    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
+function getMsgData() {
+    return msgauto.get('data') || [];
+}
+
+function setMsgData(data) {
+    msgauto.set('data', data);
 }
 
 module.exports = {
@@ -47,18 +47,9 @@ module.exports = {
                         return interaction.reply({ content: 'ID inválido.', ephemeral: true });
                     }
 
-                    let msgData = [];
-                    if (fs.existsSync(mensagemPach)) {
-                        try {
-                            msgData = JSON.parse(fs.readFileSync(mensagemPach));
-                            if (!Array.isArray(msgData)) msgData = [];
-                        } catch (error) {
-                            msgData = [];
-                        }
-                    }
-
+                    let msgData = getMsgData();
                     msgData = msgData.filter(data => data.id !== idToDelete);
-                    fs.writeFileSync(mensagemPach, JSON.stringify(msgData, null, 2));
+                    setMsgData(msgData);
 
                     await updateConfigContainer(interaction, client);
                 }
@@ -75,18 +66,9 @@ module.exports = {
                         return interaction.reply({ content: 'Os tempos devem ser números válidos.', ephemeral: true });
                     }
 
-                    let msgData = [];
-                    if (fs.existsSync(mensagemPach)) {
-                        try {
-                            msgData = JSON.parse(fs.readFileSync(mensagemPach));
-                            if (!Array.isArray(msgData)) msgData = [];
-                        } catch (error) {
-                            msgData = [];
-                        }
-                    }
-
+                    let msgData = getMsgData();
                     msgData.push({ id: msgData.length + 1, message, chatIds, deleteTime, repostTime });
-                    fs.writeFileSync(mensagemPach, JSON.stringify(msgData, null, 2));
+                    setMsgData(msgData);
 
                     await updateConfigContainer(interaction, client);
                 }
@@ -98,18 +80,7 @@ module.exports = {
 };
 
 async function updateConfigContainer(interaction, client) {
-    let msgData = [];
-    if (fs.existsSync(mensagemPach)) {
-        try {
-            msgData = JSON.parse(fs.readFileSync(mensagemPach));
-            if (!Array.isArray(msgData)) msgData = [];
-        } catch (error) {
-            msgData = [];
-        }
-    }
-
-    const cor = configuracao.get('Cores.Principal') || '5865F2';
-    const accentColor = (() => { try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; } })();
+    const msgData = getMsgData();
 
     const container = new ContainerBuilder();
     container;

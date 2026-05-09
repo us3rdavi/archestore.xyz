@@ -7,7 +7,7 @@ const {
     SeparatorBuilder,
     MessageFlags,
 } = require('discord.js');
-const { Emojis } = require('../../DataBaseJson');
+const { Emojis } = require('../../Database');
 
 module.exports = {
     name: 'lockall',

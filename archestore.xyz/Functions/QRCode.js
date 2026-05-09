@@ -1,5 +1,5 @@
 const { EmbedBuilder, ApplicationCommandType, ActionRowBuilder, ButtonBuilder } = require("discord.js");
-const { produtos, configuracao } = require("../DataBaseJson");
+const { produtos, configuracao } = require("../Database");
 
 async function configqrcode(interaction, client) {
 

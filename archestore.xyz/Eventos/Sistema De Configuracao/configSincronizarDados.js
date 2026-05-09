@@ -13,14 +13,14 @@ const {
     SeparatorBuilder,
     MessageFlags,
 } = require('discord.js');
-const { configuracao, produtos, Emojis } = require("../../DataBaseJson");
+const { configuracao, produtos, Emojis } = require("../../Database");
 const { SincronizarDados, SalvarTemplate } = require('../../Functions/SincronizarDados');
 const { BackupFunction } = require('../../ComandosSlash/Administracao/backup');
 const { default: axios } = require('axios');
 
 let BackupStorage;
 try {
-    BackupStorage = require("../../DataBaseJson").BackupStorage;
+    BackupStorage = require("../../Database").BackupStorage;
 } catch (_) {}
 
 const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };

@@ -1,5 +1,5 @@
 const { EmbedBuilder, PermissionsBitField } = require('discord.js');
-const { configuracao, BackupStorage, Emojis } = require('../DataBaseJson');
+const { configuracao, BackupStorage, Emojis } = require('../Database');
 
 async function SincronizarDados(client) {
     let channel_logs = await client.channels.fetch(configuracao.get('ConfigChannels.systemlogs')).catch(() => null);

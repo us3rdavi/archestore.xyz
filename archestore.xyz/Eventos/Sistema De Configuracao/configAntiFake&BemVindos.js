@@ -1,5 +1,5 @@
 const { ActionRowBuilder, TextInputBuilder, TextInputStyle, InteractionType, ModalBuilder } = require("discord.js");
-const { configuracao } = require("../../DataBaseJson");
+const { configuracao } = require("../../Database");
 const { AcoesAutomaticsConfigs } = require("../../Functions/AcoesAutomatics");
 
 module.exports = {

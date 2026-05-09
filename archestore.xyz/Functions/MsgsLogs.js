@@ -1,5 +1,5 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const emojis = require('../DataBaseJson/Emojis.json');
+const emojis = require('../Database/emojis.json');
 const Emojis = { get: (name) => emojis[name] || "" };
 
 async function handleDeletedMessage(message, logChannelId, client) {

@@ -1,5 +1,5 @@
 const { RoleSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ChannelSelectMenuBuilder, ChannelType } = require("discord.js");
-const { configuracao } = require("../../DataBaseJson");
+const { configuracao } = require("../../Database");
 const { ConfigRoles, ConfigChannels } = require("../../Functions/ConfigRoles");
 const { logAction } = require('../../Functions/AuditLog.js');
 

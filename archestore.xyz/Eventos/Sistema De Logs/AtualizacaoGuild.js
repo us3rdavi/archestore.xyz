@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const { configuracao } = require("../../DataBaseJson");
+const { configuracao } = require("../../Database");
 
 module.exports = {
     name: 'guildUpdate',

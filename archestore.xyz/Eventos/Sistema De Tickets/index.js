@@ -8,8 +8,8 @@ const {
     SeparatorBuilder,
     MessageFlags
 } = require("discord.js");
-const { configuracao, tickets } = require("../../DataBaseJson");
-const emojis = require("../../DataBaseJson/Emojis.json");
+const { configuracao, tickets } = require("../../Database");
+const emojis = require("../../Database/emojis.json");
 const {
     findTicketByThreadId,
     isStaff,

@@ -3,8 +3,8 @@ const {
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MediaGalleryBuilder,
     MessageFlags
 } = require("discord.js");
-const { tickets, configuracao } = require("../DataBaseJson");
-const emojis = require("../DataBaseJson/Emojis.json");
+const { tickets, configuracao } = require("../Database");
+const emojis = require("../Database/emojis.json");
 const Emojis = { get: (name) => emojis[name] || "" };
 
 function getAccentColor() {

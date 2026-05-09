@@ -1,5 +1,5 @@
 const { ActionRowBuilder, ModalBuilder, TextInputBuilder, RoleSelectMenuBuilder, TextInputStyle } = require("discord.js");
-const { configuracao } = require("../../DataBaseJson/index.js");
+const { configuracao } = require("../../Database");
 const { configrole24 } = require("../../Functions/cargocomprar.js");
 
 module.exports = {

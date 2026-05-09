@@ -9,7 +9,7 @@ const {
     MessageFlags,
 } = require('discord.js');
 const { getPermissions } = require('../../Functions/PermissionsCache.js');
-const { Emojis } = require('../../DataBaseJson');
+const { Emojis } = require('../../Database');
 
 module.exports = {
     name: 'lock',

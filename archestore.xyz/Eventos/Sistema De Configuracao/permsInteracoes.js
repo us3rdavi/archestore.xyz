@@ -7,7 +7,7 @@ const {
     SeparatorBuilder,
     MessageFlags,
 } = require('discord.js');
-const { Emojis } = require('../../DataBaseJson');
+const { Emojis } = require('../../Database');
 const { getPermissions, addPermission, removePermission } = require('../../Functions/PermissionsCache.js');
 const { buildPermsPanel } = require('../../ComandosSlash/Administracao/perms.js');
 const config = require('../../config.json');

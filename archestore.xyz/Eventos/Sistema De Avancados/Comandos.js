@@ -2,7 +2,7 @@ const {
     ActionRowBuilder, ButtonBuilder, ChannelSelectMenuBuilder, ChannelType, RoleSelectMenuBuilder,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require('discord.js');
-const { configuracao } = require("../../DataBaseJson");
+const { configuracao } = require("../../Database");
 
 function getAccentColor() {
     const cor = configuracao.get('Cores.Principal') || '5865F2';

@@ -1,6 +1,6 @@
 const { PermissionFlagsBits, ApplicationCommandType, MessageFlags } = require('discord.js');
 const { getPermissions } = require('../../Functions/PermissionsCache.js');
-const { Emojis } = require('../../DataBaseJson');
+const { Emojis } = require('../../Database');
 const { buildMainPanel } = require('../../Functions/ConfigPainelBuilder');
 
 module.exports = {

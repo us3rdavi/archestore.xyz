@@ -8,7 +8,7 @@ const {
     StringSelectMenuBuilder,
     MessageFlags,
 } = require('discord.js');
-const { configuracao, Emojis } = require('../../DataBaseJson');
+const { configuracao, Emojis } = require('../../Database');
 const { hasPermission } = require('../../Functions/PermissionsCache');
 
 module.exports = {

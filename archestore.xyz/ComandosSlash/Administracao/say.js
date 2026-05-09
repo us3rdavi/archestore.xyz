@@ -1,7 +1,7 @@
 const Discord = require("discord.js");
 const config = require("../../config.json");
 const { getPermissions } = require("../../Functions/PermissionsCache.js");
-const emojis = require("../../DataBaseJson/Emojis.json");
+const emojis = require("../../Database/emojis.json");
 const Emojis = { get: (name) => emojis[name] || "" };
 
 module.exports = {

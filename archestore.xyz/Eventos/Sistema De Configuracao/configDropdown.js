@@ -1,5 +1,5 @@
 const { buildMainPanel, buildSubPanel, getAccentColor } = require('../../Functions/ConfigPainelBuilder');
-const { Emojis, tickets } = require('../../DataBaseJson');
+const { Emojis, tickets } = require('../../Database');
 const {
     ActionRowBuilder, ChannelSelectMenuBuilder, ChannelType,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, ButtonBuilder, MessageFlags

@@ -1,5 +1,5 @@
 const { WebhookClient, EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require("discord.js");
-const { configuracao, SystemMod } = require("../../DataBaseJson");
+const { configuracao, SystemMod } = require("../../Database");
 
 module.exports = {
     name: 'messageCreate',

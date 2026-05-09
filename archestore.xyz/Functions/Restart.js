@@ -1,5 +1,5 @@
 const { ActivityType, ActionRowBuilder, EmbedBuilder, ButtonBuilder } = require('discord.js');
-const { configuracao, Emojis } = require('../DataBaseJson');
+const { configuracao, Emojis } = require('../Database');
 
 async function restart(client, status) {
 

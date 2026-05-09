@@ -7,8 +7,8 @@ const {
     ChannelType,
     MessageFlags
 } = require("discord.js");
-const { tickets } = require("../DataBaseJson");
-const emojis = require("../DataBaseJson/Emojis.json");
+const { tickets, estatisticas } = require("../Database");
+const emojis = require("../Database/emojis.json");
 const { buildTicketContainer } = require("./TicketHelpers");
 const fs = require('fs');
 const moment = require('moment-timezone');
@@ -146,7 +146,7 @@ async function CreateTicket(interaction, valor) {
         tickets.set(`tickets.abertos.${interaction.user.id}.messageId`, ticketMsg.id);
 
         try {
-            const statsData = JSON.parse(fs.readFileSync('./DataBaseJson/estatisticas.json', 'utf8'));
+            const statsData = Object.fromEntries(estatisticas.all().map(e => [e.id, e.value]));
             const userPurchases = Object.values(statsData).filter(p => p.userid === interaction.user.id);
 
             if (userPurchases.length > 0) {

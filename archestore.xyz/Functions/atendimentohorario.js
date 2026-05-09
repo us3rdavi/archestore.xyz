@@ -2,8 +2,8 @@ const {
     ActionRowBuilder, ButtonBuilder, ModalBuilder, TextInputBuilder, TextInputStyle,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require("discord.js");
-const { tickets } = require("../DataBaseJson/index");
-const emojis = require("../DataBaseJson/Emojis.json");
+const { tickets } = require("../Database");
+const emojis = require("../Database/emojis.json");
 const Emojis = { get: (name) => emojis[name] || "" };
 
 async function Atendimentohorario(interaction, client) {

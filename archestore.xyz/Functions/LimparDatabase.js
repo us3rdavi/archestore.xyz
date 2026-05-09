@@ -1,18 +1,13 @@
-const fs = require('fs');
+const { carrinhos } = require('../Database');
 
 function limparDatabase() {
-    const caminhoArquivo = './DataBaseJson/carrinhos.json';
-    const dadosVazios = '{}';
-
-    fs.writeFile(caminhoArquivo, dadosVazios, (err) => {
-        if (err) {
-            console.error('Erro ao limpar a database:', err);
-            return;
-        }
-        console.log('Database limpa com sucesso.');
-    });
+    for (const key of Object.keys(carrinhos._cache)) {
+        delete carrinhos._cache[key];
+    }
+    if (carrinhos._col) {
+        carrinhos._col.deleteMany({}).catch(() => {});
+    }
+    console.log('Database limpa com sucesso.');
 }
 
-module.exports = {
-    limparDatabase
-};
+module.exports = { limparDatabase };

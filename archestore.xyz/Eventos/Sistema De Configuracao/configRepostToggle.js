@@ -1,5 +1,5 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
-const { configuracao, produtos } = require("../../DataBaseJson");
+const { configuracao, produtos } = require("../../Database");
 const { agendarRepostagem, pararRepostagem } = require("../../Functions/repostagem");
 const moment = require('moment-timezone');
 const { AcoesRepostAutomatics } = require('../../Functions/ConfigRepostAuto');

@@ -1,12 +1,13 @@
 
 const Discord = require("discord.js")
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require("discord.js")
-const { produtos, configuracao, Emojis } = require("../../DataBaseJson");
-const { QuickDB } = require("quick.db");
+const { produtos, configuracao, Emojis } = require("../../Database");
+const db = require("../../Database").quickStore;
+
 const { GerenciarCampos, GerenciarCampos2 } = require("../../Functions/GerenciarCampos");
 const { UpdateMessageProduto } = require("../../Functions/SenderMessagesOrUpdates");
 const axios = require("axios")
-const db = new QuickDB();
+
 
 
 module.exports = {

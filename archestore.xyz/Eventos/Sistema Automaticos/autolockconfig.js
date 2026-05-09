@@ -2,21 +2,19 @@ const {
     ActionRowBuilder, ButtonBuilder, ModalBuilder, TextInputBuilder, TextInputStyle,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require("discord.js");
-const fs = require('fs');
-const path = require('path');
-const { configuracao } = require("../../DataBaseJson");
-const automaticosPath = path.resolve(__dirname, '../../DataBaseJson/autolock.json');
+const { configuracao, autolock } = require("../../Database");
 
-function readAutomaticos() {
-    if (fs.existsSync(automaticosPath)) {
-        const rawData = fs.readFileSync(automaticosPath);
-        return JSON.parse(rawData);
-    }
-    return {};
+function readAutomaticos(guildId) {
+    if (guildId) return autolock.get(guildId) || {};
+    return Object.fromEntries(autolock.all().map(e => [e.id, e.value]));
 }
 
-function writeAutomaticos(data) {
-    fs.writeFileSync(automaticosPath, JSON.stringify(data, null, 2));
+function writeAutolock(guildId, data) {
+    autolock.set(guildId, data);
+}
+
+function deleteAutolock(guildId) {
+    autolock.delete(guildId);
 }
 
 function isValidTime(time) {
@@ -42,11 +40,6 @@ async function validateChannelIds(client, guildId, channelIds) {
         }
     }
     return invalidIds;
-}
-
-function getAccentColor() {
-    const cor = configuracao.get('Cores.Principal') || '5865F2';
-    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
 }
 
 function buildConfigContainer(title, fields) {
@@ -85,8 +78,7 @@ module.exports = {
             if (interaction.isButton()) {
                 if (interaction.customId === 'configlock') {
                     const guildId = interaction.guild.id;
-                    const automaticos = readAutomaticos();
-                    const config = automaticos[guildId] || {};
+                    const config = readAutomaticos(guildId);
                     const channelNames = config.channels ? config.channels.map(id => `<#${id}>`).join(', ') : 'Não configurado';
 
                     const container = buildConfigContainer('Configuração de Bloqueio Automático', [
@@ -128,11 +120,8 @@ module.exports = {
 
                 if (interaction.customId === 'disableConfig') {
                     const guildId = interaction.guild.id;
-                    const automaticos = readAutomaticos();
-
-                    if (automaticos[guildId]) {
-                        delete automaticos[guildId];
-                        writeAutomaticos(automaticos);
+                    if (autolock.get(guildId)) {
+                        deleteAutolock(guildId);
                         await interaction.reply({ content: 'Configuração de bloqueio automático desativada.', ephemeral: true });
                     } else {
                         await interaction.reply({ content: 'Nenhuma configuração de bloqueio automático encontrada para desativar.', ephemeral: true });
@@ -158,14 +147,12 @@ module.exports = {
                         return;
                     }
 
-                    const automaticos = readAutomaticos();
-                    automaticos[guildId] = {
+                    writeAutolock(guildId, {
                         abrir: lockTime,
                         fechar: unlockTime,
                         channels: channelIds.map(id => id.trim()),
                         serverid: guildId
-                    };
-                    writeAutomaticos(automaticos);
+                    });
 
                     const channelNames = channelIds.map(id => `<#${id}>`).join(', ');
                     const container = buildConfigContainer('Configuração Atualizada de Bloqueio Automático', [

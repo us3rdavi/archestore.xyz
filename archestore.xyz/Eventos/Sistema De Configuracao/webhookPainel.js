@@ -10,7 +10,7 @@ const {
     ButtonStyle,
     MessageFlags,
 } = require('discord.js');
-const { Emojis } = require('../../DataBaseJson');
+const { Emojis } = require('../../Database');
 const { buildWebhookPanel } = require('../../ComandosSlash/Administracao/webhook.js');
 
 const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };

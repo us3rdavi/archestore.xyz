@@ -6,10 +6,11 @@ const {
   TextInputBuilder,
   TextInputStyle,
 } = require("discord.js");
-const { produtos, configuracao } = require("../DataBaseJson");
-const { QuickDB } = require("quick.db");
+const { produtos, configuracao } = require("../Database");
+const db = require("../Database").quickStore;
+
 const { stat } = require("fs");
-const db = new QuickDB();
+
 
 function GerenciarProduto(interaction, status, produtoname) {
   const ggg = produtos.get(produtoname);

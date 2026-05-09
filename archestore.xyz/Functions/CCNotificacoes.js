@@ -1,29 +1,16 @@
 const { ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags } = require('discord.js');
 const { listOrders, getOrder, getPackage } = require('./CentralCartAPI');
-const { configuracao, Emojis } = require('../DataBaseJson');
-const fs = require('fs');
-const path = require('path');
+const { configuracao, Emojis, cc_notificacoes } = require('../Database');
 
-const STATE_FILE = path.join(__dirname, '../DataBaseJson/cc_notificacoes.json');
 const DIAS_AVISO_EXPIRACAO = 3;
+const DEFAULT_STATE = { order_notified: [], expiry_warn_notified: [], expiry_notified: [] };
 
 function loadState() {
-    try {
-        if (fs.existsSync(STATE_FILE)) {
-            return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
-        }
-    } catch (e) {
-        console.error('[CCNotif] Erro ao carregar estado:', e.message);
-    }
-    return { order_notified: [], expiry_warn_notified: [], expiry_notified: [] };
+    return cc_notificacoes.get('state') || { ...DEFAULT_STATE };
 }
 
 function saveState(state) {
-    try {
-        fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), 'utf8');
-    } catch (e) {
-        console.error('[CCNotif] Erro ao salvar estado:', e.message);
-    }
+    cc_notificacoes.set('state', state);
 }
 
 function getAccentColor() {

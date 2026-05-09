@@ -1,5 +1,5 @@
 const { hasPermission } = require('../../Functions/PermissionsCache.js');
-const { Emojis } = require('../../DataBaseJson');
+const { Emojis } = require('../../Database');
 
 module.exports = {
     name: 'interactionCreate',

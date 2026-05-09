@@ -2,7 +2,7 @@ const {
     ActionRowBuilder, ButtonBuilder,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require("discord.js");
-const { configuracao } = require("../DataBaseJson");
+const { configuracao } = require("../Database");
 
 async function configrole24(interaction, client) {
     const statusComprar = configuracao.get('ConfigRoles.statuscomprar') || false;

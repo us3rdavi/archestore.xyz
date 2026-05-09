@@ -1,4 +1,4 @@
-const { configuracao } = require("../DataBaseJson");
+const { configuracao } = require("../Database");
 const axios = require('axios');
 
 async function BloquearBanco(client, bank, id, yy, msg) {

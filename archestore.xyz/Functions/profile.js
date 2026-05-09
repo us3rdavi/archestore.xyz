@@ -2,7 +2,7 @@ const {
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require("discord.js");
 const { EstatisticasKing } = require("../index.js");
-const { configuracao } = require("../DataBaseJson/index.js");
+const { configuracao } = require("../Database");
 
 function getAccentColor() {
     const cor = configuracao.get('Cores.Principal') || '5865F2';

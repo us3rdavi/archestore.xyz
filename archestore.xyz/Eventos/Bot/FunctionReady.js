@@ -3,7 +3,7 @@ const { WebhookClient } = require('discord.js');
 const { CloseThreds } = require('../../Functions/CloseThread');
 const { iniciarNotificacoes } = require('../../Functions/CCNotificacoes');
 const { CheckPosition } = require('../../Functions/PosicoesFunction.js');
-const { configuracao, Convites, GuildsInvites } = require('../../DataBaseJson');
+const { configuracao, Convites, GuildsInvites, carrinhos } = require('../../Database');
 const { restart } = require('../../Functions/Restart.js');
 const { Varredura } = require('../../Functions/Varredura.js');
 const colors = require("colors");
@@ -32,20 +32,15 @@ module.exports = {
             });
         }
 
-        // Limpar carrinhos.js
+        // Limpar carrinhos no startup
         async function resetCarrinhosFile() {
-            const filePath = path.resolve(__dirname, '../../DataBaseJson/carrinhos.json');
-            const content = '{}';
-
-            try {
-                fs.writeFileSync(filePath, content, 'utf8');
-                console.log('Arquivo carrinhos.json foi limpo e redefinido com sucesso.');
-            } catch (error) {
-                console.error('Erro ao redefinir o arquivo carrinhos.js:', error);
+            for (const key of Object.keys(carrinhos._cache)) {
+                delete carrinhos._cache[key];
             }
+            if (carrinhos._col) await carrinhos._col.deleteMany({}).catch(() => {});
+            console.log('Carrinhos limpos com sucesso.');
         }
 
-        // Chamar a função logo após o bot ligar
         await resetCarrinhosFile();
 
         const closeThreads = () => {

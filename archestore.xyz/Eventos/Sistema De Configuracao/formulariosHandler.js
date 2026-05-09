@@ -5,7 +5,7 @@ const {
     ModalBuilder, TextInputBuilder, TextInputStyle,
     MessageFlags, ChannelType,
 } = require('discord.js');
-const { formularios, Emojis, configuracao } = require('../../DataBaseJson');
+const { formularios, Emojis, configuracao } = require('../../Database');
 
 // Lock para evitar duplicação de perguntas por double-submit
 const pergLock = new Set();

@@ -11,9 +11,9 @@ const {
     ChannelType,
     InteractionType
 } = require("discord.js");
-const { tickets } = require("../../DataBaseJson");
+const { tickets } = require("../../Database");
 const { painelTicket, painelConfiguracaoTicket } = require("../../Functions/PainelTickets");
-const emojis = require("../../DataBaseJson/Emojis.json");
+const emojis = require("../../Database/emojis.json");
 
 const Emojis = { get: (name) => emojis[name] || "" };
 

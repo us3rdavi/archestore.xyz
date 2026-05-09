@@ -2,7 +2,7 @@ const {
     ActionRowBuilder, ButtonBuilder, ButtonStyle,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require("discord.js");
-const { produtos, configuracao } = require("../DataBaseJson");
+const { produtos, configuracao } = require("../Database");
 const moment = require('moment-timezone');
 
 function getAccentColor() {

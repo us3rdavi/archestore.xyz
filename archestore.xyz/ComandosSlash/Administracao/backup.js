@@ -9,11 +9,11 @@ const {
     SeparatorBuilder,
     MessageFlags,
 } = require("discord.js");
-const { configuracao, Emojis } = require("../../DataBaseJson");
+const { configuracao, Emojis } = require("../../Database");
 
 let BackupStorage;
 try {
-    BackupStorage = require("../../DataBaseJson").BackupStorage;
+    BackupStorage = require("../../Database").BackupStorage;
 } catch (_) {}
 
 module.exports = {

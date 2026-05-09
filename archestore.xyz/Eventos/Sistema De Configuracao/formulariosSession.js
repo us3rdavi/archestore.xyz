@@ -4,7 +4,7 @@ const {
     ModalBuilder, TextInputBuilder, TextInputStyle,
     MessageFlags,
 } = require('discord.js');
-const { formularios, Emojis, configuracao } = require('../../DataBaseJson');
+const { formularios, Emojis, configuracao } = require('../../Database');
 
 function getAccentColor() {
     const cor = configuracao.get('Cores.Principal') || '5865F2';

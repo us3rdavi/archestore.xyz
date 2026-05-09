@@ -2,7 +2,7 @@ const {
     ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder,
     ButtonStyle, EmbedBuilder
 } = require('discord.js');
-const { dbembed, Emojis } = require('../DataBaseJson');
+const { dbembed, Emojis } = require('../Database');
 
 const NAV_OPTIONS = [
     { label: 'Menu Principal', description: 'Voltar ao menu principal',  value: 'main',        emoji: { name: 'system_emoji',    id: '1501804019184828507' } },

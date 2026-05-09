@@ -1,4 +1,4 @@
-const { Emojis } = require('../DataBaseJson');
+const { Emojis } = require('../Database');
 const AllEmojis = require('./emojis.json');
 const axios = require('axios');
 

@@ -1,7 +1,7 @@
 const {
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require('discord.js');
-const { configuracao, Emojis } = require('../DataBaseJson');
+const { configuracao, Emojis } = require('../Database');
 
 function getAccentColor() {
     const cor = configuracao.get('Cores.Principal') || '5865F2';

@@ -1,6 +1,6 @@
-const { configuracao, tickets } = require("../../DataBaseJson");
+const { configuracao, tickets } = require("../../Database");
 const { ModalBuilder, TextInputBuilder, EmbedBuilder, TextInputStyle, ActionRowBuilder } = require("discord.js");
-const emojis = require("../../DataBaseJson/Emojis.json");
+const emojis = require("../../Database/emojis.json");
 const Emojis = { get: (name) => emojis[name] || "" };
 
 module.exports = {

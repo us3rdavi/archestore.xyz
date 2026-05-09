@@ -1,6 +1,6 @@
 
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ChannelSelectMenuBuilder, ChannelType, InteractionType } = require("discord.js")
-const { configuracao } = require("../../DataBaseJson")
+const { configuracao } = require("../../Database")
 const { sistemaAntiRaid } = require("../../Functions/AcoesAutomatics")
 const { CriarSelectChannel } = require("./painel")
 

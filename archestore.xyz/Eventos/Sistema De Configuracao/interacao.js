@@ -4,16 +4,17 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ModalBuilder, TextInputBu
 const { Painel } = require("../../Functions/Painel");
 const { Gerenciar } = require("../../Functions/Gerenciar");
 const { ConfigRoles } = require("../../Functions/ConfigRoles");
-const { produtos, configuracao, perms, pagamentos } = require("../../DataBaseJson");
+const { produtos, configuracao, perms, pagamentos } = require("../../Database");
 const { GerenciarProduto } = require("../../Functions/CreateProduto");
-const { QuickDB } = require("quick.db");
+
 const { GerenciarCampos, GerenciarCampos2 } = require("../../Functions/GerenciarCampos");
 const { UpdateMessageProduto } = require("../../Functions/SenderMessagesOrUpdates");
 const { FormasDePagamentos } = require("../../Functions/FormasDePagamentosConfig");
 const { semiConfigs } = require("../../Functions/semiConfigs");
 const { gerenciarPerms } = require("../../Functions/modUsersPerms");
-const { Emojis } = require("../../DataBaseJson");
-const db = new QuickDB();
+const { Emojis } = require("../../Database");
+const db = require("../../Database").quickStore;
+
 
 
 module.exports = {

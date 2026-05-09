@@ -1,6 +1,6 @@
 const { getPermissions } = require('../../Functions/PermissionsCache');
 const { buildMainMenu } = require('../../Functions/AnunciarBuilder');
-const { Emojis } = require('../../DataBaseJson');
+const { Emojis } = require('../../Database');
 
 module.exports = {
     name: 'anunciar',

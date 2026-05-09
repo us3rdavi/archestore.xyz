@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const { configuracao, Temporario } = require("../../DataBaseJson");
+const { configuracao, Temporario } = require("../../Database");
 
 module.exports = {
     name: 'guildBanAdd',

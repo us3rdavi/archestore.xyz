@@ -2,7 +2,7 @@ const {
     ActionRowBuilder, ButtonBuilder,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require('discord.js');
-const { configuracao, Emojis } = require('../DataBaseJson');
+const { configuracao, Emojis } = require('../Database');
 
 async function Gerenciar(interaction, client) {
     try {

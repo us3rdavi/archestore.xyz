@@ -1,135 +1,119 @@
-const { GatewayIntentBits, Client, Collection, ChannelType, EmbedBuilder, WebhookClient } = require("discord.js");
-const { AtivarIntents } = require("./Functions/StartIntents");
-const { configuracao, carrinhos } = require("./DataBaseJson");
-const { handleDeletedMessage, handleUpdatedMessage } = require('./Functions/MsgsLogs');
-const { handleVoiceStateUpdate } = require('./Functions/VoiceLogs');
-const { handleProfileUpdate } = require('./Functions/ProfileLog');
-const { agendarRepostagem } = require('./Functions/repostagem');
-const _nodeFetch = require('node-fetch');
-const fetch = _nodeFetch.default || _nodeFetch;
-const schedule = require('node-schedule');
-const fs = require('fs');
-const path = require('path');
 const colors = require("colors");
-
-const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildVoiceStates,
-        GatewayIntentBits.DirectMessages,
-        GatewayIntentBits.GuildMessageReactions
-    ]
-});
-
-// Aumentando o limite de listeners
-client.setMaxListeners(30); // Aumenta o limite para 30, ajustável conforme necessário
-
-const estatisticasKingInstance = require("./Functions/VariaveisEstatisticas");
-const EstatisticasKing = new estatisticasKingInstance();
-module.exports = { EstatisticasKing };
-const { sendMessage } = require('./Functions/MsgAutomatics');
-
-AtivarIntents();
-
-const config = require("./config.json");
-const events = require('./Handler/events');
-const slash = require('./Handler/slash');
-
-// Evento ready
-client.once('ready', async () => {
-    console.log(`Bot ${client.user.tag} está online!`);
-
-    // Agendar repostagem
-    agendarRepostagem(client);
-});
-
-slash.run(client);
-events.run(client);
-
-client.slashCommands = new Collection();
-
-client.on('error', (err) => {
-    console.log(`${colors.red(`[ERROR]`)} ${err.message}`);
-});
 
 process.on('unhandledRejection', (err) => {
     console.log(`${colors.red(`[UNHANDLED]`)} ${err?.message || err}`);
 });
 
-const botToken = process.env.DISCORD_BOT_TOKEN || config.token;
-client.login(botToken).catch((err) => {
-    if (err?.message?.includes("intent")) return console.log(`${colors.red(`[LOG]`)} Ativa as Intents do Bot`);
-    if (err?.message?.includes("invalid")) return console.log(`${colors.red(`[LOG]`)} Token Incorreto`);
-});
+(async () => {
+    // 1. Conectar MongoDB e carregar todos os dados na memória ANTES de qualquer require que use banco
+    const { initDatabase } = require('./Database');
+    await initDatabase();
 
-const messageLogChannelId = configuracao.get(`ConfigChannels.mensagens`);
-const trafficLogChannelId = configuracao.get(`ConfigChannels.tráfego`);
-const profileLogChannelId = configuracao.get(`ConfigChannels.tráfego`);
+    // 2. Agora é seguro carregar tudo
+    const { GatewayIntentBits, Client, Collection } = require("discord.js");
+    const { AtivarIntents } = require("./Functions/StartIntents");
+    const { configuracao, carrinhos } = require("./Database");
+    const { handleDeletedMessage, handleUpdatedMessage } = require('./Functions/MsgsLogs');
+    const { handleVoiceStateUpdate } = require('./Functions/VoiceLogs');
+    const { handleProfileUpdate } = require('./Functions/ProfileLog');
+    const { agendarRepostagem } = require('./Functions/repostagem');
+    const _nodeFetch = require('node-fetch');
+    const fetch = _nodeFetch.default || _nodeFetch;
+    const schedule = require('node-schedule');
+    const fs = require('fs');
+    const path = require('path');
+    const config = require("./config.json");
 
-client.on('messageDelete', message => {
-    if (messageLogChannelId) {
-        handleDeletedMessage(message, messageLogChannelId, client);
-    } else {
-        return;
-    }
-});
+    const { sendMessage } = require('./Functions/MsgAutomatics');
 
-client.on('messageUpdate', (oldMessage, newMessage) => {
-    if (messageLogChannelId) {
-        handleUpdatedMessage(oldMessage, newMessage, messageLogChannelId, client);
-    } else {
-        return;
-    }
-});
+    const estatisticasKingInstance = require("./Functions/VariaveisEstatisticas");
+    const EstatisticasKing = new estatisticasKingInstance();
+    module.exports.EstatisticasKing = EstatisticasKing;
 
-client.on('voiceStateUpdate', (oldState, newState) => {
-    if (trafficLogChannelId) {
-        handleVoiceStateUpdate(oldState, newState, trafficLogChannelId, client);
-    } else {
-        return;
-    }
-});
+    AtivarIntents();
 
-client.on('interactionCreate', async (interaction) => {
-    if (!interaction.isStringSelectMenu()) return;
-  
-    // Verifica se é o Select Menu correspondente
-    if (interaction.customId === 'extensaoapenasparaogeradorkkkk') {
-      const selectedValue = interaction.values[0];
-  
-      if (selectedValue === 'geradorextensao') {
-        // Chama o painel de configuração do gerador
-        await configgenpainelzika(interaction, client);
-      }
-    }
-  });
+    const client = new Client({
+        intents: [
+            GatewayIntentBits.Guilds,
+            GatewayIntentBits.GuildMessages,
+            GatewayIntentBits.MessageContent,
+            GatewayIntentBits.GuildMembers,
+            GatewayIntentBits.GuildVoiceStates,
+            GatewayIntentBits.DirectMessages,
+            GatewayIntentBits.GuildMessageReactions
+        ]
+    });
 
-client.on('guildMemberUpdate', (oldMember, newMember) => {
-    if (profileLogChannelId) {
-        handleProfileUpdate(oldMember, newMember, profileLogChannelId, client);
-    } else {
-        return;
-    }
-});
+    client.setMaxListeners(30);
+    client.slashCommands = new Collection();
+    module.exports.client = client;
 
-const filePath = path.join(__dirname, './DataBaseJson', 'carrinhos.json');
+    const events = require('./Handler/events');
+    const slash = require('./Handler/slash');
 
-function resetCarrinhos() {
-    let data = {};
+    slash.run(client);
+    events.run(client);
 
-    fs.writeFile(filePath, JSON.stringify(data), 'utf8', (err) => {
-        if (err) {
-            console.log('Erro ao escrever no arquivo:', err);
-        } else {
-            console.log('[Reset carrinhos.json] Carrinhos zerados com sucesso!');
+    // Evento ready
+    client.once('ready', async () => {
+        console.log(`Bot ${client.user.tag} está online!`);
+        agendarRepostagem(client);
+    });
+
+    // Log de mensagens/voz/perfil — IDs lidos depois que o banco foi carregado
+    const messageLogChannelId = configuracao.get(`ConfigChannels.mensagens`);
+    const trafficLogChannelId = configuracao.get(`ConfigChannels.tráfego`);
+    const profileLogChannelId = configuracao.get(`ConfigChannels.tráfego`);
+
+    client.on('messageDelete', message => {
+        if (messageLogChannelId) handleDeletedMessage(message, messageLogChannelId, client);
+    });
+
+    client.on('messageUpdate', (oldMessage, newMessage) => {
+        if (messageLogChannelId) handleUpdatedMessage(oldMessage, newMessage, messageLogChannelId, client);
+    });
+
+    client.on('voiceStateUpdate', (oldState, newState) => {
+        if (trafficLogChannelId) handleVoiceStateUpdate(oldState, newState, trafficLogChannelId, client);
+    });
+
+    client.on('guildMemberUpdate', (oldMember, newMember) => {
+        if (profileLogChannelId) handleProfileUpdate(oldMember, newMember, profileLogChannelId, client);
+    });
+
+    client.on('interactionCreate', async (interaction) => {
+        if (!interaction.isStringSelectMenu()) return;
+        if (interaction.customId === 'extensaoapenasparaogeradorkkkk') {
+            const selectedValue = interaction.values[0];
+            if (selectedValue === 'geradorextensao') {
+                await configgenpainelzika(interaction, client);
+            }
         }
     });
-}
 
-const job = schedule.scheduleJob({ hour: 5, minute: 55, tz: 'America/Sao_Paulo' }, function () {
-    resetCarrinhos();
+    client.on('error', (err) => {
+        console.log(`${colors.red(`[ERROR]`)} ${err.message}`);
+    });
+
+    // Reset de carrinhos às 05:55 (America/Sao_Paulo) — limpa cache e MongoDB
+    function resetCarrinhos() {
+        for (const key of Object.keys(carrinhos._cache)) {
+            delete carrinhos._cache[key];
+        }
+        carrinhos._col?.deleteMany({}).catch(() => {});
+        console.log('[Reset carrinhos] Carrinhos zerados com sucesso!');
+    }
+
+    schedule.scheduleJob({ hour: 5, minute: 55, tz: 'America/Sao_Paulo' }, resetCarrinhos);
+
+    const botToken = process.env.DISCORD_BOT_TOKEN || config.token;
+    client.login(botToken).catch((err) => {
+        if (err?.message?.includes("intent")) return console.log(`${colors.red(`[LOG]`)} Ativa as Intents do Bot`);
+        if (err?.message?.includes("invalid")) return console.log(`${colors.red(`[LOG]`)} Token Incorreto`);
+        console.error(`${colors.red(`[LOGIN ERROR]`)}`, err);
+    });
+
+})().catch(err => {
+    console.error('[FATAL] Falha ao iniciar o bot:', err);
+    process.exit(1);
 });
-

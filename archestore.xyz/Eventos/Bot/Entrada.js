@@ -1,6 +1,6 @@
 const { WebhookClient, EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require("discord.js");
-const { Convites, GuildsInvites, configuracao } = require("../../DataBaseJson");
-const { Emojis } = require("../../DataBaseJson");
+const { Convites, GuildsInvites, configuracao } = require("../../Database");
+const { Emojis } = require("../../Database");
 
 module.exports = {
     name: 'guildMemberAdd',

@@ -1,6 +1,6 @@
 const { ApplicationCommandType } = require("discord.js");
 const { getPermissions } = require("../../Functions/PermissionsCache.js");
-const { configuracao, Emojis } = require("../../DataBaseJson/index.js");
+const { configuracao, Emojis } = require("../../Database");
 
 module.exports = {
     name: "interactionCreate",

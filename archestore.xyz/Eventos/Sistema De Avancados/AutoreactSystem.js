@@ -1,4 +1,4 @@
-const { configuracao } = require("../../DataBaseJson");
+const { configuracao } = require("../../Database");
 const { ModalBuilder, TextInputBuilder, EmbedBuilder, ButtonBuilder, TextInputStyle, ActionRowBuilder } = require("discord.js");
 
 module.exports = {

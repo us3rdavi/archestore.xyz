@@ -1,4 +1,4 @@
-const { estatisticas } = require("../DataBaseJson");
+const { estatisticas } = require("../Database");
 
 class EstatisticasKing {
 

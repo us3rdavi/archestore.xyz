@@ -1,4 +1,4 @@
-const { configuracao } = require("../../DataBaseJson");
+const { configuracao } = require("../../Database");
 const {
     ModalBuilder, TextInputBuilder, ButtonBuilder, TextInputStyle, ActionRowBuilder,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags

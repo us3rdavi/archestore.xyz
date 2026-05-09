@@ -1,7 +1,8 @@
-const { produtos, configuracao, Emojis } = require("../DataBaseJson")
+const { produtos, configuracao, Emojis } = require("../Database")
+const db = require("../Database").quickStore;
 
-const { QuickDB } = require("quick.db");
-const db = new QuickDB();
+
+
 
 const Discord = require("discord.js")
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require("discord.js")

@@ -11,7 +11,7 @@ const {
     ChannelSelectMenuBuilder,
     MessageFlags,
 } = require('discord.js');
-const { Emojis } = require('../../DataBaseJson');
+const { Emojis } = require('../../Database');
 
 async function buildWebhookPanel(interaction, channel) {
     const ch = channel || interaction.channel;

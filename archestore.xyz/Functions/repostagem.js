@@ -2,7 +2,7 @@ const cron = require('node-cron');
 const { MessageCreate, UpdateMessageProduto } = require("./SenderMessagesOrUpdates");
 const Discord = require("discord.js");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js')
-const { produtos, configuracao } = require("../DataBaseJson");
+const { produtos, configuracao } = require("../Database");
 
 let cronJob = null;
 

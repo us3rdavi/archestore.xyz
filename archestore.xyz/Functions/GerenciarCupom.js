@@ -2,9 +2,8 @@ const {
     ActionRowBuilder, ButtonBuilder,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require("discord.js");
-const { produtos, configuracao } = require("../DataBaseJson");
-const { QuickDB } = require("quick.db");
-const db = new QuickDB();
+const { produtos, configuracao } = require("../Database");
+const db = require("../Database").quickStore;
 const axios = require('axios');
 
 function getAccentColor() {

@@ -1,5 +1,5 @@
 const { ActionRowBuilder, StringSelectMenuBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, InteractionType } = require("discord.js");
-const { msgsauto } = require("../../DataBaseJson");
+const { msgsauto } = require("../../Database");
 
 module.exports = {
     name: 'interactionCreate',

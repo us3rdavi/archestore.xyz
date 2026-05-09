@@ -2,7 +2,7 @@ const {
     ActionRowBuilder, ButtonBuilder,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require("discord.js");
-const { relikia } = require("../DataBaseJson");
+const { relikia } = require("../Database");
 
 async function AutoClear(interaction, client) {
     if (!relikia) {

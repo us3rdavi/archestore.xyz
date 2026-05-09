@@ -4,7 +4,7 @@ const path = require("path");
 
 const token = process.env.DISCORD_BOT_TOKEN;
 const ICON_BASE = "/tmp/iconpack";
-const EMOJIS_JSON = path.join(__dirname, "DataBaseJson/Emojis.json");
+const EMOJIS_JSON = path.join(__dirname, "Database/emojis.json");
 
 const rest = new REST({ version: "10" }).setToken(token);
 

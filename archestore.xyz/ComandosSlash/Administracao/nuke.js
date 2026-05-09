@@ -5,8 +5,8 @@ const {
   PermissionFlagsBits
 } = require('discord.js');
 const { getPermissions } = require("../../Functions/PermissionsCache.js");
-const { configuracao } = require('../../DataBaseJson/index.js');
-const emojis = require("../../DataBaseJson/Emojis.json");
+const { configuracao } = require('../../Database');
+const emojis = require("../../Database/emojis.json");
 
 const Emojis = {
     get: (name) => emojis[name] || ""

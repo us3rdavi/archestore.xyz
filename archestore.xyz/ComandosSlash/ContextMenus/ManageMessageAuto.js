@@ -1,7 +1,7 @@
 const { PermissionFlagsBits, ApplicationCommandType, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require("discord.js");
-const { msgsauto } = require("../../DataBaseJson");
+const { msgsauto } = require("../../Database");
 const { owner } = require('../../config.json');
-const { Emojis } = require("../../DataBaseJson");
+const { Emojis } = require("../../Database");
 
 module.exports = {
     name: 'Editar Mensagem Automática',
