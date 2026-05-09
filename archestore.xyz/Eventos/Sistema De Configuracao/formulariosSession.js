@@ -80,7 +80,7 @@ async function runQuestionFlow(dmChannel, userId, questions, timeLimit) {
 
         const qc = new ContainerBuilder();
         qc.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-            `${Emojis.get('question_emoji')} **Pergunta ${i + 1} de ${questions.length}**\n\n` +
+            `${Emojis.get('custom_question_emoji')} **Pergunta ${i + 1} de ${questions.length}**\n\n` +
             `${q.text}\n\n` +
             `-# ${Emojis.get('clock_emoji')} Você tem ${timeLimit} segundos para responder.`
         ));
@@ -182,7 +182,7 @@ module.exports = {
                         `## ${Emojis.get('_messages_emoji')} ${form.name}\n` +
                         `Olá, **${interaction.user.username}**! Você iniciou o processo de aplicação.\n\n` +
                         `${Emojis.get('information_emoji')} **O que esperar:**\n` +
-                        `> ${Emojis.get('question_emoji')} **${questions.length} pergunta(s)** serão feitas aqui na DM\n` +
+                        `> ${Emojis.get('custom_question_emoji')} **${questions.length} pergunta(s)** serão feitas aqui na DM\n` +
                         `> ${Emojis.get('clock_emoji')} Você tem **${form.time_limit || 120} segundos** por pergunta\n` +
                         `> ${Emojis.get('_lapis_emoji')} Responda digitando normalmente nesta conversa\n\n` +
                         `-# A primeira pergunta aparecerá em instantes...`
