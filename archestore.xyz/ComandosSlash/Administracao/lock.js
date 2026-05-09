@@ -1,51 +1,60 @@
 const {
-    PermissionFlagsBits, ApplicationCommandType,
-    ActionRowBuilder, ButtonBuilder,
-    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
-} = require("discord.js");
-const { getPermissions } = require("../../Functions/PermissionsCache.js");
-const { Emojis, configuracao } = require("../../DataBaseJson");
-
-function getAccentColor() {
-    const cor = configuracao.get('Cores.Principal') || '5865F2';
-    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
-}
+    PermissionFlagsBits,
+    ApplicationCommandType,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ContainerBuilder,
+    TextDisplayBuilder,
+    SeparatorBuilder,
+    MessageFlags,
+} = require('discord.js');
+const { getPermissions } = require('../../Functions/PermissionsCache.js');
+const { Emojis } = require('../../DataBaseJson');
 
 module.exports = {
     name: 'lock',
-    description: 'Use para trancar o canal',
+    description: 'Tranca o canal atual.',
     type: ApplicationCommandType.ChatInput,
     default_member_permissions: PermissionFlagsBits.Administrator,
 
     run: async (client, interaction) => {
         const perm = await getPermissions(client.user.id);
         if (perm === null || !perm.includes(interaction.user.id)) {
-            return interaction.reply({ content: `${Emojis.get('negative_emoji')} Faltam permissões.`, ephemeral: true });
+            const errContainer = new ContainerBuilder();
+            errContainer.addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    `${Emojis.get('negative_emoji')} Você não tem permissão para usar este comando.`
+                )
+            );
+            return interaction.reply({
+                components: [errContainer],
+                flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
+            });
         }
 
-        interaction.channel.permissionOverwrites.edit(interaction.guild.id, { SendMessages: false });
+        await interaction.channel.permissionOverwrites.edit(interaction.guild.id, { SendMessages: false });
 
-        const container = new ContainerBuilder();
-        container;
+        const userName = interaction.member?.displayName
+            || interaction.user?.displayName
+            || interaction.user?.username;
 
-        container.addTextDisplayComponents(
-            new TextDisplayBuilder().setContent(
-                `Este canal ${interaction.channel} foi trancado por ${interaction.user}`
-            )
-        );
-
-        container.addSeparatorComponents(new SeparatorBuilder());
-
-        container.addActionRowComponents(
+        const c = new ContainerBuilder();
+        c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+            `## ${Emojis.get('negative_emoji')} Canal Bloqueado\n` +
+            `**${userName}** · Owner\n\n` +
+            `${Emojis.get('information_emoji')} O canal ${interaction.channel} foi trancado com sucesso.\n` +
+            `-# Apenas administradores podem enviar mensagens.`
+        ));
+        c.addSeparatorComponents(new SeparatorBuilder());
+        c.addActionRowComponents(
             new ActionRowBuilder().addComponents(
                 new ButtonBuilder().setCustomId('unlockChannel').setLabel('Destrancar').setStyle(2)
             )
         );
 
-        interaction.reply({
-            components: [container],
+        await interaction.reply({
+            components: [c],
             flags: MessageFlags.IsComponentsV2,
-            embeds: []
         });
-    }
-}
+    },
+};
