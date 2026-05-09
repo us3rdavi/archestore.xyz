@@ -11,20 +11,10 @@ const { tickets } = require("../Database");
 const emojis = require("../Database/emojis.json");
 const Emojis = { get: (name) => emojis[name] || "" };
 
-function buildTicketComponents(ggg, aparencia) {
+function buildTicketComponents(funcoes, aparencia) {
     const container = new ContainerBuilder();
 
-    if (aparencia.color) {
-        try {
-            container;
-        } catch (e) {
-            container;
-        }
-    } else {
-        container;
-    }
-
-    const tituloEmoji = aparencia.emoji ? `${aparencia.emoji} ` : `${Emojis.get('_support_emoji')} `;
+    const tituloEmoji = aparencia.emoji ? `${aparencia.emoji} ` : `${Emojis.get('_ticket_emoji')} `;
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
             `## ${tituloEmoji}${aparencia.title || 'Central de Suporte'}`
@@ -33,20 +23,22 @@ function buildTicketComponents(ggg, aparencia) {
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-            aparencia.description || 'Selecione a opção que melhor se adequa às suas necessidades.'
+            aparencia.description || 'Selecione a opção abaixo que melhor se adequa à sua necessidade.'
         )
     );
 
     if (aparencia.banner) {
-        container.addMediaGalleryComponents(
-            new MediaGalleryBuilder().addItems({ media: { url: aparencia.banner } })
-        );
+        try {
+            container.addMediaGalleryComponents(
+                new MediaGalleryBuilder().addItems({ media: { url: aparencia.banner } })
+            );
+        } catch (e) {}
     }
 
     container.addSeparatorComponents(new SeparatorBuilder());
 
-    const funcoes = Object.entries(ggg);
-    funcoes.forEach(([key, funcao]) => {
+    const funcList = Object.entries(funcoes);
+    funcList.forEach(([key, funcao]) => {
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(
                 `**${funcao.predescricao || funcao.nome}**\n-# Clique em **${funcao.nome}** para abrir um ticket.`
@@ -62,69 +54,57 @@ function buildTicketComponents(ggg, aparencia) {
             try { btn.setEmoji(funcao.emoji); } catch (e) {}
         }
 
-        container.addActionRowComponents(
-            new ActionRowBuilder().addComponents(btn)
-        );
-
+        container.addActionRowComponents(new ActionRowBuilder().addComponents(btn));
         container.addSeparatorComponents(new SeparatorBuilder());
     });
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-            `-# ${Emojis.get('system_emoji')} Nossa equipe de suporte geralmente responde em 5 a 30 minutos.`
+            `-# ${Emojis.get('system_emoji')} Nossa equipe geralmente responde em até 30 minutos.`
         )
     );
 
     return container;
 }
 
-function CreateMessageTicket(interaction, channel, client) {
-    const ggg = tickets.get(`tickets.funcoes`);
-    const aparencia = tickets.get(`tickets.aparencia`);
-    const channel2 = client.channels.cache.get(channel);
+function CreateMessageTicket(interaction, channelId, client) {
+    const funcoes   = tickets.get('tickets.funcoes');
+    const aparencia = tickets.get('tickets.aparencia');
+    const channel   = client.channels.cache.get(channelId);
 
-    if (!ggg || !aparencia || !channel2) return;
+    if (!funcoes || !aparencia || !channel) return;
 
-    const container = buildTicketComponents(ggg, aparencia);
+    const container = buildTicketComponents(funcoes, aparencia);
 
-    channel2.send({
+    channel.send({
         components: [container],
         flags: MessageFlags.IsComponentsV2
     }).then(msg => {
-        tickets.push(`tickets.messageid`, {
-            msgid: msg.id,
-            channelid: msg.channel.id,
-            guildid: msg.guild.id
-        });
+        const existing = tickets.get('tickets.messageid') || [];
+        existing.push({ msgid: msg.id, channelid: msg.channel.id, guildid: msg.guild.id });
+        tickets.set('tickets.messageid', existing);
     }).catch(err => {
         console.error('[Ticket] Erro ao postar mensagem:', err.message);
     });
 }
 
 async function Checkarmensagensticket(client) {
-    const ggg = tickets.get(`tickets.funcoes`);
-    const aparencia = tickets.get(`tickets.aparencia`);
-    const item = tickets.get(`tickets.messageid`);
+    const funcoes   = tickets.get('tickets.funcoes');
+    const aparencia = tickets.get('tickets.aparencia');
+    const items     = tickets.get('tickets.messageid');
 
-    if (!item || !ggg || !aparencia) return;
+    if (!items || !funcoes || !aparencia) return;
 
-    const container = buildTicketComponents(ggg, aparencia);
+    const container = buildTicketComponents(funcoes, aparencia);
 
-    for (const element of item) {
+    for (const element of items) {
         try {
             const channel = client.channels.cache.get(element.channelid);
             if (!channel) continue;
-
             const msg = await channel.messages.fetch(element.msgid);
-            await msg.edit({
-                components: [container],
-                flags: MessageFlags.IsComponentsV2
-            });
-        } catch (error) {}
+            await msg.edit({ components: [container], flags: MessageFlags.IsComponentsV2 });
+        } catch (e) {}
     }
 }
 
-module.exports = {
-    CreateMessageTicket,
-    Checkarmensagensticket
-};
+module.exports = { CreateMessageTicket, Checkarmensagensticket };

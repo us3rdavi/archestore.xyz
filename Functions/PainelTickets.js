@@ -1,173 +1,80 @@
 const {
-    ButtonBuilder, ActionRowBuilder,
-    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MediaGalleryBuilder,
-    MessageFlags
+    ButtonBuilder, ActionRowBuilder, StringSelectMenuBuilder,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require("discord.js");
-const { tickets, configuracao } = require("../Database");
-const emojis = require("../Database/emojis.json");
-const Emojis = { get: (name) => emojis[name] || "" };
-
-function getAccentColor() {
-    const cor = configuracao.get('Cores.Principal') || '5865F2';
-    try { return parseInt(cor.replace('#', ''), 16); } catch (e) { return 0x5865F2; }
-}
+const { tickets, Emojis } = require("../Database");
 
 async function painelTicket(interaction, useEditReply = false) {
-    const atualstatus24 = tickets.get("statusmsg") || false;
-
-    if (atualstatus24) {
-        const mensagemConfigurada = tickets.get(`tickets.aparencia.message`) || 'Nenhuma mensagem configurada.';
-        const bannerMensagem = tickets.get(`tickets.aparencia.bannermsg`) || null;
-
-        const container = new ContainerBuilder();
-        container;
-
-        container.addTextDisplayComponents(
-            new TextDisplayBuilder().setContent(mensagemConfigurada)
-        );
-
-        if (bannerMensagem) {
-            try {
-                container.addMediaGalleryComponents(
-                    new MediaGalleryBuilder().addItems({ media: { url: bannerMensagem } })
-                );
-            } catch (e) {}
-        }
-
-        container.addSeparatorComponents(new SeparatorBuilder());
-
-        const row1 = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setCustomId("definiraparencia")
-                .setLabel('Definir aparência')
-                .setEmoji({ id: '1501804122943389716' })
-                .setStyle(2)
-        );
-        const row2 = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setCustomId("addfuncaoticket")
-                .setLabel('Adicionar função')
-                .setEmoji({ id: '1501803905363869769' })
-                .setStyle(2),
-            new ButtonBuilder()
-                .setCustomId("remfuncaoticket")
-                .setLabel('Remover função')
-                .setEmoji({ id: '1501803926180335727' })
-                .setStyle(4),
-            new ButtonBuilder()
-                .setCustomId("definirhorarioatendimento24")
-                .setLabel('Horário de atendimento')
-                .setEmoji({ id: '1501804058699366470' })
-                .setStyle(2)
-        );
-        const row3 = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setCustomId("postarticket")
-                .setLabel('Postar')
-                .setEmoji({ id: '1501803923126747178' })
-                .setStyle(1),
-            new ButtonBuilder()
-                .setCustomId("voltar1")
-                .setLabel('Voltar')
-                .setEmoji({ id: '1501803908589162537' })
-                .setStyle(2)
-        );
-
-        container.addActionRowComponents(row1);
-        container.addActionRowComponents(row2);
-        container.addActionRowComponents(row3);
-
-        const payload = {
-            content: '',
-            embeds: [],
-            components: [container],
-            flags: MessageFlags.IsComponentsV2
-        };
-
-        if (useEditReply) await interaction.editReply(payload);
-        else await interaction.update(payload);
-        return;
-    }
-
-    const canalTickets = tickets.get('tickets.canalTickets');
-    const canalLogs = tickets.get('tickets.canalLogs');
-    const staffRoles = tickets.get('tickets.staffRoles') || [];
-    const contador = tickets.get('tickets.contador') || 0;
-    const botoesAdicionais = tickets.get('tickets.botoesAdicionais') || [];
-    const aparenciaTitle = tickets.get('tickets.aparencia.title');
-    const aparenciaColor = tickets.get('tickets.aparencia.color');
-
-    let accentColor = getAccentColor();
-    if (aparenciaColor) {
-        try { accentColor = parseInt(aparenciaColor.replace('#', ''), 16); } catch (e) {}
-    }
+    const canalTickets  = tickets.get('tickets.canalTickets');
+    const canalLogs     = tickets.get('tickets.canalLogs');
+    const staffRoles    = tickets.get('tickets.staffRoles') || [];
+    const contador      = tickets.get('tickets.contador') || 0;
+    const botoesAdic    = tickets.get('tickets.botoesAdicionais') || [];
+    const funcoes       = tickets.get('tickets.funcoes') || {};
+    const nFuncoes      = Object.keys(funcoes).length;
+    const horarioOn     = tickets.get('statushorario') || false;
+    const abertura      = tickets.get('horarioAbertura');
+    const fechamento    = tickets.get('horarioFechamento');
 
     const container = new ContainerBuilder();
-    container;
 
     container.addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`## ${Emojis.get('_settings_emoji')} Central de Atendimento`)
+        new TextDisplayBuilder().setContent(
+            `## ${Emojis.get('_ticket_emoji')} Central de Atendimento\n` +
+            `-# Gerencie toda a configuração do sistema de tickets.`
+        )
     );
 
     container.addSeparatorComponents(new SeparatorBuilder());
 
-    let info = '';
-    if (aparenciaTitle) info += `${Emojis.get('_messages_emoji')} **Título:** ${aparenciaTitle}\n`;
-    info += `${Emojis.get('_ticket_emoji')} **Canal de Tickets:** ${canalTickets ? `<#${canalTickets}>` : '`Não configurado`'}\n`;
-    info += `${Emojis.get('_messages_emoji')} **Canal de Logs:** ${canalLogs ? `<#${canalLogs}>` : '`Não configurado`'}\n`;
-    info += `${Emojis.get('_staff_emoji')} **Cargos Staff:** ${staffRoles.length > 0 ? staffRoles.map(r => `<@&${r}>`).join(', ') : '`Nenhum configurado`'}\n`;
-    info += `${Emojis.get('information_emoji')} **Total de Tickets:** \`${contador}\`\n`;
-    info += `${Emojis.get('_add_emoji')} **Botões Adicionais:** \`${botoesAdicionais.length}\` botão(ões)`;
+    let status = '';
+    status += `${Emojis.get('_ticket_emoji')} **Canal de Tickets:** ${canalTickets ? `<#${canalTickets}>` : `\`Não configurado\``}\n`;
+    status += `${Emojis.get('_messages_emoji')} **Canal de Logs:** ${canalLogs ? `<#${canalLogs}>` : `\`Não configurado\``}\n`;
+    status += `${Emojis.get('_staff_emoji')} **Cargos Staff:** ${staffRoles.length > 0 ? staffRoles.map(r => `<@&${r}>`).join(', ') : `\`Nenhum configurado\``}\n`;
+    status += `${Emojis.get('_folder_emoji')} **Funções:** \`${nFuncoes}\`${nFuncoes > 0 ? ` — ${Object.keys(funcoes).slice(0, 3).join(', ')}${nFuncoes > 3 ? ` +${nFuncoes - 3}` : ''}` : ''}\n`;
+    status += `${Emojis.get('information_emoji')} **Total de Tickets:** \`${contador}\` · **Botões extras:** \`${botoesAdic.length}\`\n`;
+    status += `${Emojis.get('clock_emoji')} **Horário de Atendimento:** ${horarioOn && abertura && fechamento ? `\`${abertura} – ${fechamento}\`` : `\`Desativado\``}`;
 
-    const funcoes = tickets.get('tickets.funcoes');
-    if (funcoes && Object.keys(funcoes).length > 0) {
-        const funcList = Object.keys(funcoes).slice(0, 5).join(', ');
-        info += `\n${Emojis.get('_folder_emoji')} **Funções:** ${funcList}${Object.keys(funcoes).length > 5 ? ` +${Object.keys(funcoes).length - 5}` : ''}`;
-    }
-
-    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(info));
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(status));
 
     container.addSeparatorComponents(new SeparatorBuilder());
 
     const row1 = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
-            .setCustomId("definiraparencia")
-            .setLabel('Aparência do Painel')
+            .setCustomId('definiraparencia')
+            .setLabel('Aparência')
             .setEmoji({ id: '1501804122943389716' })
             .setStyle(2),
         new ButtonBuilder()
-            .setCustomId("configuracaoticket")
-            .setLabel('Configuração')
+            .setCustomId('configuracaoticket')
+            .setLabel('Configurações')
             .setEmoji({ id: '1501804064596558017' })
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId('definirhorarioatendimento24')
+            .setLabel('Horário')
+            .setEmoji({ id: '1501804058699366470' })
             .setStyle(2)
     );
 
     const row2 = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
-            .setCustomId("addfuncaoticket")
+            .setCustomId('addfuncaoticket')
             .setLabel('Adicionar Função')
             .setEmoji({ id: '1501803905363869769' })
-            .setStyle(2),
+            .setStyle(1),
         new ButtonBuilder()
-            .setCustomId("remfuncaoticket")
+            .setCustomId('remfuncaoticket')
             .setLabel('Remover Função')
             .setEmoji({ id: '1501803926180335727' })
             .setStyle(4),
         new ButtonBuilder()
-            .setCustomId("definirhorarioatendimento24")
-            .setLabel('Horário de Atendimento')
-            .setEmoji({ id: '1501804058699366470' })
-            .setStyle(2)
-    );
-
-    const row3 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId("postarticket")
+            .setCustomId('postarticket')
             .setLabel('Postar Painel')
             .setEmoji({ id: '1501803923126747178' })
             .setStyle(1),
         new ButtonBuilder()
-            .setCustomId("voltar1")
+            .setCustomId('voltar1')
             .setLabel('Voltar')
             .setEmoji({ id: '1501803908589162537' })
             .setStyle(2)
@@ -175,113 +82,113 @@ async function painelTicket(interaction, useEditReply = false) {
 
     container.addActionRowComponents(row1);
     container.addActionRowComponents(row2);
-    container.addActionRowComponents(row3);
 
-    const payload = {
-        content: '',
-        embeds: [],
-        components: [container],
-        flags: MessageFlags.IsComponentsV2
-    };
-
+    const payload = { content: '', embeds: [], components: [container], flags: MessageFlags.IsComponentsV2 };
     if (useEditReply) await interaction.editReply(payload);
     else await interaction.update(payload);
 }
 
 async function painelConfiguracaoTicket(interaction) {
-    const canalTickets = tickets.get('tickets.canalTickets');
-    const canalLogs = tickets.get('tickets.canalLogs');
-    const staffRoles = tickets.get('tickets.staffRoles') || [];
-    const botoesAdicionais = tickets.get('tickets.botoesAdicionais') || [];
-    const mensagemInicial = tickets.get('tickets.mensagemInicial') || {};
-    const mensagemFinal = tickets.get('tickets.mensagemFinalizacao') || {};
+    const canalTickets  = tickets.get('tickets.canalTickets');
+    const canalLogs     = tickets.get('tickets.canalLogs');
+    const staffRoles    = tickets.get('tickets.staffRoles') || [];
+    const botoesAdic    = tickets.get('tickets.botoesAdicionais') || [];
+    const msgInicial    = tickets.get('tickets.mensagemInicial') || {};
+    const msgFinal      = tickets.get('tickets.mensagemFinalizacao') || {};
 
     const container = new ContainerBuilder();
-    container;
 
     container.addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`## ${Emojis.get('_settings_emoji')} Configuração\nGerencie canais, cargos e mensagens do sistema de tickets.`)
+        new TextDisplayBuilder().setContent(
+            `## ${Emojis.get('_settings_emoji')} Configurações de Atendimento\n` +
+            `-# Gerencie canais, cargos e mensagens do sistema de tickets.`
+        )
     );
 
     container.addSeparatorComponents(new SeparatorBuilder());
 
+    const tick = Emojis.get('confirmed_emoji');
+    const warn = Emojis.get('_flag_emoji');
+
     let info = '';
-    info += `${Emojis.get('_ticket_emoji')} **Canal de Tickets:** ${canalTickets ? `<#${canalTickets}>` : '`Não configurado`'}\n`;
-    info += `${Emojis.get('_messages_emoji')} **Canal de Logs:** ${canalLogs ? `<#${canalLogs}>` : '`Não configurado`'}\n`;
-    info += `${Emojis.get('_staff_emoji')} **Cargos Staff:** ${staffRoles.length > 0 ? staffRoles.map(r => `<@&${r}>`).join(', ') : '`Nenhum configurado`'}\n`;
-    info += `${Emojis.get('_add_emoji')} **Botões Adicionais:** \`${botoesAdicionais.length}\` botão(ões)\n`;
-    info += `${Emojis.get('_messages_emoji')} **Msg. Inicial:** ${mensagemInicial.msgTitulo ? `\`${mensagemInicial.msgTitulo}\`` : '`Não configurada`'}\n`;
-    info += `${Emojis.get('_messages_emoji')} **Msg. Finalização:** ${mensagemFinal.titulo ? `\`${mensagemFinal.titulo}\`` : '`Não configurada`'}`;
+    info += `${Emojis.get('_ticket_emoji')} **Canal de Tickets:** ${canalTickets ? `<#${canalTickets}>` : `${warn} \`Não configurado\``}\n`;
+    info += `${Emojis.get('_messages_emoji')} **Canal de Logs:** ${canalLogs ? `<#${canalLogs}>` : `${warn} \`Não configurado\``}\n`;
+    info += `${Emojis.get('_staff_emoji')} **Cargos Staff:** ${staffRoles.length > 0 ? `${tick} ${staffRoles.map(r => `<@&${r}>`).join(', ')}` : `${warn} \`Nenhum configurado\``}\n`;
+    info += `${Emojis.get('_pincel_emoji')} **Msg. Inicial:** ${msgInicial.msgTitulo ? `${tick} \`${msgInicial.msgTitulo}\`` : `${warn} \`Padrão\``}\n`;
+    info += `${Emojis.get('_confirm_emoji')} **Msg. Finalização:** ${msgFinal.titulo ? `${tick} \`${msgFinal.titulo}\`` : `${warn} \`Padrão\``}\n`;
+    info += `${Emojis.get('_add_emoji')} **Botões de Link:** \`${botoesAdic.length}/5\``;
 
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(info));
 
     container.addSeparatorComponents(new SeparatorBuilder());
 
-    const row1 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId("canalticketconfigsystem")
-            .setLabel('Canal de Tickets')
-            .setEmoji({ id: '1501804058699366470' })
-            .setStyle(2),
-        new ButtonBuilder()
-            .setCustomId("canallogsticket2")
-            .setLabel('Canal de Logs')
-            .setEmoji({ id: '1501804039451709441' })
-            .setStyle(2),
-        new ButtonBuilder()
-            .setCustomId("cargosstaff")
-            .setLabel('Cargos Staff')
-            .setEmoji({ id: '1501803902046048297' })
-            .setStyle(2)
+    const select = new StringSelectMenuBuilder()
+        .setCustomId('config_ticket_settings')
+        .setPlaceholder('Selecione o que deseja configurar...')
+        .addOptions([
+            {
+                label: 'Canal de Tickets',
+                value: 'canalticketconfigsystem',
+                description: 'Canal onde os tópicos dos tickets são criados',
+                emoji: { id: '1501804058699366470' }
+            },
+            {
+                label: 'Canal de Logs',
+                value: 'canallogsticket2',
+                description: 'Canal de logs e transcripts dos tickets',
+                emoji: { id: '1501804039451709441' }
+            },
+            {
+                label: 'Cargos Staff',
+                value: 'cargosstaff',
+                description: 'Cargos que podem gerenciar tickets',
+                emoji: { id: '1501803902046048297' }
+            },
+            {
+                label: 'Mensagem Inicial',
+                value: 'configmensageminicial',
+                description: 'Título, descrição, cor e banner do ticket',
+                emoji: { id: '1501804122943389716' }
+            },
+            {
+                label: 'Mensagem de Finalização',
+                value: 'configmensagemfinal',
+                description: 'Mensagem exibida ao encerrar um ticket',
+                emoji: { id: '1501804067616325723' }
+            },
+            {
+                label: 'Adicionar Botão de Link',
+                value: 'adicionarbotaoticket',
+                description: 'Adiciona um botão de link ao ticket (máx. 5)',
+                emoji: { id: '1501803905363869769' }
+            },
+            {
+                label: 'Remover Botão de Link',
+                value: 'removerbotoesticket',
+                description: 'Remove botões de link configurados',
+                emoji: { id: '1501803926180335727' }
+            },
+        ]);
+
+    container.addActionRowComponents(
+        new ActionRowBuilder().addComponents(select)
     );
 
-    const row2 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId("configmensageminicial")
-            .setLabel('Mensagem Inicial')
-            .setEmoji({ id: '1501804122943389716' })
-            .setStyle(2),
-        new ButtonBuilder()
-            .setCustomId("configmensagemfinal")
-            .setLabel('Mensagem de Finalização')
-            .setEmoji({ id: '1501804067616325723' })
-            .setStyle(2)
+    container.addActionRowComponents(
+        new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId('painelconfigticket')
+                .setLabel('Voltar')
+                .setEmoji({ id: '1501803908589162537' })
+                .setStyle(2)
+        )
     );
 
-    const row3 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId("adicionarbotaoticket")
-            .setLabel('Adicionar Botão')
-            .setEmoji({ id: '1501803905363869769' })
-            .setStyle(2),
-        new ButtonBuilder()
-            .setCustomId("removerbotoesticket")
-            .setLabel('Remover Botão')
-            .setEmoji({ id: '1501803926180335727' })
-            .setStyle(4)
-    );
-
-    const row4 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId("painelconfigticket")
-            .setLabel('Voltar')
-            .setEmoji({ id: '1501803908589162537' })
-            .setStyle(2)
-    );
-
-    container.addActionRowComponents(row1);
-    container.addActionRowComponents(row2);
-    container.addActionRowComponents(row3);
-    container.addActionRowComponents(row4);
-
-    const payload = {
-        content: '',
-        embeds: [],
+    await interaction.update({
+        content: '', embeds: [],
         components: [container],
         flags: MessageFlags.IsComponentsV2
-    };
-
-    await interaction.update(payload);
+    });
 }
 
 module.exports = { painelTicket, painelConfiguracaoTicket };
