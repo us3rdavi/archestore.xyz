@@ -4,7 +4,7 @@ const {
 } = require("discord.js");
 const { tickets, Emojis } = require("../Database");
 
-async function painelTicket(interaction, useEditReply = false) {
+async function painelTicket(interaction, useEditReply = false, useReply = false) {
     const canalTickets  = tickets.get('tickets.canalTickets');
     const canalLogs     = tickets.get('tickets.canalLogs');
     const staffRoles    = tickets.get('tickets.staffRoles') || [];
@@ -84,8 +84,9 @@ async function painelTicket(interaction, useEditReply = false) {
     container.addActionRowComponents(row2);
 
     const payload = { content: '', embeds: [], components: [container], flags: MessageFlags.IsComponentsV2 };
-    if (useEditReply) await interaction.editReply(payload);
-    else await interaction.update(payload);
+    if (useReply)     await interaction.reply(payload);
+    else if (useEditReply) await interaction.editReply(payload);
+    else               await interaction.update(payload);
 }
 
 async function painelConfiguracaoTicket(interaction) {

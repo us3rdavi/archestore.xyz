@@ -55,14 +55,13 @@ module.exports = {
 
                 if (sub === 'atendimento_postar') {
                     const funcoes = tickets.get('tickets.funcoes');
-                    const aparencia = tickets.get('tickets.aparencia');
-                    if (!funcoes || Object.keys(funcoes).length === 0 || !aparencia || Object.keys(aparencia).length === 0) {
+                    if (!funcoes || Object.keys(funcoes).length === 0) {
                         const container = new ContainerBuilder();
                         container;
                         container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                             `## ${Emojis.get('_ticket_emoji')} Postar Painel\n` +
-                            `${Emojis.get('negative_emoji')} Configure as funções e aparência do ticket antes de postar.\n\n` +
-                            `-# Acesse **Configurar Tickets** primeiro.`
+                            `${Emojis.get('negative_emoji')} Adicione ao menos uma **Função** antes de postar o painel.\n\n` +
+                            `-# Acesse **Configurar Tickets** → **Adicionar Função** primeiro.`
                         ));
                         container.addSeparatorComponents(new SeparatorBuilder());
                         container.addActionRowComponents(new ActionRowBuilder().addComponents(

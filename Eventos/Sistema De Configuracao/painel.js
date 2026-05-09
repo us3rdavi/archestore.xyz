@@ -171,7 +171,7 @@ module.exports = {
                     }
                 }
 
-                await painelTicket(interaction)
+                await painelTicket(interaction, false, true)
 
                 interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Função adicionada com sucesso!`, ephemeral: true });
                 logAction(client, { action: 'Função de Ticket criada', details: `Nome: \`${NOME}\``, userId: interaction.user.id, guildId: interaction.guildId });
@@ -241,7 +241,7 @@ module.exports = {
                     tickets.delete(`tickets.aparencia.emoji`)
                 }
 
-                await painelTicket(interaction)
+                await painelTicket(interaction, false, true)
                 logAction(client, { action: 'Aparência do Ticket configurada', details: `Título: \`${TITULO || 'nenhum'}\``, userId: interaction.user.id, guildId: interaction.guildId });
 
 
@@ -405,11 +405,9 @@ module.exports = {
 
             if (interaction.customId == `postarticket`) {
                 const ggg = tickets.get(`tickets.funcoes`)
-                const ggg2 = tickets.get(`tickets.aparencia`)
 
-
-                if (ggg == null || Object.keys(ggg).length == 0 || ggg2 == null || Object.keys(ggg2).length == 0) {
-                    return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Adicione uma função antes de postar a mensagem.`, ephemeral: true });
+                if (ggg == null || Object.keys(ggg).length == 0) {
+                    return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Adicione ao menos uma **Função** antes de postar o painel de tickets.`, ephemeral: true });
                 } else {
                     const selectaaa = new Discord.ChannelSelectMenuBuilder()
                         .setCustomId('canalpostarticket')
