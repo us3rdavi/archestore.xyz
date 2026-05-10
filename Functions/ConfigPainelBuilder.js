@@ -6,11 +6,9 @@ const { configuracao, Emojis } = require('../Database');
 
 const MAIN_OPTIONS = [
     { label: 'Atendimento',    value: 'atendimento',    description: 'Sistema de tickets e suporte',          emoji: { id: '1501804043121725490' } },
-    { label: 'Proteção',       value: 'protecao',       description: 'Anti-raid e segurança avançada',        emoji: { id: '1501804019184828507' } },
     { label: 'Automações',     value: 'automacoes',     description: 'Mensagens e repost automáticos',        emoji: { id: '1502541664579879072' } },
     { label: 'Moderação',      value: 'moderacao',      description: 'Ferramentas de moderação',              emoji: { id: '1501804067616325723' } },
     { label: 'Personalização', value: 'personalizacao', description: 'Bot designer e aparência do bot',       emoji: { id: '1501804122943389716' } },
-    { label: 'Permissões',     value: 'permissoes',     description: 'Autorização e controle de acesso',      emoji: { id: '1501804064596558017' } },
     { label: 'Formulários',    value: 'formularios',    description: 'Sistema de formulários personalizados', emoji: { id: '1501804039451709441' } },
     { label: 'Definições',     value: 'definicoes',     description: 'Configurações gerais do sistema',       emoji: { id: '1501804030605922346' } },
 ];
@@ -20,10 +18,6 @@ const SUB_OPTIONS = {
         { label: 'Página Inicial',          value: 'home',               description: 'Voltar ao menu principal',                    emoji: { id: '1501803908589162537' } },
         { label: 'Configurar Tickets',       value: 'atendimento_config', description: 'Configurações do sistema de tickets',         emoji: { id: '1501804043121725490' } },
         { label: 'Postar Painel de Tickets', value: 'atendimento_postar', description: 'Enviar o painel de abertura de tickets',      emoji: { id: '1501803923126747178' } },
-    ],
-    protecao: [
-        { label: 'Página Inicial',      value: 'home',            description: 'Voltar ao menu principal',         emoji: { id: '1501803908589162537' } },
-        { label: 'Proteção do Servidor', value: 'protecao_config', description: 'Anti-raid e filtros de segurança', emoji: { id: '1501804019184828507' } },
     ],
     automacoes: [
         { label: 'Página Inicial',        value: 'home',             description: 'Voltar ao menu principal',        emoji: { id: '1501803908589162537' } },
@@ -39,10 +33,6 @@ const SUB_OPTIONS = {
         { label: 'Meu Bot Designer', value: 'personalizacao_designer', description: 'Aparência e personalização do bot',   emoji: { id: '1501804122943389716' } },
         { label: 'Definições',       value: 'personalizacao_def',      description: 'Configurações gerais e integrações',  emoji: { id: '1501804030605922346' } },
     ],
-    permissoes: [
-        { label: 'Página Inicial',       value: 'home',             description: 'Voltar ao menu principal',       emoji: { id: '1501803908589162537' } },
-        { label: 'Gerenciar Permissões', value: 'permissoes_config', description: 'Adicionar e remover permissões', emoji: { id: '1501804064596558017' } },
-    ],
     formularios: [
         { label: 'Página Inicial',        value: 'home',        description: 'Voltar ao menu principal',                     emoji: { id: '1501803908589162537' } },
         { label: 'Gerenciar Formulários', value: 'form_manage', description: 'Editar formulários existentes (máx. 5 slots)',  emoji: { id: '1501804003850322052' } },
@@ -57,9 +47,9 @@ const SUB_OPTIONS = {
 };
 
 const CATEGORY_LABELS = {
-    atendimento: 'Atendimento', protecao: 'Proteção',
+    atendimento: 'Atendimento',
     automacoes: 'Automações', moderacao: 'Moderação',
-    personalizacao: 'Personalização', permissoes: 'Permissões',
+    personalizacao: 'Personalização',
     formularios: 'Formulários', definicoes: 'Definições',
 };
 
@@ -71,11 +61,9 @@ function getAccentColor() {
 function getCategoryHeader(category) {
     const map = {
         atendimento:    () => `${Emojis.get('_ticket_emoji')} Atendimento`,
-        protecao:       () => `${Emojis.get('system_emoji')} Proteção`,
-        automacoes:     () => `<:console:1502541664579879072> Automações`,
+        automacoes:     () => `${Emojis.get('_settings_emoji')} Automações`,
         moderacao:      () => `${Emojis.get('_ban_emoji')} Moderação`,
         personalizacao: () => `${Emojis.get('_pincel_emoji')} Personalização`,
-        permissoes:     () => `${Emojis.get('permissions_emoji')} Permissões`,
         formularios:    () => `${Emojis.get('_messages_emoji')} Formulários`,
         definicoes:     () => `${Emojis.get('_settings_emoji')} Definições`,
     };

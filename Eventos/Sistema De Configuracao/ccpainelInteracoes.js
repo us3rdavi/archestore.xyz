@@ -232,7 +232,10 @@ async function buildCupons(busca = null) {
 }
 
 async function buildTopClientes(opts = {}) {
-    const res      = await getTopCustomers({ from: opts.from, to: opts.to });
+    const today = new Date().toISOString().slice(0, 10);
+    const from  = opts.from || '2020-01-01';
+    const to    = opts.to   || today;
+    const res      = await getTopCustomers({ from, to });
     const clientes = res.data || [];
 
     let text;
@@ -242,7 +245,7 @@ async function buildTopClientes(opts = {}) {
         const linhas = clientes.map((c, i) =>
             `**${i + 1}.** **${c.username}** — \`${c.spent}\` — \`${c.purchases}\` compra(s)`
         );
-        const periodo = opts.from && opts.to ? `${opts.from} até ${opts.to}` : 'todos os tempos';
+        const periodo = opts.from && opts.to ? `${opts.from} até ${opts.to}` : `${from} até ${to}`;
         text = `-# ${periodo}\n\n${linhas.join('\n')}`;
     }
 

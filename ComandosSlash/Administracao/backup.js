@@ -37,18 +37,19 @@ module.exports = {
 };
 
 async function BackupFunction(client, interaction) {
-    const hasBackup = BackupStorage &&
-        typeof BackupStorage.fetchAll === "function" &&
-        Object.keys(BackupStorage.fetchAll() || {}).length > 0;
+    const guildId = interaction.guild?.id;
+    const backupArr = (BackupStorage && typeof BackupStorage.fetchAll === 'function')
+        ? (BackupStorage.fetchAll() || [])
+        : [];
+    const guildEntry = backupArr.find(b => b.id === guildId);
+    const guildBackups = Array.isArray(guildEntry?.data) ? guildEntry.data : [];
+    const hasBackup = guildBackups.length > 0;
 
     let backupInfoText = '';
     if (hasBackup) {
-        const backups = BackupStorage.fetchAll();
-        const keys = Object.keys(backups);
-        backupInfoText = `${Emojis.get('confirmed_emoji')} **${keys.length}** backup(s) salvo(s) na nuvem.\n`;
-        const latest = backups[keys[0]];
-        if (latest?.data?.[0]) {
-            const b = latest.data[0];
+        backupInfoText = `${Emojis.get('confirmed_emoji')} **${guildBackups.length}** backup(s) salvo(s) na nuvem.\n`;
+        const b = guildBackups[0];
+        if (b?.name) {
             backupInfoText +=
                 `> ${Emojis.get('ecloud_emoji')} **${b.name}**\n` +
                 `-# Canais: \`${b.channels?.length ?? 0}\` · Cargos: \`${b.roles?.length ?? 0}\` · Emojis: \`${b.emojis?.length ?? 0}\``;

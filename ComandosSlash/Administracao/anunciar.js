@@ -1,4 +1,4 @@
-const { ApplicationCommandType, PermissionFlagsBits } = require('discord.js');
+const { ApplicationCommandType, PermissionFlagsBits, MessageFlags } = require('discord.js');
 const { buildMainMenu } = require('../../Functions/AnunciarBuilder');
 const { hasPermission } = require('../../Functions/PermissionsCache');
 const { Emojis } = require('../../Database');
@@ -17,6 +17,10 @@ module.exports = {
             });
         }
 
-        await interaction.reply({ ...buildMainMenu(interaction.user.id), ephemeral: true });
+        const menu = buildMainMenu(interaction.user.id);
+        await interaction.reply({
+            ...menu,
+            flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
+        });
     },
 };

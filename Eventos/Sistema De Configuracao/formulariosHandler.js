@@ -185,64 +185,24 @@ function buildFormPanelPayload(guildId, slotId) {
     ));
     c.addSeparatorComponents(new SeparatorBuilder());
 
-    // Linha 1 — canais, staff, botão
+    // Select menu de configurações
     c.addActionRowComponents(new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId(`form_btn_canais_${guildId}_${slotId}`)
-            .setLabel('Configurar Canais')
-            .setEmoji({ id: '1501803997583904810' })
-            .setStyle(ButtonStyle.Primary),
-        new ButtonBuilder()
-            .setCustomId(`form_btn_cargos_${guildId}_${slotId}`)
-            .setLabel('Staff Responsável')
-            .setEmoji({ id: '1501803902046048297' })
-            .setStyle(ButtonStyle.Primary),
-        new ButtonBuilder()
-            .setCustomId(`form_btn_botao_${guildId}_${slotId}`)
-            .setLabel('Configurar Botão')
-            .setEmoji({ id: '1501804003850322052' })
-            .setStyle(ButtonStyle.Primary),
+        new StringSelectMenuBuilder()
+            .setCustomId(`form_config_select_${guildId}_${slotId}`)
+            .setPlaceholder('Selecione uma opção para configurar...')
+            .addOptions([
+                { label: 'Configurar Canais',    value: 'canais',       description: 'Canal do formulário e canal de logs',          emoji: { id: '1501803997583904810' } },
+                { label: 'Staff Responsável',    value: 'cargos',       description: 'Cargos com acesso às respostas',               emoji: { id: '1501803902046048297' } },
+                { label: 'Configurar Botão',     value: 'botao',        description: 'Texto e emoji do botão de início',             emoji: { id: '1501804003850322052' } },
+                { label: 'Perguntas',            value: 'perguntas',    description: 'Adicionar e remover perguntas',                emoji: { id: '1502520447340777482' } },
+                { label: 'Cargo ao Aprovar',     value: 'cargoaprovado', description: 'Cargo concedido ao aprovar candidato',        emoji: { id: '1501804064596558017' } },
+                { label: 'Tempo por Pergunta',   value: 'timelimit',    description: 'Segundos disponíveis para cada pergunta',      emoji: { id: '1501804058699366470' } },
+                { label: 'Limitar Envios',       value: 'limite',       description: 'Quantidade máxima de envios por usuário',      emoji: { id: '1501804061719007232' } },
+                { label: 'Aparência',            value: 'embeds',       description: 'Título, descrição e imagem do formulário',     emoji: { id: '1501804122943389716' } },
+                { label: 'Renomear',             value: 'nome',         description: 'Alterar o nome interno do formulário',         emoji: { id: '1501804003850322052' } },
+            ])
     ));
 
-    // Linha 2 — perguntas, cargo aprovado, tempo
-    c.addActionRowComponents(new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId(`form_btn_perguntas_${guildId}_${slotId}`)
-            .setLabel('Perguntas')
-            .setEmoji({ id: '1502520447340777482' })
-            .setStyle(ButtonStyle.Secondary),
-        new ButtonBuilder()
-            .setCustomId(`form_btn_cargoaprovado_${guildId}_${slotId}`)
-            .setLabel('Cargo ao Aprovar')
-            .setEmoji({ id: '1501804064596558017' })
-            .setStyle(ButtonStyle.Secondary),
-        new ButtonBuilder()
-            .setCustomId(`form_btn_timelimit_${guildId}_${slotId}`)
-            .setLabel(`Tempo: ${timeLimit}s`)
-            .setEmoji({ id: '1501804058699366470' })
-            .setStyle(ButtonStyle.Secondary),
-    ));
-
-    // Linha 3 — limite, aparência, nome
-    c.addActionRowComponents(new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId(`form_btn_limite_${guildId}_${slotId}`)
-            .setLabel('Limitar Envios')
-            .setEmoji({ id: '1501804061719007232' })
-            .setStyle(ButtonStyle.Secondary),
-        new ButtonBuilder()
-            .setCustomId(`form_btn_embeds_${guildId}_${slotId}`)
-            .setLabel('Aparência')
-            .setEmoji({ id: '1501804122943389716' })
-            .setStyle(ButtonStyle.Secondary),
-        new ButtonBuilder()
-            .setCustomId(`form_btn_nome_${guildId}_${slotId}`)
-            .setLabel('Renomear')
-            .setEmoji({ id: '1501804003850322052' })
-            .setStyle(ButtonStyle.Secondary),
-    ));
-
-    // Linha 4 — postar
     c.addActionRowComponents(new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId(`form_btn_postar_${guildId}_${slotId}`)
@@ -251,7 +211,6 @@ function buildFormPanelPayload(guildId, slotId) {
             .setStyle(ButtonStyle.Success),
     ));
 
-    // Linha 5 — voltar, deletar
     c.addActionRowComponents(new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId(`form_btn_voltar_${guildId}_${slotId}`)
@@ -476,6 +435,131 @@ module.exports = {
                 const gid   = parts[parts.length - 2];
                 await interaction.deferUpdate();
                 await interaction.editReply(buildFormPanelPayload(gid, sid));
+                return;
+            }
+
+            // ── StringSelect: form_config_select (painel do formulário) ──
+            if (interaction.isStringSelectMenu() && customId.startsWith('form_config_select_')) {
+                const parts   = customId.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const action  = interaction.values[0];
+
+                // Ações que abrem modais — NÃO defere antes
+                const modalActions = {
+                    botao: async () => {
+                        const form = (formularios.get(guildId) || {})[slotId] || {};
+                        const modal = new ModalBuilder()
+                            .setCustomId(`form_modal_botao_${guildId}_${slotId}`)
+                            .setTitle('Configurar Botão');
+                        modal.addComponents(
+                            new ActionRowBuilder().addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('button_label')
+                                    .setLabel('Texto do Botão')
+                                    .setValue(form.button_label || 'Iniciar Aplicação')
+                                    .setStyle(TextInputStyle.Short)
+                                    .setMaxLength(80)
+                                    .setRequired(true)
+                            ),
+                            new ActionRowBuilder().addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('button_emoji')
+                                    .setLabel('ID do Emoji do bot (deixe vazio p/ nenhum)')
+                                    .setValue(form.button_emoji || '')
+                                    .setStyle(TextInputStyle.Short)
+                                    .setRequired(false)
+                            )
+                        );
+                        await interaction.showModal(modal);
+                    },
+                    limite: async () => {
+                        const form = (formularios.get(guildId) || {})[slotId] || {};
+                        const modal = new ModalBuilder()
+                            .setCustomId(`form_modal_limite_${guildId}_${slotId}`)
+                            .setTitle('Limitar Envios por Usuário');
+                        modal.addComponents(
+                            new ActionRowBuilder().addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('limit')
+                                    .setLabel('Limite (0 = ilimitado)')
+                                    .setValue(form.limit_per_user ? String(form.limit_per_user) : '0')
+                                    .setStyle(TextInputStyle.Short)
+                                    .setRequired(true)
+                                    .setPlaceholder('Ex: 1 para permitir somente um envio')
+                            )
+                        );
+                        await interaction.showModal(modal);
+                    },
+                    timelimit: async () => {
+                        const form = (formularios.get(guildId) || {})[slotId] || {};
+                        const modal = new ModalBuilder()
+                            .setCustomId(`form_modal_timelimit_${guildId}_${slotId}`)
+                            .setTitle('Tempo Limite por Pergunta');
+                        modal.addComponents(
+                            new ActionRowBuilder().addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('timelimit')
+                                    .setLabel('Segundos por Pergunta (30 — 600)')
+                                    .setValue(String((formularios.get(guildId) || {})[slotId]?.time_limit || 120))
+                                    .setStyle(TextInputStyle.Short)
+                                    .setRequired(true)
+                                    .setPlaceholder('Ex: 120')
+                            )
+                        );
+                        await interaction.showModal(modal);
+                    },
+                    nome: async () => {
+                        const form = (formularios.get(guildId) || {})[slotId] || {};
+                        const modal = new ModalBuilder()
+                            .setCustomId(`form_modal_nome_${guildId}_${slotId}`)
+                            .setTitle('Renomear Formulário');
+                        modal.addComponents(
+                            new ActionRowBuilder().addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('nome')
+                                    .setLabel('Nome do Formulário')
+                                    .setValue(form.name || '')
+                                    .setStyle(TextInputStyle.Short)
+                                    .setMaxLength(80)
+                                    .setRequired(true)
+                            )
+                        );
+                        await interaction.showModal(modal);
+                    },
+                };
+
+                if (modalActions[action]) {
+                    await modalActions[action]();
+                    return;
+                }
+
+                // Ações de navegação — defere e abre painel
+                await interaction.deferUpdate();
+
+                if (action === 'canais') {
+                    await interaction.editReply(buildChannelConfigPayload(guildId, slotId));
+                } else if (action === 'cargos') {
+                    await interaction.editReply(buildStaffConfigPayload(guildId, slotId));
+                } else if (action === 'perguntas') {
+                    await interaction.editReply(buildQuestionsPanelPayload(guildId, slotId));
+                } else if (action === 'cargoaprovado') {
+                    await interaction.editReply(buildAprovadoConfigPayload(guildId, slotId));
+                } else if (action === 'embeds') {
+                    const form = (formularios.get(guildId) || {})[slotId] || {};
+                    const emb  = form.embed || {};
+                    formEmbedSessions.set(interaction.user.id, {
+                        guildId, slotId,
+                        formName: form.name || `Formulário ${slotId}`,
+                        data: {
+                            title:       emb.title       || null,
+                            description: emb.description || null,
+                            image:       emb.image       || null,
+                            footer:      emb.footer      || null,
+                        }
+                    });
+                    await interaction.editReply(buildFormEmbedMainMenu(interaction.user.id, guildId, slotId));
+                }
                 return;
             }
 

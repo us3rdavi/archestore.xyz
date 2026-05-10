@@ -6,6 +6,8 @@ const {
     ContainerBuilder,
     TextDisplayBuilder,
     SeparatorBuilder,
+    UserSelectMenuBuilder,
+    ChannelType,
     MessageFlags
 } = require("discord.js");
 const { configuracao, tickets } = require("../../Database");
@@ -33,9 +35,162 @@ module.exports = {
     name: 'interactionCreate',
 
     run: async (interaction, client) => {
-        if (!interaction.isButton()) return;
-        if (!TICKET_BUTTON_IDS.includes(interaction.customId)) return;
+        const isBtn    = interaction.isButton();
+        const isSelect = interaction.isStringSelectMenu();
+        const isUserSel = interaction.isUserSelectMenu();
 
+        if (!isBtn && !isSelect && !isUserSel) return;
+
+        if (isBtn && !TICKET_BUTTON_IDS.includes(interaction.customId)) return;
+        if (isSelect && interaction.customId !== 'ticket_staff_action') return;
+        if (isUserSel && !interaction.customId.startsWith('ticket_staff_user_')) return;
+
+        // ── UserSelectMenu handlers (transferir / addmembro / remmembro) ─────
+        if (isUserSel && interaction.customId.startsWith('ticket_staff_user_')) {
+            const parts    = interaction.customId.split('_');
+            const action   = parts[4]; // transferir | addmembro | remmembro
+            const threadId = parts[5];
+
+            const ticketData = findTicketByThreadId(threadId || interaction.channel.id);
+
+            if (action === 'transferir') {
+                const novoStaffId = interaction.values[0];
+                if (!ticketData) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Ticket inválido.`, ephemeral: true });
+                tickets.set(`tickets.abertos.${ticketData.userId}.staffMemberId`, novoStaffId);
+                tickets.set(`tickets.abertos.${ticketData.userId}.assumidoPor`, `<@${novoStaffId}>`);
+                await interaction.reply({ content: `${Emojis.get('confirmed_emoji')} Ticket transferido para <@${novoStaffId}>!`, ephemeral: true });
+                const thread = interaction.guild.channels.cache.get(threadId);
+                if (thread) await thread.send({ content: `${Emojis.get('_transfer_emoji')} O ticket foi transferido para <@${novoStaffId}>.` }).catch(() => {});
+                return;
+            }
+
+            if (action === 'addmembro') {
+                const memberId = interaction.values[0];
+                const thread = interaction.guild.channels.cache.get(threadId);
+                if (!thread) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Canal do ticket não encontrado.`, ephemeral: true });
+                try {
+                    await thread.members.add(memberId);
+                    await interaction.reply({ content: `${Emojis.get('confirmed_emoji')} <@${memberId}> foi adicionado ao ticket!`, ephemeral: true });
+                } catch (e) {
+                    await interaction.reply({ content: `${Emojis.get('negative_emoji')} Não foi possível adicionar o membro.`, ephemeral: true });
+                }
+                return;
+            }
+
+            if (action === 'remmembro') {
+                const memberId = interaction.values[0];
+                const thread = interaction.guild.channels.cache.get(threadId);
+                if (!thread) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Canal do ticket não encontrado.`, ephemeral: true });
+                try {
+                    await thread.members.remove(memberId);
+                    await interaction.reply({ content: `${Emojis.get('confirmed_emoji')} <@${memberId}> foi removido do ticket.`, ephemeral: true });
+                } catch (e) {
+                    await interaction.reply({ content: `${Emojis.get('negative_emoji')} Não foi possível remover o membro.`, ephemeral: true });
+                }
+                return;
+            }
+            return;
+        }
+
+        // ── StringSelectMenu: ticket_staff_action ────────────────────────────
+        if (isSelect && interaction.customId === 'ticket_staff_action') {
+            if (!isStaff(interaction.member)) {
+                return interaction.reply({
+                    content: `${Emojis.get('negative_emoji')} Você não tem permissão para usar o painel staff.`,
+                    ephemeral: true
+                });
+            }
+
+            const ticketData = findTicketByThreadId(interaction.channel.id);
+            if (!ticketData) {
+                return interaction.reply({
+                    content: `${Emojis.get('negative_emoji')} Este canal não é um ticket válido.`,
+                    ephemeral: true
+                });
+            }
+
+            const action   = interaction.values[0];
+            const threadId = interaction.channel.id;
+
+            if (action === 'notificar') {
+                try {
+                    const usuario = await client.users.fetch(ticketData.userId);
+                    await usuario.send({
+                        content: `${Emojis.get('_notify_emoji')} Olá, **${ticketData.username}**! Um membro da nossa equipe notificou você sobre o seu ticket **#${ticketData.numero}** no servidor **${interaction.guild.name}**. Por favor, acesse o ticket para continuar.`
+                    });
+                    await interaction.reply({ content: `${Emojis.get('confirmed_emoji')} Usuário <@${ticketData.userId}> foi notificado via DM!`, ephemeral: true });
+                } catch (e) {
+                    await interaction.reply({ content: `${Emojis.get('negative_emoji')} Não foi possível enviar DM para o usuário (DMs fechadas).`, ephemeral: true });
+                }
+                return;
+            }
+
+            if (action === 'transferir') {
+                const row = new ActionRowBuilder().addComponents(
+                    new UserSelectMenuBuilder()
+                        .setCustomId(`ticket_staff_user_transferir_${threadId}`)
+                        .setPlaceholder('Selecione o membro da equipe para transferir...')
+                        .setMinValues(1)
+                        .setMaxValues(1)
+                );
+                await interaction.reply({ content: `${Emojis.get('_transfer_emoji')} Selecione o membro para receber o ticket:`, components: [row], ephemeral: true });
+                return;
+            }
+
+            if (action === 'addmembro') {
+                const row = new ActionRowBuilder().addComponents(
+                    new UserSelectMenuBuilder()
+                        .setCustomId(`ticket_staff_user_addmembro_${threadId}`)
+                        .setPlaceholder('Selecione o membro para adicionar...')
+                        .setMinValues(1)
+                        .setMaxValues(1)
+                );
+                await interaction.reply({ content: `${Emojis.get('_add_emoji') || '➕'} Selecione o membro para adicionar ao ticket:`, components: [row], ephemeral: true });
+                return;
+            }
+
+            if (action === 'remmembro') {
+                const row = new ActionRowBuilder().addComponents(
+                    new UserSelectMenuBuilder()
+                        .setCustomId(`ticket_staff_user_remmembro_${threadId}`)
+                        .setPlaceholder('Selecione o membro para remover...')
+                        .setMinValues(1)
+                        .setMaxValues(1)
+                );
+                await interaction.reply({ content: `${Emojis.get('negative_emoji')} Selecione o membro para remover do ticket:`, components: [row], ephemeral: true });
+                return;
+            }
+
+            if (action === 'criarcall') {
+                try {
+                    const category = interaction.channel.parent?.parentId
+                        ? interaction.guild.channels.cache.get(interaction.channel.parent.parentId)
+                        : interaction.channel.parent || null;
+
+                    const voiceChannel = await interaction.guild.channels.create({
+                        name: `ticket-${ticketData.numero}`,
+                        type: ChannelType.GuildVoice,
+                        parent: category?.id || null,
+                        reason: `Call do Ticket #${ticketData.numero}`,
+                    });
+
+                    await interaction.reply({
+                        content: `${Emojis.get('confirmed_emoji')} Call criada: ${voiceChannel}`,
+                        ephemeral: true
+                    });
+                    await interaction.channel.send({
+                        content: `${Emojis.get('information_emoji')} Uma call foi criada para este ticket: ${voiceChannel}`
+                    });
+                } catch (e) {
+                    console.error('[Ticket] Erro ao criar call:', e.message);
+                    await interaction.reply({ content: `${Emojis.get('negative_emoji')} Não foi possível criar o canal de voz.`, ephemeral: true });
+                }
+                return;
+            }
+            return;
+        }
+
+        // ── Button handlers ──────────────────────────────────────────────────
         const ticketData = findTicketByThreadId(interaction.channel.id);
 
         if (interaction.customId === 'ticket_assumir') {
@@ -147,7 +302,6 @@ module.exports = {
             await interaction.deferUpdate();
 
             const confirmContainer = new ContainerBuilder();
-            confirmContainer;
             confirmContainer.addTextDisplayComponents(
                 new TextDisplayBuilder().setContent(`## ${Emojis.get('confirmed_emoji')} Ticket Encerrado\nEste ticket foi marcado como **resolvido**. Obrigado pelo contato!`)
             );
@@ -225,7 +379,6 @@ module.exports = {
             await interaction.deferUpdate();
 
             const reabertoContainer = new ContainerBuilder();
-            reabertoContainer;
             reabertoContainer.addTextDisplayComponents(
                 new TextDisplayBuilder().setContent(`## ${Emojis.get('warn_emoji')} Ticket Reaberto\nO usuário ainda precisa de ajuda. Um membro da equipe entrará em contato em breve.`)
             );

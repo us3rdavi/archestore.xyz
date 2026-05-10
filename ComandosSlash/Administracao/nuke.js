@@ -39,12 +39,10 @@ module.exports = {
     }
 
     try {
-      // Responder imediatamente para evitar o erro de "Unknown interaction"
-      await interaction.reply({ content: `Nukando o canal...`, ephemeral: true });
+      await interaction.reply({ content: `${Emojis.get('loading_emoji')} Nukando ${channelOption}...`, ephemeral: true });
 
       const newChannel = await channelOption.clone();
 
-      // Atualiza a configuração se necessário
       if (configuracao.get(`AutomaticSettings.SistemaNukar.canais`)?.includes(channelOption.id)) {
         let canais = configuracao.get(`AutomaticSettings.SistemaNukar.canais`);
         let index = canais.indexOf(channelOption.id);
@@ -52,18 +50,21 @@ module.exports = {
         configuracao.set(`AutomaticSettings.SistemaNukar.canais`, canais);
       }
 
-      // Verifica se o canal ainda existe antes de deletar
       const channelToDelete = interaction.guild.channels.cache.get(channelOption.id);
       if (channelToDelete) {
         await channelToDelete.delete();
       }
 
-      await newChannel.send({ content: `Nuked by \`${interaction.user.username}\`` });
+      await newChannel.send({
+        content:
+          `${Emojis.get('_ban_emoji')} **Canal nukado** por ${interaction.user}\n` +
+          `-# Todas as mensagens foram apagadas e o canal foi recriado.`
+      });
 
     } catch (error) {
       console.error(error);
       try {
-        await interaction.followUp({ content: 'Ocorreu um erro ao processar o comando.', ephemeral: true });
+        await interaction.followUp({ content: `${Emojis.get('negative_emoji')} Ocorreu um erro ao processar o comando.`, ephemeral: true });
       } catch (err) {
         console.error("Erro ao enviar followUp:", err);
       }

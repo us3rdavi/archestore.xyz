@@ -98,12 +98,6 @@ module.exports = {
                     return;
                 }
 
-                if (sub === 'protecao_config') {
-                    const { Avançados } = require('../../Functions/Avancados.js');
-                    await Avançados(interaction, client);
-                    return;
-                }
-
                 if (sub === 'automacoes_msgs') {
                     const { AcoesMsgsAutomatics } = require('../../Functions/ConfigMsgsAutomatics.js');
                     await AcoesMsgsAutomatics(interaction, client);
@@ -156,13 +150,6 @@ module.exports = {
                 if (sub === 'personalizacao_def') {
                     const { Gerenciar } = require('../../Functions/Gerenciar.js');
                     await Gerenciar(interaction, client);
-                    return;
-                }
-
-                if (sub === 'permissoes_config') {
-                    await interaction.deferUpdate();
-                    const { gerenciarPerms } = require('../../Functions/modUsersPerms.js');
-                    await gerenciarPerms(interaction, client);
                     return;
                 }
 

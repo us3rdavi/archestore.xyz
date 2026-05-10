@@ -6,6 +6,7 @@ const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
+    StringSelectMenuBuilder,
     MessageFlags
 } = require("discord.js");
 const { tickets } = require("../Database");
@@ -174,7 +175,10 @@ function buildStaffPanelContainer(ticketData) {
     const container = new ContainerBuilder();
 
     container.addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`## ${Emojis.get('_tool_emoji')} Painel Staff`)
+        new TextDisplayBuilder().setContent(
+            `## ${Emojis.get('_tool_emoji')} Painel Staff\n` +
+            `-# Ações disponíveis para gerenciar este ticket`
+        )
     );
 
     container.addSeparatorComponents(new SeparatorBuilder());
@@ -196,16 +200,41 @@ function buildStaffPanelContainer(ticketData) {
 
     container.addActionRowComponents(
         new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setCustomId('ticket_notificar')
-                .setLabel('Notificar Usuário')
-                .setEmoji({ id: '1501804036540862464' })
-                .setStyle(ButtonStyle.Primary),
-            new ButtonBuilder()
-                .setCustomId('ticket_finalizar')
-                .setLabel('Finalizar Ticket')
-                .setEmoji({ id: '1501804123924729946' })
-                .setStyle(ButtonStyle.Success)
+            new StringSelectMenuBuilder()
+                .setCustomId('ticket_staff_action')
+                .setPlaceholder('Selecione uma ação...')
+                .addOptions([
+                    {
+                        label: 'Notificar Usuário',
+                        value: 'notificar',
+                        description: 'Enviar notificação por DM ao usuário do ticket',
+                        emoji: { id: '1501804036540862464' },
+                    },
+                    {
+                        label: 'Transferir Ticket',
+                        value: 'transferir',
+                        description: 'Transferir o ticket para outro membro da equipe',
+                        emoji: { id: '1501803997583904810' },
+                    },
+                    {
+                        label: 'Adicionar Membro',
+                        value: 'addmembro',
+                        description: 'Adicionar um membro ao ticket',
+                        emoji: { id: '1501803923126747178' },
+                    },
+                    {
+                        label: 'Remover Membro',
+                        value: 'remmembro',
+                        description: 'Remover um membro do ticket',
+                        emoji: { id: '1501803926180335727' },
+                    },
+                    {
+                        label: 'Criar Call',
+                        value: 'criarcall',
+                        description: 'Criar um canal de voz temporário para este ticket',
+                        emoji: { id: '1501804043121725490' },
+                    },
+                ])
         )
     );
 
