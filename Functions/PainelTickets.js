@@ -69,6 +69,11 @@ async function painelTicket(interaction, useEditReply = false, useReply = false)
             .setEmoji({ id: '1501803926180335727' })
             .setStyle(4),
         new ButtonBuilder()
+            .setCustomId('editaremojiticket')
+            .setLabel('Emojis das Funções')
+            .setEmoji({ id: '1501804043121725490' })
+            .setStyle(2),
+        new ButtonBuilder()
             .setCustomId('postarticket')
             .setLabel('Postar Painel')
             .setEmoji({ id: '1501803923126747178' })

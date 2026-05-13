@@ -4,7 +4,7 @@ module.exports = {
 
     run: (client) => {
 
-        client.setMaxListeners(30);
+        client.setMaxListeners(60);
 
         fs.readdirSync('./Eventos/').forEach(local => {
             const eventFiles = fs.readdirSync(`./Eventos/${local}`).filter(arquivo => arquivo.endsWith('.js'))
