@@ -10,27 +10,38 @@ const {
 const { tickets, estatisticas } = require("../Database");
 const emojis = require("../Database/emojis.json");
 const { buildTicketContainer } = require("./TicketHelpers");
-const fs = require('fs');
 const moment = require('moment-timezone');
 
 const Emojis = { get: (name) => emojis[name] || "" };
 
 async function CreateTicket(interaction, valor) {
+    const isSelectMenu = interaction.isStringSelectMenu();
+
+    // Helpers para responder corretamente tanto para botão quanto select menu
+    const replyEphemeral = async (opts) => {
+        if (isSelectMenu) {
+            if (!interaction.deferred && !interaction.replied) {
+                await interaction.deferUpdate().catch(() => {});
+            }
+            return interaction.followUp({ ...opts, ephemeral: true });
+        }
+        return interaction.reply({ ...opts, ephemeral: true });
+    };
+
     const statusHorario = tickets.get("statushorario");
     const horarioAbertura = tickets.get("horarioAbertura") || `Não configurado`;
     const horarioFechamento = tickets.get("horarioFechamento") || `Contacte o owner para configurar`;
     const tempoatualtimebr24 = moment().tz("America/Sao_Paulo").format("HH:mm");
 
     if (statusHorario && (tempoatualtimebr24 < horarioAbertura || tempoatualtimebr24 > horarioFechamento)) {
-        return interaction.reply({
-            content: `${Emojis.get('negative_emoji')} Tickets só podem ser abertos entre \`${horarioAbertura}\` e \`${horarioFechamento}\` (horário de Brasília).`,
-            ephemeral: true
+        return replyEphemeral({
+            content: `${Emojis.get('negative_emoji')} Tickets só podem ser abertos entre \`${horarioAbertura}\` e \`${horarioFechamento}\` (horário de Brasília).`
         });
     }
 
     const ticketFunction = tickets.get(`tickets.funcoes.${valor}`);
     if (!ticketFunction || Object.keys(ticketFunction).length === 0) {
-        return interaction.reply({ content: `${Emojis.get('negative_emoji')} Essa função não existe!`, ephemeral: true });
+        return replyEphemeral({ content: `${Emojis.get('negative_emoji')} Essa função não existe!` });
     }
 
     const ticketsAbertos = tickets.get('tickets.abertos') || {};
@@ -42,17 +53,27 @@ async function CreateTicket(interaction, valor) {
                 .setLabel('Ir para o Ticket')
                 .setStyle(ButtonStyle.Link)
         );
-        return interaction.reply({
+        return replyEphemeral({
             content: `${Emojis.get('negative_emoji')} Você já possui um ticket aberto.`,
-            components: [row],
-            ephemeral: true
+            components: [row]
         });
     }
 
-    await interaction.reply({
-        content: `${Emojis.get('loading_emoji')} Aguarde, estamos criando seu ticket!`,
-        ephemeral: true
-    });
+    // Deferimento inicial: select menu usa deferUpdate (mantém painel com opção selecionada visível)
+    // botão usa reply ephemeral de loading
+    const nomeSelecionado = ticketFunction.nome || valor;
+    if (isSelectMenu) {
+        await interaction.deferUpdate().catch(() => {});
+        await interaction.followUp({
+            content: `${Emojis.get('loading_emoji')} Você selecionou **${nomeSelecionado}** — aguarde, estamos criando seu ticket!`,
+            ephemeral: true
+        });
+    } else {
+        await interaction.reply({
+            content: `${Emojis.get('loading_emoji')} Aguarde, estamos criando seu ticket!`,
+            ephemeral: true
+        });
+    }
 
     const canalTicketsId = tickets.get('tickets.canalTickets');
     let ticketChannel = canalTicketsId ? interaction.guild.channels.cache.get(canalTicketsId) : null;
@@ -66,6 +87,16 @@ async function CreateTicket(interaction, valor) {
 
     const username = (interaction.user.globalName || interaction.user.username).slice(0, 30);
     const threadName = `${valor} #${contador} • ${username}`.slice(0, 100);
+
+    const editLoading = async (opts) => {
+        try {
+            if (isSelectMenu) {
+                await interaction.editReply({ content: opts.content, components: opts.components || [], ephemeral: true }).catch(() => {});
+            } else {
+                await interaction.editReply(opts);
+            }
+        } catch (e) {}
+    };
 
     try {
         const thread = await ticketChannel.threads.create({
@@ -113,8 +144,9 @@ async function CreateTicket(interaction, valor) {
                 .setLabel('Ir para o Ticket')
                 .setStyle(ButtonStyle.Link)
         );
-        await interaction.editReply({
-            content: `${Emojis.get('confirmed_emoji')} Ticket criado com sucesso!`,
+
+        await editLoading({
+            content: `${Emojis.get('confirmed_emoji')} Ticket criado com sucesso! Categoria: **${nomeSelecionado}**`,
             components: [row]
         });
 
@@ -236,7 +268,7 @@ async function CreateTicket(interaction, valor) {
     } catch (error) {
         console.error('[Ticket] Erro ao criar ticket:', error);
         tickets.set('tickets.contador', contador - 1);
-        await interaction.editReply({
+        await editLoading({
             content: `${Emojis.get('negative_emoji')} Ocorreu um erro ao criar o ticket. Verifique se o canal de tickets está configurado corretamente.`
         });
     }

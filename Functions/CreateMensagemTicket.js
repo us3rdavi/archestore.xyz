@@ -4,7 +4,7 @@ const {
     SeparatorBuilder,
     MediaGalleryBuilder,
     ActionRowBuilder,
-    ButtonBuilder,
+    StringSelectMenuBuilder,
     MessageFlags
 } = require("discord.js");
 const { tickets } = require("../Database");
@@ -38,25 +38,41 @@ function buildTicketComponents(funcoes, aparencia) {
     container.addSeparatorComponents(new SeparatorBuilder());
 
     const funcList = Object.entries(funcoes);
-    funcList.forEach(([key, funcao]) => {
-        container.addTextDisplayComponents(
-            new TextDisplayBuilder().setContent(
-                `**${funcao.predescricao || funcao.nome}**\n-# Clique em **${funcao.nome}** para abrir um ticket.`
-            )
+
+    if (funcList.length > 0) {
+        const options = funcList.map(([key, funcao]) => {
+            const option = {
+                label: funcao.nome.slice(0, 100),
+                value: key,
+                description: (funcao.predescricao || `Clique para abrir um ticket de ${funcao.nome}`).slice(0, 100),
+            };
+            if (funcao.emoji) {
+                try {
+                    const emojiStr = String(funcao.emoji).trim();
+                    if (/^\d+$/.test(emojiStr)) {
+                        option.emoji = { id: emojiStr };
+                    } else if (/^<a?:\w+:\d+>$/.test(emojiStr)) {
+                        const match = emojiStr.match(/<a?:(\w+):(\d+)>/);
+                        if (match) option.emoji = { name: match[1], id: match[2] };
+                    } else {
+                        option.emoji = { name: emojiStr };
+                    }
+                } catch (e) {}
+            }
+            return option;
+        });
+
+        const selectMenu = new StringSelectMenuBuilder()
+            .setCustomId('abrirticket')
+            .setPlaceholder('🎫 Selecione uma categoria de suporte...')
+            .addOptions(options.slice(0, 25));
+
+        container.addActionRowComponents(
+            new ActionRowBuilder().addComponents(selectMenu)
         );
+    }
 
-        const btn = new ButtonBuilder()
-            .setCustomId(`AbrirTicket_${key}`)
-            .setLabel(funcao.nome)
-            .setStyle(1);
-
-        if (funcao.emoji) {
-            try { btn.setEmoji(funcao.emoji); } catch (e) {}
-        }
-
-        container.addActionRowComponents(new ActionRowBuilder().addComponents(btn));
-        container.addSeparatorComponents(new SeparatorBuilder());
-    });
+    container.addSeparatorComponents(new SeparatorBuilder());
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
@@ -107,4 +123,4 @@ async function Checkarmensagensticket(client) {
     }
 }
 
-module.exports = { CreateMessageTicket, Checkarmensagensticket };
+module.exports = { CreateMessageTicket, Checkarmensagensticket, buildTicketComponents };

@@ -341,13 +341,16 @@ module.exports = {
                     .setTimestamp();
 
                 try {
-                    const transcriptModule = require('discord-html-transcripts');
-                    const attachment = await transcriptModule.createTranscript(interaction.channel, {
-                        limit: -1,
-                        returnType: 'attachment',
-                        filename: `transcript-ticket-${ticketData.numero}.html`,
-                        poweredBy: false,
-                        saveImages: false,
+                    const { generateTranscript } = require('../../Functions/TranscriptHTML');
+                    const { AttachmentBuilder } = require('discord.js');
+                    const htmlContent = await generateTranscript(interaction.channel, {
+                        ...ticketData,
+                        userId: ticketData.userId
+                    });
+                    const buffer = Buffer.from(htmlContent, 'utf-8');
+                    const attachment = new AttachmentBuilder(buffer, {
+                        name: `transcript-ticket-${ticketData.numero}.html`,
+                        description: `Transcript do Ticket #${ticketData.numero}`
                     });
                     await logChannel.send({ embeds: [logEmbed], files: [attachment] });
                 } catch (err) {
