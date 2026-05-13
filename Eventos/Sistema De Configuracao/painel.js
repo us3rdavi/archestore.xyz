@@ -23,6 +23,37 @@ const { owner } = require("../../config.json");
 const discordTranscripts = require('discord-html-transcripts');
 const { StringSelectMenuOptionBuilder } = require("discord.js");
 const { Emojis } = require("../../Database");
+
+// Helper: opções de emojis do bot para seletores visuais (apenas emojis de upload, nunca unicode)
+function buildBotEmojiOptions() {
+    return [
+        { label: 'Sem emoji', value: 'sem_emoji', description: 'Remove o emoji do título' },
+        { label: 'Ticket', value: '1501804043121725490', description: 'Ícone de ticket', emoji: { id: '1501804043121725490' } },
+        { label: 'Suporte', value: '1501803899085131867', description: 'Ícone de suporte', emoji: { id: '1501803899085131867' } },
+        { label: 'Staff', value: '1501803902046048297', description: 'Ícone de staff/atendente', emoji: { id: '1501803902046048297' } },
+        { label: 'Informação', value: '1501803944375222392', description: 'Ícone de informação', emoji: { id: '1501803944375222392' } },
+        { label: 'Confirmado', value: '1501803932484108359', description: 'Ícone de confirmação', emoji: { id: '1501803932484108359' } },
+        { label: 'Aviso', value: '1501803941112053861', description: 'Ícone de aviso', emoji: { id: '1501803941112053861' } },
+        { label: 'Estrela', value: '1501804049563910285', description: 'Ícone de estrela/destaque', emoji: { id: '1501804049563910285' } },
+        { label: 'Diamante', value: '1501804052827209768', description: 'Ícone de diamante/premium', emoji: { id: '1501804052827209768' } },
+        { label: 'Configurações', value: '1501804030605922346', description: 'Ícone de configurações', emoji: { id: '1501804030605922346' } },
+        { label: 'Ferramenta', value: '1501804000994132080', description: 'Ícone de ferramenta', emoji: { id: '1501804000994132080' } },
+        { label: 'Pasta', value: '1501804010049634426', description: 'Ícone de pasta/categoria', emoji: { id: '1501804010049634426' } },
+        { label: 'Mensagens', value: '1501804039451709441', description: 'Ícone de mensagens/chat', emoji: { id: '1501804039451709441' } },
+        { label: 'Pincel', value: '1501804122943389716', description: 'Ícone de design/aparência', emoji: { id: '1501804122943389716' } },
+        { label: 'Adicionar', value: '1501803905363869769', description: 'Ícone de adicionar/plus', emoji: { id: '1501803905363869769' } },
+        { label: 'Enviar', value: '1501803923126747178', description: 'Ícone de envio', emoji: { id: '1501803923126747178' } },
+        { label: 'Notificar', value: '1501804036540862464', description: 'Ícone de notificação/sino', emoji: { id: '1501804036540862464' } },
+        { label: 'Fantasma', value: '1501804033608777859', description: 'Ícone fantasma', emoji: { id: '1501804033608777859' } },
+        { label: 'Pessoas', value: '1501803896073621706', description: 'Ícone de grupo/comunidade', emoji: { id: '1501803896073621706' } },
+        { label: 'Loja', value: '1501803947898306724', description: 'Ícone de loja/store', emoji: { id: '1501803947898306724' } },
+        { label: 'Marca', value: '1501804076189351949', description: 'Ícone de marca/branding', emoji: { id: '1501804076189351949' } },
+        { label: 'Lápis', value: '1501804003850322052', description: 'Ícone de edição/lápis', emoji: { id: '1501804003850322052' } },
+        { label: 'Relógio', value: '1501804058699366470', description: 'Ícone de horário/tempo', emoji: { id: '1501804058699366470' } },
+        { label: 'Pergunta', value: '1502520447340777482', description: 'Ícone de dúvida/pergunta', emoji: { id: '1502520447340777482' } },
+        { label: 'Sistema', value: '1501804019184828507', description: 'Ícone de sistema', emoji: { id: '1501804019184828507' } },
+    ];
+}
 const { logAction } = require('../../Functions/AuditLog.js');
 
 
@@ -123,7 +154,6 @@ module.exports = {
                 let PREDESC = interaction.fields.getTextInputValue('tokenMP2');
                 let DESC = interaction.fields.getTextInputValue('tokenMP3');
                 let BANNER = interaction.fields.getTextInputValue('tokenMP5');
-                let EMOJI = interaction.fields.getTextInputValue('tokenMP6');
 
                 NOME = NOME.replace('.', '');
                 PREDESC = PREDESC.replace('.', '');
@@ -156,29 +186,25 @@ module.exports = {
                     const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
                     if (!urlRegex.test(BANNER)) {
                         tickets.set(`tickets.funcoes.${NOME}.banner`, BANNER)
-                        return interaction.reply({ message: dd, content: `${Emojis.get(`negative_emoji`)} Você escolheu incorretamente a URL do banner!`, ephemeral: true });
+                        return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Você escolheu incorretamente a URL do banner!`, ephemeral: true });
                     } else {
                         tickets.set(`tickets.funcoes.${NOME}.banner`, BANNER)
                     }
                 }
 
-                if (EMOJI !== '') {
-                    const emojiRegex = /^<:.+:\d+>$|^<a:.+:\d+>$|^\p{Emoji}$/u;
-                    if (!emojiRegex.test(EMOJI)) {
-                        return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Você escolheu incorretamente o emoji!`, ephemeral: true });
-                    } else {
-                        tickets.set(`tickets.funcoes.${NOME}.emoji`, EMOJI)
-                    }
-                }
+                // Mostrar seletor de emoji do bot para a função
+                const emojiSelectFuncao = new Discord.StringSelectMenuBuilder()
+                    .setCustomId(`ticket_emoji_funcao_${NOME}`)
+                    .setPlaceholder('Selecione um emoji para a função...')
+                    .addOptions(buildBotEmojiOptions());
 
-                await painelTicket(interaction, false, true)
+                await interaction.reply({
+                    content: `${Emojis.get('confirmed_emoji')} Função **${NOME}** adicionada! Agora selecione um emoji para ela:`,
+                    components: [new ActionRowBuilder().addComponents(emojiSelectFuncao)],
+                    ephemeral: true
+                });
 
-                interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Função adicionada com sucesso!`, ephemeral: true });
                 logAction(client, { action: 'Função de Ticket criada', details: `Nome: \`${NOME}\``, userId: interaction.user.id, guildId: interaction.guildId });
-
-
-
-
             }
 
             if (interaction.customId == '0-89du0awd8awdaw8daw') {
@@ -187,7 +213,6 @@ module.exports = {
                 let DESC = interaction.fields.getTextInputValue('tokenMP2');
                 let BANNER = interaction.fields.getTextInputValue('tokenMP3');
                 let COREMBED = interaction.fields.getTextInputValue('tokenMP5');
-                let EMOJI = interaction.fields.getTextInputValue('tokenMP6');
 
                 if (TITULO.length > 256) {
                     return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} O título não pode ter mais de 256 caracteres!`, ephemeral: true });
@@ -199,20 +224,16 @@ module.exports = {
                 if (COREMBED !== '') {
                     const hexColorRegex = /^#?([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/;
                     if (!hexColorRegex.test(COREMBED)) {
-
                         return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Código Hex Color \`${COREMBED}\` inváldo, tente pegar [nesse site.](https://www.google.com/search?q=color+picker&oq=color+picker) `, ephemeral: true });
                     } else {
                         tickets.set(`tickets.aparencia.color`, COREMBED)
                     }
                 }
 
-
-
                 if (BANNER !== '') {
                     const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
                     if (!urlRegex.test(BANNER)) {
-
-                        return interaction.reply({ message: dd, content: `${Emojis.get(`negative_emoji`)} Você escolheu incorretamente a URL do banner!`, ephemeral: true });
+                        return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Você escolheu incorretamente a URL do banner!`, ephemeral: true });
                     } else {
                         tickets.set(`tickets.aparencia.banner`, BANNER)
                     }
@@ -230,21 +251,19 @@ module.exports = {
                     tickets.delete(`tickets.aparencia.description`)
                 }
 
-                if (EMOJI !== '') {
-                    const emojiRegex = /^(\p{Emoji_Presentation}|\p{Extended_Pictographic}|<a?:\w+:\d+>)$/u;
-                    if (!emojiRegex.test(EMOJI.trim())) {
-                        return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Emoji inválido! Use um emoji padrão (ex: 🎧) ou um emoji personalizado (ex: <:nome:123456789>).`, ephemeral: true });
-                    } else {
-                        tickets.set(`tickets.aparencia.emoji`, EMOJI.trim())
-                    }
-                } else {
-                    tickets.delete(`tickets.aparencia.emoji`)
-                }
-
-                await painelTicket(interaction, false, true)
                 logAction(client, { action: 'Aparência do Ticket configurada', details: `Título: \`${TITULO || 'nenhum'}\``, userId: interaction.user.id, guildId: interaction.guildId });
 
+                // Mostrar seletor de emoji do bot para o painel
+                const emojiSelectPainel = new Discord.StringSelectMenuBuilder()
+                    .setCustomId('ticket_emoji_painel')
+                    .setPlaceholder('Selecione um emoji para o título do painel...')
+                    .addOptions(buildBotEmojiOptions());
 
+                await interaction.reply({
+                    content: `${Emojis.get('confirmed_emoji')} Aparência atualizada! Agora selecione um emoji para o título do painel:`,
+                    components: [new ActionRowBuilder().addComponents(emojiSelectPainel)],
+                    ephemeral: true
+                });
             }
 
 
@@ -267,6 +286,35 @@ module.exports = {
         }
 
         if (interaction.isStringSelectMenu()) {
+
+            // ── Seletor de emoji do painel (aparência) ───────────────────────
+            if (interaction.customId === 'ticket_emoji_painel') {
+                const valor = interaction.values[0];
+                if (valor === 'sem_emoji') {
+                    tickets.delete('tickets.aparencia.emoji');
+                    await interaction.update({ content: `${Emojis.get('confirmed_emoji')} Emoji removido do painel com sucesso!`, components: [] });
+                } else {
+                    const emojiStr = `<:e:${valor}>`;
+                    tickets.set('tickets.aparencia.emoji', emojiStr);
+                    await interaction.update({ content: `${Emojis.get('confirmed_emoji')} Emoji <:e:${valor}> definido no painel com sucesso!`, components: [] });
+                }
+                return;
+            }
+
+            // ── Seletor de emoji de função de ticket ─────────────────────────
+            if (interaction.customId.startsWith('ticket_emoji_funcao_')) {
+                const nomeFuncao = interaction.customId.replace('ticket_emoji_funcao_', '');
+                const valor = interaction.values[0];
+                if (valor === 'sem_emoji') {
+                    tickets.delete(`tickets.funcoes.${nomeFuncao}.emoji`);
+                    await interaction.update({ content: `${Emojis.get('confirmed_emoji')} Emoji removido da função **${nomeFuncao}** com sucesso!`, components: [] });
+                } else {
+                    const emojiStr = `<:e:${valor}>`;
+                    tickets.set(`tickets.funcoes.${nomeFuncao}.emoji`, emojiStr);
+                    await interaction.update({ content: `${Emojis.get('confirmed_emoji')} Emoji <:e:${valor}> definido na função **${nomeFuncao}** com sucesso!`, components: [] });
+                }
+                return;
+            }
 
             if (interaction.customId == 'asdihadbhawhdwhdaw') {
 
@@ -1055,21 +1103,12 @@ module.exports = {
                     .setStyle(TextInputStyle.Short)
                     .setRequired(false)
 
-                const newnameboteN6 = new TextInputBuilder()
-                    .setCustomId('tokenMP6')
-                    .setLabel(`EMOJI DA FUNÇÃO`)
-                    .setPlaceholder(`Insira um nome ou id de um emoji do servidor.`)
-                    .setStyle(TextInputStyle.Short)
-                    .setRequired(false)
-
                 const firstActionRow3 = new ActionRowBuilder().addComponents(newnameboteN);
                 const firstActionRow4 = new ActionRowBuilder().addComponents(newnameboteN2);
                 const firstActionRow5 = new ActionRowBuilder().addComponents(newnameboteN4);
                 const firstActionRow6 = new ActionRowBuilder().addComponents(newnameboteN5);
-                const firstActionRow7 = new ActionRowBuilder().addComponents(newnameboteN6);
 
-
-                modalaAA.addComponents(firstActionRow3, firstActionRow4, firstActionRow5, firstActionRow6, firstActionRow7);
+                modalaAA.addComponents(firstActionRow3, firstActionRow4, firstActionRow5, firstActionRow6);
                 await interaction.showModal(modalaAA);
 
             }
@@ -1120,21 +1159,12 @@ module.exports = {
                     .setValue(dd?.color == undefined ? '' : dd.color)
                     .setRequired(false)
 
-                const newnameboteN6 = new TextInputBuilder()
-                    .setCustomId('tokenMP6')
-                    .setLabel(`EMOJI DO TÍTULO (OPCIONAL)`)
-                    .setPlaceholder(`Ex: 🎧 ou <:nome:123456789> ou <a:nome:123456789>`)
-                    .setStyle(TextInputStyle.Short)
-                    .setValue(dd?.emoji == undefined ? '' : dd.emoji)
-                    .setRequired(false)
-
                 const firstActionRow3 = new ActionRowBuilder().addComponents(newnameboteN);
                 const firstActionRow4 = new ActionRowBuilder().addComponents(newnameboteN2);
                 const firstActionRow5 = new ActionRowBuilder().addComponents(newnameboteN4);
                 const firstActionRow6 = new ActionRowBuilder().addComponents(newnameboteN5);
-                const firstActionRow7 = new ActionRowBuilder().addComponents(newnameboteN6);
 
-                modalaAA.addComponents(firstActionRow3, firstActionRow4, firstActionRow5, firstActionRow6, firstActionRow7);
+                modalaAA.addComponents(firstActionRow3, firstActionRow4, firstActionRow5, firstActionRow6);
                 await interaction.showModal(modalaAA);
 
 

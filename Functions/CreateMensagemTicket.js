@@ -14,7 +14,7 @@ const Emojis = { get: (name) => emojis[name] || "" };
 function buildTicketComponents(funcoes, aparencia) {
     const container = new ContainerBuilder();
 
-    const tituloEmoji = aparencia.emoji ? `${aparencia.emoji} ` : `${Emojis.get('_ticket_emoji')} `;
+    const tituloEmoji = aparencia.emoji ? `${aparencia.emoji} ` : '';
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
             `## ${tituloEmoji}${aparencia.title || 'Central de Suporte'}`
@@ -49,14 +49,15 @@ function buildTicketComponents(funcoes, aparencia) {
             if (funcao.emoji) {
                 try {
                     const emojiStr = String(funcao.emoji).trim();
-                    if (/^\d+$/.test(emojiStr)) {
+                    // Apenas emojis customizados: <:nome:id> ou <a:nome:id>
+                    const match = emojiStr.match(/^<(a?):(\w+):(\d+)>$/);
+                    if (match) {
+                        option.emoji = { name: match[2], id: match[3], animated: match[1] === 'a' };
+                    } else if (/^\d{17,20}$/.test(emojiStr)) {
+                        // Só o ID numérico
                         option.emoji = { id: emojiStr };
-                    } else if (/^<a?:\w+:\d+>$/.test(emojiStr)) {
-                        const match = emojiStr.match(/<a?:(\w+):(\d+)>/);
-                        if (match) option.emoji = { name: match[1], id: match[2] };
-                    } else {
-                        option.emoji = { name: emojiStr };
                     }
+                    // Unicode emojis são ignorados — o bot usa apenas emojis de upload
                 } catch (e) {}
             }
             return option;
@@ -64,7 +65,7 @@ function buildTicketComponents(funcoes, aparencia) {
 
         const selectMenu = new StringSelectMenuBuilder()
             .setCustomId('abrirticket')
-            .setPlaceholder('🎫 Selecione uma categoria de suporte...')
+            .setPlaceholder('Selecione uma categoria de suporte...')
             .addOptions(options.slice(0, 25));
 
         container.addActionRowComponents(
