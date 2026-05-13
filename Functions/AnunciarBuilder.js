@@ -1,7 +1,6 @@
 const {
     ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder,
-    ButtonStyle, EmbedBuilder,
-    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
+    ButtonStyle, EmbedBuilder, MessageFlags
 } = require('discord.js');
 const { dbembed, Emojis } = require('../Database');
 
@@ -59,31 +58,21 @@ function buildDiscordEmbed(data) {
     return embed;
 }
 
-function buildPreviewText(data) {
-    const hasData = Object.keys(data).some(k => k !== 'content');
-    if (!hasData && !data.content) {
-        return `-# Configure as propriedades abaixo para construir a embed.`;
+// Embed de preview ao vivo — sempre retorna um EmbedBuilder real
+function buildLivePreviewEmbed(data) {
+    const hasData = data && Object.keys(data).some(k => k !== 'content');
+    if (!hasData) {
+        return new EmbedBuilder()
+            .setDescription(
+                '> Configure as propriedades usando o seletor abaixo.\n' +
+                '> A embed será atualizada **em tempo real** aqui — exatamente como ficará ao enviar.'
+            )
+            .setColor('#2B2D31');
     }
-    const ok = Emojis.get('confirmed_emoji') || '✅';
-    const no = Emojis.get('negative_emoji')  || '❌';
-    const lines = [];
-    if (data.title)       lines.push(`**Título:** \`${data.title.slice(0, 60)}\``);
-    if (data.description) lines.push(`**Descrição:** \`${data.description.slice(0, 80)}${data.description.length > 80 ? '...' : ''}\``);
-    if (data.color)       lines.push(`**Cor:** \`${data.color}\``);
-    if (data.author)      lines.push(`**Autor:** \`${data.author.slice(0, 60)}\``);
-    if (data.url)         lines.push(`**URL:** \`${data.url.slice(0, 60)}\``);
-    if (data.thumbnail)   lines.push(`**Thumbnail:** ${ok} Definida`);
-    if (data.image)       lines.push(`**Imagem:** ${ok} Definida`);
-    if (data.footer)      lines.push(`**Footer:** \`${data.footer.slice(0, 60)}\``);
-    if (data.timestamp)   lines.push(`**Timestamp:** \`${new Date(data.timestamp).toLocaleString('pt-BR')}\``);
-    if (data.fields && data.fields.length > 0) lines.push(`**Campos:** \`${data.fields.length}\` campo(s) definido(s)`);
-    if (data.content)     lines.push(`**Conteúdo:** \`${data.content.slice(0, 80)}${data.content.length > 80 ? '...' : ''}\``);
-    return lines.length ? lines.join('\n') : `-# Configure as propriedades abaixo para construir a embed.`;
+    return buildDiscordEmbed(data) || new EmbedBuilder().setDescription('Embed configurada.').setColor('#5865F2');
 }
 
-const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
-
-function buildNavSelect(userId, currentSection) {
+function buildNavSelectRow(userId, currentSection) {
     const options = NAV_OPTIONS.map(opt => ({ ...opt, default: opt.value === currentSection }));
     return new ActionRowBuilder().addComponents(
         new StringSelectMenuBuilder()
@@ -95,56 +84,40 @@ function buildNavSelect(userId, currentSection) {
 
 function buildMainMenu(userId) {
     const data = getEmbedData(userId);
-    const previewText = buildPreviewText(data);
-
-    const container = new ContainerBuilder();
-    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('_send_emoji') || '📢'} Construtor de Anúncios\n` +
-        `-# Pré-visualização das propriedades configuradas`
-    ));
-    container.addSeparatorComponents(new SeparatorBuilder());
-    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(previewText));
-    container.addSeparatorComponents(new SeparatorBuilder());
-    container.addActionRowComponents(buildNavSelect(userId, 'main'));
-    container.addActionRowComponents(new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId(`anunciar_post_${userId}`)
-            .setLabel('Enviar Embed')
-            .setEmoji({ id: '1501803923126747178' })
-            .setStyle(ButtonStyle.Success),
-        new ButtonBuilder()
-            .setCustomId(`anunciar_content_${userId}`)
-            .setLabel('Conteúdo')
-            .setEmoji({ id: '1501804039451709441' })
-            .setStyle(ButtonStyle.Secondary),
-        new ButtonBuilder()
-            .setCustomId(`anunciar_reset_${userId}`)
-            .setLabel('Resetar')
-            .setEmoji({ id: '1501803926180335727' })
-            .setStyle(ButtonStyle.Danger),
-    ));
-
-    return { components: [container], ...CV2 };
+    return {
+        content: `-# ${Emojis.get('_send_emoji')} Construtor de Anúncios — preview ao vivo abaixo`,
+        embeds: [buildLivePreviewEmbed(data)],
+        components: [
+            buildNavSelectRow(userId, 'main'),
+            new ActionRowBuilder().addComponents(
+                new ButtonBuilder()
+                    .setCustomId(`anunciar_post_${userId}`)
+                    .setLabel('Enviar Embed')
+                    .setEmoji({ id: '1501803923126747178' })
+                    .setStyle(ButtonStyle.Success),
+                new ButtonBuilder()
+                    .setCustomId(`anunciar_content_${userId}`)
+                    .setLabel('Conteúdo')
+                    .setEmoji({ id: '1501804039451709441' })
+                    .setStyle(ButtonStyle.Secondary),
+                new ButtonBuilder()
+                    .setCustomId(`anunciar_reset_${userId}`)
+                    .setLabel('Resetar')
+                    .setEmoji({ id: '1501803926180335727' })
+                    .setStyle(ButtonStyle.Danger),
+            ),
+        ],
+    };
 }
 
 function buildSectionScreen(userId, section) {
     const data = getEmbedData(userId);
-    const previewText = buildPreviewText(data);
     const sectionLabel = SECTION_LABELS[section] || section;
 
-    const container = new ContainerBuilder();
-    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('_lapis_emoji') || '✏️'} Editando — ${sectionLabel}\n` +
-        `-# Pré-visualização atual das propriedades`
-    ));
-    container.addSeparatorComponents(new SeparatorBuilder());
-    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(previewText));
-    container.addSeparatorComponents(new SeparatorBuilder());
-    container.addActionRowComponents(buildNavSelect(userId, section));
+    const components = [buildNavSelectRow(userId, section)];
 
-    let actionRow;
     if (section === 'fields') {
-        actionRow = new ActionRowBuilder().addComponents(
+        components.push(new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId(`anunciar_addfield_${userId}`)
                 .setLabel('Adicionar Campo')
@@ -155,9 +128,9 @@ function buildSectionScreen(userId, section) {
                 .setLabel('Limpar Campos')
                 .setEmoji({ id: '1501803926180335727' })
                 .setStyle(ButtonStyle.Danger),
-        );
+        ));
     } else if (section === 'timestamp') {
-        actionRow = new ActionRowBuilder().addComponents(
+        components.push(new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId(`anunciar_setnow_${userId}`)
                 .setLabel('Agora')
@@ -173,9 +146,9 @@ function buildSectionScreen(userId, section) {
                 .setLabel('Remover')
                 .setEmoji({ id: '1501803935453679616' })
                 .setStyle(ButtonStyle.Secondary),
-        );
+        ));
     } else {
-        actionRow = new ActionRowBuilder().addComponents(
+        components.push(new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId(`anunciar_set_${section}_${userId}`)
                 .setLabel(`Definir ${sectionLabel}`)
@@ -186,11 +159,14 @@ function buildSectionScreen(userId, section) {
                 .setLabel('Remover')
                 .setEmoji({ id: '1501803935453679616' })
                 .setStyle(ButtonStyle.Secondary),
-        );
+        ));
     }
 
-    container.addActionRowComponents(actionRow);
-    return { components: [container], ...CV2 };
+    return {
+        content: `-# ${Emojis.get('_lapis_emoji')} Editando **${sectionLabel}** — preview ao vivo abaixo`,
+        embeds: [buildLivePreviewEmbed(data)],
+        components,
+    };
 }
 
 module.exports = {
