@@ -36,12 +36,22 @@ function clearEmbedData(userId) {
     dbembed.delete(`builder.${userId}`);
 }
 
+// Constrói o EmbedBuilder real a partir dos dados — usado para envio E para live preview
 function buildDiscordEmbed(data) {
     if (!data || Object.keys(data).filter(k => k !== 'content').length === 0) return null;
     const embed = new EmbedBuilder();
     if (data.title) embed.setTitle(data.title);
     if (data.description) embed.setDescription(data.description);
-    try { embed.setColor(data.color || '#5865F2'); } catch (e) { embed.setColor('#5865F2'); }
+
+    // Cor: '__none__' = sem barra de cor; undefined/null = blurple padrão; valor = cor definida
+    if (data.color === '__none__') {
+        // não chama setColor — embed fica sem barra lateral colorida
+    } else if (data.color) {
+        try { embed.setColor(data.color); } catch (e) { embed.setColor('#5865F2'); }
+    } else {
+        embed.setColor('#5865F2');
+    }
+
     if (data.url) { try { embed.setURL(data.url); } catch (e) {} }
     if (data.thumbnail) { try { embed.setThumbnail(data.thumbnail); } catch (e) {} }
     if (data.image) { try { embed.setImage(data.image); } catch (e) {} }
@@ -147,6 +157,25 @@ function buildSectionScreen(userId, section) {
                 .setEmoji({ id: '1501803935453679616' })
                 .setStyle(ButtonStyle.Secondary),
         ));
+    } else if (section === 'color') {
+        // Cor tem 3 opções: definir, sem barra de cor, remover
+        components.push(new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId(`anunciar_set_color_${userId}`)
+                .setLabel('Definir Cor')
+                .setEmoji({ id: '1501804122943389716' })
+                .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
+                .setCustomId(`anunciar_nocolor_${userId}`)
+                .setLabel('Sem Barra de Cor')
+                .setEmoji({ id: '1501803935453679616' })
+                .setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder()
+                .setCustomId(`anunciar_remove_color_${userId}`)
+                .setLabel('Restaurar Padrão')
+                .setEmoji({ id: '1501803920576745522' })
+                .setStyle(ButtonStyle.Secondary),
+        ));
     } else {
         components.push(new ActionRowBuilder().addComponents(
             new ButtonBuilder()
@@ -162,8 +191,15 @@ function buildSectionScreen(userId, section) {
         ));
     }
 
+    const colorInfo = section === 'color' && data.color === '__none__'
+        ? `-# Modo atual: **Sem barra de cor**`
+        : null;
+
     return {
-        content: `-# ${Emojis.get('_lapis_emoji')} Editando **${sectionLabel}** — preview ao vivo abaixo`,
+        content: [
+            `-# ${Emojis.get('_lapis_emoji')} Editando **${sectionLabel}** — preview ao vivo abaixo`,
+            colorInfo,
+        ].filter(Boolean).join('\n'),
         embeds: [buildLivePreviewEmbed(data)],
         components,
     };

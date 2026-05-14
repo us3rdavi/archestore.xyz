@@ -118,6 +118,14 @@ module.exports = {
                 return;
             }
 
+            if (customId === `anunciar_nocolor_${userId}`) {
+                const data = getEmbedData(userId);
+                data.color = '__none__';
+                setEmbedData(userId, data);
+                await interaction.update(buildSectionScreen(userId, 'color'));
+                return;
+            }
+
             if (customId === `anunciar_content_${userId}`) {
                 const data = getEmbedData(userId);
                 const modal = new ModalBuilder()

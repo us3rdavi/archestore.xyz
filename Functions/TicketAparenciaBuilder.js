@@ -1,7 +1,7 @@
 const {
     ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder,
-    ButtonStyle, EmbedBuilder, MessageFlags,
-    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder
+    ButtonStyle, MessageFlags,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MediaGalleryBuilder
 } = require('discord.js');
 const { tickets, Emojis } = require('../Database');
 
@@ -46,27 +46,40 @@ const BOT_EMOJI_OPTIONS = [
     { label: 'Sistema',       value: '1501804019184828507', description: 'Ícone de sistema',      emoji: { id: '1501804019184828507' } },
 ];
 
-// Constrói o embed real do painel de tickets a partir dos dados salvos — preview ao vivo
-function buildTicketLiveEmbed() {
-    const data = tickets.get('tickets.aparencia') || {};
-    const hasData = Object.keys(data).length > 0;
+const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+
+// Preview visual do embed dentro de CV2 usando heading + MediaGallery para o banner
+function buildPreviewContainer(data) {
+    const c = new ContainerBuilder();
+    const titleParts = [data.emoji, data.title].filter(Boolean);
+    const titleStr = titleParts.join(' ');
+    const hasData = titleStr || data.description || data.color || data.banner;
 
     if (!hasData) {
-        return new EmbedBuilder()
-            .setDescription(
-                '> Configure a aparência usando os controles abaixo.\n' +
-                '> O embed será atualizado **em tempo real** aqui — exatamente como ficará ao postar o painel.'
-            )
-            .setColor('#2B2D31');
+        c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+            `-# Configure as propriedades abaixo para ver o preview aqui.`
+        ));
+        return c;
     }
 
-    const embed = new EmbedBuilder();
-    const titleParts = [data.emoji, data.title].filter(Boolean);
-    if (titleParts.length) embed.setTitle(titleParts.join(' '));
-    if (data.description) embed.setDescription(data.description);
-    try { embed.setColor(data.color || '#5865F2'); } catch (e) { embed.setColor('#5865F2'); }
-    if (data.banner) { try { embed.setImage(data.banner); } catch (e) {} }
-    return embed;
+    const lines = [];
+    if (titleStr) lines.push(`## ${titleStr}`);
+    if (data.description) lines.push(data.description);
+    if (data.color) lines.push(`-# Cor da barra: \`${data.color}\``);
+
+    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        lines.join('\n') || `-# Configure as propriedades abaixo.`
+    ));
+
+    if (data.banner) {
+        try {
+            c.addMediaGalleryComponents(
+                new MediaGalleryBuilder().addItems({ media: { url: data.banner } })
+            );
+        } catch (e) {}
+    }
+
+    return c;
 }
 
 function buildNavSelectRow(userId, currentSection) {
@@ -80,35 +93,49 @@ function buildNavSelectRow(userId, currentSection) {
 }
 
 function buildAparenciaMain(userId) {
-    return {
-        content: `-# ${Emojis.get('_pincel_emoji')} Aparência do Painel de Tickets — preview ao vivo abaixo`,
-        embeds: [buildTicketLiveEmbed()],
-        components: [
-            buildNavSelectRow(userId, 'main'),
-            new ActionRowBuilder().addComponents(
-                new ButtonBuilder()
-                    .setCustomId('painelconfigticket')
-                    .setLabel('Voltar ao Painel')
-                    .setEmoji({ id: '1501803908589162537' })
-                    .setStyle(ButtonStyle.Secondary),
-            ),
-        ],
-    };
+    const data = tickets.get('tickets.aparencia') || {};
+    const previewContainer = buildPreviewContainer(data);
+
+    const controlContainer = new ContainerBuilder();
+    controlContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('_pincel_emoji')} Aparência do Painel de Tickets\n` +
+        `-# Preview ao vivo acima — atualize as propriedades usando o menu abaixo`
+    ));
+    controlContainer.addSeparatorComponents(new SeparatorBuilder());
+    controlContainer.addActionRowComponents(buildNavSelectRow(userId, 'main'));
+    controlContainer.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId('painelconfigticket')
+            .setLabel('Voltar ao Painel')
+            .setEmoji({ id: '1501803908589162537' })
+            .setStyle(ButtonStyle.Secondary),
+    ));
+
+    return { components: [previewContainer, controlContainer], ...CV2 };
 }
 
 function buildAparenciaSection(userId, section) {
+    const data = tickets.get('tickets.aparencia') || {};
     const sectionLabel = SECTION_LABELS[section] || section;
-    const components = [buildNavSelectRow(userId, section)];
+    const previewContainer = buildPreviewContainer(data);
+
+    const controlContainer = new ContainerBuilder();
+    controlContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('_lapis_emoji')} Editando — ${sectionLabel}\n` +
+        `-# Preview ao vivo acima — atualize as propriedades usando os controles abaixo`
+    ));
+    controlContainer.addSeparatorComponents(new SeparatorBuilder());
+    controlContainer.addActionRowComponents(buildNavSelectRow(userId, section));
 
     if (section === 'emoji') {
-        components.push(new ActionRowBuilder().addComponents(
+        controlContainer.addActionRowComponents(new ActionRowBuilder().addComponents(
             new StringSelectMenuBuilder()
                 .setCustomId(`taparel_emoji_pick_${userId}`)
                 .setPlaceholder('Escolha um emoji para o título do painel...')
                 .addOptions(BOT_EMOJI_OPTIONS)
         ));
     } else {
-        components.push(new ActionRowBuilder().addComponents(
+        controlContainer.addActionRowComponents(new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId(`taparel_set_${section}_${userId}`)
                 .setLabel(`Definir ${sectionLabel}`)
@@ -122,15 +149,10 @@ function buildAparenciaSection(userId, section) {
         ));
     }
 
-    return {
-        content: `-# ${Emojis.get('_lapis_emoji')} Editando **${sectionLabel}** — preview ao vivo abaixo`,
-        embeds: [buildTicketLiveEmbed()],
-        components,
-    };
+    return { components: [previewContainer, controlContainer], ...CV2 };
 }
 
-// ── Telas de emojis das funções (sem embed preview, apenas navegação) ─────────
-const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+// ── Telas de emojis das funções ────────────────────────────────────────────────
 
 function buildFuncaoNavScreen(userId) {
     const funcoes = tickets.get('tickets.funcoes') || {};

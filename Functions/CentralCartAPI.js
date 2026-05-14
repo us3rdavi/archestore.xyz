@@ -37,6 +37,12 @@ async function getAppDetails() {
     return apiRequest('GET', '/app');
 }
 
+// ── Categorias ────────────────────────────────────────────────────────────────
+
+async function listCategories() {
+    return apiRequest('GET', '/app/category');
+}
+
 // ── Pacotes ───────────────────────────────────────────────────────────────────
 
 async function listPackages({ page = 1, search = null, all = false } = {}) {
@@ -121,6 +127,7 @@ async function createCheckout(data) {
 
 module.exports = {
     getAppDetails,
+    listCategories,
     listPackages,
     getPackage,
     listOrders,
