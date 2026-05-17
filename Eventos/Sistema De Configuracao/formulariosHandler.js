@@ -28,9 +28,9 @@ const EMB_SECTION_LABELS = {
     title: 'Título', description: 'Descrição', image: 'URL da Imagem', footer: 'Texto do Footer',
 };
 
-function buildFormEmbedPreviewContainer(data, formName) {
+function buildFormEmbedPreviewContainer(data, formName, placeholderLabel) {
     const title = data.title || formName || 'Formulário';
-    const desc  = data.description || 'Clique no botão abaixo para iniciar sua aplicação.';
+    const desc  = data.description || 'Selecione uma opção abaixo para iniciar sua aplicação.';
     const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `-# ${Emojis.get('_search_emoji')} Pré-visualização — como o formulário aparecerá no servidor\n\n` +
@@ -46,11 +46,11 @@ function buildFormEmbedPreviewContainer(data, formName) {
         c.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${data.footer}`));
     }
     c.addActionRowComponents(new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
+        new StringSelectMenuBuilder()
             .setCustomId('_form_prev_disabled')
-            .setLabel('Iniciar Aplicação')
-            .setStyle(ButtonStyle.Primary)
+            .setPlaceholder(placeholderLabel || 'Iniciar Aplicação')
             .setDisabled(true)
+            .addOptions([{ label: 'Iniciar Aplicação', value: '_prev' }])
     ));
     return c;
 }
@@ -116,11 +116,12 @@ function buildFormEmbedEditorContainer(userId, guildId, slotId, section, data) {
 const EMB_CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
 
 function buildFormEmbedMainMenu(userId, guildId, slotId) {
-    const sess     = formEmbedSessions.get(userId) || { data: {} };
-    const formName = sess.formName || `Formulário ${slotId}`;
+    const sess        = formEmbedSessions.get(userId) || { data: {} };
+    const formName    = sess.formName || `Formulário ${slotId}`;
+    const form        = (formularios.get(guildId) || {})[slotId] || {};
     return {
         components: [
-            buildFormEmbedPreviewContainer(sess.data, formName),
+            buildFormEmbedPreviewContainer(sess.data, formName, form.button_label),
             buildFormEmbedEditorContainer(userId, guildId, slotId, 'main', sess.data),
         ],
         ...EMB_CV2,
@@ -128,11 +129,12 @@ function buildFormEmbedMainMenu(userId, guildId, slotId) {
 }
 
 function buildFormEmbedSection(userId, guildId, slotId, section) {
-    const sess     = formEmbedSessions.get(userId) || { data: {} };
-    const formName = sess.formName || `Formulário ${slotId}`;
+    const sess        = formEmbedSessions.get(userId) || { data: {} };
+    const formName    = sess.formName || `Formulário ${slotId}`;
+    const form        = (formularios.get(guildId) || {})[slotId] || {};
     return {
         components: [
-            buildFormEmbedPreviewContainer(sess.data, formName),
+            buildFormEmbedPreviewContainer(sess.data, formName, form.button_label),
             buildFormEmbedEditorContainer(userId, guildId, slotId, section, sess.data),
         ],
         ...EMB_CV2,
@@ -179,7 +181,7 @@ function buildFormPanelPayload(guildId, slotId) {
         `${Emojis.get('_folder_emoji')} **Canal de Logs:** ${chOutput}\n` +
         `${Emojis.get('_staff_emoji')} **Staff Responsável:** ${staffRoles}\n` +
         `${Emojis.get('permissions_emoji')} **Cargo ao Aprovar:** ${roleAprovado}\n` +
-        `${Emojis.get('_lapis_emoji')} **Botão:** \`${form.button_label || 'Iniciar Aplicação'}\`\n` +
+        `${Emojis.get('_lapis_emoji')} **Placeholder:** \`${form.button_label || 'Iniciar Aplicação'}\`\n` +
         `${Emojis.get('_lapis_emoji')} **Perguntas:** ${qtdPerguntas}/10\n` +
         `${Emojis.get('clock_emoji')} **Tempo por Pergunta:** ${timeLimit}s\n` +
         `${Emojis.get('_fixe_emoji')} **Limite por Usuário:** ${limite}`
@@ -194,7 +196,7 @@ function buildFormPanelPayload(guildId, slotId) {
             .addOptions([
                 { label: 'Configurar Canais',    value: 'canais',       description: 'Canal do formulário e canal de logs',          emoji: { id: '1501803997583904810' } },
                 { label: 'Staff Responsável',    value: 'cargos',       description: 'Cargos com acesso às respostas',               emoji: { id: '1501803902046048297' } },
-                { label: 'Configurar Botão',     value: 'botao',        description: 'Texto e emoji do botão de início',             emoji: { id: '1501804003850322052' } },
+                { label: 'Configurar Menu',      value: 'botao',        description: 'Placeholder e emoji do select menu',           emoji: { id: '1501804003850322052' } },
                 { label: 'Perguntas',            value: 'perguntas',    description: 'Adicionar e remover perguntas',                emoji: { id: '1502520447340777482' } },
                 { label: 'Cargo ao Aprovar',     value: 'cargoaprovado', description: 'Cargo concedido ao aprovar candidato',        emoji: { id: '1501804064596558017' } },
                 { label: 'Tempo por Pergunta',   value: 'timelimit',    description: 'Segundos disponíveis para cada pergunta',      emoji: { id: '1501804058699366470' } },
@@ -454,12 +456,12 @@ module.exports = {
                         const form = (formularios.get(guildId) || {})[slotId] || {};
                         const modal = new ModalBuilder()
                             .setCustomId(`form_modal_botao_${guildId}_${slotId}`)
-                            .setTitle('Configurar Botão');
+                            .setTitle('Configurar Menu');
                         modal.addComponents(
                             new ActionRowBuilder().addComponents(
                                 new TextInputBuilder()
                                     .setCustomId('button_label')
-                                    .setLabel('Texto do Botão')
+                                    .setLabel('Placeholder do Menu')
                                     .setValue(form.button_label || 'Iniciar Aplicação')
                                     .setStyle(TextInputStyle.Short)
                                     .setMaxLength(80)
@@ -810,12 +812,12 @@ module.exports = {
                         const form = (formularios.get(guildId) || {})[slotId] || {};
                         const modal = new ModalBuilder()
                             .setCustomId(`form_modal_botao_${guildId}_${slotId}`)
-                            .setTitle('Configurar Botão');
+                            .setTitle('Configurar Menu');
                         modal.addComponents(
                             new ActionRowBuilder().addComponents(
                                 new TextInputBuilder()
                                     .setCustomId('button_label')
-                                    .setLabel('Texto do Botão')
+                                    .setLabel('Placeholder do Menu')
                                     .setValue(form.button_label || 'Iniciar Aplicação')
                                     .setStyle(TextInputStyle.Short)
                                     .setMaxLength(80)
