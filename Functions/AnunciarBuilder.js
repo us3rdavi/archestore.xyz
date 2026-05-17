@@ -141,6 +141,7 @@ function buildAnnouncementContainer(data) {
     }
 
     if (data.buttons && data.buttons.length > 0) {
+        c.addSeparatorComponents(new SeparatorBuilder());
         const rows = buildButtonRows(data.buttons);
         for (const row of rows) c.addActionRowComponents(row);
     }
@@ -198,6 +199,7 @@ function buildPreviewContainer(data) {
     }
 
     if (data.buttons && data.buttons.length > 0) {
+        c.addSeparatorComponents(new SeparatorBuilder());
         const rows = buildButtonRows(data.buttons);
         for (const row of rows) c.addActionRowComponents(row);
     }
