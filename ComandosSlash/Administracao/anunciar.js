@@ -20,7 +20,7 @@ module.exports = {
         const menu = buildMainMenu(interaction.user.id);
         await interaction.reply({
             ...menu,
-            flags: MessageFlags.Ephemeral,
+            flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
         });
     },
 };
