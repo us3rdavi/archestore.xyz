@@ -484,40 +484,42 @@ function buildBotaoCorScreen(userId, idx) {
     return { components: [previewContainer, controlContainer], ...CV2 };
 }
 
-function buildBotaoEmojiScreen(userId, idx) {
+const PAGE_SIZE = 25;
+
+function buildBotaoEmojiScreen(userId, idx, page = 0) {
     const data = getEmbedData(userId);
     const buttons = data.buttons || [];
     const btn = buttons[idx];
     if (!btn) return buildBoesScreen(userId);
+
+    // Collect ALL valid custom emojis from the bot store
+    const allEmojis = Emojis.all();
+    const allOptions = [];
+    for (const val of Object.values(allEmojis)) {
+        const match = val.match(/^<(a?):([^:]+):(\d+)>$/);
+        if (!match) continue;
+        allOptions.push({
+            label: match[2].replace(/_emoji$/, '').replace(/_/g, ' '),
+            value: val,
+            emoji: { id: match[3], animated: match[1] === 'a' },
+        });
+    }
+
+    const totalPages = Math.ceil(allOptions.length / PAGE_SIZE);
+    const safePage = Math.max(0, Math.min(page, totalPages - 1));
+    const pageOptions = allOptions.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
 
     const previewContainer = buildPreviewContainer(data);
     const controlContainer = new ContainerBuilder();
 
     controlContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('_lapis_emoji')} Escolher Emoji — Botão ${idx + 1}\n` +
-        `-# Selecione um emoji do bot para o botão **${btn.label || 'Sem nome'}**`
+        `-# Página ${safePage + 1}/${totalPages} · ${allOptions.length} emojis disponíveis · **${btn.label || 'Sem nome'}**`
     ));
     controlContainer.addSeparatorComponents(new SeparatorBuilder());
     controlContainer.addActionRowComponents(buildNavSelectRow(userId, 'botoes'));
 
-    // Build emoji options from the bot's emoji store
-    const allEmojis = Emojis.all();
-    const emojiOptions = [];
-    for (const [key, val] of Object.entries(allEmojis)) {
-        if (emojiOptions.length >= 25) break;
-        const match = val.match(/^<(a?):([^:]+):(\d+)>$/);
-        if (!match) continue;
-        const name = match[2];
-        const id = match[3];
-        const animated = match[1] === 'a';
-        emojiOptions.push({
-            label: name.replace(/_emoji$/, '').replace(/_/g, ' '),
-            value: val,
-            emoji: { id, animated },
-        });
-    }
-
-    if (emojiOptions.length === 0) {
+    if (allOptions.length === 0) {
         controlContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(
             `-# Nenhum emoji do bot disponível.`
         ));
@@ -526,10 +528,38 @@ function buildBotaoEmojiScreen(userId, idx) {
             new ActionRowBuilder().addComponents(
                 new StringSelectMenuBuilder()
                     .setCustomId(`anunciar_botao_emojisel_${idx}_${userId}`)
-                    .setPlaceholder('Selecione um emoji...')
-                    .addOptions(emojiOptions)
+                    .setPlaceholder(`Emojis ${safePage * PAGE_SIZE + 1}–${Math.min((safePage + 1) * PAGE_SIZE, allOptions.length)} de ${allOptions.length}...`)
+                    .addOptions(pageOptions)
             )
         );
+
+        // Pagination buttons (only shown when there are multiple pages)
+        if (totalPages > 1) {
+            const navRow = new ActionRowBuilder();
+            if (safePage > 0) {
+                navRow.addComponents(
+                    new ButtonBuilder()
+                        .setCustomId(`anunciar_botao_emojipage_${safePage - 1}_${idx}_${userId}`)
+                        .setLabel('◀ Anterior')
+                        .setStyle(ButtonStyle.Secondary)
+                );
+            }
+            navRow.addComponents(
+                new ButtonBuilder()
+                    .setCustomId(`anunciar_botao_emojiback_${idx}_${userId}`)
+                    .setLabel('Voltar ao Botão')
+                    .setStyle(ButtonStyle.Primary)
+            );
+            if (safePage < totalPages - 1) {
+                navRow.addComponents(
+                    new ButtonBuilder()
+                        .setCustomId(`anunciar_botao_emojipage_${safePage + 1}_${idx}_${userId}`)
+                        .setLabel('Próxima ▶')
+                        .setStyle(ButtonStyle.Secondary)
+                );
+            }
+            controlContainer.addActionRowComponents(navRow);
+        }
     }
 
     return { components: [previewContainer, controlContainer], ...CV2 };

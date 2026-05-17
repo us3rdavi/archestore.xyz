@@ -422,11 +422,30 @@ module.exports = {
                 return;
             }
 
-            // Open emoji selection screen
-            if (customId.startsWith(`anunciar_botao_emoji_`) && !customId.startsWith(`anunciar_botao_emojisel_`) && !customId.startsWith(`anunciar_botao_removeemoji_`)) {
+            // Open emoji selection screen (page 0)
+            if (customId.startsWith(`anunciar_botao_emoji_`) && !customId.startsWith(`anunciar_botao_emojisel_`) && !customId.startsWith(`anunciar_botao_removeemoji_`) && !customId.startsWith(`anunciar_botao_emojipage_`) && !customId.startsWith(`anunciar_botao_emojiback_`)) {
                 const inner = customId.slice('anunciar_botao_emoji_'.length);
                 const idx = parseInt(inner.slice(0, inner.lastIndexOf('_')), 10);
-                await interaction.update(buildBotaoEmojiScreen(userId, idx));
+                await interaction.update(buildBotaoEmojiScreen(userId, idx, 0));
+                return;
+            }
+
+            // Emoji page navigation
+            if (customId.startsWith(`anunciar_botao_emojipage_`)) {
+                const inner = customId.slice('anunciar_botao_emojipage_'.length);
+                const parts2 = inner.split('_');
+                // format: page_idx_userId  (userId may itself contain no underscores — it's a snowflake)
+                const page = parseInt(parts2[0], 10);
+                const idx = parseInt(parts2[1], 10);
+                await interaction.update(buildBotaoEmojiScreen(userId, idx, page));
+                return;
+            }
+
+            // Emoji screen → back to button edit
+            if (customId.startsWith(`anunciar_botao_emojiback_`)) {
+                const inner = customId.slice('anunciar_botao_emojiback_'.length);
+                const idx = parseInt(inner.slice(0, inner.lastIndexOf('_')), 10);
+                await interaction.update(buildBotaoEditScreen(userId, idx));
                 return;
             }
 
