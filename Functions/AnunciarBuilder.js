@@ -43,9 +43,9 @@ function buildDiscordEmbed(data) {
     if (data.title) embed.setTitle(data.title);
     if (data.description) embed.setDescription(data.description);
 
-    // Cor: '__none__' = sem barra de cor; undefined/null = blurple padrão; valor = cor definida
+    // Cor: '__none__' = sem barra de cor (usa cor do fundo do Discord); undefined/null = blurple padrão; valor = cor definida
     if (data.color === '__none__') {
-        // não chama setColor — embed fica sem barra lateral colorida
+        embed.setColor(0x2b2d31);
     } else if (data.color) {
         try { embed.setColor(data.color); } catch (e) { embed.setColor('#5865F2'); }
     } else {

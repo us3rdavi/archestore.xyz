@@ -118,12 +118,13 @@ module.exports = {
             const { customId } = interaction;
             if (!customId) return;
 
-            // ── Botão: iniciar formulário ────────────────────────────────
-            if (interaction.isButton() && customId.startsWith('fstart_')) {
+            // ── Select Menu: iniciar formulário ──────────────────────────
+            if (interaction.isStringSelectMenu() && customId.startsWith('fstart_')) {
                 const parts   = customId.split('_');
                 const guildId = parts[1];
                 const slotId  = parts[2];
                 const userId  = interaction.user.id;
+                const selectedOptIdx = parseInt(interaction.values[0]) || 0;
 
                 if (interaction.guild?.id !== guildId) return;
 

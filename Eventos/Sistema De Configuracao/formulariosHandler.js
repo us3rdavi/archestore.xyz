@@ -6,6 +6,7 @@ const {
     MessageFlags, ChannelType,
 } = require('discord.js');
 const { formularios, Emojis, configuracao } = require('../../Database');
+const { BOT_EMOJI_OPTIONS } = require('../../Functions/TicketAparenciaBuilder');
 
 // Lock para evitar duplicação de perguntas por double-submit
 const pergLock = new Set();
@@ -35,12 +36,12 @@ function buildFormEmbedPreviewContainer(data, formName) {
         `-# ${Emojis.get('_search_emoji')} Pré-visualização — como o formulário aparecerá no servidor\n\n` +
         `## ${Emojis.get('_messages_emoji')} ${title}\n${desc}`
     ));
-    c.addSeparatorComponents(new SeparatorBuilder());
     if (data.image) {
         try {
             c.addMediaGalleryComponents(new MediaGalleryBuilder().addItems({ media: { url: data.image } }));
         } catch (e) {}
     }
+    c.addSeparatorComponents(new SeparatorBuilder());
     if (data.footer) {
         c.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${data.footer}`));
     }
@@ -198,8 +199,9 @@ function buildFormPanelPayload(guildId, slotId) {
                 { label: 'Cargo ao Aprovar',     value: 'cargoaprovado', description: 'Cargo concedido ao aprovar candidato',        emoji: { id: '1501804064596558017' } },
                 { label: 'Tempo por Pergunta',   value: 'timelimit',    description: 'Segundos disponíveis para cada pergunta',      emoji: { id: '1501804058699366470' } },
                 { label: 'Limitar Envios',       value: 'limite',       description: 'Quantidade máxima de envios por usuário',      emoji: { id: '1501804061719007232' } },
-                { label: 'Aparência',            value: 'embeds',       description: 'Título, descrição e imagem do formulário',     emoji: { id: '1501804122943389716' } },
-                { label: 'Renomear',             value: 'nome',         description: 'Alterar o nome interno do formulário',         emoji: { id: '1501804003850322052' } },
+                { label: 'Aparência',            value: 'embeds',         description: 'Título, descrição e imagem do formulário',       emoji: { id: '1501804122943389716' } },
+                { label: 'Opções do Menu',       value: 'selectoptions',  description: 'Gerenciar opções do select menu do painel',      emoji: { id: '1501804013262475275' } },
+                { label: 'Renomear',             value: 'nome',           description: 'Alterar o nome interno do formulário',           emoji: { id: '1501804003850322052' } },
             ])
     ));
 
@@ -397,6 +399,7 @@ async function handleFormAction(interaction, client, action) {
             role_approved: null,
             button_label: 'Iniciar Aplicação',
             button_emoji: null,
+            selectOptions: [{ label: 'Iniciar Aplicação', emoji: null, description: '' }],
             questions: [],
             time_limit: 120,
             limit_per_user: null,
@@ -559,6 +562,8 @@ module.exports = {
                         }
                     });
                     await interaction.editReply(buildFormEmbedMainMenu(interaction.user.id, guildId, slotId));
+                } else if (action === 'selectoptions') {
+                    await interaction.editReply(buildSelectOptionsPanel(guildId, slotId));
                 }
                 return;
             }
@@ -759,22 +764,26 @@ module.exports = {
                     fc.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                         `## ${Emojis.get('_messages_emoji')} ${formTitle}\n${formDesc}`
                     ));
+                    if (form.embed?.image) {
+                        try { fc.addMediaGalleryComponents(new MediaGalleryBuilder().addItems({ media: { url: form.embed.image } })); } catch (e) {}
+                    }
                     fc.addSeparatorComponents(new SeparatorBuilder());
 
-                    const startBtn = new ButtonBuilder()
-                        .setCustomId(`fstart_${guildId}_${slotId}`)
-                        .setLabel(form.button_label || 'Iniciar Aplicação')
-                        .setStyle(ButtonStyle.Primary);
-
-                    if (form.button_emoji) {
-                        startBtn.setEmoji(
-                            /^\d+$/.test(form.button_emoji)
-                                ? { id: form.button_emoji }
-                                : form.button_emoji
-                        );
-                    }
-
-                    fc.addActionRowComponents(new ActionRowBuilder().addComponents(startBtn));
+                    const rawOpts = form.selectOptions && form.selectOptions.length > 0
+                        ? form.selectOptions
+                        : [{ label: 'Iniciar Aplicação', emoji: null, description: '' }];
+                    const selectOpts = rawOpts.slice(0, 25).map((opt, i) => {
+                        const o = { label: (opt.label || 'Opção').slice(0, 100), value: String(i) };
+                        if (opt.description) o.description = opt.description.slice(0, 100);
+                        if (opt.emoji && /^\d+$/.test(opt.emoji)) o.emoji = { id: opt.emoji };
+                        return o;
+                    });
+                    fc.addActionRowComponents(new ActionRowBuilder().addComponents(
+                        new StringSelectMenuBuilder()
+                            .setCustomId(`fstart_${guildId}_${slotId}`)
+                            .setPlaceholder(form.button_label || 'Iniciar Aplicação')
+                            .addOptions(selectOpts)
+                    ));
 
                     try {
                         await channel.send({ components: [fc], flags: MessageFlags.IsComponentsV2 });
@@ -921,6 +930,46 @@ module.exports = {
                 return;
             }
 
+            // ── Modal: adicionar opção do select menu ─────────────────────
+            if (interaction.isModalSubmit() && customId.startsWith('form_modal_addopt_')) {
+                const parts   = customId.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const slots   = formularios.get(guildId) || {};
+                if (!slots[slotId]) return;
+                const label = interaction.fields.getTextInputValue('opt_label').trim();
+                const desc  = interaction.fields.getTextInputValue('opt_desc').trim();
+                if (!label) return interaction.reply({ content: `${Emojis.get('negative_emoji')} O nome da opção não pode estar vazio.`, ephemeral: true });
+                if (!slots[slotId].selectOptions) slots[slotId].selectOptions = [];
+                if (slots[slotId].selectOptions.length >= 25)
+                    return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 25 opções atingido.`, ephemeral: true });
+                slots[slotId].selectOptions.push({ label: label.slice(0, 100), emoji: null, description: desc.slice(0, 100) });
+                formularios.set(guildId, slots);
+                await interaction.update(buildSelectOptionsPanel(guildId, slotId));
+                return;
+            }
+
+            // ── Modal: editar opção do select menu ────────────────────────
+            if (interaction.isModalSubmit() && customId.startsWith('form_modal_editopt_')) {
+                const parts   = customId.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const optIdx  = parseInt(parts[parts.length - 3]);
+                const slots   = formularios.get(guildId) || {};
+                if (!slots[slotId]) return;
+                const label = interaction.fields.getTextInputValue('opt_label').trim();
+                const desc  = interaction.fields.getTextInputValue('opt_desc').trim();
+                if (!label) return interaction.reply({ content: `${Emojis.get('negative_emoji')} O nome da opção não pode estar vazio.`, ephemeral: true });
+                if (!slots[slotId].selectOptions) slots[slotId].selectOptions = [];
+                if (slots[slotId].selectOptions[optIdx]) {
+                    slots[slotId].selectOptions[optIdx].label = label.slice(0, 100);
+                    slots[slotId].selectOptions[optIdx].description = desc.slice(0, 100);
+                    formularios.set(guildId, slots);
+                }
+                await interaction.update(buildOptionEditPanel(guildId, slotId, optIdx));
+                return;
+            }
+
             // ── Modal submits ─────────────────────────────────────────────
             if (interaction.isModalSubmit() && customId.startsWith('form_modal_')) {
                 const parts   = customId.split('_');
@@ -988,6 +1037,191 @@ module.exports = {
                     }
 
                 }
+                return;
+            }
+
+            // ── Opções do Select Menu: navegar ao painel principal ────────
+            if (interaction.isButton() && customId.startsWith('form_sopts_main_')) {
+                const parts   = customId.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                await interaction.deferUpdate();
+                await interaction.editReply(buildSelectOptionsPanel(guildId, slotId));
+                return;
+            }
+
+            // ── Opções do Select Menu: selecionar opção para editar ───────
+            if (interaction.isStringSelectMenu() && customId.startsWith('form_sopts_pick_')) {
+                const parts   = customId.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const optIdx  = parseInt(interaction.values[0]);
+                await interaction.deferUpdate();
+                await interaction.editReply(buildOptionEditPanel(guildId, slotId, optIdx));
+                return;
+            }
+
+            // ── Opções do Select Menu: botão adicionar (abre modal) ───────
+            if (interaction.isButton() && customId.startsWith('form_sopts_add_')) {
+                const parts   = customId.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const modal = new ModalBuilder()
+                    .setCustomId(`form_modal_addopt_${guildId}_${slotId}`)
+                    .setTitle('Adicionar Opção ao Menu');
+                modal.addComponents(
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('opt_label')
+                            .setLabel('Nome da Opção')
+                            .setStyle(TextInputStyle.Short)
+                            .setMaxLength(100)
+                            .setRequired(true)
+                            .setPlaceholder('Ex: Iniciar Aplicação')
+                    ),
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('opt_desc')
+                            .setLabel('Sub-descrição (opcional)')
+                            .setStyle(TextInputStyle.Short)
+                            .setMaxLength(100)
+                            .setRequired(false)
+                            .setPlaceholder('Ex: Clique para começar')
+                    )
+                );
+                await interaction.showModal(modal);
+                return;
+            }
+
+            // ── Opções do Select Menu: navegar ao painel de edição ────────
+            if (interaction.isButton() && customId.startsWith('form_sopts_edit_')) {
+                const withoutPrefix = customId.slice('form_sopts_edit_'.length);
+                const parts   = withoutPrefix.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const optIdx  = parseInt(parts[parts.length - 3]);
+                await interaction.deferUpdate();
+                await interaction.editReply(buildOptionEditPanel(guildId, slotId, optIdx));
+                return;
+            }
+
+            // ── Opções do Select Menu: editar nome e descrição (modal) ────
+            if (interaction.isButton() && customId.startsWith('form_sopts_editlabel_')) {
+                const withoutPrefix = customId.slice('form_sopts_editlabel_'.length);
+                const parts   = withoutPrefix.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const optIdx  = parseInt(parts[parts.length - 3]);
+                const slots   = formularios.get(guildId) || {};
+                const opt     = (slots[slotId]?.selectOptions || [])[optIdx] || {};
+                const modal = new ModalBuilder()
+                    .setCustomId(`form_modal_editopt_${optIdx}_${guildId}_${slotId}`)
+                    .setTitle(`Editar Opção ${optIdx + 1}`);
+                modal.addComponents(
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('opt_label')
+                            .setLabel('Nome da Opção')
+                            .setStyle(TextInputStyle.Short)
+                            .setMaxLength(100)
+                            .setRequired(true)
+                            .setValue(opt.label || '')
+                    ),
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('opt_desc')
+                            .setLabel('Sub-descrição (opcional)')
+                            .setStyle(TextInputStyle.Short)
+                            .setMaxLength(100)
+                            .setRequired(false)
+                            .setValue(opt.description || '')
+                    )
+                );
+                await interaction.showModal(modal);
+                return;
+            }
+
+            // ── Opções do Select Menu: remover opção ──────────────────────
+            if (interaction.isButton() && customId.startsWith('form_sopts_del_')) {
+                const withoutPrefix = customId.slice('form_sopts_del_'.length);
+                const parts   = withoutPrefix.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const optIdx  = parseInt(parts[parts.length - 3]);
+                const slots   = formularios.get(guildId) || {};
+                if (slots[slotId]?.selectOptions) {
+                    slots[slotId].selectOptions.splice(optIdx, 1);
+                    if (slots[slotId].selectOptions.length === 0)
+                        slots[slotId].selectOptions = [{ label: 'Iniciar Aplicação', emoji: null, description: '' }];
+                    formularios.set(guildId, slots);
+                }
+                await interaction.deferUpdate();
+                await interaction.editReply(buildSelectOptionsPanel(guildId, slotId));
+                return;
+            }
+
+            // ── Opções do Select Menu: abrir seletor de emoji ─────────────
+            if (interaction.isButton() && customId.startsWith('form_sopts_emoji_')) {
+                const withoutPrefix = customId.slice('form_sopts_emoji_'.length);
+                const parts   = withoutPrefix.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const optIdx  = parseInt(parts[parts.length - 3]);
+                await interaction.deferUpdate();
+                await interaction.editReply(buildOptionEmojiPicker(interaction.guild, guildId, slotId, optIdx));
+                return;
+            }
+
+            // ── Opções do Select Menu: emoji do bot selecionado ───────────
+            if (interaction.isStringSelectMenu() && customId.startsWith('form_sopts_botoji_')) {
+                const withoutPrefix = customId.slice('form_sopts_botoji_'.length);
+                const parts   = withoutPrefix.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const optIdx  = parseInt(parts[parts.length - 3]);
+                const emojiId = interaction.values[0];
+                const slots   = formularios.get(guildId) || {};
+                if (slots[slotId]?.selectOptions?.[optIdx]) {
+                    slots[slotId].selectOptions[optIdx].emoji = emojiId === 'sem_emoji' ? null : emojiId;
+                    formularios.set(guildId, slots);
+                }
+                await interaction.deferUpdate();
+                await interaction.editReply(buildOptionEditPanel(guildId, slotId, optIdx));
+                return;
+            }
+
+            // ── Opções do Select Menu: emoji do servidor selecionado ──────
+            if (interaction.isStringSelectMenu() && customId.startsWith('form_sopts_svroji_')) {
+                const withoutPrefix = customId.slice('form_sopts_svroji_'.length);
+                const parts   = withoutPrefix.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const optIdx  = parseInt(parts[parts.length - 3]);
+                const emojiId = interaction.values[0];
+                const slots   = formularios.get(guildId) || {};
+                if (slots[slotId]?.selectOptions?.[optIdx]) {
+                    slots[slotId].selectOptions[optIdx].emoji = emojiId;
+                    formularios.set(guildId, slots);
+                }
+                await interaction.deferUpdate();
+                await interaction.editReply(buildOptionEditPanel(guildId, slotId, optIdx));
+                return;
+            }
+
+            // ── Opções do Select Menu: remover emoji ──────────────────────
+            if (interaction.isButton() && customId.startsWith('form_sopts_noji_')) {
+                const withoutPrefix = customId.slice('form_sopts_noji_'.length);
+                const parts   = withoutPrefix.split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                const optIdx  = parseInt(parts[parts.length - 3]);
+                const slots   = formularios.get(guildId) || {};
+                if (slots[slotId]?.selectOptions?.[optIdx]) {
+                    slots[slotId].selectOptions[optIdx].emoji = null;
+                    formularios.set(guildId, slots);
+                }
+                await interaction.deferUpdate();
+                await interaction.editReply(buildOptionEditPanel(guildId, slotId, optIdx));
                 return;
             }
 
@@ -1190,5 +1424,162 @@ function buildAprovadoConfigPayload(guildId, slotId) {
             .setEmoji({ id: '1501803908589162537' })
             .setStyle(ButtonStyle.Secondary)
     ));
+    return { components: [c], flags: MessageFlags.IsComponentsV2 };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PAINEL DE OPÇÕES DO SELECT MENU
+// ─────────────────────────────────────────────────────────────────────────────
+function buildSelectOptionsPanel(guildId, slotId) {
+    const form    = (formularios.get(guildId) || {})[slotId] || {};
+    const options = form.selectOptions && form.selectOptions.length > 0
+        ? form.selectOptions
+        : [{ label: 'Iniciar Aplicação', emoji: null, description: '' }];
+
+    const optLines = options.map((o, i) => {
+        const emojiStr = o.emoji ? `<:e:${o.emoji}>` : '`sem emoji`';
+        const descStr  = o.description ? ` — ${o.description}` : '';
+        return `-# ${i + 1}. **${o.label}**${descStr} | ${emojiStr}`;
+    }).join('\n');
+
+    const c = new ContainerBuilder();
+    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('_lapis_emoji')} Opções do Select Menu\n` +
+        `-# Configure as opções que aparecerão no dropdown do formulário postado.\n\n` +
+        `${optLines}\n\n` +
+        `-# ${options.length}/25 opções configuradas`
+    ));
+    c.addSeparatorComponents(new SeparatorBuilder());
+
+    if (options.length > 0) {
+        c.addActionRowComponents(new ActionRowBuilder().addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId(`form_sopts_pick_${guildId}_${slotId}`)
+                .setPlaceholder('Selecione uma opção para editar...')
+                .addOptions(options.slice(0, 25).map((o, i) => {
+                    const entry = { label: (o.label || 'Opção').slice(0, 100), value: String(i) };
+                    if (o.description) entry.description = o.description.slice(0, 100);
+                    if (o.emoji && /^\d+$/.test(o.emoji)) entry.emoji = { id: o.emoji };
+                    return entry;
+                }))
+        ));
+    }
+
+    c.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`form_sopts_add_${guildId}_${slotId}`)
+            .setLabel('Adicionar Opção')
+            .setEmoji({ id: '1501803905363869769' })
+            .setStyle(ButtonStyle.Success)
+            .setDisabled(options.length >= 25),
+        new ButtonBuilder()
+            .setCustomId(`form_btn_voltarform_${guildId}_${slotId}`)
+            .setLabel('Voltar')
+            .setEmoji({ id: '1501803908589162537' })
+            .setStyle(ButtonStyle.Secondary),
+    ));
+
+    return { components: [c], flags: MessageFlags.IsComponentsV2 };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PAINEL DE EDIÇÃO DE UMA OPÇÃO
+// ─────────────────────────────────────────────────────────────────────────────
+function buildOptionEditPanel(guildId, slotId, optIdx) {
+    const form    = (formularios.get(guildId) || {})[slotId] || {};
+    const options = form.selectOptions || [];
+    const opt     = options[optIdx];
+
+    if (!opt) {
+        const c = new ContainerBuilder();
+        c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+            `${Emojis.get('negative_emoji')} Opção não encontrada.`
+        ));
+        return { components: [c], flags: MessageFlags.IsComponentsV2 };
+    }
+
+    const emojiStr = opt.emoji ? `<:e:${opt.emoji}>` : '`Sem emoji`';
+
+    const c = new ContainerBuilder();
+    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('_lapis_emoji')} Editar Opção ${optIdx + 1}\n\n` +
+        `${Emojis.get('_text_emoji')} **Nome:** \`${opt.label || 'Sem nome'}\`\n` +
+        `${Emojis.get('_messages_emoji')} **Sub-descrição:** \`${opt.description || 'Nenhuma'}\`\n` +
+        `${Emojis.get('_ticket_emoji')} **Emoji:** ${emojiStr}`
+    ));
+    c.addSeparatorComponents(new SeparatorBuilder());
+    c.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`form_sopts_editlabel_${optIdx}_${guildId}_${slotId}`)
+            .setLabel('Editar Nome e Descrição')
+            .setEmoji({ id: '1501804003850322052' })
+            .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+            .setCustomId(`form_sopts_emoji_${optIdx}_${guildId}_${slotId}`)
+            .setLabel('Trocar Emoji')
+            .setEmoji({ id: '1501804043121725490' })
+            .setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+            .setCustomId(`form_sopts_del_${optIdx}_${guildId}_${slotId}`)
+            .setLabel('Remover')
+            .setEmoji({ id: '1501803935453679616' })
+            .setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+            .setCustomId(`form_sopts_main_${guildId}_${slotId}`)
+            .setLabel('Voltar')
+            .setEmoji({ id: '1501803908589162537' })
+            .setStyle(ButtonStyle.Secondary),
+    ));
+
+    return { components: [c], flags: MessageFlags.IsComponentsV2 };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SELETOR DE EMOJI PARA OPÇÃO
+// ─────────────────────────────────────────────────────────────────────────────
+function buildOptionEmojiPicker(guild, guildId, slotId, optIdx) {
+    const c = new ContainerBuilder();
+    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('_ticket_emoji')} Escolher Emoji — Opção ${optIdx + 1}\n` +
+        `-# Selecione um emoji do bot ou do servidor para esta opção.`
+    ));
+    c.addSeparatorComponents(new SeparatorBuilder());
+
+    c.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new StringSelectMenuBuilder()
+            .setCustomId(`form_sopts_botoji_${optIdx}_${guildId}_${slotId}`)
+            .setPlaceholder('Emojis do bot...')
+            .addOptions(BOT_EMOJI_OPTIONS.slice(0, 25))
+    ));
+
+    const serverEmojis = guild?.emojis?.cache
+        ? [...guild.emojis.cache.values()].filter(e => !e.animated).slice(0, 25)
+        : [];
+    if (serverEmojis.length > 0) {
+        c.addActionRowComponents(new ActionRowBuilder().addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId(`form_sopts_svroji_${optIdx}_${guildId}_${slotId}`)
+                .setPlaceholder('Emojis do servidor...')
+                .addOptions(serverEmojis.map(e => ({
+                    label: e.name.slice(0, 100),
+                    value: e.id,
+                    emoji: { id: e.id },
+                })))
+        ));
+    }
+
+    c.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`form_sopts_noji_${optIdx}_${guildId}_${slotId}`)
+            .setLabel('Sem Emoji')
+            .setEmoji({ id: '1501803935453679616' })
+            .setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+            .setCustomId(`form_sopts_edit_${optIdx}_${guildId}_${slotId}`)
+            .setLabel('Voltar')
+            .setEmoji({ id: '1501803908589162537' })
+            .setStyle(ButtonStyle.Secondary),
+    ));
+
     return { components: [c], flags: MessageFlags.IsComponentsV2 };
 }
