@@ -1,10 +1,12 @@
 const {
     ModalBuilder, TextInputBuilder, TextInputStyle,
-    ActionRowBuilder, ChannelSelectMenuBuilder
+    ActionRowBuilder, ChannelSelectMenuBuilder,
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder,
+    MessageFlags,
 } = require('discord.js');
 const {
     getEmbedData, setEmbedData, clearEmbedData,
-    buildMainMenu, buildSectionScreen, buildDiscordEmbed
+    buildMainMenu, buildSectionScreen, buildAnnouncementContainer
 } = require('../../Functions/AnunciarBuilder');
 const { Emojis } = require('../../Database');
 
@@ -39,15 +41,22 @@ module.exports = {
             if (interaction.isChannelSelectMenu() && customId === `anunciar_channel_${userId}`) {
                 const channel = interaction.guild.channels.cache.get(interaction.values[0]);
                 const data = getEmbedData(userId);
-                const embed = buildDiscordEmbed(data);
+                const hasContent = data && Object.keys(data).some(k => k !== 'content');
 
-                if (!embed) {
-                    return interaction.reply({ content: `${Emojis.get('negative_emoji')} Configure a embed antes de enviar.`, ephemeral: true });
+                if (!hasContent) {
+                    return interaction.reply({ content: `${Emojis.get('negative_emoji')} Configure o anúncio antes de enviar.`, ephemeral: true });
                 }
 
                 try {
-                    await channel.send({ embeds: [embed], content: data.content || null });
-                    await interaction.reply({ content: `${Emojis.get('confirmed_emoji')} Embed enviada com sucesso em <#${channel.id}>!`, ephemeral: true });
+                    const sendComponents = [];
+                    if (data.content) {
+                        const contentC = new ContainerBuilder();
+                        contentC.addTextDisplayComponents(new TextDisplayBuilder().setContent(data.content));
+                        sendComponents.push(contentC);
+                    }
+                    sendComponents.push(buildAnnouncementContainer(data));
+                    await channel.send({ components: sendComponents, flags: MessageFlags.IsComponentsV2 });
+                    await interaction.reply({ content: `${Emojis.get('confirmed_emoji')} Anúncio enviado com sucesso em <#${channel.id}>!`, ephemeral: true });
                 } catch (e) {
                     await interaction.reply({ content: `${Emojis.get('negative_emoji')} Erro ao enviar: ${e.message}`, ephemeral: true });
                 }
@@ -82,15 +91,7 @@ module.exports = {
                 } else {
                     const value = interaction.fields.getTextInputValue('section_value');
                     if (value && value.trim()) {
-                        if (section === 'color') {
-                            const hexRegex = /^#?([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/;
-                            if (!hexRegex.test(value.trim())) {
-                                return interaction.reply({ content: `${Emojis.get('negative_emoji')} Cor inválida. Use formato hex, ex: \`#5865F2\``, ephemeral: true });
-                            }
-                            data[section] = value.trim().startsWith('#') ? value.trim() : `#${value.trim()}`;
-                        } else {
-                            data[section] = value.trim();
-                        }
+                        data[section] = value.trim();
                     } else {
                         delete data[section];
                     }
@@ -115,14 +116,6 @@ module.exports = {
             if (customId === `anunciar_reset_${userId}`) {
                 clearEmbedData(userId);
                 await interaction.update(buildMainMenu(userId));
-                return;
-            }
-
-            if (customId === `anunciar_nocolor_${userId}`) {
-                const data = getEmbedData(userId);
-                data.color = '__none__';
-                setEmbedData(userId, data);
-                await interaction.update(buildSectionScreen(userId, 'color'));
                 return;
             }
 
@@ -226,7 +219,7 @@ module.exports = {
                 const section = withoutPrefix.slice(0, withoutPrefix.lastIndexOf('_'));
                 const sectionLabels = {
                     title: 'Título', description: 'Descrição', author: 'Autor',
-                    color: 'Cor (ex: #5865F2)', url: 'URL da mensagem',
+                    url: 'URL da mensagem',
                     thumbnail: 'URL da Thumbnail', image: 'URL da Imagem', footer: 'Texto do Footer',
                 };
                 const data = getEmbedData(userId);
