@@ -73,14 +73,6 @@ function buildTicketComponents(funcoes, aparencia) {
         );
     }
 
-    container.addSeparatorComponents(new SeparatorBuilder());
-
-    container.addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(
-            `-# ${Emojis.get('system_emoji')} Nossa equipe geralmente responde em até 30 minutos.`
-        )
-    );
-
     return container;
 }
 
