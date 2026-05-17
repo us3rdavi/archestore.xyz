@@ -40,3 +40,4 @@ A Discord.js v14 bot (in Portuguese) for managing a sales/store system on Discor
 
 ## User Preferences
 - Keep the existing Portuguese naming conventions
+- **Nunca usar emojis de teclado/unicode em componentes Discord (ButtonBuilder, etc.)** — sempre usar emojis de upload do bot via `.setEmoji({ id: 'SNOWFLAKE_ID' })`. IDs disponíveis em `Database/emojis.json`. Emojis unicode só são permitidos em conteúdo de texto (TextDisplayBuilder, labels de select menu, strings normais).

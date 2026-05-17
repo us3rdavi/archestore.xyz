@@ -38,11 +38,11 @@ const BUTTON_STYLE_MAP = {
 };
 
 const BUTTON_STYLE_LABELS = {
-    [ButtonStyle.Primary]:   '🔵 Azul (Primary)',
-    [ButtonStyle.Secondary]: '⚪ Cinza (Secondary)',
-    [ButtonStyle.Success]:   '🟢 Verde (Success)',
-    [ButtonStyle.Danger]:    '🔴 Vermelho (Danger)',
-    [ButtonStyle.Link]:      '🔗 Link',
+    [ButtonStyle.Primary]:   'Azul (Primary)',
+    [ButtonStyle.Secondary]: 'Cinza (Secondary)',
+    [ButtonStyle.Success]:   'Verde (Success)',
+    [ButtonStyle.Danger]:    'Vermelho (Danger)',
+    [ButtonStyle.Link]:      'Link',
 };
 
 function styleFromString(str) {
@@ -330,7 +330,7 @@ function buildBoesScreen(userId) {
         const lines = buttons.map((b, i) => {
             const styleLabel = BUTTON_STYLE_LABELS[b.style ?? ButtonStyle.Primary] || '?';
             const emojiPart = b.emoji ? ` ${b.emoji}` : '';
-            const urlPart = b.url ? ` — 🔗 ${b.url}` : '';
+            const urlPart = b.url ? ` — ${b.url}` : '';
             return `\`${i + 1}.\`${emojiPart} **${b.label || 'Sem nome'}** · ${styleLabel}${urlPart}`;
         });
         headerText += `-# ${btnCount}/5 botões configurados\n\n${lines.join('\n')}`;
@@ -394,7 +394,7 @@ function buildBotaoEditScreen(userId, idx) {
 
     const styleLabel = BUTTON_STYLE_LABELS[btn.style ?? ButtonStyle.Primary] || '?';
     const emojiPart = btn.emoji ? ` | Emoji: ${btn.emoji}` : '';
-    const urlPart = btn.url ? `\n-# 🔗 URL: ${btn.url}` : '';
+    const urlPart = btn.url ? `\n-# URL: ${btn.url}` : '';
 
     controlContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('_lapis_emoji')} Editando Botão ${idx + 1}\n` +
@@ -465,11 +465,11 @@ function buildBotaoCorScreen(userId, idx) {
     controlContainer.addActionRowComponents(buildNavSelectRow(userId, 'botoes'));
 
     const colorOptions = [
-        { label: '🔵 Azul (Primary)',      value: `${ButtonStyle.Primary}`,   description: 'Botão azul padrão' },
-        { label: '⚪ Cinza (Secondary)',    value: `${ButtonStyle.Secondary}`, description: 'Botão cinza neutro' },
-        { label: '🟢 Verde (Success)',      value: `${ButtonStyle.Success}`,   description: 'Botão verde de confirmação' },
-        { label: '🔴 Vermelho (Danger)',    value: `${ButtonStyle.Danger}`,    description: 'Botão vermelho de atenção' },
-        { label: '🔗 Link',                value: `${ButtonStyle.Link}`,      description: 'Botão de link externo (requer URL)' },
+        { label: 'Azul (Primary)',      value: `${ButtonStyle.Primary}`,   description: 'Botão azul padrão' },
+        { label: 'Cinza (Secondary)',   value: `${ButtonStyle.Secondary}`, description: 'Botão cinza neutro' },
+        { label: 'Verde (Success)',     value: `${ButtonStyle.Success}`,   description: 'Botão verde de confirmação' },
+        { label: 'Vermelho (Danger)',   value: `${ButtonStyle.Danger}`,    description: 'Botão vermelho de atenção' },
+        { label: 'Link',               value: `${ButtonStyle.Link}`,      description: 'Botão de link externo (requer URL)' },
     ];
 
     controlContainer.addActionRowComponents(
@@ -540,7 +540,8 @@ function buildBotaoEmojiScreen(userId, idx, page = 0) {
                 navRow.addComponents(
                     new ButtonBuilder()
                         .setCustomId(`anunciar_botao_emojipage_${safePage - 1}_${idx}_${userId}`)
-                        .setLabel('◀ Anterior')
+                        .setLabel('Anterior')
+                        .setEmoji({ id: '1501803911655198742' })
                         .setStyle(ButtonStyle.Secondary)
                 );
             }
@@ -548,13 +549,15 @@ function buildBotaoEmojiScreen(userId, idx, page = 0) {
                 new ButtonBuilder()
                     .setCustomId(`anunciar_botao_emojiback_${idx}_${userId}`)
                     .setLabel('Voltar ao Botão')
+                    .setEmoji({ id: '1501803908589162537' })
                     .setStyle(ButtonStyle.Primary)
             );
             if (safePage < totalPages - 1) {
                 navRow.addComponents(
                     new ButtonBuilder()
                         .setCustomId(`anunciar_botao_emojipage_${safePage + 1}_${idx}_${userId}`)
-                        .setLabel('Próxima ▶')
+                        .setLabel('Próxima')
+                        .setEmoji({ id: '1501803914654257326' })
                         .setStyle(ButtonStyle.Secondary)
                 );
             }
