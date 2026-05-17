@@ -48,9 +48,9 @@ function buildFormEmbedPreviewContainer(data, formName, placeholderLabel) {
     c.addActionRowComponents(new ActionRowBuilder().addComponents(
         new StringSelectMenuBuilder()
             .setCustomId('_form_prev_disabled')
-            .setPlaceholder(placeholderLabel || 'Iniciar Aplicação')
+            .setPlaceholder(placeholderLabel || 'Selecione uma área para iniciar seu formulário...')
             .setDisabled(true)
-            .addOptions([{ label: 'Iniciar Aplicação', value: '_prev' }])
+            .addOptions([{ label: 'Selecione uma área para iniciar seu formulário...', value: '_prev' }])
     ));
     return c;
 }
@@ -181,7 +181,7 @@ function buildFormPanelPayload(guildId, slotId) {
         `${Emojis.get('_folder_emoji')} **Canal de Logs:** ${chOutput}\n` +
         `${Emojis.get('_staff_emoji')} **Staff Responsável:** ${staffRoles}\n` +
         `${Emojis.get('permissions_emoji')} **Cargo ao Aprovar:** ${roleAprovado}\n` +
-        `${Emojis.get('_lapis_emoji')} **Placeholder:** \`${form.button_label || 'Iniciar Aplicação'}\`\n` +
+        `${Emojis.get('_lapis_emoji')} **Placeholder:** \`${form.button_label || 'Selecione uma área para iniciar seu formulário...'}\`\n` +
         `${Emojis.get('_lapis_emoji')} **Perguntas:** ${qtdPerguntas}/10\n` +
         `${Emojis.get('clock_emoji')} **Tempo por Pergunta:** ${timeLimit}s\n` +
         `${Emojis.get('_fixe_emoji')} **Limite por Usuário:** ${limite}`
@@ -399,9 +399,9 @@ async function handleFormAction(interaction, client, action) {
             channel_output: null,
             roles_responsible: [],
             role_approved: null,
-            button_label: 'Iniciar Aplicação',
+            button_label: 'Selecione uma área para iniciar seu formulário...',
             button_emoji: null,
-            selectOptions: [{ label: 'Iniciar Aplicação', emoji: null, description: '' }],
+            selectOptions: [{ label: 'Selecione uma área para iniciar seu formulário...', emoji: null, description: '' }],
             questions: [],
             time_limit: 120,
             limit_per_user: null,
@@ -462,7 +462,7 @@ module.exports = {
                                 new TextInputBuilder()
                                     .setCustomId('button_label')
                                     .setLabel('Placeholder do Menu')
-                                    .setValue(form.button_label || 'Iniciar Aplicação')
+                                    .setValue(form.button_label || 'Selecione uma área para iniciar seu formulário...')
                                     .setStyle(TextInputStyle.Short)
                                     .setMaxLength(80)
                                     .setRequired(true)
@@ -773,7 +773,7 @@ module.exports = {
 
                     const rawOpts = form.selectOptions && form.selectOptions.length > 0
                         ? form.selectOptions
-                        : [{ label: 'Iniciar Aplicação', emoji: null, description: '' }];
+                        : [{ label: 'Selecione uma área para iniciar seu formulário...', emoji: null, description: '' }];
                     const selectOpts = rawOpts.slice(0, 25).map((opt, i) => {
                         const o = { label: (opt.label || 'Opção').slice(0, 100), value: String(i) };
                         if (opt.description) o.description = opt.description.slice(0, 100);
@@ -783,7 +783,7 @@ module.exports = {
                     fc.addActionRowComponents(new ActionRowBuilder().addComponents(
                         new StringSelectMenuBuilder()
                             .setCustomId(`fstart_${guildId}_${slotId}`)
-                            .setPlaceholder(form.button_label || 'Iniciar Aplicação')
+                            .setPlaceholder(form.button_label || 'Selecione uma área para iniciar seu formulário...')
                             .addOptions(selectOpts)
                     ));
 
@@ -818,7 +818,7 @@ module.exports = {
                                 new TextInputBuilder()
                                     .setCustomId('button_label')
                                     .setLabel('Placeholder do Menu')
-                                    .setValue(form.button_label || 'Iniciar Aplicação')
+                                    .setValue(form.button_label || 'Selecione uma área para iniciar seu formulário...')
                                     .setStyle(TextInputStyle.Short)
                                     .setMaxLength(80)
                                     .setRequired(true)
@@ -986,7 +986,7 @@ module.exports = {
                 const { logAction } = require('../../Functions/AuditLog.js');
 
                 if (action === 'botao') {
-                    slots[slotId].button_label = interaction.fields.getTextInputValue('button_label').trim() || 'Iniciar Aplicação';
+                    slots[slotId].button_label = interaction.fields.getTextInputValue('button_label').trim() || 'Selecione uma área para iniciar seu formulário...';
                     slots[slotId].button_emoji = interaction.fields.getTextInputValue('button_emoji').trim() || null;
                     formularios.set(guildId, slots);
                     logAction(client, { action: 'Botão do Formulário configurado', details: `Slot \`${slotId}\`: \`${slots[slotId].button_label}\``, userId: interaction.user.id, guildId });
@@ -1079,7 +1079,7 @@ module.exports = {
                             .setStyle(TextInputStyle.Short)
                             .setMaxLength(100)
                             .setRequired(true)
-                            .setPlaceholder('Ex: Iniciar Aplicação')
+                            .setPlaceholder('Ex: Selecione uma área para iniciar seu formulário...')
                     ),
                     new ActionRowBuilder().addComponents(
                         new TextInputBuilder()
@@ -1154,7 +1154,7 @@ module.exports = {
                 if (slots[slotId]?.selectOptions) {
                     slots[slotId].selectOptions.splice(optIdx, 1);
                     if (slots[slotId].selectOptions.length === 0)
-                        slots[slotId].selectOptions = [{ label: 'Iniciar Aplicação', emoji: null, description: '' }];
+                        slots[slotId].selectOptions = [{ label: 'Selecione uma área para iniciar seu formulário...', emoji: null, description: '' }];
                     formularios.set(guildId, slots);
                 }
                 await interaction.deferUpdate();
@@ -1437,7 +1437,7 @@ function buildSelectOptionsPanel(guildId, slotId) {
     const form    = (formularios.get(guildId) || {})[slotId] || {};
     const options = form.selectOptions && form.selectOptions.length > 0
         ? form.selectOptions
-        : [{ label: 'Iniciar Aplicação', emoji: null, description: '' }];
+        : [{ label: 'Selecione uma área para iniciar seu formulário...', emoji: null, description: '' }];
 
     const optLines = options.map((o, i) => {
         const emojiStr = o.emoji ? `<:e:${o.emoji}>` : '`sem emoji`';
