@@ -251,12 +251,13 @@ module.exports = {
             }
 
         } catch (err) {
+            if (err.code === 10062) return;
             console.error('[AnunciarHandler] Erro:', err);
             try {
                 if (!interaction.replied && !interaction.deferred) {
                     await interaction.reply({ content: `${Emojis.get('negative_emoji')} Ocorreu um erro. Tente novamente.`, ephemeral: true });
                 }
-            } catch (e) {}
+            } catch (e) { if (e.code !== 10062) console.error('[AnunciarHandler] Erro ao responder:', e.message); }
         }
     }
 };

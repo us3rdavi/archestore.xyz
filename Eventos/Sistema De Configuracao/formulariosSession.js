@@ -427,6 +427,7 @@ module.exports = {
             }
 
         } catch (err) {
+            if (err.code === 10062) return;
             console.error('[FormSession] Erro:', err);
             try {
                 if (!interaction.replied && !interaction.deferred)

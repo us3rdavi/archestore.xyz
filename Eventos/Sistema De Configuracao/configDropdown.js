@@ -173,12 +173,13 @@ module.exports = {
                 }
             }
         } catch (err) {
+            if (err.code === 10062) return;
             console.error('[ConfigDropdown] Erro:', err);
             try {
                 if (!interaction.replied && !interaction.deferred) {
                     await interaction.reply({ content: `Ocorreu um erro ao processar sua seleção.`, ephemeral: true });
                 }
-            } catch (e) {}
+            } catch (e) { if (e.code !== 10062) console.error('[ConfigDropdown] Erro ao responder:', e.message); }
         }
     },
 };

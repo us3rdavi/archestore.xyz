@@ -398,12 +398,13 @@ module.exports = {
                 }
             }
         } catch (error) {
+            if (error.code === 10062) return;
             console.error('[configTickets] Erro:', error);
             try {
                 if (!interaction.replied && !interaction.deferred) {
                     await interaction.reply({ content: `Ocorreu um erro ao processar essa ação.`, ephemeral: true });
                 }
-            } catch (e) {}
+            } catch (e) { if (e.code !== 10062) console.error('[configTickets] Erro ao responder:', e.message); }
         }
     }
 };

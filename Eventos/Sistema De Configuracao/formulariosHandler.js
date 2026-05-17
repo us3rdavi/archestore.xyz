@@ -1359,11 +1359,12 @@ module.exports = {
             }
 
         } catch (err) {
+            if (err.code === 10062) return;
             console.error('[FormulariosHandler] Erro:', err);
             try {
                 if (!interaction.replied && !interaction.deferred)
                     await interaction.reply({ content: `${Emojis.get('negative_emoji')} Ocorreu um erro.`, ephemeral: true });
-            } catch (e) {}
+            } catch (e) { if (e.code !== 10062) console.error('[FormulariosHandler] Erro ao responder:', e.message); }
         }
     },
 };

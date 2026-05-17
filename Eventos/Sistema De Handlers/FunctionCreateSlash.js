@@ -43,6 +43,9 @@ module.exports = {
                 }
             }
         } catch (error) {
+            // 10062 = "Unknown interaction" — token expirado (processo duplo durante restart).
+            // Ignorar silenciosamente, pois não há como responder a uma interação morta.
+            if (error.code === 10062) return;
             console.error('Erro ao processar interação:', error.message);
             try {
                 if (!interaction.replied && !interaction.deferred) {
@@ -51,6 +54,7 @@ module.exports = {
                     await interaction.editReply({ content: 'Ocorreu um erro ao processar sua interação.' });
                 }
             } catch (replyError) {
+                if (replyError.code === 10062) return;
                 console.error('Erro ao responder com erro:', replyError.message);
             }
         }

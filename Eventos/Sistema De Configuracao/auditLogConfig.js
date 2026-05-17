@@ -108,6 +108,7 @@ module.exports = {
                 return;
             }
         } catch (err) {
+            if (err.code === 10062) return;
             console.error('[AuditLogConfig] Erro:', err);
         }
     }

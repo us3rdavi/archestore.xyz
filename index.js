@@ -4,6 +4,21 @@ process.on('unhandledRejection', (err) => {
     console.log(`${colors.red(`[UNHANDLED]`)} ${err?.message || err}`);
 });
 
+// Referência global ao client — preenchida logo após a criação do Client.
+// Usada pelo graceful shutdown para fechar o WebSocket antes de sair.
+let _discordClient = null;
+
+// Graceful shutdown — encerra a conexão WebSocket com o Discord imediatamente
+// ao receber SIGTERM (reinicialização do workflow) ou SIGINT (Ctrl+C).
+// Sem isso, o processo antigo mantém o gateway ativo por alguns segundos e
+// ambos os processos recebem as mesmas interações, causando o erro 10062.
+function gracefulShutdown() {
+    try { if (_discordClient) _discordClient.destroy(); } catch (e) {}
+    process.exit(0);
+}
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT',  gracefulShutdown);
+
 (async () => {
     // 1. Conectar MongoDB e carregar todos os dados na memória ANTES de qualquer require que use banco
     const { initDatabase } = require('./Database');
@@ -53,6 +68,7 @@ process.on('unhandledRejection', (err) => {
     client.setMaxListeners(50);
     client.slashCommands = new Collection();
     module.exports.client = client;
+    _discordClient = client;
 
     const events = require('./Handler/events');
     const slash = require('./Handler/slash');
