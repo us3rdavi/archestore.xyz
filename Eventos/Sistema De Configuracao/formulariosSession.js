@@ -28,21 +28,22 @@ function hasStaffPermission(member, form) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Envia log de respostas no canal configurado
 // ─────────────────────────────────────────────────────────────────────────────
-async function sendFormLog(guild, form, slotId, guildId, user, answers) {
+async function sendFormLog(guild, form, slotId, guildId, user, answers, questions, sectionLabel) {
     const channel = guild.channels.cache.get(form.channel_output);
     if (!channel) return null;
 
-    const questions  = form.questions || [];
-    const qaText     = questions.map((q, i) =>
+    const qaText    = questions.map((q, i) =>
         `**${i + 1}. ${q.text}**\n> ${answers[i] || '*Sem resposta*'}`
     ).join('\n\n');
-    const timestamp  = Math.floor(Date.now() / 1000);
+    const timestamp = Math.floor(Date.now() / 1000);
+    const secLine   = sectionLabel ? `${Emojis.get('_folder_emoji')} **Área:** ${sectionLabel}\n` : '';
 
     const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('_messages_emoji')} Nova Aplicação — ${form.name}\n` +
         `${Emojis.get('_silueta_emoji')} **Candidato:** ${user.username} (<@${user.id}>)\n` +
         `${Emojis.get('date_emoji')} **Enviado em:** <t:${timestamp}:F>\n` +
+        secLine +
         `-# ID: ${user.id}\n\n` +
         `${Emojis.get('_lapis_emoji')} **Respostas:**\n\n${qaText}`
     ));
@@ -138,10 +139,15 @@ module.exports = {
                     });
                 }
 
-                const questions = form.questions || [];
+                const selectedOpt = (form.selectOptions || [])[selectedOptIdx];
+                const selectedOptLabel = selectedOpt?.label || null;
+                // backward-compat: formulários antigos usam form.questions; novos usam selectOptions[i].questions
+                const questions = selectedOpt?.questions
+                    || (selectedOptIdx === 0 ? form.questions : null)
+                    || [];
                 if (questions.length === 0) {
                     return interaction.reply({
-                        content: `${Emojis.get('negative_emoji')} Este formulário não possui perguntas configuradas.`,
+                        content: `${Emojis.get('negative_emoji')} Esta área não possui perguntas configuradas ainda.`,
                         ephemeral: true,
                     });
                 }
@@ -180,7 +186,7 @@ module.exports = {
                 try {
                     const wc = new ContainerBuilder();
                     wc.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-                        `## ${Emojis.get('_messages_emoji')} ${form.name}\n` +
+                        `## ${Emojis.get('_messages_emoji')} ${form.name}${selectedOptLabel ? ` — ${selectedOptLabel}` : ''}\n` +
                         `Olá, **${interaction.user.username}**! Você iniciou o processo de aplicação.\n\n` +
                         `${Emojis.get('information_emoji')} **O que esperar:**\n` +
                         `> <:custom_question_emoji:1502520447340777482> **${questions.length} pergunta(s)** serão feitas aqui na DM\n` +
@@ -257,7 +263,7 @@ module.exports = {
                 if (!guild) return;
                 const currentForm = (formularios.get(guildId) || {})[slotId];
                 if (!currentForm) return;
-                await sendFormLog(guild, currentForm, slotId, guildId, interaction.user, answers);
+                await sendFormLog(guild, currentForm, slotId, guildId, interaction.user, answers, questions, selectedOptLabel);
                 return;
             }
 

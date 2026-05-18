@@ -169,9 +169,11 @@ function buildFormPanelPayload(guildId, slotId) {
         ? form.roles_responsible.map(r => `<@&${r}>`).join(', ')
         : `\`Nenhum\``;
     const roleAprovado = form.role_approved ? `<@&${form.role_approved}>` : `\`Não definido\``;
-    const timeLimit    = form.time_limit || 120;
-    const qtdPerguntas = (form.questions || []).length;
-    const limite       = form.limit_per_user ? `${form.limit_per_user} envio(s)` : `Ilimitado`;
+    const timeLimit      = form.time_limit || 120;
+    const totalPerguntas = (form.selectOptions || []).reduce((s, o) => s + (o.questions || []).length, 0)
+        + (form.questions || []).length;
+    const numSecoes      = (form.selectOptions || []).length || 1;
+    const limite         = form.limit_per_user ? `${form.limit_per_user} envio(s)` : `Ilimitado`;
 
     const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
@@ -182,7 +184,7 @@ function buildFormPanelPayload(guildId, slotId) {
         `${Emojis.get('_staff_emoji')} **Staff Responsável:** ${staffRoles}\n` +
         `${Emojis.get('permissions_emoji')} **Cargo ao Aprovar:** ${roleAprovado}\n` +
         `${Emojis.get('_lapis_emoji')} **Placeholder:** \`${form.button_label || 'Selecione uma área para iniciar seu formulário...'}\`\n` +
-        `${Emojis.get('_lapis_emoji')} **Perguntas:** ${qtdPerguntas}/10\n` +
+        `${Emojis.get('_lapis_emoji')} **Perguntas:** ${totalPerguntas} pergunta(s) em ${numSecoes} seção(ões)\n` +
         `${Emojis.get('clock_emoji')} **Tempo por Pergunta:** ${timeLimit}s\n` +
         `${Emojis.get('_fixe_emoji')} **Limite por Usuário:** ${limite}`
     ));
@@ -316,7 +318,7 @@ function buildFormManagePayload(guildId, userId) {
             .addOptions(existing.map(([slotId, form]) => ({
                 label: form.name,
                 value: `${guildId}_${slotId}`,
-                description: `Slot ${slotId} — ${form.active ? 'Ativo' : 'Inativo'} — ${(form.questions || []).length} pergunta(s)`,
+                description: `Slot ${slotId} — ${form.active ? 'Ativo' : 'Inativo'} — ${(form.selectOptions || []).reduce((s, o) => s + (o.questions || []).length, 0) + (form.questions || []).length} pergunta(s)`,
                 emoji: { id: '1501804039451709441' },
             })))
     ));
@@ -325,12 +327,72 @@ function buildFormManagePayload(guildId, userId) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PAINEL DE PERGUNTAS
+// PAINEL DE PERGUNTAS POR SEÇÃO
 // ─────────────────────────────────────────────────────────────────────────────
-function buildQuestionsPanelPayload(guildId, slotId) {
+
+// Retorna as perguntas de uma seção, com backward-compat para o campo legado form.questions
+function getSectionQuestions(form, optionIdx) {
+    const opt = (form.selectOptions || [])[optionIdx];
+    if (opt) return opt.questions || [];
+    // backward-compat: formulários antigos com campo flat questions
+    if (optionIdx === 0) return form.questions || [];
+    return [];
+}
+
+// Painel de seleção de seção (mostrado quando há mais de 1 opção no menu)
+function buildSectionQuestionsSelectPayload(guildId, slotId) {
+    const form = (formularios.get(guildId) || {})[slotId] || {};
+    const opts = form.selectOptions || [];
+
+    const c = new ContainerBuilder();
+    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('_lapis_emoji')} Perguntas por Seção — ${form.name || `Formulário ${slotId}`}\n` +
+        `-# Selecione uma seção abaixo para configurar suas perguntas individualmente.\n\n` +
+        opts.map((opt, i) => `-# ${i + 1}. **${opt.label}** — ${(opt.questions || []).length}/10 pergunta(s)`).join('\n')
+    ));
+    c.addSeparatorComponents(new SeparatorBuilder());
+
+    if (opts.length > 0) {
+        c.addActionRowComponents(new ActionRowBuilder().addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId(`form_secq_pick_${guildId}_${slotId}`)
+                .setPlaceholder('Selecionar seção para configurar perguntas...')
+                .addOptions(opts.map((opt, i) => {
+                    const o = {
+                        label: (opt.label || `Seção ${i + 1}`).slice(0, 100),
+                        value: String(i),
+                        description: `${(opt.questions || []).length}/10 perguntas configuradas`,
+                    };
+                    if (opt.emoji && /^\d+$/.test(opt.emoji)) o.emoji = { id: opt.emoji };
+                    return o;
+                }))
+        ));
+    } else {
+        c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+            `-# Nenhuma opção no menu. Configure as opções primeiro em **Opções do Menu**.`
+        ));
+    }
+
+    c.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`form_btn_voltarform_${guildId}_${slotId}`)
+            .setLabel('Voltar')
+            .setEmoji({ id: '1501803908589162537' })
+            .setStyle(ButtonStyle.Secondary),
+    ));
+
+    return { components: [c], flags: MessageFlags.IsComponentsV2 };
+}
+
+// Painel de perguntas de uma seção específica (optionIdx = índice em selectOptions)
+function buildQuestionsPanelPayload(guildId, slotId, optionIdx = 0) {
     const slots     = formularios.get(guildId) || {};
     const form      = slots[slotId] || {};
-    const questions = form.questions || [];
+    const opts      = form.selectOptions || [];
+    const opt       = opts[optionIdx];
+    const optLabel  = opt?.label || `Seção ${optionIdx + 1}`;
+    const questions = getSectionQuestions(form, optionIdx);
+    const hasMultiple = opts.length > 1;
 
     const qLines = questions.length > 0
         ? questions.map((q, i) => `-# ${i + 1}. ${q.text}`).join('\n')
@@ -338,26 +400,29 @@ function buildQuestionsPanelPayload(guildId, slotId) {
 
     const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('_lapis_emoji')} Perguntas — ${form.name || `Formulário ${slotId}`}\n` +
+        `## ${Emojis.get('_lapis_emoji')} Perguntas — ${optLabel}\n` +
+        `-# Formulário: ${form.name || `Formulário ${slotId}`}\n\n` +
         `${qLines}\n\n` +
         `-# ${questions.length}/10 perguntas configuradas`
     ));
     c.addSeparatorComponents(new SeparatorBuilder());
     c.addActionRowComponents(new ActionRowBuilder().addComponents(
         new ButtonBuilder()
-            .setCustomId(`form_btn_addperg_${guildId}_${slotId}`)
+            .setCustomId(`form_secq_add_${optionIdx}_${guildId}_${slotId}`)
             .setLabel('Adicionar Pergunta')
             .setEmoji({ id: '1501803923126747178' })
             .setStyle(ButtonStyle.Success)
             .setDisabled(questions.length >= 10),
         new ButtonBuilder()
-            .setCustomId(`form_btn_delperg_${guildId}_${slotId}`)
+            .setCustomId(`form_secq_del_${optionIdx}_${guildId}_${slotId}`)
             .setLabel('Remover Última')
             .setEmoji({ id: '1501803926180335727' })
             .setStyle(ButtonStyle.Danger)
             .setDisabled(questions.length === 0),
         new ButtonBuilder()
-            .setCustomId(`form_btn_voltarform_${guildId}_${slotId}`)
+            .setCustomId(hasMultiple
+                ? `form_secq_back_${guildId}_${slotId}`
+                : `form_btn_voltarform_${guildId}_${slotId}`)
             .setLabel('Voltar')
             .setEmoji({ id: '1501803908589162537' })
             .setStyle(ButtonStyle.Secondary),
@@ -547,7 +612,13 @@ module.exports = {
                 } else if (action === 'cargos') {
                     await interaction.editReply(buildStaffConfigPayload(guildId, slotId));
                 } else if (action === 'perguntas') {
-                    await interaction.editReply(buildQuestionsPanelPayload(guildId, slotId));
+                    const formData = (formularios.get(guildId) || {})[slotId] || {};
+                    const secOpts  = formData.selectOptions || [];
+                    if (secOpts.length > 1) {
+                        await interaction.editReply(buildSectionQuestionsSelectPayload(guildId, slotId));
+                    } else {
+                        await interaction.editReply(buildQuestionsPanelPayload(guildId, slotId, 0));
+                    }
                 } else if (action === 'cargoaprovado') {
                     await interaction.editReply(buildAprovadoConfigPayload(guildId, slotId));
                 } else if (action === 'embeds') {
@@ -666,25 +737,16 @@ module.exports = {
                     return;
                 }
 
-                // Perguntas — abre painel
+                // Perguntas — abre painel (com seleção de seção se houver múltiplas)
                 if (action === 'perguntas') {
                     await interaction.deferUpdate();
-                    await interaction.editReply(buildQuestionsPanelPayload(guildId, slotId));
-                    return;
-                }
-
-                // Remover última pergunta
-                if (action === 'delperg') {
-                    const slots = formularios.get(guildId) || {};
-                    if (slots[slotId]?.questions?.length > 0) {
-                        const removedQ = slots[slotId].questions[slots[slotId].questions.length - 1];
-                        slots[slotId].questions.pop();
-                        formularios.set(guildId, slots);
-                        const { logAction } = require('../../Functions/AuditLog.js');
-                        logAction(client, { action: 'Pergunta do Formulário removida', details: `Slot \`${slotId}\`: \`${removedQ?.text || 'desconhecida'}\``, userId: interaction.user.id, guildId });
+                    const fData  = (formularios.get(guildId) || {})[slotId] || {};
+                    const sOpts  = fData.selectOptions || [];
+                    if (sOpts.length > 1) {
+                        await interaction.editReply(buildSectionQuestionsSelectPayload(guildId, slotId));
+                    } else {
+                        await interaction.editReply(buildQuestionsPanelPayload(guildId, slotId, 0));
                     }
-                    await interaction.deferUpdate();
-                    await interaction.editReply(buildQuestionsPanelPayload(guildId, slotId));
                     return;
                 }
 
@@ -751,8 +813,10 @@ module.exports = {
                         return interaction.reply({ content: `${Emojis.get('negative_emoji')} Configure o **Canal do Formulário** antes de postar.`, ephemeral: true });
                     if (!form.channel_output)
                         return interaction.reply({ content: `${Emojis.get('negative_emoji')} Configure o **Canal de Logs** antes de postar.`, ephemeral: true });
-                    if ((form.questions || []).length === 0)
-                        return interaction.reply({ content: `${Emojis.get('negative_emoji')} Adicione pelo menos **uma pergunta** antes de postar.`, ephemeral: true });
+                    const hasAnyQuestion = (form.selectOptions || []).some(opt => (opt.questions || []).length > 0)
+                        || (form.questions || []).length > 0;
+                    if (!hasAnyQuestion)
+                        return interaction.reply({ content: `${Emojis.get('negative_emoji')} Adicione pelo menos **uma pergunta** em uma das seções antes de postar.`, ephemeral: true });
 
                     const channel = interaction.guild.channels.cache.get(form.channel_input);
                     if (!channel)
@@ -932,6 +996,38 @@ module.exports = {
                 return;
             }
 
+            // ── Modal: adicionar pergunta por seção ───────────────────────
+            if (interaction.isModalSubmit() && customId.startsWith('form_modal_secqadd_')) {
+                const parts     = customId.slice('form_modal_secqadd_'.length).split('_');
+                const slotId    = parts[parts.length - 1];
+                const guildId   = parts[parts.length - 2];
+                const optionIdx = parseInt(parts[parts.length - 3]);
+
+                const lockKey = `secq_${guildId}_${slotId}_${optionIdx}_${interaction.user.id}`;
+                if (pergLock.has(lockKey)) return;
+                pergLock.add(lockKey);
+                try {
+                    const text = interaction.fields.getTextInputValue('question_text').trim();
+                    if (!text) return;
+                    const freshSlots = formularios.get(guildId) || {};
+                    if (!freshSlots[slotId]) return;
+                    if (!freshSlots[slotId].selectOptions?.[optionIdx]) return;
+                    if (!freshSlots[slotId].selectOptions[optionIdx].questions)
+                        freshSlots[slotId].selectOptions[optionIdx].questions = [];
+                    if (freshSlots[slotId].selectOptions[optionIdx].questions.length >= 10)
+                        return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 10 perguntas atingido.`, ephemeral: true });
+                    freshSlots[slotId].selectOptions[optionIdx].questions.push({ text });
+                    formularios.set(guildId, freshSlots);
+                    const { logAction } = require('../../Functions/AuditLog.js');
+                    const optLabel = freshSlots[slotId].selectOptions[optionIdx].label || `Seção ${optionIdx + 1}`;
+                    logAction(client, { action: 'Pergunta adicionada (por seção)', details: `Slot \`${slotId}\` · Seção \`${optLabel}\`: \`${text.slice(0, 80)}\``, userId: interaction.user.id, guildId });
+                    await interaction.update(buildQuestionsPanelPayload(guildId, slotId, optionIdx));
+                } finally {
+                    setTimeout(() => pergLock.delete(lockKey), 2000);
+                }
+                return;
+            }
+
             // ── Modal: adicionar opção do select menu ─────────────────────
             if (interaction.isModalSubmit() && customId.startsWith('form_modal_addopt_')) {
                 const parts   = customId.split('_');
@@ -1039,6 +1135,75 @@ module.exports = {
                     }
 
                 }
+                return;
+            }
+
+            // ── Perguntas por seção: selecionar seção via select menu ────
+            if (interaction.isStringSelectMenu() && customId.startsWith('form_secq_pick_')) {
+                const parts      = customId.slice('form_secq_pick_'.length).split('_');
+                const slotId     = parts[parts.length - 1];
+                const guildId    = parts[parts.length - 2];
+                const optionIdx  = parseInt(interaction.values[0]);
+                await interaction.deferUpdate();
+                await interaction.editReply(buildQuestionsPanelPayload(guildId, slotId, optionIdx));
+                return;
+            }
+
+            // ── Perguntas por seção: adicionar (abre modal) ───────────────
+            if (interaction.isButton() && customId.startsWith('form_secq_add_')) {
+                const parts     = customId.slice('form_secq_add_'.length).split('_');
+                const slotId    = parts[parts.length - 1];
+                const guildId   = parts[parts.length - 2];
+                const optionIdx = parseInt(parts[parts.length - 3]);
+                const slotsData = formularios.get(guildId) || {};
+                const opt       = (slotsData[slotId]?.selectOptions || [])[optionIdx] || {};
+                if ((opt.questions || []).length >= 10)
+                    return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 10 perguntas atingido nesta seção.`, ephemeral: true });
+                const modal = new ModalBuilder()
+                    .setCustomId(`form_modal_secqadd_${optionIdx}_${guildId}_${slotId}`)
+                    .setTitle(`Adicionar Pergunta — ${(opt.label || 'Seção').slice(0, 40)}`);
+                modal.addComponents(
+                    new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('question_text')
+                            .setLabel('Texto da Pergunta')
+                            .setStyle(TextInputStyle.Paragraph)
+                            .setMaxLength(300)
+                            .setRequired(true)
+                            .setPlaceholder('Digite a pergunta que será feita ao candidato...')
+                    )
+                );
+                await interaction.showModal(modal);
+                return;
+            }
+
+            // ── Perguntas por seção: remover última ───────────────────────
+            if (interaction.isButton() && customId.startsWith('form_secq_del_')) {
+                const parts     = customId.slice('form_secq_del_'.length).split('_');
+                const slotId    = parts[parts.length - 1];
+                const guildId   = parts[parts.length - 2];
+                const optionIdx = parseInt(parts[parts.length - 3]);
+                const slotsData = formularios.get(guildId) || {};
+                const opt       = slotsData[slotId]?.selectOptions?.[optionIdx];
+                if (opt && (opt.questions || []).length > 0) {
+                    const removed = opt.questions[opt.questions.length - 1];
+                    opt.questions.pop();
+                    formularios.set(guildId, slotsData);
+                    const { logAction } = require('../../Functions/AuditLog.js');
+                    logAction(client, { action: 'Pergunta de seção removida', details: `Slot \`${slotId}\` Seção \`${opt.label || optionIdx}\`: \`${removed?.text?.slice(0, 60) || ''}\``, userId: interaction.user.id, guildId });
+                }
+                await interaction.deferUpdate();
+                await interaction.editReply(buildQuestionsPanelPayload(guildId, slotId, optionIdx));
+                return;
+            }
+
+            // ── Perguntas por seção: voltar à lista de seções ─────────────
+            if (interaction.isButton() && customId.startsWith('form_secq_back_')) {
+                const parts   = customId.slice('form_secq_back_'.length).split('_');
+                const slotId  = parts[parts.length - 1];
+                const guildId = parts[parts.length - 2];
+                await interaction.deferUpdate();
+                await interaction.editReply(buildSectionQuestionsSelectPayload(guildId, slotId));
                 return;
             }
 
