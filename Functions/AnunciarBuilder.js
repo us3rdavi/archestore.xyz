@@ -432,18 +432,28 @@ function buildBotaoEditScreen(userId, idx) {
                 .setStyle(ButtonStyle.Secondary),
             new ButtonBuilder()
                 .setCustomId(`anunciar_botao_emoji_${idx}_${userId}`)
-                .setLabel('Escolher Emoji')
+                .setLabel('Emojis do Bot')
                 .setEmoji({ id: '1501804039451709441' })
                 .setStyle(ButtonStyle.Secondary),
-            ...(btn.emoji ? [
+            new ButtonBuilder()
+                .setCustomId(`anunciar_botao_svremoji_${idx}_${userId}`)
+                .setLabel('Emojis do Servidor')
+                .setEmoji({ id: '1501803947898306724' })
+                .setStyle(ButtonStyle.Secondary),
+        )
+    );
+
+    if (btn.emoji) {
+        controlContainer.addActionRowComponents(
+            new ActionRowBuilder().addComponents(
                 new ButtonBuilder()
                     .setCustomId(`anunciar_botao_removeemoji_${idx}_${userId}`)
                     .setLabel('Remover Emoji')
                     .setEmoji({ id: '1501803926180335727' })
                     .setStyle(ButtonStyle.Secondary),
-            ] : []),
-        )
-    );
+            )
+        );
+    }
 
     return { components: [previewContainer, controlContainer], ...CV2 };
 }
@@ -486,60 +496,79 @@ function buildBotaoCorScreen(userId, idx) {
 
 const PAGE_SIZE = 25;
 
-function buildBotaoEmojiScreen(userId, idx, page = 0) {
+// ── Emoji option builders ──────────────────────────────────────────────────────
+
+function buildBotEmojiOptions() {
+    const allEmojis = Emojis.all();
+    const options = [];
+    for (const val of Object.values(allEmojis)) {
+        const match = val.match(/^<(a?):([^:]+):(\d+)>$/);
+        if (!match) continue;
+        options.push({
+            label: (match[2].replace(/_emoji$/, '').replace(/_/g, ' ') || 'emoji').slice(0, 100),
+            value: val,
+            emoji: { id: match[3], animated: match[1] === 'a' },
+        });
+    }
+    return options;
+}
+
+function buildServerEmojiOptions(guild) {
+    return [...guild.emojis.cache.values()].map(e => ({
+        label: ((e.name || 'emoji').replace(/_/g, ' ')).slice(0, 100),
+        value: `<${e.animated ? 'a' : ''}:${e.name}:${e.id}>`,
+        emoji: { id: e.id, animated: !!e.animated },
+    }));
+}
+
+// source: 'bot' | 'server'
+// allOptions: full pre-built array — sliced here for the requested page
+function buildBotaoEmojiScreen(userId, idx, page, allOptions, source = 'bot') {
     const data = getEmbedData(userId);
     const buttons = data.buttons || [];
     const btn = buttons[idx];
     if (!btn) return buildBoesScreen(userId);
 
-    // Collect ALL valid custom emojis from the bot store
-    const allEmojis = Emojis.all();
-    const allOptions = [];
-    for (const val of Object.values(allEmojis)) {
-        const match = val.match(/^<(a?):([^:]+):(\d+)>$/);
-        if (!match) continue;
-        allOptions.push({
-            label: match[2].replace(/_emoji$/, '').replace(/_/g, ' '),
-            value: val,
-            emoji: { id: match[3], animated: match[1] === 'a' },
-        });
-    }
-
-    const totalPages = Math.ceil(allOptions.length / PAGE_SIZE);
-    const safePage = Math.max(0, Math.min(page, totalPages - 1));
+    const totalPages = Math.max(1, Math.ceil(allOptions.length / PAGE_SIZE));
+    const safePage   = Math.max(0, Math.min(page, totalPages - 1));
     const pageOptions = allOptions.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
+
+    const isServer   = source === 'server';
+    const sourceLabel = isServer ? 'Servidor' : 'Bot';
+    const selId      = `anunciar_botao_${isServer ? 'svr' : ''}emojisel_${idx}_${userId}`;
+    const pagePrefix = `anunciar_botao_${isServer ? 'svr' : ''}emojipage`;
+    const backId     = `anunciar_botao_${isServer ? 'svr' : ''}emojiback_${idx}_${userId}`;
 
     const previewContainer = buildPreviewContainer(data);
     const controlContainer = new ContainerBuilder();
 
     controlContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('_lapis_emoji')} Escolher Emoji — Botão ${idx + 1}\n` +
-        `-# Página ${safePage + 1}/${totalPages} · ${allOptions.length} emojis disponíveis · **${btn.label || 'Sem nome'}**`
+        `## ${Emojis.get('_lapis_emoji')} Emojis do ${sourceLabel} — Botão ${idx + 1}\n` +
+        `-# Página ${safePage + 1}/${totalPages} · ${allOptions.length} emojis · **${btn.label || 'Sem nome'}**`
     ));
     controlContainer.addSeparatorComponents(new SeparatorBuilder());
     controlContainer.addActionRowComponents(buildNavSelectRow(userId, 'botoes'));
 
     if (allOptions.length === 0) {
         controlContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-            `-# Nenhum emoji do bot disponível.`
+            `-# Nenhum emoji do ${sourceLabel.toLowerCase()} disponível.`
         ));
     } else {
         controlContainer.addActionRowComponents(
             new ActionRowBuilder().addComponents(
                 new StringSelectMenuBuilder()
-                    .setCustomId(`anunciar_botao_emojisel_${idx}_${userId}`)
+                    .setCustomId(selId)
                     .setPlaceholder(`Emojis ${safePage * PAGE_SIZE + 1}–${Math.min((safePage + 1) * PAGE_SIZE, allOptions.length)} de ${allOptions.length}...`)
                     .addOptions(pageOptions)
             )
         );
 
-        // Pagination buttons (only shown when there are multiple pages)
         if (totalPages > 1) {
             const navRow = new ActionRowBuilder();
             if (safePage > 0) {
                 navRow.addComponents(
                     new ButtonBuilder()
-                        .setCustomId(`anunciar_botao_emojipage_${safePage - 1}_${idx}_${userId}`)
+                        .setCustomId(`${pagePrefix}_${safePage - 1}_${idx}_${userId}`)
                         .setLabel('Anterior')
                         .setEmoji({ id: '1501803911655198742' })
                         .setStyle(ButtonStyle.Secondary)
@@ -547,7 +576,7 @@ function buildBotaoEmojiScreen(userId, idx, page = 0) {
             }
             navRow.addComponents(
                 new ButtonBuilder()
-                    .setCustomId(`anunciar_botao_emojiback_${idx}_${userId}`)
+                    .setCustomId(backId)
                     .setLabel('Voltar ao Botão')
                     .setEmoji({ id: '1501803908589162537' })
                     .setStyle(ButtonStyle.Primary)
@@ -555,7 +584,7 @@ function buildBotaoEmojiScreen(userId, idx, page = 0) {
             if (safePage < totalPages - 1) {
                 navRow.addComponents(
                     new ButtonBuilder()
-                        .setCustomId(`anunciar_botao_emojipage_${safePage + 1}_${idx}_${userId}`)
+                        .setCustomId(`${pagePrefix}_${safePage + 1}_${idx}_${userId}`)
                         .setLabel('Próxima')
                         .setEmoji({ id: '1501803914654257326' })
                         .setStyle(ButtonStyle.Secondary)
@@ -579,6 +608,8 @@ module.exports = {
     buildBotaoEditScreen,
     buildBotaoCorScreen,
     buildBotaoEmojiScreen,
+    buildBotEmojiOptions,
+    buildServerEmojiOptions,
     styleFromString,
     SECTION_LABELS,
     NAV_OPTIONS,

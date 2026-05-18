@@ -8,6 +8,7 @@ const {
     getEmbedData, setEmbedData, clearEmbedData,
     buildMainMenu, buildSectionScreen, buildAnnouncementContainer,
     buildBoesScreen, buildBotaoEditScreen, buildBotaoCorScreen, buildBotaoEmojiScreen,
+    buildBotEmojiOptions, buildServerEmojiOptions,
     styleFromString,
 } = require('../../Functions/AnunciarBuilder');
 const { Emojis } = require('../../Database');
@@ -67,9 +68,12 @@ module.exports = {
                     return;
                 }
 
-                // Emoji selection for a button
-                if (customId.startsWith(`anunciar_botao_emojisel_`)) {
-                    const inner = customId.slice('anunciar_botao_emojisel_'.length);
+                // Emoji selection — bot or server (same save logic, different customId prefix)
+                if (customId.startsWith(`anunciar_botao_emojisel_`) || customId.startsWith(`anunciar_botao_svremojisel_`)) {
+                    const prefix = customId.startsWith(`anunciar_botao_svremojisel_`)
+                        ? 'anunciar_botao_svremojisel_'
+                        : 'anunciar_botao_emojisel_';
+                    const inner = customId.slice(prefix.length);
                     const idx = parseInt(inner.slice(0, inner.lastIndexOf('_')), 10);
                     const emojiVal = interaction.values[0];
                     const data = getEmbedData(userId);
@@ -422,28 +426,53 @@ module.exports = {
                 return;
             }
 
-            // Open emoji selection screen (page 0)
-            if (customId.startsWith(`anunciar_botao_emoji_`) && !customId.startsWith(`anunciar_botao_emojisel_`) && !customId.startsWith(`anunciar_botao_removeemoji_`) && !customId.startsWith(`anunciar_botao_emojipage_`) && !customId.startsWith(`anunciar_botao_emojiback_`)) {
+            // Open bot emoji screen (page 0)
+            if (customId.startsWith(`anunciar_botao_emoji_`) && !customId.startsWith(`anunciar_botao_emojisel_`) && !customId.startsWith(`anunciar_botao_removeemoji_`) && !customId.startsWith(`anunciar_botao_emojipage_`) && !customId.startsWith(`anunciar_botao_emojiback_`) && !customId.startsWith(`anunciar_botao_svremoji_`)) {
                 const inner = customId.slice('anunciar_botao_emoji_'.length);
                 const idx = parseInt(inner.slice(0, inner.lastIndexOf('_')), 10);
-                await interaction.update(buildBotaoEmojiScreen(userId, idx, 0));
+                await interaction.update(buildBotaoEmojiScreen(userId, idx, 0, buildBotEmojiOptions(), 'bot'));
                 return;
             }
 
-            // Emoji page navigation
+            // Open server emoji screen (page 0) — fetches live from guild
+            if (customId.startsWith(`anunciar_botao_svremoji_`) && !customId.startsWith(`anunciar_botao_svremojisel_`) && !customId.startsWith(`anunciar_botao_svremojipage_`) && !customId.startsWith(`anunciar_botao_svremojiback_`)) {
+                const inner = customId.slice('anunciar_botao_svremoji_'.length);
+                const idx = parseInt(inner.slice(0, inner.lastIndexOf('_')), 10);
+                await interaction.update(buildBotaoEmojiScreen(userId, idx, 0, buildServerEmojiOptions(interaction.guild), 'server'));
+                return;
+            }
+
+            // Bot emoji page navigation
             if (customId.startsWith(`anunciar_botao_emojipage_`)) {
                 const inner = customId.slice('anunciar_botao_emojipage_'.length);
                 const parts2 = inner.split('_');
-                // format: page_idx_userId  (userId may itself contain no underscores — it's a snowflake)
                 const page = parseInt(parts2[0], 10);
                 const idx = parseInt(parts2[1], 10);
-                await interaction.update(buildBotaoEmojiScreen(userId, idx, page));
+                await interaction.update(buildBotaoEmojiScreen(userId, idx, page, buildBotEmojiOptions(), 'bot'));
                 return;
             }
 
-            // Emoji screen → back to button edit
+            // Server emoji page navigation — re-fetches live guild emojis
+            if (customId.startsWith(`anunciar_botao_svremojipage_`)) {
+                const inner = customId.slice('anunciar_botao_svremojipage_'.length);
+                const parts2 = inner.split('_');
+                const page = parseInt(parts2[0], 10);
+                const idx = parseInt(parts2[1], 10);
+                await interaction.update(buildBotaoEmojiScreen(userId, idx, page, buildServerEmojiOptions(interaction.guild), 'server'));
+                return;
+            }
+
+            // Bot emoji screen → back to button edit
             if (customId.startsWith(`anunciar_botao_emojiback_`)) {
                 const inner = customId.slice('anunciar_botao_emojiback_'.length);
+                const idx = parseInt(inner.slice(0, inner.lastIndexOf('_')), 10);
+                await interaction.update(buildBotaoEditScreen(userId, idx));
+                return;
+            }
+
+            // Server emoji screen → back to button edit
+            if (customId.startsWith(`anunciar_botao_svremojiback_`)) {
+                const inner = customId.slice('anunciar_botao_svremojiback_'.length);
                 const idx = parseInt(inner.slice(0, inner.lastIndexOf('_')), 10);
                 await interaction.update(buildBotaoEditScreen(userId, idx));
                 return;
