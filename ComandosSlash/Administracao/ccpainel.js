@@ -15,7 +15,6 @@ module.exports = {
     name: 'cc-config',
     description: 'Abre o painel de gerenciamento da CentralCart.',
     type: ApplicationCommandType.ChatInput,
-    default_member_permissions: PermissionFlagsBits.Administrator,
 
     run: async (client, interaction) => {
         if (!hasPermission(interaction.user.id)) {

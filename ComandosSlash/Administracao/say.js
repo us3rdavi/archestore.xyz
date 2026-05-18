@@ -7,7 +7,6 @@ module.exports = {
     name: "say",
     description: "Enviar Mensagem",
     type: Discord.ApplicationCommandType.ChatInput,
-    default_member_permissions: Discord.PermissionFlagsBits.Administrator,
     options: [
         {
             name: 'texto',

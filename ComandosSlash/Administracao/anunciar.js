@@ -7,7 +7,6 @@ module.exports = {
     name: 'anunciar',
     description: 'Crie e envie anúncios personalizados com o construtor de embeds.',
     type: ApplicationCommandType.ChatInput,
-    default_member_permissions: PermissionFlagsBits.Administrator,
 
     run: async (client, interaction) => {
         if (!hasPermission(interaction.user.id)) {

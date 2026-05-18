@@ -13,7 +13,6 @@ module.exports = {
     name: 'lockall',
     description: 'Bloqueia todos os canais de texto do servidor.',
     type: ApplicationCommandType.ChatInput,
-    default_member_permissions: PermissionFlagsBits.Administrator,
 
     run: async (client, interaction) => {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });

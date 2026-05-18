@@ -7,7 +7,6 @@ module.exports = {
     name: 'produtos',
     description: 'Crie e envie anúncios dos produtos da loja com select menu integrado.',
     type: ApplicationCommandType.ChatInput,
-    default_member_permissions: PermissionFlagsBits.Administrator,
 
     run: async (client, interaction) => {
         if (!hasPermission(interaction.user.id)) {

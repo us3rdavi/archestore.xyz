@@ -7,7 +7,6 @@ module.exports = {
     name: 'config',
     description: 'Central de configurações do servidor.',
     type: ApplicationCommandType.ChatInput,
-    default_member_permissions: PermissionFlagsBits.Administrator,
 
     run: async (client, interaction) => {
         try {

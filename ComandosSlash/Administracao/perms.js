@@ -78,7 +78,6 @@ module.exports = {
     name: 'perms',
     description: 'Gerencia o sistema de permissões do bot.',
     type: ApplicationCommandType.ChatInput,
-    default_member_permissions: PermissionFlagsBits.Administrator,
     buildPermsPanel,
 
     run: async (client, interaction) => {

@@ -82,7 +82,6 @@ module.exports = {
     name: 'criarwebhook',
     description: 'Gerencia e cria webhooks nos canais do servidor.',
     type: ApplicationCommandType.ChatInput,
-    default_member_permissions: PermissionFlagsBits.Administrator,
     buildWebhookPanel,
 
     run: async (client, interaction) => {

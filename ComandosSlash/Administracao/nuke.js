@@ -24,7 +24,6 @@ module.exports = {
       channelTypes: [ChannelType.GuildText],
     },
   ],
-  default_member_permissions: PermissionFlagsBits.Administrator,
 
   run: async (client, interaction) => {
     const perm = await getPermissions(client.user.id);
