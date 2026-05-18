@@ -15,6 +15,7 @@ module.exports = {
     name: 'lock',
     description: 'Tranca o canal atual.',
     type: ApplicationCommandType.ChatInput,
+    default_member_permissions: PermissionFlagsBits.Administrator,
 
     run: async (client, interaction) => {
         const perm = await getPermissions(client.user.id);

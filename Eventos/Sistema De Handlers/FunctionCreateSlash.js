@@ -12,23 +12,21 @@ module.exports = {
                     return interaction.reply({ content: 'Ocorreu algum erro, o comando não foi encontrado.', ephemeral: true });
                 }
 
-                const member = interaction.guild?.members.cache.get(interaction.user.id) || interaction.member;
-                if (!hasPermission(interaction.user.id, member)) {
+                if (!hasPermission(interaction.user.id)) {
                     return interaction.reply({
                         content: `${Emojis.get('negative_emoji')} Você não tem permissão para usar os comandos do bot.`,
                         ephemeral: true,
                     });
                 }
 
-                interaction['member'] = member;
+                interaction['member'] = interaction.guild.members.cache.get(interaction.user.id);
                 await cmd.run(client, interaction);
             }
 
             if (interaction.isMessageContextMenuCommand()) {
                 const command = client.slashCommands.get(interaction.commandName);
                 if (command) {
-                    const m = interaction.guild?.members.cache.get(interaction.user.id) || interaction.member;
-                    if (!hasPermission(interaction.user.id, m)) {
+                    if (!hasPermission(interaction.user.id)) {
                         return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sem permissão.`, ephemeral: true });
                     }
                     await command.run(client, interaction);
@@ -38,8 +36,7 @@ module.exports = {
             if (interaction.isUserContextMenuCommand()) {
                 const command = client.slashCommands.get(interaction.commandName);
                 if (command) {
-                    const m = interaction.guild?.members.cache.get(interaction.user.id) || interaction.member;
-                    if (!hasPermission(interaction.user.id, m)) {
+                    if (!hasPermission(interaction.user.id)) {
                         return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sem permissão.`, ephemeral: true });
                     }
                     await command.run(client, interaction);

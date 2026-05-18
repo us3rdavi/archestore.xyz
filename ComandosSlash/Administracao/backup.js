@@ -20,6 +20,7 @@ module.exports = {
     name: "realizar_backup",
     description: "Moderação - Gerenciamento de backup do servidor.",
     type: ApplicationCommandType.ChatInput,
+    default_member_permissions: PermissionFlagsBits.Administrator,
     BackupFunction,
 
     run: async (client, interaction) => {

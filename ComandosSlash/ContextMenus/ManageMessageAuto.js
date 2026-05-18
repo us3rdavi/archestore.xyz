@@ -6,6 +6,7 @@ const { Emojis } = require("../../Database");
 module.exports = {
     name: 'Editar Mensagem Automática',
     type: ApplicationCommandType.Message,
+    default_member_permissions: PermissionFlagsBits.Administrator,
 
     run: async (client, interaction) => {
         const ownerIdList = owner;
