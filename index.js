@@ -61,7 +61,8 @@ process.on('SIGINT',  gracefulShutdown);
             GatewayIntentBits.GuildMembers,
             GatewayIntentBits.GuildVoiceStates,
             GatewayIntentBits.DirectMessages,
-            GatewayIntentBits.GuildMessageReactions
+            GatewayIntentBits.GuildMessageReactions,
+            GatewayIntentBits.GuildEmojisAndStickers,
         ]
     });
 
