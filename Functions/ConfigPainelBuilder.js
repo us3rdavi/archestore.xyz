@@ -11,6 +11,7 @@ const MAIN_OPTIONS = [
     { label: 'Moderação',      value: 'moderacao',      description: 'Ferramentas de moderação',              emoji: { id: '1501804067616325723' } },
     { label: 'Personalização', value: 'personalizacao', description: 'Bot designer e aparência do bot',       emoji: { id: '1501804122943389716' } },
     { label: 'Formulários',    value: 'formularios',    description: 'Sistema de formulários personalizados', emoji: { id: '1501804039451709441' } },
+    { label: 'Forms (EN)',     value: 'formularios_en', description: 'English forms system (5 slots)',         emoji: { id: '1501803899085131867' } },
     { label: 'Definições',     value: 'definicoes',     description: 'Configurações gerais do sistema',       emoji: { id: '1501804030605922346' } },
 ];
 
@@ -44,6 +45,11 @@ const SUB_OPTIONS = {
         { label: 'Gerenciar Formulários', value: 'form_manage', description: 'Editar formulários existentes (máx. 5 slots)',  emoji: { id: '1501804003850322052' } },
         { label: 'Criar Formulário',      value: 'form_create', description: 'Criar um novo formulário personalizado',        emoji: { id: '1501803923126747178' } },
     ],
+    formularios_en: [
+        { label: 'Página Inicial',         value: 'home',           description: 'Voltar ao menu principal',                       emoji: { id: '1501803908589162537' } },
+        { label: 'Manage Forms (EN)',       value: 'enform_manage',  description: 'Edit existing English forms (max. 5 slots)',     emoji: { id: '1501804003850322052' } },
+        { label: 'Create Form (EN)',        value: 'enform_create',  description: 'Create a new English form',                      emoji: { id: '1501803923126747178' } },
+    ],
     definicoes: [
         { label: 'Página Inicial',       value: 'home',               description: 'Voltar ao menu principal',              emoji: { id: '1501803908589162537' } },
         { label: 'Configurações Gerais', value: 'definicoes_gerais',   description: 'Configurações diversas do servidor',    emoji: { id: '1501804030605922346' } },
@@ -56,7 +62,7 @@ const CATEGORY_LABELS = {
     atendimento: 'Atendimento',
     automacoes: 'Automações', moderacao: 'Moderação',
     personalizacao: 'Personalização',
-    formularios: 'Formulários', definicoes: 'Definições',
+    formularios: 'Formulários', formularios_en: 'Forms (EN)', definicoes: 'Definições',
 };
 
 function getAccentColor() {
@@ -71,6 +77,7 @@ function getCategoryHeader(category) {
         moderacao:      () => `${Emojis.get('_ban_emoji')} Moderação`,
         personalizacao: () => `${Emojis.get('_pincel_emoji')} Personalização`,
         formularios:    () => `${Emojis.get('_messages_emoji')} Formulários`,
+        formularios_en: () => `${Emojis.get('_messages_emoji')} Forms (EN)`,
         definicoes:     () => `${Emojis.get('_settings_emoji')} Definições`,
     };
     return (map[category] ? map[category]() : `${Emojis.get('_settings_emoji')} ${CATEGORY_LABELS[category] || category}`);

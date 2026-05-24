@@ -47,6 +47,12 @@ module.exports = {
                     return;
                 }
 
+                if (sub === 'enform_create' || sub === 'enform_manage') {
+                    const { handleFormActionEN } = require('./formulariosHandlerEN.js');
+                    await handleFormActionEN(interaction, client, sub === 'enform_create' ? 'form_create' : 'form_manage');
+                    return;
+                }
+
                 if (sub === 'atendimento_config') {
                     const { painelTicket } = require('../../Functions/PainelTickets.js');
                     await painelTicket(interaction, false);
