@@ -6,6 +6,7 @@ const { configuracao, Emojis } = require('../Database');
 
 const MAIN_OPTIONS = [
     { label: 'Atendimento',    value: 'atendimento',    description: 'Sistema de tickets e suporte',          emoji: { id: '1501804043121725490' } },
+    { label: 'Support (EN)',   value: 'support_en',     description: 'English ticket system',                 emoji: { id: '1501803899085131867' } },
     { label: 'Automações',     value: 'automacoes',     description: 'Mensagens e repost automáticos',        emoji: { id: '1502541664579879072' } },
     { label: 'Moderação',      value: 'moderacao',      description: 'Ferramentas de moderação',              emoji: { id: '1501804067616325723' } },
     { label: 'Personalização', value: 'personalizacao', description: 'Bot designer e aparência do bot',       emoji: { id: '1501804122943389716' } },
@@ -18,6 +19,11 @@ const SUB_OPTIONS = {
         { label: 'Página Inicial',          value: 'home',               description: 'Voltar ao menu principal',                    emoji: { id: '1501803908589162537' } },
         { label: 'Configurar Tickets',       value: 'atendimento_config', description: 'Configurações do sistema de tickets',         emoji: { id: '1501804043121725490' } },
         { label: 'Postar Painel de Tickets', value: 'atendimento_postar', description: 'Enviar o painel de abertura de tickets',      emoji: { id: '1501803923126747178' } },
+    ],
+    support_en: [
+        { label: 'Home',                    value: 'home',               description: 'Back to main menu',                           emoji: { id: '1501803908589162537' } },
+        { label: 'Configure Tickets (EN)',   value: 'en_support_config',  description: 'Settings for the English ticket system',      emoji: { id: '1501804043121725490' } },
+        { label: 'Post Panel (EN)',          value: 'en_support_postar',  description: 'Post the English ticket opening panel',        emoji: { id: '1501803923126747178' } },
     ],
     automacoes: [
         { label: 'Página Inicial',        value: 'home',             description: 'Voltar ao menu principal',        emoji: { id: '1501803908589162537' } },

@@ -53,6 +53,57 @@ module.exports = {
                     return;
                 }
 
+                if (sub === 'en_support_config') {
+                    const { painelTicketEN } = require('../../Functions/PainelTicketsEN.js');
+                    await painelTicketEN(interaction);
+                    return;
+                }
+
+                if (sub === 'en_support_postar') {
+                    const { tickets } = require('../../Database');
+                    const funcoes = tickets.get('en.funcoes');
+                    if (!funcoes || Object.keys(funcoes).length === 0) {
+                        const container = new ContainerBuilder();
+                        container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                            `## ${Emojis.get('_ticket_emoji')} Post Panel (EN)\n` +
+                            `${Emojis.get('negative_emoji')} Add at least one **Category** before posting the panel.\n\n` +
+                            `-# Go to **Configure Tickets (EN)** → **Add Category** first.`
+                        ));
+                        container.addSeparatorComponents(new SeparatorBuilder());
+                        container.addActionRowComponents(new ActionRowBuilder().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId('en_voltar1')
+                                .setLabel('Main Menu')
+                                .setEmoji({ id: '1501803908589162537' })
+                                .setStyle(2)
+                        ));
+                        await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] });
+                        return;
+                    }
+                    const { ChannelSelectMenuBuilder, ChannelType } = require('discord.js');
+                    const container = new ContainerBuilder();
+                    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                        `## ${Emojis.get('_ticket_emoji')} Post Ticket Panel (EN)\n` +
+                        `Select the channel where you want to post the English ticket opening panel.`
+                    ));
+                    container.addSeparatorComponents(new SeparatorBuilder());
+                    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+                        new ChannelSelectMenuBuilder()
+                            .setCustomId('en_canalpostarticket')
+                            .setPlaceholder('Select the channel...')
+                            .setChannelTypes(ChannelType.GuildText)
+                    ));
+                    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId('en_voltar1')
+                            .setLabel('Main Menu')
+                            .setEmoji({ id: '1501803908589162537' })
+                            .setStyle(2)
+                    ));
+                    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] });
+                    return;
+                }
+
                 if (sub === 'atendimento_postar') {
                     const funcoes = tickets.get('tickets.funcoes');
                     if (!funcoes || Object.keys(funcoes).length === 0) {
