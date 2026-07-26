@@ -116,17 +116,17 @@ async function EfiBankConfiguracao(client, interaction, a) {
         new ButtonBuilder()
             .setCustomId('alterarcredenciais')
             .setLabel('Alterar Credenciais')
-            .setEmoji('<:Sync:1347378353124147232>')
+            .setEmoji({ id: '1347378353124147232' })
             .setStyle(2),
         new ButtonBuilder()
             .setURL('https://www.youtube.com/watch?v=DKyFF65McYQ')
             .setLabel('Ver Tutorial')
-            .setEmoji('<:1345588774423367825:1350658400580800624>')
+            .setEmoji({ id: '1350658400580800624' })
             .setStyle(5),
         new ButtonBuilder()
             .setCustomId('efionoff')
             .setLabel(isOn ? 'Desabilitar' : 'Habilitar')
-            .setEmoji('<:1317972026564153509:1350658971605667921>')
+            .setEmoji({ id: '1350658971605667921' })
             .setDisabled(!configuracao.get("pagamentos.EfiAPI"))
             .setStyle(isOn ? 4 : 3),
     );
@@ -135,7 +135,7 @@ async function EfiBankConfiguracao(client, interaction, a) {
         new ButtonBuilder()
             .setCustomId('formasdepagamentos')
             .setLabel('Voltar')
-            .setEmoji('1238413255886639104')
+            .setEmoji({ id: '1238413255886639104' })
             .setStyle(2),
     );
 
