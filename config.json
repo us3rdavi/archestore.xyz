@@ -1,8 +1,8 @@
 {
-    "token": "",
+    "token": "MTQ5MjIxMjI2NTU0MDI1NTc2NA.GZgco0.lzToaNyLpv984e0n_PYOHjhS7Nj8vmakGMt68M",
     "owner": "804354181653463120",
     "botid": "1492212265540255764",
     "CLIENT_ID": "1492212265540255764",
     "EXPIRATION": "2050-05-15T19:58:18.712Z",
-    "MONGODB_URI": ""
+    "MONGODB_URI": "mongodb+srv://us3r_davi:12345010@cluster0.5tuuxdp.mongodb.net/?appName=Cluster0"
 }
