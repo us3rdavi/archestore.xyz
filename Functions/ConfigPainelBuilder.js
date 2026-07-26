@@ -12,6 +12,7 @@ const MAIN_OPTIONS = [
     { label: 'Personalização', value: 'personalizacao', description: 'Bot designer e aparência do bot',       emoji: { id: '1501804122943389716' } },
     { label: 'Formulários',    value: 'formularios',    description: 'Sistema de formulários personalizados', emoji: { id: '1501804039451709441' } },
     { label: 'Forms (EN)',     value: 'formularios_en', description: 'English forms system (5 slots)',         emoji: { id: '1501803899085131867' } },
+    { label: 'Vendas',         value: 'vendas',         description: 'Dropdown de vendas com PIX automático', emoji: { id: '1501803982849445998' } },
     { label: 'Definições',     value: 'definicoes',     description: 'Configurações gerais do sistema',       emoji: { id: '1501804030605922346' } },
 ];
 
@@ -50,6 +51,12 @@ const SUB_OPTIONS = {
         { label: 'Manage Forms (EN)',       value: 'enform_manage',  description: 'Edit existing English forms (max. 5 slots)',     emoji: { id: '1501804003850322052' } },
         { label: 'Create Form (EN)',        value: 'enform_create',  description: 'Create a new English form',                      emoji: { id: '1501803923126747178' } },
     ],
+    vendas: [
+        { label: 'Página Inicial',          value: 'home',              description: 'Voltar ao menu principal',                      emoji: { id: '1501803908589162537' } },
+        { label: 'Dropdown de Produtos',    value: 'vendas_dropdown',   description: 'Gerenciar seções do dropdown de vendas',        emoji: { id: '1501803947898306724' } },
+        { label: 'Canais de Log',           value: 'vendas_logs',       description: 'Log de compras e pagamentos pendentes',         emoji: { id: '1501804019184828507' } },
+        { label: 'Postar Painel de Vendas', value: 'vendas_postar',     description: 'Enviar o painel de vendas para um canal',       emoji: { id: '1501803923126747178' } },
+    ],
     definicoes: [
         { label: 'Página Inicial',       value: 'home',               description: 'Voltar ao menu principal',              emoji: { id: '1501803908589162537' } },
         { label: 'Configurações Gerais', value: 'definicoes_gerais',   description: 'Configurações diversas do servidor',    emoji: { id: '1501804030605922346' } },
@@ -62,7 +69,9 @@ const CATEGORY_LABELS = {
     atendimento: 'Atendimento',
     automacoes: 'Automações', moderacao: 'Moderação',
     personalizacao: 'Personalização',
-    formularios: 'Formulários', formularios_en: 'Forms (EN)', definicoes: 'Definições',
+    formularios: 'Formulários', formularios_en: 'Forms (EN)',
+    vendas: 'Vendas',
+    definicoes: 'Definições',
 };
 
 function getAccentColor() {
@@ -78,6 +87,7 @@ function getCategoryHeader(category) {
         personalizacao: () => `${Emojis.get('_pincel_emoji')} Personalização`,
         formularios:    () => `${Emojis.get('_messages_emoji')} Formulários`,
         formularios_en: () => `${Emojis.get('_messages_emoji')} Forms (EN)`,
+        vendas:         () => `${Emojis.get('store_emoji')} Vendas`,
         definicoes:     () => `${Emojis.get('_settings_emoji')} Definições`,
     };
     return (map[category] ? map[category]() : `${Emojis.get('_settings_emoji')} ${CATEGORY_LABELS[category] || category}`);

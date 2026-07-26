@@ -228,6 +228,24 @@ module.exports = {
                     await showAuditLogPanel(interaction, client);
                     return;
                 }
+
+                if (sub === 'vendas_dropdown') {
+                    const { gerenciarDropdownVendas } = require('../../Functions/VendasDropdownManager.js');
+                    await gerenciarDropdownVendas(interaction);
+                    return;
+                }
+
+                if (sub === 'vendas_logs') {
+                    const { vendasLogsConfig } = require('../../Functions/VendasConfig.js');
+                    await vendasLogsConfig(interaction);
+                    return;
+                }
+
+                if (sub === 'vendas_postar') {
+                    const { vendasPostarPainel } = require('../../Functions/VendasConfig.js');
+                    await vendasPostarPainel(interaction);
+                    return;
+                }
             }
         } catch (err) {
             if (err.code === 10062) return;
