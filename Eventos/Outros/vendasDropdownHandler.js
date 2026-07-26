@@ -48,28 +48,9 @@ module.exports = {
                     });
                 }
 
-                const mensagem = secao.mensagem || `Selecione um produto abaixo para continuar com sua compra.`;
-
-                const options = subprodutos.slice(0, 25).map(sp => ({
-                    label: sp.nome.slice(0, 100),
-                    value: `vndsub_${secao.id}_${sp.id}`,
-                    description: ((sp.descricao ? `${sp.descricao} — ` : '') + `R$ ${Number(sp.valor).toFixed(2)}`).slice(0, 100),
-                    ...(sp.emoji ? { emoji: { id: sp.emoji } } : {}),
-                }));
-
-                const container = new ContainerBuilder();
-                container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-                    `## ${secao.emoji ? `<:e:${secao.emoji}> ` : Emojis.get('store_emoji') + ' '}${secao.nome}\n\n${mensagem}`
-                ));
-                container.addSeparatorComponents(new SeparatorBuilder());
-                container.addActionRowComponents(
-                    new ActionRowBuilder().addComponents(
-                        new StringSelectMenuBuilder()
-                            .setCustomId('vnd_sub_select')
-                            .setPlaceholder('Selecione um produto...')
-                            .addOptions(options)
-                    )
-                );
+                // Usa builderData da seção se existir, senão exibe o layout padrão
+                const { buildFinalSecaoContainer } = require('../../Functions/VendasPainelBuilder');
+                const container = buildFinalSecaoContainer(secao.builderData || null, secao, subprodutos);
 
                 await interaction.reply({
                     components: [container],

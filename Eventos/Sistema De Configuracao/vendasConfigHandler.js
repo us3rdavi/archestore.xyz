@@ -25,32 +25,12 @@ const { logAction } = require('../../Functions/AuditLog');
 
 // Posta o painel no canal selecionado
 async function postarPainelNoCanal(channel) {
-    const { StringSelectMenuBuilder } = require('discord.js');
     const secoes = configuracao.get('vendas.secoes') || [];
     if (secoes.length === 0) return;
 
-    const options = secoes.slice(0, 25).map(s => ({
-        label: s.nome.slice(0, 100),
-        value: `vnd_${s.id}`,
-        description: (s.descricao || '').slice(0, 100) || undefined,
-        ...(s.emoji ? { emoji: { id: s.emoji } } : {}),
-    }));
-
-    const container = new ContainerBuilder();
-    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('store_emoji')} Loja\n` +
-        `Selecione uma categoria abaixo para ver os produtos disponíveis.\n` +
-        `-# Pagamento via PIX automático — confirmação instantânea.`
-    ));
-    container.addSeparatorComponents(new SeparatorBuilder());
-    container.addActionRowComponents(
-        new ActionRowBuilder().addComponents(
-            new StringSelectMenuBuilder()
-                .setCustomId('vnd_comprar_select')
-                .setPlaceholder('Selecione uma categoria...')
-                .addOptions(options)
-        )
-    );
+    const { buildFinalPainelContainer } = require('../../Functions/VendasPainelBuilder');
+    const painelData = configuracao.get('vendas.painelData') || null;
+    const container = buildFinalPainelContainer(painelData, secoes);
 
     await channel.send({ components: [container], flags: MessageFlags.IsComponentsV2 });
 }
@@ -73,6 +53,37 @@ module.exports = {
                 if (customId === 'vnd_config_logs')          { await vendasLogsConfig(interaction); return; }
                 if (customId === 'vnd_postar_painel')        { await vendasPostarPainel(interaction); return; }
                 if (customId === 'vnd_config_canal_carrinho'){ await vendasCanalCarrinhoConfig(interaction); return; }
+
+                // ── Construtor realtime — painel principal ───────────────────
+                if (customId === 'vnd_builder_painel') {
+                    const { buildPainelMainMenu, getPainelData, setPainelData } = require('../../Functions/VendasPainelBuilder');
+                    const userId = interaction.user.id;
+                    // Carrega dados salvos como ponto de partida (se existirem)
+                    const saved = configuracao.get('vendas.painelData');
+                    if (saved && Object.keys(getPainelData(userId)).length === 0) {
+                        setPainelData(userId, { ...saved });
+                    }
+                    await interaction.update(buildPainelMainMenu(userId));
+                    return;
+                }
+
+                // ── Construtor realtime — seção ──────────────────────────────
+                if (customId.startsWith('vnd_secao_builder_')) {
+                    const secaoId = customId.slice('vnd_secao_builder_'.length);
+                    const secao = (configuracao.get('vendas.secoes') || []).find(s => s.id === secaoId);
+                    if (!secao) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
+                    const { buildSecaoMainMenu, getSecaoData, setSecaoData } = require('../../Functions/VendasPainelBuilder');
+                    const userId = interaction.user.id;
+                    // Carrega builderData existente como ponto de partida
+                    const existing = getSecaoData(userId);
+                    if (!existing._secaoId || existing._secaoId !== secaoId) {
+                        const base = secao.builderData ? { ...secao.builderData } : {};
+                        base._secaoId = secaoId;
+                        setSecaoData(userId, base);
+                    }
+                    await interaction.update(buildSecaoMainMenu(userId, secao));
+                    return;
+                }
                 if (customId === 'vnd_add_secao')            { await interaction.showModal(buildModalAddSecao()); return; }
                 if (customId === 'vnd_editar_secao_pick')    { await handlePickEditSecao(interaction); return; }
                 if (customId === 'vnd_remover_secao_pick')   { await handlePickRemoverSecao(interaction); return; }

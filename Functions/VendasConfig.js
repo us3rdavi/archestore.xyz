@@ -63,11 +63,19 @@ async function vendasConfig(interaction) {
 
     const row3 = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
+            .setCustomId('vnd_builder_painel')
+            .setLabel('Editar Visual do Painel')
+            .setEmoji({ id: '1501803923126747178' })
+            .setStyle(3),
+        new ButtonBuilder()
             .setCustomId('vnd_postar_painel')
             .setLabel('Postar Painel de Vendas')
             .setEmoji({ id: '1501803923126747178' })
-            .setStyle(3)
+            .setStyle(1)
             .setDisabled(secoes.length === 0 || totalSubs === 0),
+    );
+
+    const row4 = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId('voltar1')
             .setLabel('Menu Principal')
@@ -78,6 +86,7 @@ async function vendasConfig(interaction) {
     container.addActionRowComponents(row1);
     container.addActionRowComponents(row2);
     container.addActionRowComponents(row3);
+    container.addActionRowComponents(row4);
 
     const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
     if (interaction.deferred || interaction.replied) {

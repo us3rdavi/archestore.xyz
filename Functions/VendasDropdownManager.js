@@ -149,6 +149,13 @@ async function buildSecaoConfigPanel(interaction, secao) {
             .setEmoji({ id: '1501803947898306724' })
             .setStyle(1),
         new ButtonBuilder()
+            .setCustomId(`vnd_secao_builder_${secao.id}`)
+            .setLabel('Editar Visual (Realtime)')
+            .setEmoji({ id: '1501803923126747178' })
+            .setStyle(3),
+    );
+    const row3 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
             .setCustomId('vnd_gerenciar_dropdown')
             .setLabel('Voltar')
             .setEmoji({ id: '1501803908589162537' })
@@ -157,6 +164,7 @@ async function buildSecaoConfigPanel(interaction, secao) {
 
     container.addActionRowComponents(row1);
     container.addActionRowComponents(row2);
+    container.addActionRowComponents(row3);
 
     const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
     if (interaction.deferred || interaction.replied) {
