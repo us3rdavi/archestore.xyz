@@ -31,12 +31,14 @@ A Discord.js v14 bot (in Portuguese) for managing a sales/store system on Discor
 - Start: `node index.js`
 
 ## Configuration
-- `DISCORD_BOT_TOKEN` secret — set in Replit Secrets (required to run the bot)
-- Edit `config.json` for:
-  - `owner` — Discord owner user ID
-  - `botid` / `CLIENT_ID` — Discord bot/application ID
-  - `MONGODB_URI` — MongoDB connection string
-  - `CENTRALCART_API_KEY` — CentralCart API key
+Secrets (set in Replit Secrets — never in code):
+- `DISCORD_BOT_TOKEN` — Discord bot token (required)
+- `MONGODB_URI` — MongoDB connection string (optional; runs in-memory without it)
+
+Edit `config.json` for:
+- `owner` — Discord owner user ID
+- `botid` / `CLIENT_ID` — Discord bot/application ID
+- Payment/API keys (MercadoPago, EFI, CentralCart)
 
 ## User Preferences
 - Keep the existing Portuguese naming conventions
