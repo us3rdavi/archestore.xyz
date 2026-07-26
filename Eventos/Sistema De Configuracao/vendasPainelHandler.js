@@ -8,7 +8,7 @@
 
 const {
     ModalBuilder, TextInputBuilder, TextInputStyle,
-    ActionRowBuilder, MessageFlags, ButtonStyle,
+    ActionRowBuilder, ButtonBuilder, MessageFlags, ButtonStyle,
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder,
 } = require('discord.js');
 const {
