@@ -1,45 +1,33 @@
-# Archestore - Discord Bot
+# Arche Store Discord Bot
 
 ## Overview
-A Discord.js v14 bot (in Portuguese) for managing a sales/store system on Discord. Features include:
-- Slash commands for administration and users
-- Ticket system
-- Payment integrations (MercadoPago, EFI/Pix, CentralCart)
-- Automated messages and reposting
-- Auto-lock channels scheduling
-- Logging (messages, voice, profile)
-- Product/cart management
-- MongoDB-based data store
+Discord bot for store management — tickets, sales cart, slash commands, auto-logs, scheduled reposting, and more.
 
-## Project Structure
-- `index.js` — Entry point
-- `config.json` — Bot owner ID, bot/client ID, API keys, MongoDB URI
-- `Handler/` — Loaders for slash commands and events
-- `ComandosSlash/` — Slash command implementations
-- `Eventos/` — Event handlers
-- `Functions/` — Business logic modules
-- `FunctionEmojis/` — Emoji upload/management
-- `Database/` — MongoDB adapter (JsonDatabase), QuickStore, emojis.json
-- `Lib/` — Utility libraries
-- `discloud.config` — DisCloud deployment config
-- `upload-emojis.js` — Script to upload emojis to Discord application
-- `clear-commands.js` — Script to clear registered slash commands
+## Stack
+- **Runtime:** Node.js 20
+- **Discord library:** discord.js v14
+- **Database:** MongoDB (in-memory cache + persistence)
+- **Payments:** Mercado Pago, EFI (Gerencianet)
 
-## Setup
-- Runtime: Node.js 20
-- Package manager: npm
-- Start: `node index.js`
+## How to run
+```
+node index.js
+```
+The workflow **Start application** handles this automatically.
 
-## Configuration
-Secrets (set in Replit Secrets — never in code):
-- `DISCORD_BOT_TOKEN` — Discord bot token (required)
-- `MONGODB_URI` — MongoDB connection string (optional; runs in-memory without it)
+## Required secrets
+| Secret | Description |
+|---|---|
+| `DISCORD_TOKEN` | Bot token from Discord Developer Portal |
+| `MONGODB_URI` | MongoDB connection string |
 
-Edit `config.json` for:
-- `owner` — Discord owner user ID
-- `botid` / `CLIENT_ID` — Discord bot/application ID
-- Payment/API keys (MercadoPago, EFI, CentralCart)
+## Project structure
+- `index.js` — entry point, Discord client setup
+- `config.json` — bot ID, owner ID, expiration (tokens go in secrets, not here)
+- `Database/` — MongoDB + in-memory cache layer
+- `ComandosSlash/` — slash command definitions
+- `Eventos/` — event handlers (tickets, logs, config, etc.)
+- `Functions/` — shared utility functions
+- `Handler/` — slash command & event loader
 
-## User Preferences
-- Keep the existing Portuguese naming conventions
-- **Nunca usar emojis de teclado/unicode em componentes Discord (ButtonBuilder, etc.)** — sempre usar emojis de upload do bot via `.setEmoji({ id: 'SNOWFLAKE_ID' })`. IDs disponíveis em `Database/emojis.json`. Emojis unicode só são permitidos em conteúdo de texto (TextDisplayBuilder, labels de select menu, strings normais).
+## User preferences
