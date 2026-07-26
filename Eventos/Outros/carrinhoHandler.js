@@ -7,7 +7,8 @@
 
 const {
     ActionRowBuilder, ButtonBuilder, ModalBuilder, TextInputBuilder, TextInputStyle,
-    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags, AttachmentBuilder
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MediaGalleryBuilder,
+    MessageFlags, AttachmentBuilder
 } = require('discord.js');
 const { carrinhos, Emojis, configuracao, pagamentos } = require('../../Database');
 const { buildCartMessage, formatBRL, calcTotal } = require('../../Functions/CarrinhoVendas');
@@ -259,6 +260,12 @@ module.exports = {
                     `-# Escaneie o QR Code abaixo ou use o código Copia e Cola.`
                 ));
                 containerPix.addSeparatorComponents(new SeparatorBuilder());
+                if (files.length > 0) {
+                    containerPix.addMediaGalleryComponents(
+                        new MediaGalleryBuilder().addItems({ media: { url: 'attachment://qrcode.png' } })
+                    );
+                    containerPix.addSeparatorComponents(new SeparatorBuilder());
+                }
                 containerPix.addActionRowComponents(new ActionRowBuilder().addComponents(
                     new ButtonBuilder()
                         .setCustomId(`cart_reenviar_pix_${threadId}`)
