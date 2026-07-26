@@ -1,7 +1,6 @@
 const { carregarCache } = require('../../Handler/EmojiFunctions');
 const { WebhookClient } = require('discord.js');
 const { CloseThreds } = require('../../Functions/CloseThread');
-const { iniciarNotificacoes } = require('../../Functions/CCNotificacoes');
 const { CheckPosition } = require('../../Functions/PosicoesFunction.js');
 const { configuracao, Convites, GuildsInvites, carrinhos } = require('../../Database');
 const { restart } = require('../../Functions/Restart.js');
@@ -54,8 +53,6 @@ module.exports = {
         }, 86400000);
 
         setInterval(closeThreads, 60000);
-        iniciarNotificacoes(client);
-
         console.log(`${colors.green(`[LOG]`)} ${client.user.tag} Is ready!`)
         console.log(`${colors.green(`[LOG]`)} Version: v2.0.0`)
         console.log(`${colors.green(`[LOG]`)} I'm not finished, but I'm being done with a lot of hate and stress\n`)

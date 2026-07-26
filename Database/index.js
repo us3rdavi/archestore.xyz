@@ -35,7 +35,6 @@ const General         = new JsonDatabase('General');
 const GeneralKeys     = new JsonDatabase('GeneralKeys');
 const autolock        = new JsonDatabase('autolock');
 const BackupStorage   = new JsonDatabase('BackupStorage');
-const cc_notificacoes = new JsonDatabase('cc_notificacoes');
 const mensagem        = new JsonDatabase('mensagem');
 
 // ── Emoji Store (arquivo estático) ──────────────────────────────────────────
@@ -63,7 +62,7 @@ const _allDbs = [
     msgsauto, msgauto, dbembed, entregaslog, SystemMod, Temporario,
     Convites, GuildsInvites, refounds, Compras, painelCards, formularios,
     moderacao, General, GeneralKeys, autolock, BackupStorage,
-    cc_notificacoes, mensagem,
+    mensagem,
 ];
 
 let _mongoClient = null;
@@ -105,7 +104,7 @@ module.exports = {
     msgsauto, msgauto, dbembed, entregaslog, SystemMod, Temporario,
     Convites, GuildsInvites, refounds, Compras, painelCards, formularios,
     moderacao, General, GeneralKeys, autolock, BackupStorage,
-    cc_notificacoes, mensagem,
+    mensagem,
     // Emoji store
     Emojis,
     // QuickStore (substitui QuickDB)
