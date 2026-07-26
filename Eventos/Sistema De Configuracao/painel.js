@@ -26,6 +26,7 @@ const { Emojis } = require("../../Database");
 const { buildAparenciaMain } = require("../../Functions/TicketAparenciaBuilder");
 const { buildFuncaoNavScreen } = require("../../Functions/TicketAparenciaBuilder");
 const { logAction } = require('../../Functions/AuditLog.js');
+const { FormasDePagamentos } = require('../../Functions/FormasDePagamentosConfig');
 
 
 module.exports = {
@@ -921,6 +922,10 @@ module.exports = {
                     embeds: [],
                     content: ''
                 });
+            }
+
+            if (interaction.customId === 'formasdepagamentos') {
+                await FormasDePagamentos(interaction);
             }
             
 
