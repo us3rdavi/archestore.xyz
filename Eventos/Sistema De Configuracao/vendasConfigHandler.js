@@ -12,6 +12,8 @@ const {
     buildSecaoConfigPanel,
     buildSubprodutosPanel,
     buildEmojiPickerPanel,
+    buildSubEmojiPickerPanel,
+    buildSubEmojiSourcePanel,
     buildModalAddSecao,
     buildModalMsgSecao,
     buildModalAddSub,
@@ -58,10 +60,16 @@ module.exports = {
                 if (customId === 'vnd_builder_painel') {
                     const { buildPainelMainMenu, getPainelData, setPainelData } = require('../../Functions/VendasPainelBuilder');
                     const userId = interaction.user.id;
-                    // Carrega dados salvos como ponto de partida (se existirem)
-                    const saved = configuracao.get('vendas.painelData');
-                    if (saved && Object.keys(getPainelData(userId)).length === 0) {
-                        setPainelData(userId, { ...saved });
+                    // Carrega dados salvos como ponto de partida; se não houver nenhum,
+                    // pré-popula com o texto padrão para que fique visível e editável.
+                    if (Object.keys(getPainelData(userId)).length === 0) {
+                        const saved = configuracao.get('vendas.painelData');
+                        const base = saved ? { ...saved } : {
+                            title: `${Emojis.get('store_emoji')} Loja`,
+                            description: 'Selecione uma categoria abaixo para ver os produtos disponíveis.',
+                            footer: 'Pagamento via PIX automático — confirmação instantânea.',
+                        };
+                        setPainelData(userId, base);
                     }
                     await interaction.update(buildPainelMainMenu(userId));
                     return;
@@ -152,6 +160,48 @@ module.exports = {
                     await handlePickDelSub(interaction, secaoId);
                     return;
                 }
+
+                // Picker: escolher subproduto para emoji
+                if (customId.startsWith('vnd_sub_emoji_pick_')) {
+                    const secaoId = customId.slice('vnd_sub_emoji_pick_'.length);
+                    await buildSubEmojiPickerPanel(interaction, secaoId);
+                    return;
+                }
+
+                // Mostrar emojis do bot ou servidor para subproduto
+                // customId: vnd_sub_emoji_<source>_<page>_<secaoId>_<subId>
+                if (customId.startsWith('vnd_sub_emoji_bot_') || customId.startsWith('vnd_sub_emoji_server_')) {
+                    const isBot = customId.startsWith('vnd_sub_emoji_bot_');
+                    const prefix = isBot ? 'vnd_sub_emoji_bot_' : 'vnd_sub_emoji_server_';
+                    const rest = customId.slice(prefix.length); // page_secaoId_subId
+                    const parts = rest.split('_');
+                    const page = parseInt(parts[0], 10) || 0;
+                    const secaoId = parts[1];
+                    const subId = parts[2];
+                    await buildSubEmojiSourcePanel(interaction, secaoId, subId, isBot ? 'bot' : 'server', page);
+                    return;
+                }
+
+                // Remover emoji do subproduto — vnd_sub_emoji_rm_<secaoId>_<subId>
+                if (customId.startsWith('vnd_sub_emoji_rm_')) {
+                    const rest = customId.slice('vnd_sub_emoji_rm_'.length);
+                    const parts = rest.split('_');
+                    const secaoId = parts[0];
+                    const subId = parts[1];
+                    let secoes = configuracao.get('vendas.secoes') || [];
+                    const si = secoes.findIndex(s => s.id === secaoId);
+                    if (si !== -1) {
+                        const pi = (secoes[si].subprodutos || []).findIndex(sp => sp.id === subId);
+                        if (pi !== -1) {
+                            secoes[si].subprodutos[pi].emoji = '';
+                            configuracao.set('vendas.secoes', secoes);
+                        }
+                    }
+                    await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
+                    const secao = (configuracao.get('vendas.secoes') || []).find(s => s.id === secaoId);
+                    if (secao) await buildSubprodutosPanel(interaction, secao);
+                    return;
+                }
             }
 
             // ══════════════════════════════════════════════════════════════════════
@@ -231,6 +281,52 @@ module.exports = {
                     logAction(client, { action: 'Emoji da seção configurado', details: `Seção \`${secoes[idx].nome}\``, userId: interaction.user.id, guildId: interaction.guildId });
                     await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
                     await buildSecaoConfigPanel(interaction, secoes[idx]);
+                    return;
+                }
+
+                // Selecionar subproduto para configurar emoji
+                if (customId.startsWith('vnd_select_sub_emoji_')) {
+                    const secaoId = customId.slice('vnd_select_sub_emoji_'.length);
+                    const subId = interaction.values[0];
+                    await buildSubEmojiSourcePanel(interaction, secaoId, subId, 'bot', 0);
+                    return;
+                }
+
+                // Selecionar emoji do bot para subproduto — vnd_sub_emojisel_bot_<secaoId>_<subId>
+                if (customId.startsWith('vnd_sub_emojisel_bot_')) {
+                    const rest = customId.slice('vnd_sub_emojisel_bot_'.length);
+                    const parts = rest.split('_');
+                    const secaoId = parts[0];
+                    const subId = parts[1];
+                    const emojiId = interaction.values[0];
+                    let secoes = configuracao.get('vendas.secoes') || [];
+                    const si = secoes.findIndex(s => s.id === secaoId);
+                    if (si === -1) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
+                    const pi = (secoes[si].subprodutos || []).findIndex(sp => sp.id === subId);
+                    if (pi === -1) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Subproduto não encontrado.`, ephemeral: true });
+                    secoes[si].subprodutos[pi].emoji = emojiId;
+                    configuracao.set('vendas.secoes', secoes);
+                    await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
+                    await buildSubprodutosPanel(interaction, secoes[si]);
+                    return;
+                }
+
+                // Selecionar emoji do servidor para subproduto — vnd_sub_emojisel_svr_<secaoId>_<subId>
+                if (customId.startsWith('vnd_sub_emojisel_svr_')) {
+                    const rest = customId.slice('vnd_sub_emojisel_svr_'.length);
+                    const parts = rest.split('_');
+                    const secaoId = parts[0];
+                    const subId = parts[1];
+                    const emojiId = interaction.values[0];
+                    let secoes = configuracao.get('vendas.secoes') || [];
+                    const si = secoes.findIndex(s => s.id === secaoId);
+                    if (si === -1) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
+                    const pi = (secoes[si].subprodutos || []).findIndex(sp => sp.id === subId);
+                    if (pi === -1) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Subproduto não encontrado.`, ephemeral: true });
+                    secoes[si].subprodutos[pi].emoji = emojiId;
+                    configuracao.set('vendas.secoes', secoes);
+                    await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
+                    await buildSubprodutosPanel(interaction, secoes[si]);
                     return;
                 }
 

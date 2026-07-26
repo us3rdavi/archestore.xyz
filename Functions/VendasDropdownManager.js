@@ -7,6 +7,33 @@ const {
 } = require('discord.js');
 const { configuracao, Emojis } = require('../Database');
 
+const PAGE_SIZE = 25;
+
+// ── Helpers de emoji ───────────────────────────────────────────────────────────
+function buildBotEmojiOptionsList() {
+    const allEmojis = Emojis.all();
+    const options = [];
+    for (const [name, val] of Object.entries(allEmojis)) {
+        const match = typeof val === 'string' ? val.match(/^<(a?):([^:]+):(\d+)>$/) : null;
+        const eid = match ? match[3] : (typeof val === 'string' && /^\d+$/.test(val.trim()) ? val.trim() : null);
+        if (!eid) continue;
+        options.push({
+            label: (name.replace(/_emoji$/, '').replace(/_/g, ' ') || 'emoji').slice(0, 100),
+            value: eid,
+            emoji: { id: eid, animated: !!(match && match[1] === 'a') },
+        });
+    }
+    return options;
+}
+
+function buildServerEmojiOptionsList(guild) {
+    return [...(guild?.emojis.cache.values() || [])].map(e => ({
+        label: ((e.name || 'emoji').replace(/_/g, ' ')).slice(0, 100),
+        value: e.id,
+        emoji: { id: e.id, animated: !!e.animated },
+    }));
+}
+
 function gerarId() {
     return Math.random().toString(36).slice(2, 10);
 }
@@ -219,6 +246,11 @@ async function buildSubprodutosPanel(interaction, secao) {
                 .setLabel('Remover')
                 .setEmoji({ id: '1501803935453679616' })
                 .setStyle(4),
+            new ButtonBuilder()
+                .setCustomId(`vnd_sub_emoji_pick_${secao.id}`)
+                .setLabel('Emoji')
+                .setEmoji({ id: '1501803982849445998' })
+                .setStyle(2),
         );
     }
 
@@ -231,6 +263,130 @@ async function buildSubprodutosPanel(interaction, secao) {
     } else {
         await interaction.update(payload);
     }
+}
+
+// ── Picker: escolhe subproduto para configurar emoji ───────────────────────────
+async function buildSubEmojiPickerPanel(interaction, secaoId) {
+    const secoes = configuracao.get('vendas.secoes') || [];
+    const secao = secoes.find(s => s.id === secaoId);
+    if (!secao) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
+    const subs = secao.subprodutos || [];
+    if (subs.length === 0) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Nenhum subproduto disponível.`, ephemeral: true });
+
+    const options = subs.slice(0, 25).map(sp => ({
+        label: sp.nome.slice(0, 100),
+        value: sp.id,
+        description: (`R$ ${Number(sp.valor).toFixed(2)}${sp.emoji ? ' · tem emoji' : ''}`).slice(0, 100),
+        ...(sp.emoji ? { emoji: { id: sp.emoji } } : {}),
+    }));
+
+    const container = new ContainerBuilder();
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('store_emoji')} Emoji do Subproduto\n` +
+        `Selecione o subproduto que deseja configurar o emoji.`
+    ));
+    container.addSeparatorComponents(new SeparatorBuilder());
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new StringSelectMenuBuilder()
+            .setCustomId(`vnd_select_sub_emoji_${secaoId}`)
+            .setPlaceholder('Selecione o subproduto...')
+            .addOptions(options)
+    ));
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`vnd_sub_panel_${secaoId}`)
+            .setLabel('Cancelar')
+            .setEmoji({ id: '1501803908589162537' })
+            .setStyle(2)
+    ));
+
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
+    else await interaction.update(payload);
+}
+
+// ── Painel de emojis do bot ou servidor para subproduto ────────────────────────
+async function buildSubEmojiSourcePanel(interaction, secaoId, subId, source, page) {
+    const secoes = configuracao.get('vendas.secoes') || [];
+    const secao = secoes.find(s => s.id === secaoId);
+    const sub = secao && (secao.subprodutos || []).find(sp => sp.id === subId);
+
+    const allOptions = source === 'server'
+        ? buildServerEmojiOptionsList(interaction.guild)
+        : buildBotEmojiOptionsList();
+
+    const totalPages = Math.max(1, Math.ceil(allOptions.length / PAGE_SIZE));
+    const safePage = Math.max(0, Math.min(page, totalPages - 1));
+    const pageOptions = allOptions.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
+
+    const sourceLabel = source === 'server' ? 'Servidor' : 'Bot';
+    const otherSource = source === 'server' ? 'bot' : 'server';
+    const otherLabel = source === 'server' ? 'Bot' : 'Servidor';
+
+    const container = new ContainerBuilder();
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('store_emoji')} Emojis do ${sourceLabel}${sub ? ` — **${sub.nome}**` : ''}\n` +
+        `-# Página ${safePage + 1}/${totalPages} · ${allOptions.length} emojis disponíveis`
+    ));
+    container.addSeparatorComponents(new SeparatorBuilder());
+
+    // Botões: trocar fonte + remover emoji atual
+    const toggleRow = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`vnd_sub_emoji_${otherSource}_0_${secaoId}_${subId}`)
+            .setLabel(`Emojis do ${otherLabel}`)
+            .setEmoji({ id: '1501803947898306724' })
+            .setStyle(2),
+    );
+    if (sub?.emoji) {
+        toggleRow.addComponents(
+            new ButtonBuilder()
+                .setCustomId(`vnd_sub_emoji_rm_${secaoId}_${subId}`)
+                .setLabel('Remover Emoji')
+                .setEmoji({ id: '1501803926180335727' })
+                .setStyle(4)
+        );
+    }
+    container.addActionRowComponents(toggleRow);
+
+    if (allOptions.length === 0) {
+        container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+            `-# Nenhum emoji do ${sourceLabel.toLowerCase()} disponível.`
+        ));
+        container.addActionRowComponents(new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId(`vnd_sub_panel_${secaoId}`).setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
+        ));
+    } else {
+        const selId = source === 'server'
+            ? `vnd_sub_emojisel_svr_${secaoId}_${subId}`
+            : `vnd_sub_emojisel_bot_${secaoId}_${subId}`;
+        container.addActionRowComponents(new ActionRowBuilder().addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId(selId)
+                .setPlaceholder(`Emojis ${safePage * PAGE_SIZE + 1}–${Math.min((safePage + 1) * PAGE_SIZE, allOptions.length)} de ${allOptions.length}...`)
+                .addOptions(pageOptions)
+        ));
+
+        const navRow = new ActionRowBuilder();
+        if (safePage > 0) {
+            navRow.addComponents(new ButtonBuilder()
+                .setCustomId(`vnd_sub_emoji_${source}_${safePage - 1}_${secaoId}_${subId}`)
+                .setLabel('Anterior').setEmoji({ id: '1501803911655198742' }).setStyle(2));
+        }
+        navRow.addComponents(new ButtonBuilder()
+            .setCustomId(`vnd_sub_panel_${secaoId}`)
+            .setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2));
+        if (safePage < totalPages - 1) {
+            navRow.addComponents(new ButtonBuilder()
+                .setCustomId(`vnd_sub_emoji_${source}_${safePage + 1}_${secaoId}_${subId}`)
+                .setLabel('Próxima').setEmoji({ id: '1501803914654257326' }).setStyle(2));
+        }
+        container.addActionRowComponents(navRow);
+    }
+
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
+    else await interaction.update(payload);
 }
 
 // ── Emoji picker panel ──────────────────────────────────────────────────────────
@@ -495,6 +651,8 @@ module.exports = {
     buildSecaoConfigPanel,
     buildSubprodutosPanel,
     buildEmojiPickerPanel,
+    buildSubEmojiPickerPanel,
+    buildSubEmojiSourcePanel,
     buildModalAddSecao,
     buildModalMsgSecao,
     buildModalAddSub,
