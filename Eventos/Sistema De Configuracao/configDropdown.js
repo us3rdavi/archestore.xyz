@@ -246,6 +246,18 @@ module.exports = {
                     await vendasPostarPainel(interaction);
                     return;
                 }
+
+                if (sub === 'vendas_descontos') {
+                    const { descontoPainel } = require('./descontoConfigHandler.js');
+                    await descontoPainel(interaction);
+                    return;
+                }
+
+                if (sub === 'vendas_carrinho') {
+                    const { vendasCanalCarrinhoConfig } = require('../../Functions/VendasConfig.js');
+                    await vendasCanalCarrinhoConfig(interaction);
+                    return;
+                }
             }
         } catch (err) {
             if (err.code === 10062) return;

@@ -52,10 +52,12 @@ const SUB_OPTIONS = {
         { label: 'Create Form (EN)',        value: 'enform_create',  description: 'Create a new English form',                      emoji: { id: '1501803923126747178' } },
     ],
     vendas: [
-        { label: 'Página Inicial',          value: 'home',              description: 'Voltar ao menu principal',                      emoji: { id: '1501803908589162537' } },
-        { label: 'Dropdown de Produtos',    value: 'vendas_dropdown',   description: 'Gerenciar seções do dropdown de vendas',        emoji: { id: '1501803947898306724' } },
-        { label: 'Canais de Log',           value: 'vendas_logs',       description: 'Log de compras e pagamentos pendentes',         emoji: { id: '1501804019184828507' } },
-        { label: 'Postar Painel de Vendas', value: 'vendas_postar',     description: 'Enviar o painel de vendas para um canal',       emoji: { id: '1501803923126747178' } },
+        { label: 'Página Inicial',          value: 'home',                description: 'Voltar ao menu principal',                        emoji: { id: '1501803908589162537' } },
+        { label: 'Gerenciar Seções',        value: 'vendas_dropdown',     description: 'Seções e subprodutos do painel de vendas',        emoji: { id: '1501803947898306724' } },
+        { label: 'Cupons de Desconto',      value: 'vendas_descontos',    description: 'Criar e gerenciar cupons de desconto',            emoji: { id: '1501803982849445998' } },
+        { label: 'Canais de Log',           value: 'vendas_logs',         description: 'Log de compras e pagamentos pendentes',           emoji: { id: '1501804019184828507' } },
+        { label: 'Canal de Carrinho',       value: 'vendas_carrinho',     description: 'Canal onde os carrinhos privados são criados',    emoji: { id: '1501804019184828507' } },
+        { label: 'Postar Painel de Vendas', value: 'vendas_postar',       description: 'Enviar o painel de vendas para um canal',         emoji: { id: '1501803923126747178' } },
     ],
     definicoes: [
         { label: 'Página Inicial',       value: 'home',               description: 'Voltar ao menu principal',              emoji: { id: '1501803908589162537' } },

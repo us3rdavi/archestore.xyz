@@ -7,34 +7,53 @@ const {
 const { configuracao, Emojis } = require('../Database');
 
 async function vendasConfig(interaction) {
-    const secoes = configuracao.get('vendas.secoes') || [];
+    const secoes       = configuracao.get('vendas.secoes') || [];
     const logCompras   = configuracao.get('vendas.canais.logCompras');
     const logPendentes = configuracao.get('vendas.canais.logPendentes');
-    const efiAtivo  = configuracao.get('pagamentos.EfiOnOff') === true;
-    const efiConfig = !!configuracao.get('pagamentos.EfiAPI.client_id');
+    const canalCarrinho = configuracao.get('vendas.canais.carrinho');
+    const efiAtivo     = configuracao.get('pagamentos.EfiOnOff') === true;
+    const efiConfig    = !!configuracao.get('pagamentos.EfiAPI.client_id');
+    const nDescontos   = (configuracao.get('vendas.descontos') || []).filter(d => d.ativo !== false).length;
 
     const ok = Emojis.get('confirmed_emoji');
     const no = Emojis.get('negative_emoji');
 
+    const totalSubs = secoes.reduce((acc, s) => acc + (s.subprodutos || []).length, 0);
+
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('store_emoji')} Sistema de Vendas\n` +
-        `Configure o dropdown de produtos, canais de log e pagamento PIX automático via EfiBank.\n\n` +
+        `Configure o painel de produtos, carrinhos, descontos e pagamento PIX automático via EfiBank.\n\n` +
         `${Emojis.get('_efi_emoji')} **EfiBank PIX:** ` +
             `${efiAtivo ? `${ok} \`Habilitado\`` : `${no} \`Desabilitado\``} | ` +
-            `${efiConfig ? `${ok} \`Credenciais configuradas\`` : `${no} \`Credenciais não configuradas\``}\n` +
-        `${Emojis.get('store_emoji')} **Seções no dropdown:** \`${secoes.length}\`\n` +
+            `${efiConfig ? `${ok} \`Credenciais OK\`` : `${no} \`Sem credenciais\``}\n` +
+        `${Emojis.get('store_emoji')} **Seções:** \`${secoes.length}\` | **Subprodutos:** \`${totalSubs}\`\n` +
+        `${Emojis.get('_folder_emoji')} **Canal de Carrinho:** ${canalCarrinho ? `${ok} <#${canalCarrinho}>` : `${no} \`Não configurado\``}\n` +
+        `${Emojis.get('dream')} **Descontos ativos:** \`${nDescontos}\`\n` +
         `${Emojis.get('neworder_emoji')} **Log de Compras:** ${logCompras ? `${ok} <#${logCompras}>` : `${no} \`Não configurado\``}\n` +
-        `${Emojis.get('clock_emoji')} **Log de Pagamentos Pendentes:** ${logPendentes ? `${ok} <#${logPendentes}>` : `${no} \`Não configurado\``}`
+        `${Emojis.get('clock_emoji')} **Log de Pendentes:** ${logPendentes ? `${ok} <#${logPendentes}>` : `${no} \`Não configurado\``}`
     ));
     container.addSeparatorComponents(new SeparatorBuilder());
 
     const row1 = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId('vnd_gerenciar_dropdown')
-            .setLabel('Gerenciar Dropdown')
+            .setLabel('Gerenciar Seções')
             .setEmoji({ id: '1501803947898306724' })
             .setStyle(1),
+        new ButtonBuilder()
+            .setCustomId('vnd_gerenciar_descontos')
+            .setLabel('Descontos / Cupons')
+            .setEmoji({ id: '1501803982849445998' })
+            .setStyle(1),
+    );
+
+    const row2 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId('vnd_config_canal_carrinho')
+            .setLabel('Canal de Carrinho')
+            .setEmoji({ id: '1501804019184828507' })
+            .setStyle(2),
         new ButtonBuilder()
             .setCustomId('vnd_config_logs')
             .setLabel('Canais de Log')
@@ -42,13 +61,13 @@ async function vendasConfig(interaction) {
             .setStyle(2),
     );
 
-    const row2 = new ActionRowBuilder().addComponents(
+    const row3 = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId('vnd_postar_painel')
             .setLabel('Postar Painel de Vendas')
             .setEmoji({ id: '1501803923126747178' })
             .setStyle(3)
-            .setDisabled(secoes.length === 0),
+            .setDisabled(secoes.length === 0 || totalSubs === 0),
         new ButtonBuilder()
             .setCustomId('voltar1')
             .setLabel('Menu Principal')
@@ -58,14 +77,9 @@ async function vendasConfig(interaction) {
 
     container.addActionRowComponents(row1);
     container.addActionRowComponents(row2);
+    container.addActionRowComponents(row3);
 
-    const payload = {
-        components: [container],
-        flags: MessageFlags.IsComponentsV2,
-        embeds: [],
-        content: ''
-    };
-
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
     if (interaction.deferred || interaction.replied) {
         await interaction.editReply(payload);
     } else {
@@ -89,17 +103,16 @@ async function vendasLogsConfig(interaction) {
         `-# Enviado quando uma cobrança PIX é **gerada** (antes do pagamento).`
     ));
     container.addSeparatorComponents(new SeparatorBuilder());
-
     container.addActionRowComponents(new ActionRowBuilder().addComponents(
         new ChannelSelectMenuBuilder()
             .setCustomId('vnd_set_log_compras')
-            .setPlaceholder('Selecione o canal de log de compras...')
+            .setPlaceholder('Canal de log de compras confirmadas...')
             .setChannelTypes(ChannelType.GuildText)
     ));
     container.addActionRowComponents(new ActionRowBuilder().addComponents(
         new ChannelSelectMenuBuilder()
             .setCustomId('vnd_set_log_pendentes')
-            .setPlaceholder('Selecione o canal de log de pagamentos pendentes...')
+            .setPlaceholder('Canal de log de pagamentos pendentes...')
             .setChannelTypes(ChannelType.GuildText)
     ));
     container.addActionRowComponents(new ActionRowBuilder().addComponents(
@@ -110,25 +123,55 @@ async function vendasLogsConfig(interaction) {
             .setStyle(2),
     ));
 
-    await interaction.update({
-        components: [container],
-        flags: MessageFlags.IsComponentsV2,
-        embeds: [],
-        content: ''
-    });
+    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+}
+
+async function vendasCanalCarrinhoConfig(interaction) {
+    const canalCarrinho = configuracao.get('vendas.canais.carrinho');
+    const ok = Emojis.get('confirmed_emoji');
+    const no = Emojis.get('negative_emoji');
+
+    const container = new ContainerBuilder();
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## 🛒 Canal de Carrinho\n` +
+        `Configure o canal onde as threads privadas de carrinho serão criadas para cada compra.\n\n` +
+        `**Canal atual:** ${canalCarrinho ? `${ok} <#${canalCarrinho}>` : `${no} \`Não configurado\``}\n\n` +
+        `-# O bot precisa ter permissão de criar threads privadas nesse canal.`
+    ));
+    container.addSeparatorComponents(new SeparatorBuilder());
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ChannelSelectMenuBuilder()
+            .setCustomId('vnd_set_canal_carrinho')
+            .setPlaceholder('Selecione o canal de carrinhos...')
+            .setChannelTypes(ChannelType.GuildText)
+    ));
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId('vnd_voltar_config')
+            .setLabel('Voltar')
+            .setEmoji({ id: '1501803908589162537' })
+            .setStyle(2),
+    ));
+
+    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
 }
 
 async function vendasPostarPainel(interaction) {
     const secoes = configuracao.get('vendas.secoes') || [];
-    if (secoes.length === 0) {
-        return interaction.reply({ content: `${Emojis.get('negative_emoji')} Adicione ao menos uma seção ao dropdown antes de postar o painel.`, ephemeral: true });
+    const totalSubs = secoes.reduce((acc, s) => acc + (s.subprodutos || []).length, 0);
+
+    if (secoes.length === 0 || totalSubs === 0) {
+        return interaction.reply({
+            content: `${Emojis.get('negative_emoji')} Adicione ao menos uma seção com subprodutos antes de postar o painel.`,
+            ephemeral: true
+        });
     }
 
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('store_emoji')} Postar Painel de Vendas\n` +
-        `Selecione o canal onde deseja postar o painel de vendas com o dropdown de produtos.\n\n` +
-        `-# **${secoes.length}** seção(ões) configurada(s) serão exibidas.`
+        `Selecione o canal onde deseja postar o painel de vendas.\n\n` +
+        `-# **${secoes.length}** seção(ões) com **${totalSubs}** subproduto(s) serão exibidos.`
     ));
     container.addSeparatorComponents(new SeparatorBuilder());
     container.addActionRowComponents(new ActionRowBuilder().addComponents(
@@ -145,12 +188,7 @@ async function vendasPostarPainel(interaction) {
             .setStyle(2),
     ));
 
-    await interaction.update({
-        components: [container],
-        flags: MessageFlags.IsComponentsV2,
-        embeds: [],
-        content: ''
-    });
+    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
 }
 
-module.exports = { vendasConfig, vendasLogsConfig, vendasPostarPainel };
+module.exports = { vendasConfig, vendasLogsConfig, vendasCanalCarrinhoConfig, vendasPostarPainel };
