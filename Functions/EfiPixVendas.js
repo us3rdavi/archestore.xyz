@@ -21,7 +21,7 @@ function getEfiInstance() {
 
 /**
  * Cria uma cobrança PIX imediata.
- * @returns {{ txid, locId, pixCopiaECola, imagemBase64, expiracao }}
+ * @returns {{ txid, locId, pixCopiaECola, qrcodePngBuffer, expiracao }}
  */
 async function criarCobrancaPix({ valor, descricao }) {
     const efi = getEfiInstance();
@@ -42,11 +42,20 @@ async function criarCobrancaPix({ valor, descricao }) {
     const charge = await efi.pixCreateImmediateCharge({}, body);
     const qr     = await efi.pixGenerateQRCode({ id: charge.loc.id });
 
+    // Gera PNG a partir do código copia-e-cola (o SDK retorna SVG que o Discord não renderiza)
+    const QRCode = require('qrcode');
+    const qrcodePngBuffer = await QRCode.toBuffer(qr.qrcode, {
+        type: 'png',
+        width: 512,
+        margin: 2,
+        color: { dark: '#000000', light: '#ffffff' },
+    });
+
     return {
         txid: charge.txid,
         locId: charge.loc.id,
         pixCopiaECola: qr.qrcode,
-        imagemBase64: qr.imagemQrcode, // data:image/png;base64,...
+        qrcodePngBuffer,
         expiracao,
     };
 }

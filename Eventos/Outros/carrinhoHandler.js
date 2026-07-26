@@ -198,7 +198,7 @@ module.exports = {
                     return;
                 }
 
-                const { txid, pixCopiaECola, imagemBase64, expiracao } = cobranca;
+                const { txid, pixCopiaECola, qrcodePngBuffer, expiracao } = cobranca;
                 const expiresAt = Math.floor(Date.now() / 1000) + expiracao;
 
                 // Salva pagamento no banco
@@ -241,11 +241,10 @@ module.exports = {
                     expiracao,
                 });
 
-                // QR Code como arquivo
+                // QR Code como arquivo PNG
                 let files = [];
                 try {
-                    const base64Data = imagemBase64.replace(/^data:image\/\w+;base64,/, '');
-                    files = [new AttachmentBuilder(Buffer.from(base64Data, 'base64'), { name: 'qrcode.png' })];
+                    if (qrcodePngBuffer) files = [new AttachmentBuilder(qrcodePngBuffer, { name: 'qrcode.png' })];
                 } catch (e) { }
 
                 // Mensagem do carrinho com PIX
