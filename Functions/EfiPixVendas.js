@@ -40,7 +40,7 @@ async function criarCobrancaPix({ valor, descricao }) {
     };
 
     const charge = await efi.pixCreateImmediateCharge({}, body);
-    const qr     = await efi.pixGenerateQrcode({ id: charge.loc.id }, {});
+    const qr     = await efi.pixGenerateQRCode({ id: charge.loc.id });
 
     return {
         txid: charge.txid,
