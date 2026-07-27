@@ -8,9 +8,19 @@ function CloseThreds(client) {
         });
 
         hilos.forEach(async element => {
-            const dataOriginal = new Date(element._createdTimestamp)
+            // Usa o timestamp da última mensagem como marcador de atividade.
+            // Se não houver mensagem ainda, usa a criação da thread.
+            const lastActivity = element.lastMessage?.createdTimestamp
+                || element.lastMessageId
+                    ? Number(BigInt(element.lastMessageId) >> 22n) + 1420070400000
+                    : element._createdTimestamp;
             let minutos = configuracao.get(`ConfigCarrinho.inatividade`) || 10;
-            const novoTimestamp = dataOriginal.getTime() + minutos * 60 * 1000;
+            const novoTimestamp = lastActivity + minutos * 60 * 1000;
+
+            // Não fechar carrinhos com pagamento em andamento ou já pago
+            const cart = carrinhos.get(element.id);
+            if (cart && (cart.status === 'aguardando_pagamento' || cart.status === 'pago')) return;
+
             if (Date.now() > novoTimestamp) {
                 element.delete().then(() => {
                 }).catch((error) => {

@@ -31,17 +31,6 @@ module.exports = {
             });
         }
 
-        // Limpar carrinhos no startup
-        async function resetCarrinhosFile() {
-            for (const key of Object.keys(carrinhos._cache)) {
-                delete carrinhos._cache[key];
-            }
-            if (carrinhos._col) await carrinhos._col.deleteMany({}).catch(() => {});
-            console.log('Carrinhos limpos com sucesso.');
-        }
-
-        await resetCarrinhosFile();
-
         const closeThreads = () => {
             CloseThreds(client);
         };
