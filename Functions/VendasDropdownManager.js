@@ -84,7 +84,7 @@ async function gerenciarDropdownVendas(interaction) {
             new ButtonBuilder()
                 .setCustomId('vnd_editar_secao_pick')
                 .setLabel('Editar Info')
-                .setEmoji({ id: '1501804003850322052' })
+                .setEmoji({ id: '1501804039451709441' })
                 .setStyle(2),
             new ButtonBuilder()
                 .setCustomId('vnd_remover_secao_pick')

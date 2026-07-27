@@ -244,14 +244,35 @@ module.exports = {
             // ── SALVAR ────────────────────────────────────────────────────────
             if (customId === `vndp_save_${userId}`) {
                 const data = getPainelData(userId);
-                const { _secaoId, ...cleanData } = data;
-                configuracao.set('vendas.painelData', cleanData);
-                clearPainelData(userId);
+                const { _secaoId, _painelId, _painelNome, ...cleanData } = data;
+
+                let painelNomeFinal = _painelNome || 'Painel';
+                if (_painelId) {
+                    let paineis = configuracao.get('vendas.paineis') || [];
+                    const idx = paineis.findIndex(p => p.id === _painelId);
+                    if (idx !== -1) {
+                        paineis[idx] = { ...paineis[idx], data: cleanData };
+                        painelNomeFinal = paineis[idx].nome;
+                    } else {
+                        // Novo painel sendo salvo pela primeira vez
+                        const nome = _painelNome || `Painel ${paineis.length + 1}`;
+                        paineis.push({ id: _painelId, nome, data: cleanData });
+                        painelNomeFinal = nome;
+                    }
+                    configuracao.set('vendas.paineis', paineis);
+                } else {
+                    // Legado — sem painelId
+                    configuracao.set('vendas.painelData', cleanData);
+                }
+
+                // Mantém _painelId/_painelNome para que o "Continuar editando" funcione
+                setPainelData(userId, { _painelId: _painelId || null, _painelNome: painelNomeFinal });
+
                 const container = new ContainerBuilder();
                 container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-                    `## ${Emojis.get('confirmed_emoji')} Painel salvo!\n` +
-                    `O visual do painel de vendas foi atualizado. Poste novamente para aplicar as alterações.\n\n` +
-                    `-# Use **Postar Painel de Vendas** nas configurações para atualizar o canal.`
+                    `## ${Emojis.get('confirmed_emoji')} **${painelNomeFinal}** salvo!\n` +
+                    `O visual do painel foi atualizado.\n\n` +
+                    `-# Use **Painéis de Vendas** nas configurações para postar no canal.`
                 ));
                 container.addSeparatorComponents(new SeparatorBuilder());
                 container.addActionRowComponents(new ActionRowBuilder().addComponents(
@@ -291,6 +312,16 @@ module.exports = {
 
             // ── REABRIR EDITOR ────────────────────────────────────────────────
             if (customId === `vndp_reopen_${userId}`) {
+                // Se o rascunho só tem _painelId (dados limpos após save), recarrega do banco
+                const draft = getPainelData(userId);
+                const visibleKeys = Object.keys(draft).filter(k => !k.startsWith('_'));
+                if (visibleKeys.length === 0 && draft._painelId) {
+                    const paineis = configuracao.get('vendas.paineis') || [];
+                    const painel = paineis.find(p => p.id === draft._painelId);
+                    if (painel?.data) {
+                        setPainelData(userId, { ...painel.data, _painelId: draft._painelId, _painelNome: draft._painelNome || painel.nome });
+                    }
+                }
                 await interaction.update(buildPainelMainMenu(userId));
                 return;
             }

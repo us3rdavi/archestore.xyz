@@ -2,10 +2,15 @@
 
 const {
     ActionRowBuilder, ButtonBuilder, ChannelSelectMenuBuilder, ChannelType,
-    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags, StringSelectMenuBuilder
+    ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags,
+    StringSelectMenuBuilder, ModalBuilder, TextInputBuilder, TextInputStyle,
 } = require('discord.js');
 const { configuracao, Emojis } = require('../../Database');
-const { vendasConfig, vendasLogsConfig, vendasCanalCarrinhoConfig, vendasPostarPainel } = require('../../Functions/VendasConfig');
+const {
+    vendasConfig, vendasGerenciarPaineis, vendasPostarPainelEspecifico,
+    vendasLogsConfig, vendasCanalCarrinhoConfig, vendasPostarPainel,
+    getPaneis, gerarPainelId,
+} = require('../../Functions/VendasConfig');
 const {
     gerenciarDropdownVendas,
     handlePickConfigSecao,
@@ -25,15 +30,12 @@ const {
 } = require('../../Functions/VendasDropdownManager');
 const { logAction } = require('../../Functions/AuditLog');
 
-// Posta o painel no canal selecionado
-async function postarPainelNoCanal(channel) {
+// Posta um painel específico no canal selecionado
+async function postarPainelNoCanal(channel, painelData) {
     const secoes = configuracao.get('vendas.secoes') || [];
     if (secoes.length === 0) return;
-
     const { buildFinalPainelContainer } = require('../../Functions/VendasPainelBuilder');
-    const painelData = configuracao.get('vendas.painelData') || null;
-    const container = buildFinalPainelContainer(painelData, secoes);
-
+    const container = buildFinalPainelContainer(painelData || null, secoes);
     await channel.send({ components: [container], flags: MessageFlags.IsComponentsV2 });
 }
 
@@ -57,21 +59,108 @@ module.exports = {
                 if (customId === 'vnd_config_canal_carrinho'){ await vendasCanalCarrinhoConfig(interaction); return; }
 
                 // ── Construtor realtime — painel principal ───────────────────
-                if (customId === 'vnd_builder_painel') {
+                // vnd_builder_painel_<painelId>  (ou legado: vnd_builder_painel)
+                if (customId === 'vnd_builder_painel' || customId.startsWith('vnd_builder_painel_')) {
+                    const painelId = customId.startsWith('vnd_builder_painel_')
+                        ? customId.slice('vnd_builder_painel_'.length)
+                        : null;
                     const { buildPainelMainMenu, getPainelData, setPainelData } = require('../../Functions/VendasPainelBuilder');
                     const userId = interaction.user.id;
-                    // Carrega dados salvos como ponto de partida; se não houver nenhum,
-                    // pré-popula com o texto padrão para que fique visível e editável.
                     if (Object.keys(getPainelData(userId)).length === 0) {
-                        const saved = configuracao.get('vendas.painelData');
-                        const base = saved ? { ...saved } : {
+                        const paineis = getPaneis();
+                        const painel = painelId ? paineis.find(p => p.id === painelId) : null;
+                        const base = painel?.data ? { ...painel.data } : {
                             title: `${Emojis.get('store_emoji')} Loja`,
                             description: 'Selecione uma categoria abaixo para ver os produtos disponíveis.',
                             footer: 'Pagamento via PIX automático — confirmação instantânea.',
                         };
+                        if (painelId) { base._painelId = painelId; base._painelNome = painel?.nome || 'Painel'; }
                         setPainelData(userId, base);
                     }
                     await interaction.update(buildPainelMainMenu(userId));
+                    return;
+                }
+
+                // ── Gerenciar painéis ──────────────────────────────────────────
+                if (customId === 'vnd_gerenciar_paineis') {
+                    await vendasGerenciarPaineis(interaction);
+                    return;
+                }
+
+                if (customId === 'vnd_add_painel') {
+                    const paineis = getPaneis();
+                    if (paineis.length >= 5) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 5 painéis atingido.`, ephemeral: true });
+                    const modal = new ModalBuilder()
+                        .setCustomId('vnd_modal_add_painel')
+                        .setTitle('Criar Novo Painel');
+                    modal.addComponents(new ActionRowBuilder().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('painel_nome')
+                            .setLabel('Nome do painel (só aparece para você)')
+                            .setStyle(TextInputStyle.Short)
+                            .setMaxLength(50)
+                            .setRequired(true)
+                            .setPlaceholder('Ex: Loja Principal, Promoções...')
+                    ));
+                    await interaction.showModal(modal);
+                    return;
+                }
+
+                if (customId === 'vnd_edit_painel_pick') {
+                    const paineis = getPaneis();
+                    if (paineis.length === 0) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Nenhum painel criado.`, ephemeral: true });
+                    const options = paineis.map((p, i) => ({ label: p.nome, value: p.id, description: `Painel ${i + 1}` }));
+                    const container = new ContainerBuilder();
+                    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                        `## ${Emojis.get('_lapis_emoji')} Editar Visual do Painel\nSelecione qual painel deseja editar.`
+                    ));
+                    container.addSeparatorComponents(new SeparatorBuilder());
+                    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+                        new StringSelectMenuBuilder().setCustomId('vnd_select_edit_painel').setPlaceholder('Selecione o painel...').addOptions(options)
+                    ));
+                    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+                        new ButtonBuilder().setCustomId('vnd_gerenciar_paineis').setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
+                    ));
+                    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+                    return;
+                }
+
+                if (customId === 'vnd_post_painel_pick') {
+                    const paineis = getPaneis();
+                    if (paineis.length === 0) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Nenhum painel criado.`, ephemeral: true });
+                    if (paineis.length === 1) { await vendasPostarPainelEspecifico(interaction, paineis[0].id); return; }
+                    const options = paineis.map((p, i) => ({ label: p.nome, value: p.id, description: `Painel ${i + 1}` }));
+                    const container = new ContainerBuilder();
+                    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                        `## ${Emojis.get('store_emoji')} Postar Painel\nSelecione qual painel deseja postar.`
+                    ));
+                    container.addSeparatorComponents(new SeparatorBuilder());
+                    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+                        new StringSelectMenuBuilder().setCustomId('vnd_select_post_painel').setPlaceholder('Selecione o painel...').addOptions(options)
+                    ));
+                    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+                        new ButtonBuilder().setCustomId('vnd_gerenciar_paineis').setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
+                    ));
+                    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+                    return;
+                }
+
+                if (customId === 'vnd_del_painel_pick') {
+                    const paineis = getPaneis();
+                    if (paineis.length === 0) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Nenhum painel para excluir.`, ephemeral: true });
+                    const options = paineis.map((p, i) => ({ label: p.nome, value: p.id, description: `Painel ${i + 1}` }));
+                    const container = new ContainerBuilder();
+                    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                        `## ${Emojis.get('_trash_emoji')} Excluir Painel\nSelecione qual painel deseja excluir.`
+                    ));
+                    container.addSeparatorComponents(new SeparatorBuilder());
+                    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+                        new StringSelectMenuBuilder().setCustomId('vnd_select_del_painel').setPlaceholder('Selecione o painel...').addOptions(options)
+                    ));
+                    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+                        new ButtonBuilder().setCustomId('vnd_gerenciar_paineis').setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
+                    ));
+                    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
                     return;
                 }
 
@@ -284,6 +373,48 @@ module.exports = {
                     return;
                 }
 
+                // Selecionar painel para editar
+                if (customId === 'vnd_select_edit_painel') {
+                    const painelId = interaction.values[0];
+                    const paineis = getPaneis();
+                    const painel = paineis.find(p => p.id === painelId);
+                    if (!painel) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Painel não encontrado.`, ephemeral: true });
+                    const { buildPainelMainMenu, getPainelData, setPainelData } = require('../../Functions/VendasPainelBuilder');
+                    const userId = interaction.user.id;
+                    if (Object.keys(getPainelData(userId)).length === 0) {
+                        const base = painel.data ? { ...painel.data } : {
+                            title: `${Emojis.get('store_emoji')} Loja`,
+                            description: 'Selecione uma categoria abaixo para ver os produtos disponíveis.',
+                            footer: 'Pagamento via PIX automático — confirmação instantânea.',
+                        };
+                        base._painelId = painelId;
+                        base._painelNome = painel.nome;
+                        setPainelData(userId, base);
+                    }
+                    await interaction.update(buildPainelMainMenu(userId));
+                    return;
+                }
+
+                // Selecionar painel para postar
+                if (customId === 'vnd_select_post_painel') {
+                    const painelId = interaction.values[0];
+                    await vendasPostarPainelEspecifico(interaction, painelId);
+                    return;
+                }
+
+                // Selecionar painel para excluir
+                if (customId === 'vnd_select_del_painel') {
+                    const painelId = interaction.values[0];
+                    let paineis = getPaneis();
+                    const nomeExcluido = paineis.find(p => p.id === painelId)?.nome || 'Painel';
+                    paineis = paineis.filter(p => p.id !== painelId);
+                    configuracao.set('vendas.paineis', paineis);
+                    logAction(client, { action: 'Painel excluído', details: `\`${nomeExcluido}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                    await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
+                    await vendasGerenciarPaineis(interaction);
+                    return;
+                }
+
                 // Selecionar subproduto para configurar emoji
                 if (customId.startsWith('vnd_select_sub_emoji_')) {
                     const secaoId = customId.slice('vnd_select_sub_emoji_'.length);
@@ -383,16 +514,47 @@ module.exports = {
                     return;
                 }
 
+                // Postar painel específico — vnd_canal_postar_<painelId>
+                if (customId.startsWith('vnd_canal_postar_')) {
+                    const painelId = customId.slice('vnd_canal_postar_'.length);
+                    const channelId = interaction.values[0];
+                    const channel = interaction.guild.channels.cache.get(channelId);
+                    if (!channel) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Canal não encontrado.`, ephemeral: true });
+                    const paineis = getPaneis();
+                    const painel = paineis.find(p => p.id === painelId);
+                    if (!painel) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Painel não encontrado.`, ephemeral: true });
+                    await interaction.deferUpdate();
+                    try {
+                        await postarPainelNoCanal(channel, painel.data);
+                        const container = new ContainerBuilder();
+                        container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                            `## ${Emojis.get('confirmed_emoji')} Painel postado!\n**${painel.nome}** foi enviado em <#${channelId}>.`
+                        ));
+                        container.addSeparatorComponents(new SeparatorBuilder());
+                        container.addActionRowComponents(new ActionRowBuilder().addComponents(
+                            new ButtonBuilder().setCustomId('vnd_gerenciar_paineis').setLabel('Voltar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
+                        ));
+                        await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+                        logAction(client, { action: `Painel "${painel.nome}" postado`, details: `Canal: <#${channelId}>`, userId: interaction.user.id, guildId: interaction.guildId });
+                    } catch (err) {
+                        await interaction.editReply({ content: `${Emojis.get('negative_emoji')} Erro ao postar: ${err.message}`, components: [], embeds: [] });
+                    }
+                    return;
+                }
+
+                // Legado — vnd_canal_postar (sem painelId)
                 if (customId === 'vnd_canal_postar') {
                     const channelId = interaction.values[0];
                     const channel = interaction.guild.channels.cache.get(channelId);
                     if (!channel) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Canal não encontrado.`, ephemeral: true });
+                    const paineis = getPaneis();
+                    const painelData = paineis[0]?.data || configuracao.get('vendas.painelData') || null;
                     await interaction.deferUpdate();
                     try {
-                        await postarPainelNoCanal(channel);
+                        await postarPainelNoCanal(channel, painelData);
                         const container = new ContainerBuilder();
                         container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-                            `## ${Emojis.get('confirmed_emoji')} Painel postado!\nO painel de vendas foi enviado em <#${channelId}>.`
+                            `## ${Emojis.get('confirmed_emoji')} Painel postado!\nEnviado em <#${channelId}>.`
                         ));
                         container.addSeparatorComponents(new SeparatorBuilder());
                         container.addActionRowComponents(new ActionRowBuilder().addComponents(
@@ -411,6 +573,34 @@ module.exports = {
             // MODAL SUBMITS
             // ══════════════════════════════════════════════════════════════════════
             if (interaction.isModalSubmit()) {
+
+                // Criar novo painel
+                if (customId === 'vnd_modal_add_painel') {
+                    const nome = interaction.fields.getTextInputValue('painel_nome').trim() || 'Novo Painel';
+                    const paineis = getPaneis();
+                    if (paineis.length >= 5) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 5 painéis atingido.`, ephemeral: true });
+                    const { buildPainelMainMenu, getPainelData, setPainelData } = require('../../Functions/VendasPainelBuilder');
+                    const userId = interaction.user.id;
+                    const newId = gerarPainelId();
+                    // Limpa rascunho anterior se havia
+                    if (Object.keys(getPainelData(userId)).length === 0) {
+                        setPainelData(userId, {
+                            _painelId: newId,
+                            _painelNome: nome,
+                            title: `${Emojis.get('store_emoji')} Loja`,
+                            description: 'Selecione uma categoria abaixo para ver os produtos disponíveis.',
+                            footer: 'Pagamento via PIX automático — confirmação instantânea.',
+                        });
+                    } else {
+                        // Atualiza o painelId/nome no rascunho existente
+                        const d = getPainelData(userId);
+                        d._painelId = newId;
+                        d._painelNome = nome;
+                        setPainelData(userId, d);
+                    }
+                    await interaction.update(buildPainelMainMenu(userId));
+                    return;
+                }
 
                 // Adicionar nova seção
                 if (customId === 'vnd_modal_add_secao') {

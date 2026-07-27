@@ -66,7 +66,7 @@ function buildCartMessage(cartData) {
         new ButtonBuilder()
             .setCustomId(`cart_rem_qty_${threadId}`)
             .setLabel('-1')
-            .setEmoji({ id: '1501803935453679616' })
+            .setEmoji({ id: '1501803911655198742' })
             .setStyle(4)
             .setDisabled(quantidade <= 1),
         new ButtonBuilder()

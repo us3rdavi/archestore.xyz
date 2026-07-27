@@ -277,9 +277,14 @@ module.exports = {
                 const payPayload = { components: [containerPix], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
                 if (files.length > 0) payPayload.files = files;
                 await interaction.message.edit(payPayload);
+                // Guarda ID da mensagem PIX (container) para deletar após confirmação
+                cart.pixMsgId = interaction.message.id;
+                carrinhos.set(threadId, cart);
 
                 // Mensagem limpa com apenas o código PIX (para mobile copiar)
-                await interaction.channel.send(pixCopiaECola);
+                const pixTextMsg = await interaction.channel.send(pixCopiaECola);
+                cart.pixTextMsgId = pixTextMsg.id;
+                carrinhos.set(threadId, cart);
 
                 // Polling de confirmação
                 iniciarPolling(txid, {
@@ -314,6 +319,16 @@ module.exports = {
                         try {
                             const thread = client.channels.cache.get(threadId);
                             if (thread) {
+                                // Deletar a mensagem com QR code e o código copia e cola
+                                await Promise.all([
+                                    cartNow.pixMsgId
+                                        ? thread.messages.fetch(cartNow.pixMsgId).then(m => m.delete()).catch(() => {})
+                                        : Promise.resolve(),
+                                    cartNow.pixTextMsgId
+                                        ? thread.messages.fetch(cartNow.pixTextMsgId).then(m => m.delete()).catch(() => {})
+                                        : Promise.resolve(),
+                                ]);
+
                                 const containerPago = new ContainerBuilder();
                                 containerPago.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                                     `## ${Emojis.get('confirmed_emoji')} Pagamento Confirmado!\n\n` +
