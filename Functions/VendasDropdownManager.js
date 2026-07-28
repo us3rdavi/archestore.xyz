@@ -436,6 +436,86 @@ async function buildEmojiPickerPanel(interaction, client, { tipo, secaoId, subId
     }
 }
 
+// ── Emoji picker paginado para seção (bot/servidor com troca de fonte) ────────────
+async function buildSecaoEmojiSourcePanel(interaction, secaoId, source, page) {
+    const secoes = configuracao.get('vendas.secoes') || [];
+    const secao = secoes.find(s => s.id === secaoId);
+
+    const allOptions = source === 'server'
+        ? buildServerEmojiOptionsList(interaction.guild)
+        : buildBotEmojiOptionsList();
+
+    const totalPages = Math.max(1, Math.ceil(allOptions.length / PAGE_SIZE));
+    const safePage = Math.max(0, Math.min(page, totalPages - 1));
+    const pageOptions = allOptions.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
+
+    const sourceLabel = source === 'server' ? 'Servidor' : 'Bot';
+    const otherSource = source === 'server' ? 'bot' : 'server';
+    const otherLabel  = source === 'server' ? 'Bot' : 'Servidor';
+
+    const container = new ContainerBuilder();
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('store_emoji')} Emojis do ${sourceLabel}${secao ? ` — **${secao.nome}**` : ''}\n` +
+        `-# Página ${safePage + 1}/${totalPages} · ${allOptions.length} emojis disponíveis`
+    ));
+    container.addSeparatorComponents(new SeparatorBuilder());
+
+    // Linha: trocar fonte + remover emoji atual (se houver)
+    const toggleRow = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`vnd_secao_emoji_${otherSource}_0_${secaoId}`)
+            .setLabel(`Emojis do ${otherLabel}`)
+            .setEmoji({ id: '1501803947898306724' })
+            .setStyle(2),
+    );
+    if (secao?.emoji) {
+        toggleRow.addComponents(
+            new ButtonBuilder()
+                .setCustomId(`vnd_secao_emoji_rm_${secaoId}`)
+                .setLabel('Remover Emoji')
+                .setEmoji({ id: '1501803926180335727' })
+                .setStyle(4)
+        );
+    }
+    container.addActionRowComponents(toggleRow);
+
+    if (allOptions.length === 0) {
+        container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+            `-# Nenhum emoji do ${sourceLabel.toLowerCase()} disponível.`
+        ));
+        container.addActionRowComponents(new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId(`vnd_secao_cfg_${secaoId}`).setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
+        ));
+    } else {
+        container.addActionRowComponents(new ActionRowBuilder().addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId(`vnd_set_emoji_s_${secaoId}`)
+                .setPlaceholder(`Emojis ${safePage * PAGE_SIZE + 1}–${Math.min((safePage + 1) * PAGE_SIZE, allOptions.length)} de ${allOptions.length}...`)
+                .addOptions(pageOptions)
+        ));
+
+        const navRow = new ActionRowBuilder();
+        if (safePage > 0) {
+            navRow.addComponents(new ButtonBuilder()
+                .setCustomId(`vnd_secao_emoji_${source}_${safePage - 1}_${secaoId}`)
+                .setLabel('Anterior').setEmoji({ id: '1501803911655198742' }).setStyle(2));
+        }
+        navRow.addComponents(new ButtonBuilder()
+            .setCustomId(`vnd_secao_cfg_${secaoId}`)
+            .setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2));
+        if (safePage < totalPages - 1) {
+            navRow.addComponents(new ButtonBuilder()
+                .setCustomId(`vnd_secao_emoji_${source}_${safePage + 1}_${secaoId}`)
+                .setLabel('Próxima').setEmoji({ id: '1501803914654257326' }).setStyle(2));
+        }
+        container.addActionRowComponents(navRow);
+    }
+
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
+    else await interaction.update(payload);
+}
+
 // ── Modal: adicionar/editar seção ───────────────────────────────────────────────
 function buildModalAddSecao(secao = null) {
     const modal = new ModalBuilder()
@@ -638,6 +718,7 @@ module.exports = {
     buildEmojiPickerPanel,
     buildSubEmojiPickerPanel,
     buildSubEmojiSourcePanel,
+    buildSecaoEmojiSourcePanel,
     buildModalAddSecao,
     buildModalMsgSecao,
     buildModalAddSub,

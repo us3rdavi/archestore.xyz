@@ -19,6 +19,7 @@ const {
     buildEmojiPickerPanel,
     buildSubEmojiPickerPanel,
     buildSubEmojiSourcePanel,
+    buildSecaoEmojiSourcePanel,
     buildModalAddSecao,
     buildModalMsgSecao,
     buildModalAddSub,
@@ -213,10 +214,35 @@ module.exports = {
                     return;
                 }
 
-                // Configurar emoji da seção
+                // Paginação do emoji picker da seção — vnd_secao_emoji_bot_<page>_<secaoId> / vnd_secao_emoji_server_<page>_<secaoId>
+                if (customId.startsWith('vnd_secao_emoji_bot_') || customId.startsWith('vnd_secao_emoji_server_')) {
+                    const isBot = customId.startsWith('vnd_secao_emoji_bot_');
+                    const prefix = isBot ? 'vnd_secao_emoji_bot_' : 'vnd_secao_emoji_server_';
+                    const rest = customId.slice(prefix.length);
+                    const us = rest.indexOf('_');
+                    const page = us !== -1 ? (parseInt(rest.slice(0, us), 10) || 0) : 0;
+                    const secaoId = us !== -1 ? rest.slice(us + 1) : rest;
+                    await buildSecaoEmojiSourcePanel(interaction, secaoId, isBot ? 'bot' : 'server', page);
+                    return;
+                }
+
+                // Remover emoji da seção — vnd_secao_emoji_rm_<secaoId>
+                if (customId.startsWith('vnd_secao_emoji_rm_')) {
+                    const secaoId = customId.slice('vnd_secao_emoji_rm_'.length);
+                    let secoes = configuracao.get('vendas.secoes') || [];
+                    const idx = secoes.findIndex(s => s.id === secaoId);
+                    if (idx !== -1) {
+                        secoes[idx].emoji = '';
+                        configuracao.set('vendas.secoes', secoes);
+                    }
+                    await buildSecaoEmojiSourcePanel(interaction, secaoId, 'bot', 0);
+                    return;
+                }
+
+                // Configurar emoji da seção — entry point: vnd_secao_emoji_<secaoId>
                 if (customId.startsWith('vnd_secao_emoji_')) {
                     const secaoId = customId.slice('vnd_secao_emoji_'.length);
-                    await buildEmojiPickerPanel(interaction, client, { tipo: 'secao', secaoId });
+                    await buildSecaoEmojiSourcePanel(interaction, secaoId, 'bot', 0);
                     return;
                 }
 
