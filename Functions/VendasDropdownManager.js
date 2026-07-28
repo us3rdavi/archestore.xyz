@@ -392,34 +392,19 @@ async function buildSubEmojiSourcePanel(interaction, secaoId, subId, source, pag
 // ── Emoji picker panel ──────────────────────────────────────────────────────────
 async function buildEmojiPickerPanel(interaction, client, { tipo, secaoId, subId }) {
     // tipo: 'secao' | 'sub'
-    const botEmojis = Emojis.all(); // { name: id }
-    const guildEmojis = [...(interaction.guild?.emojis.cache.values() || [])];
+    // Usa os mesmos helpers já existentes (que extraem corretamente o snowflake
+    // das strings <:name:id> armazenadas no banco de emojis).
+    const botOptions    = buildBotEmojiOptionsList();
+    const serverOptions = buildServerEmojiOptionsList(interaction.guild);
 
-    const options = [];
+    // Mescla sem duplicatas, limitado a 25 opções do Discord
     const seenIds = new Set();
-
-    // Bot emojis first
-    for (const [name, id] of Object.entries(botEmojis)) {
-        if (options.length >= 23) break;
-        if (!id || seenIds.has(String(id))) continue;
-        seenIds.add(String(id));
-        options.push({
-            label: name.slice(0, 100),
-            value: String(id),
-            emoji: { id: String(id) },
-        });
-    }
-
-    // Server emojis
-    for (const emoji of guildEmojis) {
+    const options = [];
+    for (const opt of [...botOptions, ...serverOptions]) {
         if (options.length >= 25) break;
-        if (!emoji.id || seenIds.has(emoji.id)) continue;
-        seenIds.add(emoji.id);
-        options.push({
-            label: (emoji.name || 'emoji').slice(0, 100),
-            value: emoji.id,
-            emoji: { id: emoji.id },
-        });
+        if (seenIds.has(opt.value)) continue;
+        seenIds.add(opt.value);
+        options.push(opt);
     }
 
     if (options.length === 0) {

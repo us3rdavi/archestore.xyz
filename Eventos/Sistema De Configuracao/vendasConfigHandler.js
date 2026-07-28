@@ -310,10 +310,7 @@ module.exports = {
                 // Selecionar seção para editar (info básica)
                 if (customId === 'vnd_select_edit_secao') {
                     const secaoId = interaction.values[0];
-                    const _secoes = configuracao.get('vendas.secoes') || [];
-                    console.log('[DEBUG edit_secao] secaoId recebido:', JSON.stringify(secaoId));
-                    console.log('[DEBUG edit_secao] ids no cache:', JSON.stringify(_secoes.map(s => s.id)));
-                    const secao = _secoes.find(s => s.id === secaoId);
+                    const secao = (configuracao.get('vendas.secoes') || []).find(s => s.id === secaoId);
                     if (!secao) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
                     await interaction.showModal(buildModalAddSecao(secao));
                     return;
