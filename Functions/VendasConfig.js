@@ -46,7 +46,7 @@ async function vendasConfig(interaction) {
         `${efiAtivo && efiConfig ? ok : no} PIX EfiBank  ·  ` +
         `${canalCarrinho ? ok : no} Canal de Carrinho\n` +
         `${Emojis.get('store_emoji')} **${secoes.length}** seções · **${totalSubs}** produtos  ·  ` +
-        `${Emojis.get('_folder_emoji')} **${paineis.length}/5** painéis  ·  ` +
+        `${Emojis.get('_folder_emoji')} **${paineis.length}/10** painéis  ·  ` +
         `${Emojis.get('pix_stamp_emoji')} **${nDescontos}** cupons\n` +
         `${logCompras ? ok : no} Log de compras  ·  ${logPendentes ? ok : no} Log de pendentes`
     ));
@@ -79,7 +79,7 @@ async function vendasConfig(interaction) {
     container.addActionRowComponents(new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId('vnd_gerenciar_paineis')
-            .setLabel(`Painéis de Vendas (${paineis.length}/5)`)
+            .setLabel(`Painéis de Vendas (${paineis.length}/10)`)
             .setEmoji({ id: '1501804003850322052' })
             .setStyle(1),
     ));
@@ -114,8 +114,8 @@ async function vendasGerenciarPaineis(interaction) {
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('store_emoji')} Painéis de Vendas\n` +
-        `Gerencie até **5** painéis independentes. Cada painel pode ser postado em canais diferentes.\n\n` +
-        listaPaineis + `\n\n-# ${paineis.length}/5 painéis`
+        `Gerencie até **10** painéis independentes. Cada painel pode ser postado em canais diferentes.\n\n` +
+        listaPaineis + `\n\n-# ${paineis.length}/10 painéis`
     ));
     container.addSeparatorComponents(new SeparatorBuilder());
 
@@ -125,7 +125,7 @@ async function vendasGerenciarPaineis(interaction) {
             .setLabel('Criar Painel')
             .setEmoji({ id: '1501803905363869769' })
             .setStyle(3)
-            .setDisabled(paineis.length >= 5),
+            .setDisabled(paineis.length >= 10),
     ));
 
     if (paineis.length > 0) {

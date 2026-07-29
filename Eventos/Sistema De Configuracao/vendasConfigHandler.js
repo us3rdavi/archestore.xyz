@@ -92,7 +92,7 @@ module.exports = {
 
                 if (customId === 'vnd_add_painel') {
                     const paineis = getPaneis();
-                    if (paineis.length >= 5) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 5 painéis atingido.`, ephemeral: true });
+                    if (paineis.length >= 10) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 10 painéis atingido.`, ephemeral: true });
                     const modal = new ModalBuilder()
                         .setCustomId('vnd_modal_add_painel')
                         .setTitle('Criar Novo Painel');
@@ -656,7 +656,7 @@ module.exports = {
                 if (customId === 'vnd_modal_add_painel') {
                     const nome = interaction.fields.getTextInputValue('painel_nome').trim() || 'Novo Painel';
                     const paineis = getPaneis();
-                    if (paineis.length >= 5) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 5 painéis atingido.`, ephemeral: true });
+                    if (paineis.length >= 10) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 10 painéis atingido.`, ephemeral: true });
                     const { buildPainelMainMenu, getPainelData, setPainelData } = require('../../Functions/VendasPainelBuilder');
                     const userId = interaction.user.id;
                     const newId = gerarPainelId();
