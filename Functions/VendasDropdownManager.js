@@ -253,6 +253,15 @@ async function buildSubprodutosPanel(interaction, secao) {
                 .setStyle(2),
         );
     }
+    if (subprodutos.length >= 2) {
+        row2Btns.push(
+            new ButtonBuilder()
+                .setCustomId(`vnd_sub_reorder_${secao.id}`)
+                .setLabel('Reorganizar')
+                .setEmoji({ id: '1501803947898306724' })
+                .setStyle(2),
+        );
+    }
 
     container.addActionRowComponents(row1);
     container.addActionRowComponents(new ActionRowBuilder().addComponents(...row2Btns));
@@ -516,6 +525,121 @@ async function buildSecaoEmojiSourcePanel(interaction, secaoId, source, page) {
     else await interaction.update(payload);
 }
 
+// ── Reorganizar subprodutos — passo 1: escolher qual mover ─────────────────────
+async function buildSubReorderPickPanel(interaction, secaoId) {
+    const secoes = configuracao.get('vendas.secoes') || [];
+    const secao = secoes.find(s => s.id === secaoId);
+    if (!secao) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
+    const subs = secao.subprodutos || [];
+
+    const lista = subs.map((sp, i) =>
+        `**${i + 1}.** ${sp.emoji ? `<:e:${sp.emoji}> ` : ''}**${sp.nome}** — \`R$ ${Number(sp.valor).toFixed(2)}\``
+    ).join('\n');
+
+    const options = subs.slice(0, 25).map((sp, i) => ({
+        label: `${i + 1}. ${sp.nome}`.slice(0, 100),
+        value: sp.id,
+        description: `R$ ${Number(sp.valor).toFixed(2)}`.slice(0, 100),
+        ...(sp.emoji ? { emoji: { id: sp.emoji } } : {}),
+    }));
+
+    const container = new ContainerBuilder();
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('store_emoji')} Reorganizar Subprodutos — ${secao.nome}\n` +
+        `Selecione o subproduto que deseja mover de posição.\n\n` +
+        lista
+    ));
+    container.addSeparatorComponents(new SeparatorBuilder());
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new StringSelectMenuBuilder()
+            .setCustomId(`vnd_sub_reorder_sel_${secaoId}`)
+            .setPlaceholder('Selecione o subproduto a mover...')
+            .addOptions(options)
+    ));
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`vnd_sub_panel_${secaoId}`)
+            .setLabel('Cancelar')
+            .setEmoji({ id: '1501803908589162537' })
+            .setStyle(2)
+    ));
+
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
+    else await interaction.update(payload);
+}
+
+// ── Reorganizar subprodutos — passo 2: mover o subproduto escolhido ─────────────
+async function buildSubReorderMovePanel(interaction, secaoId, subId) {
+    const secoes = configuracao.get('vendas.secoes') || [];
+    const secao = secoes.find(s => s.id === secaoId);
+    if (!secao) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
+    const subs = secao.subprodutos || [];
+    const idx = subs.findIndex(sp => sp.id === subId);
+    if (idx === -1) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Subproduto não encontrado.`, ephemeral: true });
+
+    const sub = subs[idx];
+    const total = subs.length;
+    const pos = idx + 1; // 1-based
+
+    const lista = subs.map((sp, i) => {
+        const marker = sp.id === subId ? '▶ ' : `${i + 1}. `;
+        const bold = sp.id === subId ? `**${sp.nome}**` : sp.nome;
+        return `${marker}${sp.emoji ? `<:e:${sp.emoji}> ` : ''}${bold}`;
+    }).join('\n');
+
+    const container = new ContainerBuilder();
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('store_emoji')} Movendo: **${sub.nome}**\n` +
+        `-# Posição atual: **${pos}** de **${total}**\n\n` +
+        lista
+    ));
+    container.addSeparatorComponents(new SeparatorBuilder());
+
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`vnd_sub_mv_top_${secaoId}_${subId}`)
+            .setLabel('Início')
+            .setEmoji({ id: '1501803914654257326' })
+            .setStyle(2)
+            .setDisabled(idx === 0),
+        new ButtonBuilder()
+            .setCustomId(`vnd_sub_mv_up_${secaoId}_${subId}`)
+            .setLabel('Subir')
+            .setEmoji({ id: '1501803911655198742' })
+            .setStyle(2)
+            .setDisabled(idx === 0),
+        new ButtonBuilder()
+            .setCustomId(`vnd_sub_mv_down_${secaoId}_${subId}`)
+            .setLabel('Descer')
+            .setEmoji({ id: '1501803914654257326' })
+            .setStyle(2)
+            .setDisabled(idx === total - 1),
+        new ButtonBuilder()
+            .setCustomId(`vnd_sub_mv_bot_${secaoId}_${subId}`)
+            .setLabel('Fim')
+            .setEmoji({ id: '1501803911655198742' })
+            .setStyle(2)
+            .setDisabled(idx === total - 1),
+    ));
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`vnd_sub_reorder_${secaoId}`)
+            .setLabel('Escolher outro')
+            .setEmoji({ id: '1501803947898306724' })
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId(`vnd_sub_panel_${secaoId}`)
+            .setLabel('Concluído')
+            .setEmoji({ id: '1501803917640732722' })
+            .setStyle(3),
+    ));
+
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
+    else await interaction.update(payload);
+}
+
 // ── Modal: adicionar/editar seção ───────────────────────────────────────────────
 function buildModalAddSecao(secao = null) {
     const modal = new ModalBuilder()
@@ -719,6 +843,8 @@ module.exports = {
     buildSubEmojiPickerPanel,
     buildSubEmojiSourcePanel,
     buildSecaoEmojiSourcePanel,
+    buildSubReorderPickPanel,
+    buildSubReorderMovePanel,
     buildModalAddSecao,
     buildModalMsgSecao,
     buildModalAddSub,

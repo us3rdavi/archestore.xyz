@@ -20,6 +20,8 @@ const {
     buildSubEmojiPickerPanel,
     buildSubEmojiSourcePanel,
     buildSecaoEmojiSourcePanel,
+    buildSubReorderPickPanel,
+    buildSubReorderMovePanel,
     buildModalAddSecao,
     buildModalMsgSecao,
     buildModalAddSub,
@@ -276,6 +278,48 @@ module.exports = {
                     return;
                 }
 
+                // Reorganizar subprodutos — abrir picker
+                if (customId.startsWith('vnd_sub_reorder_')) {
+                    const secaoId = customId.slice('vnd_sub_reorder_'.length);
+                    await buildSubReorderPickPanel(interaction, secaoId);
+                    return;
+                }
+
+                // Mover subproduto — vnd_sub_mv_<dir>_<secaoId>_<subId>
+                if (customId.startsWith('vnd_sub_mv_')) {
+                    const rest = customId.slice('vnd_sub_mv_'.length); // dir_secaoId_subId
+                    const firstUs = rest.indexOf('_');
+                    const dir = rest.slice(0, firstUs);              // top | up | down | bot
+                    const ids = rest.slice(firstUs + 1);             // secaoId_subId
+                    const secondUs = ids.indexOf('_');
+                    const secaoId = ids.slice(0, secondUs);
+                    const subId   = ids.slice(secondUs + 1);
+
+                    let secoes = configuracao.get('vendas.secoes') || [];
+                    const si = secoes.findIndex(s => s.id === secaoId);
+                    if (si === -1) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
+                    const subs = secoes[si].subprodutos || [];
+                    const pi = subs.findIndex(sp => sp.id === subId);
+                    if (pi === -1) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Subproduto não encontrado.`, ephemeral: true });
+
+                    if (dir === 'top') {
+                        const [item] = subs.splice(pi, 1);
+                        subs.unshift(item);
+                    } else if (dir === 'up' && pi > 0) {
+                        [subs[pi - 1], subs[pi]] = [subs[pi], subs[pi - 1]];
+                    } else if (dir === 'down' && pi < subs.length - 1) {
+                        [subs[pi], subs[pi + 1]] = [subs[pi + 1], subs[pi]];
+                    } else if (dir === 'bot') {
+                        const [item] = subs.splice(pi, 1);
+                        subs.push(item);
+                    }
+
+                    secoes[si].subprodutos = subs;
+                    configuracao.set('vendas.secoes', secoes);
+                    await buildSubReorderMovePanel(interaction, secaoId, subId);
+                    return;
+                }
+
                 // Picker: escolher subproduto para emoji
                 if (customId.startsWith('vnd_sub_emoji_pick_')) {
                     const secaoId = customId.slice('vnd_sub_emoji_pick_'.length);
@@ -353,6 +397,14 @@ module.exports = {
                     logAction(client, { action: 'Seção removida', details: `Seção \`${secao.nome}\` removida.`, userId: interaction.user.id, guildId: interaction.guildId });
                     await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
                     await gerenciarDropdownVendas(interaction);
+                    return;
+                }
+
+                // Selecionar subproduto para reorganizar — passo 2
+                if (customId.startsWith('vnd_sub_reorder_sel_')) {
+                    const secaoId = customId.slice('vnd_sub_reorder_sel_'.length);
+                    const subId = interaction.values[0];
+                    await buildSubReorderMovePanel(interaction, secaoId, subId);
                     return;
                 }
 
