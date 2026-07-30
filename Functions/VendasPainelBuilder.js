@@ -182,7 +182,9 @@ function buildPreviewContainer(data) {
 
 function buildPainelPreviewContainer(data) {
     const content = buildPreviewContainer(data);
-    const secoes = configuracao.get('vendas.secoes') || [];
+    const todasSecoes = configuracao.get('vendas.secoes') || [];
+    const painelIdPreview = data && data._painelId;
+    const secoes = painelIdPreview ? todasSecoes.filter(s => s.painelId === painelIdPreview) : todasSecoes;
 
     // Adiciona o dropdown de seções no preview (mostra exatamente como vai ficar)
     if (secoes.length > 0) {

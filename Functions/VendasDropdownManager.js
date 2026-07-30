@@ -38,9 +38,10 @@ function gerarId() {
     return Math.random().toString(36).slice(2, 10);
 }
 
-// ── Painel principal: lista de seções ──────────────────────────────────────────
-async function gerenciarDropdownVendas(interaction) {
-    const secoes = configuracao.get('vendas.secoes') || [];
+// ── Painel principal: lista de seções (filtrado por painel) ───────────────────
+async function gerenciarDropdownVendas(interaction, painelId) {
+    const todasSecoes = configuracao.get('vendas.secoes') || [];
+    const secoes = painelId ? todasSecoes.filter(s => s.painelId === painelId) : todasSecoes;
 
     const listaSecoes = secoes.length === 0
         ? `${Emojis.get('negative_emoji')} Nenhuma seção cadastrada ainda.`
@@ -48,6 +49,11 @@ async function gerenciarDropdownVendas(interaction) {
             const nSub = (s.subprodutos || []).length;
             return `**${i + 1}.** ${s.emoji ? `<:e:${s.emoji}> ` : ''}**${s.nome}** — \`${nSub} subproduto(s)\`\n-# ${s.descricao || 'Sem descrição'}`;
         }).join('\n\n');
+
+    const addId = painelId ? `vnd_add_secao_${painelId}` : 'vnd_add_secao';
+    const cfgId = painelId ? `vnd_config_secao_pick_${painelId}` : 'vnd_config_secao_pick';
+    const editId = painelId ? `vnd_editar_secao_pick_${painelId}` : 'vnd_editar_secao_pick';
+    const rmId   = painelId ? `vnd_remover_secao_pick_${painelId}` : 'vnd_remover_secao_pick';
 
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
@@ -59,13 +65,13 @@ async function gerenciarDropdownVendas(interaction) {
 
     const row1 = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
-            .setCustomId('vnd_add_secao')
+            .setCustomId(addId)
             .setLabel('Adicionar Seção')
             .setEmoji({ id: '1501803905363869769' })
             .setStyle(3)
             .setDisabled(secoes.length >= 25),
         new ButtonBuilder()
-            .setCustomId('vnd_config_secao_pick')
+            .setCustomId(cfgId)
             .setLabel('Configurar Seção')
             .setEmoji({ id: '1501804003850322052' })
             .setStyle(1)
@@ -82,12 +88,12 @@ async function gerenciarDropdownVendas(interaction) {
     if (secoes.length > 0) {
         row2Btns.unshift(
             new ButtonBuilder()
-                .setCustomId('vnd_editar_secao_pick')
+                .setCustomId(editId)
                 .setLabel('Editar Info')
                 .setEmoji({ id: '1501804039451709441' })
                 .setStyle(2),
             new ButtonBuilder()
-                .setCustomId('vnd_remover_secao_pick')
+                .setCustomId(rmId)
                 .setLabel('Remover')
                 .setEmoji({ id: '1501803935453679616' })
                 .setStyle(4),
@@ -106,8 +112,9 @@ async function gerenciarDropdownVendas(interaction) {
 }
 
 // ── Picker: escolhe qual seção configurar ───────────────────────────────────────
-async function handlePickConfigSecao(interaction) {
-    const secoes = configuracao.get('vendas.secoes') || [];
+async function handlePickConfigSecao(interaction, painelId) {
+    const todasSecoes = configuracao.get('vendas.secoes') || [];
+    const secoes = painelId ? todasSecoes.filter(s => s.painelId === painelId) : todasSecoes;
     if (secoes.length === 0) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Nenhuma seção disponível.`, ephemeral: true });
 
     const options = secoes.slice(0, 25).map(s => ({
@@ -116,6 +123,8 @@ async function handlePickConfigSecao(interaction) {
         description: `${(s.subprodutos || []).length} subproduto(s) — ${s.descricao || 'Sem descrição'}`.slice(0, 100),
         ...(s.emoji ? { emoji: { id: s.emoji } } : {}),
     }));
+
+    const backId = painelId ? `vnd_gerenciar_dropdown_${painelId}` : 'vnd_gerenciar_dropdown';
 
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
@@ -126,7 +135,7 @@ async function handlePickConfigSecao(interaction) {
         new StringSelectMenuBuilder().setCustomId('vnd_select_config_secao').setPlaceholder('Selecione a seção...').addOptions(options)
     ));
     container.addActionRowComponents(new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId('vnd_gerenciar_dropdown').setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
+        new ButtonBuilder().setCustomId(backId).setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
     ));
 
     await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
@@ -181,9 +190,10 @@ async function buildSecaoConfigPanel(interaction, secao) {
             .setEmoji({ id: '1501803923126747178' })
             .setStyle(3),
     );
+    const backId = secao.painelId ? `vnd_gerenciar_dropdown_${secao.painelId}` : 'vnd_gerenciar_dropdown';
     const row3 = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
-            .setCustomId('vnd_gerenciar_dropdown')
+            .setCustomId(backId)
             .setLabel('Voltar')
             .setEmoji({ id: '1501803908589162537' })
             .setStyle(2),
@@ -641,9 +651,10 @@ async function buildSubReorderMovePanel(interaction, secaoId, subId) {
 }
 
 // ── Modal: adicionar/editar seção ───────────────────────────────────────────────
-function buildModalAddSecao(secao = null) {
+function buildModalAddSecao(secao = null, painelId = null) {
+    const newCustomId = painelId ? `vnd_modal_add_secao_${painelId}` : 'vnd_modal_add_secao';
     const modal = new ModalBuilder()
-        .setCustomId(secao ? `vnd_modal_edit_secao_${secao.id}` : 'vnd_modal_add_secao')
+        .setCustomId(secao ? `vnd_modal_edit_secao_${secao.id}` : newCustomId)
         .setTitle(secao ? 'Editar Seção' : 'Adicionar Seção');
 
     modal.addComponents(
@@ -785,8 +796,9 @@ async function handlePickDelSub(interaction, secaoId) {
 }
 
 // ── Picker: editar seção (info básica) ─────────────────────────────────────────
-async function handlePickEditSecao(interaction) {
-    const secoes = configuracao.get('vendas.secoes') || [];
+async function handlePickEditSecao(interaction, painelId) {
+    const todasSecoes = configuracao.get('vendas.secoes') || [];
+    const secoes = painelId ? todasSecoes.filter(s => s.painelId === painelId) : todasSecoes;
     if (secoes.length === 0) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Nenhuma seção para editar.`, ephemeral: true });
 
     const options = secoes.slice(0, 25).map(s => ({
@@ -796,6 +808,8 @@ async function handlePickEditSecao(interaction) {
         ...(s.emoji ? { emoji: { id: s.emoji } } : {}),
     }));
 
+    const backId = painelId ? `vnd_gerenciar_dropdown_${painelId}` : 'vnd_gerenciar_dropdown';
+
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${Emojis.get('_lapis_emoji')} Editar Info da Seção\nSelecione a seção que deseja editar.`));
     container.addSeparatorComponents(new SeparatorBuilder());
@@ -803,15 +817,16 @@ async function handlePickEditSecao(interaction) {
         new StringSelectMenuBuilder().setCustomId('vnd_select_edit_secao').setPlaceholder('Selecione a seção...').addOptions(options)
     ));
     container.addActionRowComponents(new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId('vnd_gerenciar_dropdown').setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
+        new ButtonBuilder().setCustomId(backId).setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
     ));
 
     await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
 }
 
 // ── Picker: remover seção ───────────────────────────────────────────────────────
-async function handlePickRemoverSecao(interaction) {
-    const secoes = configuracao.get('vendas.secoes') || [];
+async function handlePickRemoverSecao(interaction, painelId) {
+    const todasSecoes = configuracao.get('vendas.secoes') || [];
+    const secoes = painelId ? todasSecoes.filter(s => s.painelId === painelId) : todasSecoes;
     if (secoes.length === 0) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Nenhuma seção para remover.`, ephemeral: true });
 
     const options = secoes.slice(0, 25).map(s => ({
@@ -821,6 +836,8 @@ async function handlePickRemoverSecao(interaction) {
         ...(s.emoji ? { emoji: { id: s.emoji } } : {}),
     }));
 
+    const backId = painelId ? `vnd_gerenciar_dropdown_${painelId}` : 'vnd_gerenciar_dropdown';
+
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${Emojis.get('_trash_emoji')} Remover Seção\nSelecione a seção que deseja remover.`));
     container.addSeparatorComponents(new SeparatorBuilder());
@@ -828,7 +845,7 @@ async function handlePickRemoverSecao(interaction) {
         new StringSelectMenuBuilder().setCustomId('vnd_select_rm_secao').setPlaceholder('Selecione a seção...').addOptions(options)
     ));
     container.addActionRowComponents(new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId('vnd_gerenciar_dropdown').setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
+        new ButtonBuilder().setCustomId(backId).setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
     ));
 
     await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });

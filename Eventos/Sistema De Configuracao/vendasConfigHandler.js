@@ -9,7 +9,7 @@ const { configuracao, Emojis } = require('../../Database');
 const {
     vendasConfig, vendasGerenciarPaineis, vendasPostarPainelEspecifico,
     vendasLogsConfig, vendasCanalCarrinhoConfig, vendasPostarPainel,
-    getPaneis, gerarPainelId,
+    getPaneis, gerarPainelId, abrirGerenciadorSecoes, migrarSecoesSemPainel,
 } = require('../../Functions/VendasConfig');
 const {
     gerenciarDropdownVendas,
@@ -34,8 +34,9 @@ const {
 const { logAction } = require('../../Functions/AuditLog');
 
 // Posta um painel específico no canal selecionado
-async function postarPainelNoCanal(channel, painelData) {
-    const secoes = configuracao.get('vendas.secoes') || [];
+async function postarPainelNoCanal(channel, painelData, painelId) {
+    const todasSecoes = configuracao.get('vendas.secoes') || [];
+    const secoes = painelId ? todasSecoes.filter(s => s.painelId === painelId) : todasSecoes;
     if (secoes.length === 0) return;
     const { buildFinalPainelContainer } = require('../../Functions/VendasPainelBuilder');
     const container = buildFinalPainelContainer(painelData || null, secoes);
@@ -56,7 +57,10 @@ module.exports = {
             if (interaction.isButton()) {
 
                 if (customId === 'vnd_voltar_config')        { await vendasConfig(interaction); return; }
-                if (customId === 'vnd_gerenciar_dropdown')   { await gerenciarDropdownVendas(interaction); return; }
+                if (customId === 'vnd_gerenciar_dropdown') {
+                    await abrirGerenciadorSecoes(interaction);
+                    return;
+                }
                 if (customId === 'vnd_config_logs')          { await vendasLogsConfig(interaction); return; }
                 if (customId === 'vnd_postar_painel')        { await vendasPostarPainel(interaction); return; }
                 if (customId === 'vnd_config_canal_carrinho'){ await vendasCanalCarrinhoConfig(interaction); return; }
@@ -87,6 +91,37 @@ module.exports = {
                 // ── Gerenciar painéis ──────────────────────────────────────────
                 if (customId === 'vnd_gerenciar_paineis') {
                     await vendasGerenciarPaineis(interaction);
+                    return;
+                }
+
+                // ── Seções de painel específico ──────────────────────────────
+                if (customId.startsWith('vnd_gerenciar_dropdown_')) {
+                    const painelId = customId.slice('vnd_gerenciar_dropdown_'.length);
+                    await gerenciarDropdownVendas(interaction, painelId);
+                    return;
+                }
+
+                // ── Adicionar seção a um painel específico ───────────────────
+                if (customId.startsWith('vnd_add_secao_')) {
+                    const painelId = customId.slice('vnd_add_secao_'.length);
+                    await interaction.showModal(buildModalAddSecao(null, painelId));
+                    return;
+                }
+
+                // ── Pickers de seção com painelId ────────────────────────────
+                if (customId.startsWith('vnd_config_secao_pick_')) {
+                    const painelId = customId.slice('vnd_config_secao_pick_'.length);
+                    await handlePickConfigSecao(interaction, painelId);
+                    return;
+                }
+                if (customId.startsWith('vnd_editar_secao_pick_')) {
+                    const painelId = customId.slice('vnd_editar_secao_pick_'.length);
+                    await handlePickEditSecao(interaction, painelId);
+                    return;
+                }
+                if (customId.startsWith('vnd_remover_secao_pick_')) {
+                    const painelId = customId.slice('vnd_remover_secao_pick_'.length);
+                    await handlePickRemoverSecao(interaction, painelId);
                     return;
                 }
 
@@ -184,10 +219,10 @@ module.exports = {
                     await interaction.update(buildSecaoMainMenu(userId, secao));
                     return;
                 }
-                if (customId === 'vnd_add_secao')            { await interaction.showModal(buildModalAddSecao()); return; }
-                if (customId === 'vnd_editar_secao_pick')    { await handlePickEditSecao(interaction); return; }
-                if (customId === 'vnd_remover_secao_pick')   { await handlePickRemoverSecao(interaction); return; }
-                if (customId === 'vnd_config_secao_pick')    { await handlePickConfigSecao(interaction); return; }
+                if (customId === 'vnd_add_secao')            { await interaction.showModal(buildModalAddSecao(null, null)); return; }
+                if (customId === 'vnd_editar_secao_pick')    { await handlePickEditSecao(interaction, null); return; }
+                if (customId === 'vnd_remover_secao_pick')   { await handlePickRemoverSecao(interaction, null); return; }
+                if (customId === 'vnd_config_secao_pick')    { await handlePickConfigSecao(interaction, null); return; }
 
                 // Voltar à seção config
                 if (customId.startsWith('vnd_secao_cfg_')) {
@@ -392,11 +427,12 @@ module.exports = {
                     let secoes = configuracao.get('vendas.secoes') || [];
                     const secao = secoes.find(s => s.id === secaoId);
                     if (!secao) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
+                    const painelIdSecao = secao.painelId || null;
                     secoes = secoes.filter(s => s.id !== secaoId);
                     configuracao.set('vendas.secoes', secoes);
                     logAction(client, { action: 'Seção removida', details: `Seção \`${secao.nome}\` removida.`, userId: interaction.user.id, guildId: interaction.guildId });
                     await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
-                    await gerenciarDropdownVendas(interaction);
+                    await gerenciarDropdownVendas(interaction, painelIdSecao);
                     return;
                 }
 
@@ -477,6 +513,13 @@ module.exports = {
                 if (customId === 'vnd_select_post_painel') {
                     const painelId = interaction.values[0];
                     await vendasPostarPainelEspecifico(interaction, painelId);
+                    return;
+                }
+
+                // Selecionar painel para gerenciar seções
+                if (customId === 'vnd_select_pick_secao_painel') {
+                    const painelId = interaction.values[0];
+                    await gerenciarDropdownVendas(interaction, painelId);
                     return;
                 }
 
@@ -603,7 +646,7 @@ module.exports = {
                     if (!painel) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Painel não encontrado.`, ephemeral: true });
                     await interaction.deferUpdate();
                     try {
-                        await postarPainelNoCanal(channel, painel.data);
+                        await postarPainelNoCanal(channel, painel.data, painelId);
                         const container = new ContainerBuilder();
                         container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                             `## ${Emojis.get('confirmed_emoji')} Painel postado!\n**${painel.nome}** foi enviado em <#${channelId}>.`
@@ -680,15 +723,27 @@ module.exports = {
                     return;
                 }
 
-                // Adicionar nova seção
-                if (customId === 'vnd_modal_add_secao') {
+                // Adicionar nova seção (customId: vnd_modal_add_secao_<painelId>)
+                // O customId sem painelId (legado) só chega aqui se vnd_add_secao foi acionado
+                // sem painelId — nesse caso atribuímos ao primeiro painel para garantir vínculo.
+                if (customId === 'vnd_modal_add_secao' || customId.startsWith('vnd_modal_add_secao_')) {
+                    let painelId = customId.startsWith('vnd_modal_add_secao_')
+                        ? customId.slice('vnd_modal_add_secao_'.length)
+                        : null;
+                    // Garante que painelId nunca seja nulo — fallback para o primeiro painel
+                    if (!painelId) {
+                        const paineis = getPaneis();
+                        painelId = paineis[0]?.id || null;
+                    }
+                    if (!painelId) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Crie um painel antes de adicionar seções.`, ephemeral: true });
                     const nome     = interaction.fields.getTextInputValue('nome').trim();
                     const descricao = interaction.fields.getTextInputValue('descricao').trim();
-                    const secoes   = configuracao.get('vendas.secoes') || [];
-                    if (secoes.length >= 25) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 25 seções atingido.`, ephemeral: true });
-                    const nova = { id: gerarId(), nome, descricao: descricao || '', emoji: '', mensagem: '', subprodutos: [] };
-                    secoes.push(nova);
-                    configuracao.set('vendas.secoes', secoes);
+                    const todasSecoes = configuracao.get('vendas.secoes') || [];
+                    const secoesDoPanel = todasSecoes.filter(s => s.painelId === painelId);
+                    if (secoesDoPanel.length >= 25) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 25 seções por painel atingido.`, ephemeral: true });
+                    const nova = { id: gerarId(), painelId, nome, descricao: descricao || '', emoji: '', mensagem: '', subprodutos: [] };
+                    todasSecoes.push(nova);
+                    configuracao.set('vendas.secoes', todasSecoes);
                     logAction(client, { action: 'Seção adicionada', details: `\`${nome}\``, userId: interaction.user.id, guildId: interaction.guildId });
                     await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
                     await buildSecaoConfigPanel(interaction, nova);

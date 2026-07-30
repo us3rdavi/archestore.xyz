@@ -24,6 +24,58 @@ function getPaneis() {
     return paineis;
 }
 
+// ── Migrar seções sem painelId para o primeiro painel (helper) ────────────────
+
+function migrarSecoesSemPainel(primeiroPainelId) {
+    const secoes = configuracao.get('vendas.secoes') || [];
+    let migrou = false;
+    for (const s of secoes) {
+        if (!s.painelId) { s.painelId = primeiroPainelId; migrou = true; }
+    }
+    if (migrou) configuracao.set('vendas.secoes', secoes);
+}
+
+// ── Abrir gerenciador de seções com picker de painel se necessário ─────────────
+// Chamado de qualquer ponto de entrada (vnd_gerenciar_dropdown, configDropdown, etc.)
+
+async function abrirGerenciadorSecoes(interaction) {
+    const paineis = getPaneis();
+    if (paineis.length === 0) {
+        return interaction.reply({
+            content: `${Emojis.get('negative_emoji')} Crie ao menos um painel em **Painéis de Vendas** antes de gerenciar seções.`,
+            ephemeral: true,
+        });
+    }
+    // Migrar seções legadas (sem painelId) para o primeiro painel
+    migrarSecoesSemPainel(paineis[0].id);
+
+    const { gerenciarDropdownVendas } = require('./VendasDropdownManager');
+
+    if (paineis.length === 1) {
+        await gerenciarDropdownVendas(interaction, paineis[0].id);
+        return;
+    }
+    // Múltiplos painéis → picker
+    const options = paineis.map((p, i) => ({ label: p.nome, value: p.id, description: `Painel ${i + 1}` }));
+    const container = new ContainerBuilder();
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('store_emoji')} Seções e Produtos\nSelecione o painel cujas seções deseja gerenciar.`
+    ));
+    container.addSeparatorComponents(new SeparatorBuilder());
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new StringSelectMenuBuilder()
+            .setCustomId('vnd_select_pick_secao_painel')
+            .setPlaceholder('Selecione o painel...')
+            .addOptions(options)
+    ));
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId('vnd_voltar_config').setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
+    ));
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
+    else await interaction.update(payload);
+}
+
 // ── Painel principal de configuração de vendas ────────────────────────────────
 
 async function vendasConfig(interaction) {
@@ -165,11 +217,12 @@ async function vendasGerenciarPaineis(interaction) {
 // ── Postar painel específico (picker de canal) ────────────────────────────────
 
 async function vendasPostarPainelEspecifico(interaction, painelId) {
-    const secoes = configuracao.get('vendas.secoes') || [];
+    const todasSecoes = configuracao.get('vendas.secoes') || [];
+    const secoes = painelId ? todasSecoes.filter(s => s.painelId === painelId) : todasSecoes;
     const totalSubs = secoes.reduce((acc, s) => acc + (s.subprodutos || []).length, 0);
     if (secoes.length === 0 || totalSubs === 0) {
         return interaction.reply({
-            content: `${Emojis.get('negative_emoji')} Adicione ao menos uma seção com subprodutos antes de postar.`,
+            content: `${Emojis.get('negative_emoji')} Adicione ao menos uma seção com subprodutos neste painel antes de postar.`,
             ephemeral: true,
         });
     }
@@ -299,4 +352,6 @@ module.exports = {
     vendasPostarPainel,
     getPaneis,
     gerarPainelId,
+    abrirGerenciadorSecoes,
+    migrarSecoesSemPainel,
 };

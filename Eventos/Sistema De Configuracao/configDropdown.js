@@ -230,8 +230,8 @@ module.exports = {
                 }
 
                 if (sub === 'vendas_dropdown') {
-                    const { gerenciarDropdownVendas } = require('../../Functions/VendasDropdownManager.js');
-                    await gerenciarDropdownVendas(interaction);
+                    const { abrirGerenciadorSecoes } = require('../../Functions/VendasConfig.js');
+                    await abrirGerenciadorSecoes(interaction);
                     return;
                 }
 
