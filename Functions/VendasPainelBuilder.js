@@ -121,9 +121,13 @@ function buildServerEmojiOptions(guild) {
 
 // ── Preview container (idêntico ao AnunciarBuilder) ───────────────────────────
 
+// Chaves internas do builder — não representam dados visuais
+const INTERNAL_BUILDER_KEYS = new Set(['content', '_secaoId', '_painelId', '_painelNome']);
+
 function buildPreviewContainer(data) {
-    const hasData = data && Object.keys(data).some(k => k !== 'content' && k !== '_secaoId');
+    const hasData = data && Object.keys(data).some(k => !INTERNAL_BUILDER_KEYS.has(k));
     const c = new ContainerBuilder();
+    let addedComponents = 0;
 
     if (!hasData) {
         c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
@@ -135,6 +139,7 @@ function buildPreviewContainer(data) {
     if (data.content) {
         c.addTextDisplayComponents(new TextDisplayBuilder().setContent(data.content));
         c.addSeparatorComponents(new SeparatorBuilder());
+        addedComponents++;
     }
 
     const headerLines = [];
@@ -143,10 +148,11 @@ function buildPreviewContainer(data) {
     if (data.description) headerLines.push(data.description);
     if (headerLines.length > 0) {
         c.addTextDisplayComponents(new TextDisplayBuilder().setContent(headerLines.join('\n')));
+        addedComponents++;
     }
 
     if (data.image) {
-        try { c.addMediaGalleryComponents(new MediaGalleryBuilder().addItems({ media: { url: data.image } })); } catch (e) {}
+        try { c.addMediaGalleryComponents(new MediaGalleryBuilder().addItems({ media: { url: data.image } })); addedComponents++; } catch (e) {}
     }
 
     if (data.fields && data.fields.length > 0) {
@@ -154,6 +160,7 @@ function buildPreviewContainer(data) {
         c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
             data.fields.map(f => `**${f.name || '\u200b'}**\n${f.value || '\u200b'}`).join('\n\n')
         ));
+        addedComponents++;
     }
 
     const footerParts = [];
@@ -167,12 +174,21 @@ function buildPreviewContainer(data) {
         c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
             footerParts.map(p => `-# ${p}`).join(' · ')
         ));
+        addedComponents++;
     }
 
     if (data.buttons && data.buttons.length > 0) {
         c.addSeparatorComponents(new SeparatorBuilder());
         const rows = buildButtonRows(data.buttons);
         for (const row of rows) c.addActionRowComponents(row);
+        addedComponents++;
+    }
+
+    // Fallback: container nunca pode ter 0 componentes (Discord rejeita)
+    if (addedComponents === 0) {
+        c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+            `-# Configure as propriedades abaixo para ver o preview aqui.`
+        ));
     }
 
     return c;
