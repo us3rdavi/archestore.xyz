@@ -101,7 +101,15 @@ function buildCartMessage(cartData) {
 }
 
 async function criarCarrinhoThread(interaction, client, secao, subproduto) {
-    const canalId = configuracao.get('vendas.canais.carrinho');
+    // Prioridade: canal de carrinho do painel > canal global de carrinho
+    let canalId = null;
+    if (secao.painelId) {
+        const paineis = configuracao.get('vendas.paineis') || [];
+        const painel = paineis.find(p => p.id === secao.painelId);
+        if (painel?.canalCarrinho) canalId = painel.canalCarrinho;
+    }
+    if (!canalId) canalId = configuracao.get('vendas.canais.carrinho');
+
     if (!canalId) {
         return interaction.reply({
             content: `${Emojis.get('negative_emoji')} Canal de carrinho não configurado. Contate um administrador.`,

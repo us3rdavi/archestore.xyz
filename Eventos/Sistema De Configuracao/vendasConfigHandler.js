@@ -8,7 +8,7 @@ const {
 const { configuracao, Emojis } = require('../../Database');
 const {
     vendasConfig, vendasGerenciarPaineis, vendasPostarPainelEspecifico,
-    vendasLogsConfig, vendasCanalCarrinhoConfig, vendasPostarPainel,
+    vendasLogsConfig, vendasCanalCarrinhoConfig, vendasCanalCarrinhoPorPainel, vendasPostarPainel,
     getPaneis, gerarPainelId, abrirGerenciadorSecoes, migrarSecoesSemPainel,
 } = require('../../Functions/VendasConfig');
 const {
@@ -175,6 +175,27 @@ module.exports = {
                     container.addSeparatorComponents(new SeparatorBuilder());
                     container.addActionRowComponents(new ActionRowBuilder().addComponents(
                         new StringSelectMenuBuilder().setCustomId('vnd_select_post_painel').setPlaceholder('Selecione o painel...').addOptions(options)
+                    ));
+                    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+                        new ButtonBuilder().setCustomId('vnd_gerenciar_paineis').setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
+                    ));
+                    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+                    return;
+                }
+
+                // ── Canal de carrinho por painel ────────────────────────────
+                if (customId === 'vnd_canal_carrinho_painel_pick') {
+                    const paineis = getPaneis();
+                    if (paineis.length === 0) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Nenhum painel criado.`, ephemeral: true });
+                    if (paineis.length === 1) { await vendasCanalCarrinhoPorPainel(interaction, paineis[0].id); return; }
+                    const options = paineis.map((p, i) => ({ label: p.nome, value: p.id, description: `Painel ${i + 1}` }));
+                    const container = new ContainerBuilder();
+                    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                        `## ${Emojis.get('store_emoji')} Canal de Carrinho por Painel\nSelecione qual painel deseja configurar.`
+                    ));
+                    container.addSeparatorComponents(new SeparatorBuilder());
+                    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+                        new StringSelectMenuBuilder().setCustomId('vnd_select_canal_carrinho_painel').setPlaceholder('Selecione o painel...').addOptions(options)
                     ));
                     container.addActionRowComponents(new ActionRowBuilder().addComponents(
                         new ButtonBuilder().setCustomId('vnd_gerenciar_paineis').setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
@@ -523,6 +544,13 @@ module.exports = {
                     return;
                 }
 
+                // Selecionar painel para configurar canal de carrinho
+                if (customId === 'vnd_select_canal_carrinho_painel') {
+                    const painelId = interaction.values[0];
+                    await vendasCanalCarrinhoPorPainel(interaction, painelId);
+                    return;
+                }
+
                 // Selecionar painel para excluir
                 if (customId === 'vnd_select_del_painel') {
                     const painelId = interaction.values[0];
@@ -623,6 +651,21 @@ module.exports = {
                     logAction(client, { action: 'Canal Log de Pendentes configurado', details: `<#${channelId}>`, userId: interaction.user.id, guildId: interaction.guildId });
                     await interaction.deferUpdate();
                     await vendasLogsConfig(interaction);
+                    return;
+                }
+
+                // Canal de carrinho por painel — vnd_set_canal_carrinho_painel_<painelId>
+                if (customId.startsWith('vnd_set_canal_carrinho_painel_')) {
+                    const painelId = customId.slice('vnd_set_canal_carrinho_painel_'.length);
+                    const channelId = interaction.values[0];
+                    const paineis = getPaneis();
+                    const idx = paineis.findIndex(p => p.id === painelId);
+                    if (idx === -1) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Painel não encontrado.`, ephemeral: true });
+                    paineis[idx].canalCarrinho = channelId;
+                    configuracao.set('vendas.paineis', paineis);
+                    logAction(client, { action: `Canal de Carrinho do painel "${paineis[idx].nome}" configurado`, details: `<#${channelId}>`, userId: interaction.user.id, guildId: interaction.guildId });
+                    await interaction.deferUpdate();
+                    await vendasCanalCarrinhoPorPainel(interaction, painelId);
                     return;
                 }
 
