@@ -514,18 +514,19 @@ module.exports = {
                     const paineis = getPaneis();
                     const painel = paineis.find(p => p.id === painelId);
                     if (!painel) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Painel não encontrado.`, ephemeral: true });
-                    const { buildPainelMainMenu, getPainelData, setPainelData } = require('../../Functions/VendasPainelBuilder');
+                    const { buildPainelMainMenu, setPainelData } = require('../../Functions/VendasPainelBuilder');
                     const userId = interaction.user.id;
-                    if (Object.keys(getPainelData(userId)).length === 0) {
-                        const base = painel.data ? { ...painel.data } : {
-                            title: `${Emojis.get('store_emoji')} Loja`,
-                            description: 'Selecione uma categoria abaixo para ver os produtos disponíveis.',
-                            footer: 'Pagamento via PIX automático — confirmação instantânea.',
-                        };
-                        base._painelId = painelId;
-                        base._painelNome = painel.nome;
-                        setPainelData(userId, base);
-                    }
+                    // Sempre resetar o rascunho para o painel selecionado.
+                    // Sem este reset, se o usuário editou outro painel antes, o draft
+                    // antigo (com _painelId diferente) seria reaproveitado.
+                    const base = painel.data ? { ...painel.data } : {
+                        title: `${Emojis.get('store_emoji')} Loja`,
+                        description: 'Selecione uma categoria abaixo para ver os produtos disponíveis.',
+                        footer: 'Pagamento via PIX automático — confirmação instantânea.',
+                    };
+                    base._painelId = painelId;
+                    base._painelNome = painel.nome;
+                    setPainelData(userId, base);
                     await interaction.update(buildPainelMainMenu(userId));
                     return;
                 }
