@@ -4,6 +4,9 @@ const {
     ButtonStyle,
     EmbedBuilder,
     StringSelectMenuBuilder,
+    ContainerBuilder,
+    TextDisplayBuilder,
+    SeparatorBuilder,
     ChannelType,
     MessageFlags
 } = require("discord.js");
@@ -62,15 +65,26 @@ async function CreateTicket(interaction, valor) {
     // Deferimento inicial: select menu usa deferUpdate (mantém painel com opção selecionada visível)
     // botão usa reply ephemeral de loading
     const nomeSelecionado = ticketFunction.nome || valor;
+    let loadingMsg = null;
+
+    const buildLoadingContainer = (text) => new ContainerBuilder()
+        .addTextDisplayComponents(new TextDisplayBuilder().setContent(text));
+
     if (isSelectMenu) {
         await interaction.deferUpdate().catch(() => {});
-        await interaction.followUp({
-            content: `${Emojis.get('loading_emoji')} Você selecionou **${nomeSelecionado}** — aguarde, estamos criando seu ticket!`,
+        loadingMsg = await interaction.followUp({
+            components: [buildLoadingContainer(
+                `${Emojis.get('loading_emoji')} Você selecionou **${nomeSelecionado}** — aguarde, estamos criando seu ticket!`
+            )],
+            flags: MessageFlags.IsComponentsV2,
             ephemeral: true
         });
     } else {
         await interaction.reply({
-            content: `${Emojis.get('loading_emoji')} Aguarde, estamos criando seu ticket!`,
+            components: [buildLoadingContainer(
+                `${Emojis.get('loading_emoji')} Aguarde, estamos criando seu ticket!`
+            )],
+            flags: MessageFlags.IsComponentsV2,
             ephemeral: true
         });
     }
@@ -88,12 +102,18 @@ async function CreateTicket(interaction, valor) {
     const username = (interaction.user.globalName || interaction.user.username).slice(0, 30);
     const threadName = `${valor} #${contador} • ${username}`.slice(0, 100);
 
-    const editLoading = async (opts) => {
+    // Para select menu: editamos a mensagem followUp diretamente (não editReply).
+    // Para botão: editamos o reply original.
+    const editLoading = async (container) => {
+        const payload = {
+            components: [container],
+            flags: MessageFlags.IsComponentsV2,
+        };
         try {
-            if (isSelectMenu) {
-                await interaction.editReply({ content: opts.content, components: opts.components || [], ephemeral: true }).catch(() => {});
+            if (isSelectMenu && loadingMsg) {
+                await loadingMsg.edit(payload).catch(() => {});
             } else {
-                await interaction.editReply(opts);
+                await interaction.editReply(payload);
             }
         } catch (e) {}
     };
@@ -138,17 +158,19 @@ async function CreateTicket(interaction, valor) {
         tickets.set(`tickets.abertos.${interaction.user.id}`, ticketData);
         tickets.set(`tickets.threads.${thread.id}`, interaction.user.id);
 
-        const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setURL(`https://discord.com/channels/${interaction.guild.id}/${thread.id}`)
-                .setLabel('Ir para o Ticket')
-                .setStyle(ButtonStyle.Link)
-        );
+        const successContainer = new ContainerBuilder()
+            .addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                `${Emojis.get('confirmed_emoji')} Ticket criado! Categoria: **${nomeSelecionado}**\n-# Clique no botão abaixo para acessar seu ticket.`
+            ))
+            .addSeparatorComponents(new SeparatorBuilder())
+            .addActionRowComponents(new ActionRowBuilder().addComponents(
+                new ButtonBuilder()
+                    .setURL(`https://discord.com/channels/${interaction.guild.id}/${thread.id}`)
+                    .setLabel('Ir para o Ticket')
+                    .setStyle(ButtonStyle.Link)
+            ));
 
-        await editLoading({
-            content: `${Emojis.get('confirmed_emoji')} Ticket criado com sucesso! Categoria: **${nomeSelecionado}**`,
-            components: [row]
-        });
+        await editLoading(successContainer);
 
         const staffRoles = tickets.get('tickets.staffRoles') || [];
         const roleMentions = staffRoles.map(id => `<@&${id}>`).join(' ');
@@ -268,9 +290,11 @@ async function CreateTicket(interaction, valor) {
     } catch (error) {
         console.error('[Ticket] Erro ao criar ticket:', error);
         tickets.set('tickets.contador', contador - 1);
-        await editLoading({
-            content: `${Emojis.get('negative_emoji')} Ocorreu um erro ao criar o ticket. Verifique se o canal de tickets está configurado corretamente.`
-        });
+        await editLoading(new ContainerBuilder().addTextDisplayComponents(
+            new TextDisplayBuilder().setContent(
+                `${Emojis.get('negative_emoji')} Ocorreu um erro ao criar o ticket. Verifique se o canal de tickets está configurado corretamente.`
+            )
+        ));
     }
 }
 
