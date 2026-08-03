@@ -406,6 +406,21 @@ function buildQuestionsPanelPayload(guildId, slotId, optionIdx = 0) {
         `-# ${questions.length}/10 perguntas configuradas`
     ));
     c.addSeparatorComponents(new SeparatorBuilder());
+
+    // Select para remover pergunta específica (só aparece se há pelo menos 1 pergunta)
+    if (questions.length > 0) {
+        c.addActionRowComponents(new ActionRowBuilder().addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId(`form_secq_delsel_${optionIdx}_${guildId}_${slotId}`)
+                .setPlaceholder('Selecionar pergunta para remover...')
+                .addOptions(questions.map((q, i) => ({
+                    label: `${i + 1}. ${q.text.slice(0, 90)}`,
+                    value: String(i),
+                    emoji: { id: '1501803935453679616' },
+                })))
+        ));
+    }
+
     c.addActionRowComponents(new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId(`form_secq_add_${optionIdx}_${guildId}_${slotId}`)
@@ -414,15 +429,72 @@ function buildQuestionsPanelPayload(guildId, slotId, optionIdx = 0) {
             .setStyle(ButtonStyle.Success)
             .setDisabled(questions.length >= 10),
         new ButtonBuilder()
-            .setCustomId(`form_secq_del_${optionIdx}_${guildId}_${slotId}`)
-            .setLabel('Remover Última')
-            .setEmoji({ id: '1501803926180335727' })
-            .setStyle(ButtonStyle.Danger)
-            .setDisabled(questions.length === 0),
+            .setCustomId(`form_secq_reorgan_${optionIdx}_${guildId}_${slotId}`)
+            .setLabel('Reorganizar')
+            .setEmoji({ id: '1501804058699366470' })
+            .setStyle(ButtonStyle.Secondary)
+            .setDisabled(questions.length <= 1),
         new ButtonBuilder()
             .setCustomId(hasMultiple
                 ? `form_secq_back_${guildId}_${slotId}`
                 : `form_btn_voltarform_${guildId}_${slotId}`)
+            .setLabel('Voltar')
+            .setEmoji({ id: '1501803908589162537' })
+            .setStyle(ButtonStyle.Secondary),
+    ));
+
+    return { components: [c], flags: MessageFlags.IsComponentsV2 };
+}
+
+// Painel de reorganização de perguntas (selectedQIdx = índice da pergunta selecionada, -1 = nenhuma)
+function buildReorganizePayload(guildId, slotId, optionIdx, selectedQIdx = -1) {
+    const slots     = formularios.get(guildId) || {};
+    const form      = slots[slotId] || {};
+    const opts      = form.selectOptions || [];
+    const opt       = opts[optionIdx];
+    const optLabel  = opt?.label || `Seção ${optionIdx + 1}`;
+    const questions = getSectionQuestions(form, optionIdx);
+
+    const qLines = questions.map((q, i) => {
+        const mark = i === selectedQIdx ? `▶ ` : '';
+        return `-# ${mark}${i + 1}. ${q.text}`;
+    }).join('\n');
+
+    const hint = selectedQIdx >= 0
+        ? `-# Pergunta **${selectedQIdx + 1}** selecionada — use os botões para mover.`
+        : `-# Selecione uma pergunta no menu abaixo para mover.`;
+
+    const c = new ContainerBuilder();
+    c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('_lapis_emoji')} Reorganizar Perguntas — ${optLabel}\n` +
+        `${hint}\n\n` +
+        `${qLines}`
+    ));
+    c.addSeparatorComponents(new SeparatorBuilder());
+
+    c.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new StringSelectMenuBuilder()
+            .setCustomId(`form_secq_rpick_${optionIdx}_${guildId}_${slotId}`)
+            .setPlaceholder('Selecionar pergunta para mover...')
+            .addOptions(questions.map((q, i) => ({
+                label: `${i + 1}. ${q.text.slice(0, 90)}`,
+                value: String(i),
+            })))
+    ));
+
+    c.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`form_secq_mvup_${selectedQIdx}_${optionIdx}_${guildId}_${slotId}`)
+            .setLabel('▲ Mover para cima')
+            .setStyle(ButtonStyle.Primary)
+            .setDisabled(selectedQIdx <= 0),
+        new ButtonBuilder()
+            .setCustomId(`form_secq_mvdn_${selectedQIdx}_${optionIdx}_${guildId}_${slotId}`)
+            .setLabel('▼ Mover para baixo')
+            .setStyle(ButtonStyle.Primary)
+            .setDisabled(selectedQIdx < 0 || selectedQIdx >= questions.length - 1),
+        new ButtonBuilder()
+            .setCustomId(`form_secq_rback_${optionIdx}_${guildId}_${slotId}`)
             .setLabel('Voltar')
             .setEmoji({ id: '1501803908589162537' })
             .setStyle(ButtonStyle.Secondary),
@@ -1192,6 +1264,100 @@ module.exports = {
                     const { logAction } = require('../../Functions/AuditLog.js');
                     logAction(client, { action: 'Pergunta de seção removida', details: `Slot \`${slotId}\` Seção \`${opt.label || optionIdx}\`: \`${removed?.text?.slice(0, 60) || ''}\``, userId: interaction.user.id, guildId });
                 }
+                await interaction.deferUpdate();
+                await interaction.editReply(buildQuestionsPanelPayload(guildId, slotId, optionIdx));
+                return;
+            }
+
+            // ── Perguntas por seção: remover pergunta específica (select) ────
+            if (interaction.isStringSelectMenu() && customId.startsWith('form_secq_delsel_')) {
+                const parts     = customId.slice('form_secq_delsel_'.length).split('_');
+                const slotId    = parts[parts.length - 1];
+                const guildId   = parts[parts.length - 2];
+                const optionIdx = parseInt(parts[parts.length - 3]);
+                const qIdx      = parseInt(interaction.values[0]);
+                const slotsData = formularios.get(guildId) || {};
+                const opt       = slotsData[slotId]?.selectOptions?.[optionIdx];
+                if (opt && (opt.questions || []).length > qIdx) {
+                    const removed = opt.questions[qIdx];
+                    opt.questions.splice(qIdx, 1);
+                    formularios.set(guildId, slotsData);
+                    const { logAction } = require('../../Functions/AuditLog.js');
+                    logAction(client, { action: 'Pergunta de seção removida', details: `Slot \`${slotId}\` Seção \`${opt.label || optionIdx}\`: \`${removed?.text?.slice(0, 60) || ''}\``, userId: interaction.user.id, guildId });
+                }
+                await interaction.deferUpdate();
+                await interaction.editReply(buildQuestionsPanelPayload(guildId, slotId, optionIdx));
+                return;
+            }
+
+            // ── Perguntas por seção: abrir painel de reorganização ─────────
+            if (interaction.isButton() && customId.startsWith('form_secq_reorgan_')) {
+                const parts     = customId.slice('form_secq_reorgan_'.length).split('_');
+                const slotId    = parts[parts.length - 1];
+                const guildId   = parts[parts.length - 2];
+                const optionIdx = parseInt(parts[parts.length - 3]);
+                await interaction.deferUpdate();
+                await interaction.editReply(buildReorganizePayload(guildId, slotId, optionIdx));
+                return;
+            }
+
+            // ── Reorganizar: selecionar pergunta para mover ────────────────
+            if (interaction.isStringSelectMenu() && customId.startsWith('form_secq_rpick_')) {
+                const parts     = customId.slice('form_secq_rpick_'.length).split('_');
+                const slotId    = parts[parts.length - 1];
+                const guildId   = parts[parts.length - 2];
+                const optionIdx = parseInt(parts[parts.length - 3]);
+                const selectedQIdx = parseInt(interaction.values[0]);
+                await interaction.deferUpdate();
+                await interaction.editReply(buildReorganizePayload(guildId, slotId, optionIdx, selectedQIdx));
+                return;
+            }
+
+            // ── Reorganizar: mover para cima ──────────────────────────────
+            if (interaction.isButton() && customId.startsWith('form_secq_mvup_')) {
+                const parts     = customId.slice('form_secq_mvup_'.length).split('_');
+                const slotId    = parts[parts.length - 1];
+                const guildId   = parts[parts.length - 2];
+                const optionIdx = parseInt(parts[parts.length - 3]);
+                const qIdx      = parseInt(parts[parts.length - 4]);
+                const slotsData = formularios.get(guildId) || {};
+                const opt       = slotsData[slotId]?.selectOptions?.[optionIdx];
+                if (opt && opt.questions && qIdx > 0 && qIdx < opt.questions.length) {
+                    [opt.questions[qIdx - 1], opt.questions[qIdx]] = [opt.questions[qIdx], opt.questions[qIdx - 1]];
+                    formularios.set(guildId, slotsData);
+                }
+                const newIdx = Math.max(0, qIdx - 1);
+                await interaction.deferUpdate();
+                await interaction.editReply(buildReorganizePayload(guildId, slotId, optionIdx, newIdx));
+                return;
+            }
+
+            // ── Reorganizar: mover para baixo ─────────────────────────────
+            if (interaction.isButton() && customId.startsWith('form_secq_mvdn_')) {
+                const parts     = customId.slice('form_secq_mvdn_'.length).split('_');
+                const slotId    = parts[parts.length - 1];
+                const guildId   = parts[parts.length - 2];
+                const optionIdx = parseInt(parts[parts.length - 3]);
+                const qIdx      = parseInt(parts[parts.length - 4]);
+                const slotsData = formularios.get(guildId) || {};
+                const opt       = slotsData[slotId]?.selectOptions?.[optionIdx];
+                const maxIdx    = (opt?.questions?.length || 1) - 1;
+                if (opt && opt.questions && qIdx >= 0 && qIdx < maxIdx) {
+                    [opt.questions[qIdx], opt.questions[qIdx + 1]] = [opt.questions[qIdx + 1], opt.questions[qIdx]];
+                    formularios.set(guildId, slotsData);
+                }
+                const newIdx = Math.min(maxIdx, qIdx + 1);
+                await interaction.deferUpdate();
+                await interaction.editReply(buildReorganizePayload(guildId, slotId, optionIdx, newIdx));
+                return;
+            }
+
+            // ── Reorganizar: voltar ao painel de perguntas ────────────────
+            if (interaction.isButton() && customId.startsWith('form_secq_rback_')) {
+                const parts     = customId.slice('form_secq_rback_'.length).split('_');
+                const slotId    = parts[parts.length - 1];
+                const guildId   = parts[parts.length - 2];
+                const optionIdx = parseInt(parts[parts.length - 3]);
                 await interaction.deferUpdate();
                 await interaction.editReply(buildQuestionsPanelPayload(guildId, slotId, optionIdx));
                 return;

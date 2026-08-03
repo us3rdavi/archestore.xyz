@@ -115,8 +115,15 @@ module.exports = {
             if (action === 'notificar') {
                 try {
                     const usuario = await client.users.fetch(ticketData.userId);
+                    const dmContainer = new ContainerBuilder()
+                        .addTextDisplayComponents(
+                            new TextDisplayBuilder().setContent(
+                                `${Emojis.get('_notify_emoji')} Olá, **${ticketData.username}**! Um membro da nossa equipe notificou você sobre o seu ticket **#${ticketData.numero}** no servidor **${interaction.guild.name}**. Por favor, acesse o ticket para continuar.`
+                            )
+                        );
                     await usuario.send({
-                        content: `${Emojis.get('_notify_emoji')} Olá, **${ticketData.username}**! Um membro da nossa equipe notificou você sobre o seu ticket **#${ticketData.numero}** no servidor **${interaction.guild.name}**. Por favor, acesse o ticket para continuar.`
+                        components: [dmContainer],
+                        flags: MessageFlags.IsComponentsV2
                     });
                     await interaction.reply({ content: `${Emojis.get('confirmed_emoji')} Usuário <@${ticketData.userId}> foi notificado via DM!`, ephemeral: true });
                 } catch (e) {
@@ -419,8 +426,15 @@ module.exports = {
 
             try {
                 const usuario = await client.users.fetch(ticketData.userId);
+                const dmContainer = new ContainerBuilder()
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder().setContent(
+                            `${Emojis.get('_notify_emoji')} Olá, **${ticketData.username}**! Um membro da nossa equipe notificou você sobre o seu ticket **#${ticketData.numero}** no servidor **${interaction.guild.name}**. Por favor, acesse o ticket para continuar.`
+                        )
+                    );
                 await usuario.send({
-                    content: `${Emojis.get('_notify_emoji')} Olá, **${ticketData.username}**! Um membro da nossa equipe notificou você sobre o seu ticket **#${ticketData.numero}** no servidor **${interaction.guild.name}**. Por favor, acesse o ticket para continuar.`
+                    components: [dmContainer],
+                    flags: MessageFlags.IsComponentsV2
                 });
                 await interaction.reply({
                     content: `${Emojis.get('confirmed_emoji')} Usuário <@${ticketData.userId}> foi notificado via DM!`,
