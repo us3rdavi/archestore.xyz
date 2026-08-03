@@ -247,7 +247,14 @@ module.exports = {
             }
 
             await interaction.channel.send({
-                content: `${Emojis.get('confirmed_emoji')} **${interaction.member.displayName}** assumiu o ticket!`
+                components: [
+                    new ContainerBuilder().addTextDisplayComponents(
+                        new TextDisplayBuilder().setContent(
+                            `${Emojis.get('confirmed_emoji')} <@${interaction.user.id}> assumiu o ticket!`
+                        )
+                    )
+                ],
+                flags: MessageFlags.IsComponentsV2
             });
         }
 
