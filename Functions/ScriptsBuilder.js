@@ -172,11 +172,11 @@ function buildScriptsPanel(guildId, userId, guild, requestedPage = 0) {
         : '';
 
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('_messages_emoji')} Scripts por palavra-chave\n` +
+        `## ${Emojis.get('_messages_emoji')} Scripts por palavra ou frase\n` +
         `**Status:** ${config.enabled ? '🟢 Ativo' : '⚪ Desativado'}\n` +
         `**Canais monitorados:** ${config.channels.length}\n${channelList}${extraChannels}\n` +
-        `**Palavras-chave:** ${config.entries.length}\n\n` +
-        `-# As correspondências ignoram maiúsculas/minúsculas. Se uma mensagem combinar com mais de uma palavra, será usada a correspondência mais longa.`
+        `**Palavras/frases cadastradas:** ${config.entries.length}\n\n` +
+        `-# A palavra ou frase pode aparecer em qualquer trecho da mensagem. Maiúsculas e minúsculas não fazem diferença. Se houver mais de uma correspondência, será usada a frase mais longa.`
     ));
     container.addSeparatorComponents(new SeparatorBuilder());
 
@@ -192,13 +192,13 @@ function buildScriptsPanel(guildId, userId, guild, requestedPage = 0) {
             new ActionRowBuilder().addComponents(
                 new StringSelectMenuBuilder()
                     .setCustomId(`scripts_${userId}_keywords_select_${page}`)
-                    .setPlaceholder(`Selecione uma palavra-chave (${page + 1}/${pageCount})`)
+                    .setPlaceholder(`Selecione uma palavra/frase (${page + 1}/${pageCount})`)
                     .addOptions(options)
             )
         );
     } else {
         container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-            `-# Nenhuma palavra-chave cadastrada. Crie uma para configurar a primeira resposta.`
+            `-# Nenhuma palavra ou frase cadastrada. Crie uma para configurar a primeira resposta.`
         ));
     }
 
@@ -243,7 +243,7 @@ function buildScriptsPanel(guildId, userId, guild, requestedPage = 0) {
         new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId(`scripts_${userId}_keyword_add`)
-                .setLabel('Adicionar palavra')
+                .setLabel('Adicionar palavra/frase')
                 .setEmoji('🔑')
                 .setStyle(ButtonStyle.Success),
             new ButtonBuilder()
@@ -383,9 +383,9 @@ function buildKeywordPanel(guildId, userId, entryId, returnPage = 0) {
     }
 
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('_messages_emoji')} Palavra-chave: \`${entry.keyword}\`\n` +
+        `## ${Emojis.get('_messages_emoji')} Palavra/frase: \`${entry.keyword}\`\n` +
         `**Resposta:** ${hasScriptMessage(entry.message) ? 'Components V2 configurados' : 'Ainda não configurada'}\n\n` +
-        `-# A mensagem será enviada nos canais monitorados quando esta palavra aparecer.`
+        `-# A mensagem será enviada nos canais monitorados quando esta palavra ou frase aparecer.`
     ));
     container.addSeparatorComponents(new SeparatorBuilder());
     container.addActionRowComponents(

@@ -277,7 +277,7 @@ module.exports = {
             if (action === 'keyword_add') {
                 const modal = new ModalBuilder()
                     .setCustomId(`scripts_${userId}_modal_add_keyword`)
-                    .setTitle('Adicionar palavra-chave');
+                    .setTitle('Adicionar palavra ou frase');
                 modal.addComponents(
                     modalTextInput(
                         'keyword',
