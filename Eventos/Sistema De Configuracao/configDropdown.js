@@ -258,6 +258,12 @@ module.exports = {
                     await vendasCanalCarrinhoConfig(interaction);
                     return;
                 }
+
+                if (sub === 'scripts_manage') {
+                    const { buildScriptsPanel } = require('../../Functions/ScriptsBuilder.js');
+                    await interaction.update(buildScriptsPanel(interaction.guildId, userId, interaction.guild));
+                    return;
+                }
             }
         } catch (err) {
             if (err.code === 10062) return;
