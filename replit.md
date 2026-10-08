@@ -32,3 +32,4 @@ The workflow **Start application** handles this automatically.
 
 ## User preferences
 - Nunca use emojis Unicode neste projeto; use somente os ícones do bot.
+- Não repita ícones; escolha ícones do bot que combinem com a ação e o contexto.

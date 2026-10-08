@@ -61,8 +61,8 @@ const SUB_OPTIONS = {
         { label: 'Postar Painel de Vendas', value: 'vendas_postar',       description: 'Enviar o painel de vendas para um canal',         emoji: { id: '1501803923126747178' } },
     ],
     scripts: [
-        { label: 'Página Inicial', value: 'home', description: 'Voltar ao menu principal', emoji: { id: '1501803908589162537' } },
-        { label: 'Gerenciar Scripts', value: 'scripts_manage', description: 'Canais, palavras-chave e mensagens V2', emoji: { id: '1501804039451709441' } },
+        { label: 'Página Inicial', value: 'home', description: 'Voltar ao menu principal' },
+        { label: 'Gerenciar Scripts', value: 'scripts_manage', description: 'Canais, palavras-chave e mensagens V2', emoji: { id: '1501804030605922346' } },
     ],
     definicoes: [
         { label: 'Página Inicial',       value: 'home',               description: 'Voltar ao menu principal',              emoji: { id: '1501803908589162537' } },

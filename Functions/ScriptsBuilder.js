@@ -164,7 +164,6 @@ function buildScriptsPanel(guildId, userId, guild, requestedPage = 0) {
     const pageCount = Math.max(1, Math.ceil(config.entries.length / KEYWORD_PAGE_SIZE));
     const page = Math.min(Math.max(0, Number(requestedPage) || 0), pageCount - 1);
     const container = new ContainerBuilder();
-    const statusIcon = Emojis.get(config.enabled ? 'confirmed_emoji' : 'negative_emoji');
     const channelList = config.channels.slice(0, 8)
         .map(id => `<#${id}>`)
         .join(' · ') || '`Nenhum canal configurado`';
@@ -173,8 +172,8 @@ function buildScriptsPanel(guildId, userId, guild, requestedPage = 0) {
         : '';
 
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('_messages_emoji')} Scripts por palavra ou frase\n` +
-        `**Status:** ${statusIcon ? `${statusIcon} ` : ''}${config.enabled ? 'Ativo' : 'Desativado'}\n` +
+        `## ${Emojis.get('system_emoji')} Scripts por palavra ou frase\n` +
+        `**Status:** ${config.enabled ? 'Ativo' : 'Desativado'}\n` +
         `**Canais monitorados:** ${config.channels.length}\n${channelList}${extraChannels}\n` +
         `**Palavras/frases cadastradas:** ${config.entries.length}\n\n` +
         `-# A palavra ou frase pode aparecer em qualquer trecho da mensagem. Maiúsculas e minúsculas não fazem diferença. Se houver mais de uma correspondência, será usada a frase mais longa.`
@@ -234,7 +233,7 @@ function buildScriptsPanel(guildId, userId, guild, requestedPage = 0) {
             new ButtonBuilder()
                 .setCustomId(`scripts_${userId}_channels_remove`)
                 .setLabel('Remover canais')
-                .setEmoji(Emojis.get('_trash_emoji'))
+                .setEmoji(Emojis.get('_clean_emoji'))
                 .setStyle(ButtonStyle.Secondary)
                 .setDisabled(config.channels.length === 0)
         )
@@ -245,7 +244,7 @@ function buildScriptsPanel(guildId, userId, guild, requestedPage = 0) {
             new ButtonBuilder()
                 .setCustomId(`scripts_${userId}_keyword_add`)
                 .setLabel('Adicionar palavra/frase')
-                .setEmoji(Emojis.get('_add_emoji'))
+                .setEmoji(Emojis.get('_text_emoji'))
                 .setStyle(ButtonStyle.Success),
             new ButtonBuilder()
                 .setCustomId(`scripts_${userId}_toggle`)
@@ -271,7 +270,7 @@ function buildScriptsPanel(guildId, userId, guild, requestedPage = 0) {
 function buildAddChannelsPanel(userId) {
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('_messages_emoji')} Adicionar canais monitorados\n` +
+        `## ${Emojis.get('_notify_emoji')} Adicionar canais monitorados\n` +
         `Selecione até 25 canais de texto por vez. Você pode repetir a operação quantas vezes precisar; a lista não tem limite.\n` +
         `Canais já cadastrados não serão duplicados.`
     ));
@@ -291,7 +290,6 @@ function buildAddChannelsPanel(userId) {
             new ButtonBuilder()
                 .setCustomId(`scripts_${userId}_main`)
                 .setLabel('Voltar')
-                .setEmoji(Emojis.get('_back_emoji'))
                 .setStyle(ButtonStyle.Secondary)
         )
     );
@@ -304,7 +302,7 @@ function buildRemoveChannelsPanel(guildId, userId, guild, requestedPage = 0) {
     const page = Math.min(Math.max(0, Number(requestedPage) || 0), pageCount - 1);
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('_messages_emoji')} Remover canais\n` +
+        `## ${Emojis.get('_trash_emoji')} Remover canais\n` +
         `Selecione os canais cadastrados que deseja retirar do monitoramento.\n` +
         `-# ${config.channels.length} canal(is) configurado(s) · Página ${page + 1}/${pageCount}`
     ));
@@ -360,7 +358,6 @@ function buildRemoveChannelsPanel(guildId, userId, guild, requestedPage = 0) {
             new ButtonBuilder()
                 .setCustomId(`scripts_${userId}_main`)
                 .setLabel('Voltar')
-                .setEmoji(Emojis.get('_back_emoji'))
                 .setStyle(ButtonStyle.Secondary)
         )
     );
@@ -372,7 +369,7 @@ function buildKeywordPanel(guildId, userId, entryId, returnPage = 0) {
     const container = new ContainerBuilder();
     if (!entry) {
         container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-            `${Emojis.get('negative_emoji')} Essa palavra-chave não existe mais.`
+            `${Emojis.get('warn_emoji')} Essa palavra-chave não existe mais.`
         ));
         container.addActionRowComponents(new ActionRowBuilder().addComponents(
             new ButtonBuilder()
@@ -384,7 +381,7 @@ function buildKeywordPanel(guildId, userId, entryId, returnPage = 0) {
     }
 
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('_messages_emoji')} Palavra/frase: \`${entry.keyword}\`\n` +
+        `## ${Emojis.get('_flag_emoji')} Gatilho: \`${entry.keyword}\`\n` +
         `**Resposta:** ${hasScriptMessage(entry.message) ? 'Components V2 configurados' : 'Ainda não configurada'}\n\n` +
         `-# A mensagem será enviada nos canais monitorados quando esta palavra ou frase aparecer.`
     ));
@@ -399,6 +396,7 @@ function buildKeywordPanel(guildId, userId, entryId, returnPage = 0) {
             new ButtonBuilder()
                 .setCustomId(`scripts_${userId}_keyword_rename_${entry.id}_${returnPage}`)
                 .setLabel('Renomear')
+                .setEmoji(Emojis.get('_change_emoji'))
                 .setStyle(ButtonStyle.Secondary)
         )
     );
@@ -407,12 +405,10 @@ function buildKeywordPanel(guildId, userId, entryId, returnPage = 0) {
             new ButtonBuilder()
                 .setCustomId(`scripts_${userId}_keyword_delete_${entry.id}_${returnPage}`)
                 .setLabel('Excluir palavra-chave')
-                .setEmoji(Emojis.get('_trash_emoji'))
                 .setStyle(ButtonStyle.Danger),
             new ButtonBuilder()
                 .setCustomId(`scripts_${userId}_main_${returnPage}`)
                 .setLabel('Voltar')
-                .setEmoji(Emojis.get('_back_emoji'))
                 .setStyle(ButtonStyle.Secondary)
         )
     );
@@ -465,7 +461,7 @@ function buildScriptEditorPayload(userId) {
     const preview = buildScriptMessageContainer(session.draft, true);
     const controls = new ContainerBuilder();
     controls.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('_lapis_emoji')} Editor da resposta — \`${session.keyword}\`\n` +
+        `## ${Emojis.get('_custom_emoji')} Editor da resposta — \`${session.keyword}\`\n` +
         `-# Pré-visualização ao vivo acima: cada alteração aparece antes de salvar.\n` +
         `**Editando:** ${sectionLabel}`
     ));
@@ -503,7 +499,7 @@ function buildScriptEditorPayload(userId) {
                 new ButtonBuilder()
                     .setCustomId(`scripts_${userId}_editor_add_link`)
                     .setLabel('Adicionar link')
-                    .setEmoji(Emojis.get('_add_emoji'))
+                    .setEmoji(Emojis.get('_send_emoji'))
                     .setStyle(ButtonStyle.Success)
             );
         }
@@ -537,12 +533,10 @@ function buildScriptEditorPayload(userId) {
                 new ButtonBuilder()
                     .setCustomId(`scripts_${userId}_editor_set_${section}`)
                     .setLabel(`Editar ${field.label}`)
-                    .setEmoji(Emojis.get('_lapis_emoji'))
                     .setStyle(ButtonStyle.Primary),
                 new ButtonBuilder()
                     .setCustomId(`scripts_${userId}_editor_remove_${section}`)
                     .setLabel('Remover')
-                    .setEmoji(Emojis.get('_trash_emoji'))
                     .setStyle(ButtonStyle.Secondary)
                     .setDisabled(!current)
             )
@@ -560,7 +554,6 @@ function buildScriptEditorPayload(userId) {
             new ButtonBuilder()
                 .setCustomId(`scripts_${userId}_editor_cancel`)
                 .setLabel('Cancelar')
-                .setEmoji(Emojis.get('_back_emoji'))
                 .setStyle(ButtonStyle.Secondary)
         )
     );
