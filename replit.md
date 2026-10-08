@@ -31,3 +31,4 @@ The workflow **Start application** handles this automatically.
 - `Handler/` — slash command & event loader
 
 ## User preferences
+- Nunca use emojis Unicode neste projeto; use somente os ícones do bot.
