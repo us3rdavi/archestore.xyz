@@ -1,0 +1,13 @@
+# Dependencies are installed by Discloud from package.json/package-lock.json
+node_modules
+
+# Replit and local development files
+.git
+.cache
+.local
+.agents
+attached_assets
+.DS_Store
+
+# Keep local environment secrets out of the upload
+.env
