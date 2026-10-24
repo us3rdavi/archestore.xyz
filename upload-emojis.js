@@ -1,215 +1,328 @@
-const { REST, Routes } = require("discord.js");
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 
-const token = process.env.DISCORD_BOT_TOKEN;
-const ICON_BASE = "/tmp/iconpack";
+const API_BASE = "https://discord.com/api/v10";
+const CONFIG = require("./config.json");
+const APPLICATION_ID = CONFIG.CLIENT_ID || CONFIG.botid;
+const SOURCE_DIR = process.env.ICONPACK_DIR || path.join(__dirname, "iconpack");
 const EMOJIS_JSON = path.join(__dirname, "Database/emojis.json");
+const IMPORT_MANIFEST = path.join(__dirname, "Database/iconpack-import.json");
+const DRY_RUN = process.argv.includes("--dry-run");
 
-const rest = new REST({ version: "10" }).setToken(token);
+// Confirmed by comparing the source pixels/animation frames with the images
+// returned by the application's emoji CDN. These IDs are used only when the
+// exact source artwork is already present; names are not used for matching.
+const VERIFIED_IMAGE_MATCHES = Object.freeze({
+    "animated/bellringing.gif": "1501803880458092654",
+    "animated/celebrating.gif": "1501803863546789900",
+    "animated/refreshing.gif": "1501803873445351435",
+    "animated/spinning.gif": "1501803860468174878",
+    "animated/thinking.gif": "1501803870479843368",
+    "animated/torefresh.gif": "1501803867023605873",
+    "animated/toright.gif": "1501803876834345022",
 
-// Mapeamento: chave do Emojis.json → arquivo do iconpack
-const mapping = {
-    // Animados
-    "loading_emoji":         "animated/spinning.gif",
-    "success":               "animated/celebrating.gif",
-    "loading":               "animated/torefresh.gif",
-    "a0_emoji":              "animated/thinking.gif",
-    "a1_emoji":              "animated/refreshing.gif",
-    "a2_emoji":              "animated/refreshing.gif",
-    "a3_emoji":              "animated/spinning.gif",
-    "a4_emoji":              "animated/toright.gif",
-    "a5_emoji":              "animated/celebrating.gif",
-    "a6_emoji":              "animated/toright.gif",
-    "a7_emoji":              "animated/bellringing.gif",
+    "core/account.png": "1501803899085131867",
+    "core/bell.png": "1501804036540862464",
+    "core/block.png": "1501804067616325723",
+    "core/calendar.png": "1501804055826141246",
+    "core/clock.png": "1501804058699366470",
+    "core/fav.png": "1501804052827209768",
+    "core/heart.png": "1501804079200993342",
+    "core/hourglass.png": "1501804061719007232",
+    "core/pin.png": "1501804120615555132",
+    "core/settings.png": "1501804030605922346",
+    "core/shield.png": "1501804064596558017",
+    "core/star.png": "1501804049563910285",
+    "core/upload.png": "1501804016210940075",
 
-    // Usuários / membros
-    "failuser_emoji":        "discord/user.png",
-    "member_verified_emoji": "symbols/check.png",
-    "member_remove_emoji":   "symbols/remove.png",
-    "member_add_emoji":      "symbols/plus.png",
-    "_silueta_emoji":        "discord/user.png",
-    "_multi_silueta_emoji":  "discord/users.png",
-    "_people_emoji":         "discord/users.png",
-    "_support_emoji":        "core/account.png",
-    "_staff_emoji":          "discord/crown.png",
+    "creation/brush.png": "1501804003850322052",
+    "creation/colorpicker.png": "1501804007079936061",
+    "creation/folder.png": "1501804010049634426",
+    "creation/key.png": "1501804043121725490",
+    "creation/notes.png": "1501804013262475275",
+    "creation/roller.png": "1501803920576745522",
+    "creation/sparks.png": "1501804125069901965",
+    "creation/web.png": "1501804076189351949",
+    "creation/wrench.png": "1501804000994132080",
 
-    // Ações / navegação
-    "_add_emoji":            "symbols/add.png",
-    "_back_emoji":           "symbols/arrowl.png",
-    "_left_emoji":           "symbols/left.png",
-    "_right_emoji":          "symbols/rigth.png",
-    "_rigth_emoji":          "symbols/rigth.png",
-    "repost_emoji":          "symbols/arrowr.png",
-    "_change_emoji":         "creation/roller.png",
-    "_send_emoji":           "discord/send.png",
-    "_confirm_emoji":        "symbols/check.png",
-    "_trash_emoji":          "discord/trashcan.png",
-    "_clean_emoji":          "discord/trashcan.png",
-    "_search_emoji":         "symbols/question.png",
+    "dashboard/cloud.png": "1501804046229438585",
+    "dashboard/console.png": "1502541664579879072",
+    "dashboard/reload.png": "1501804022762573825",
 
-    // Status / resultado
-    "confirmed_emoji":       "symbols/success.png",
-    "negative_emoji":        "symbols/cancel.png",
-    "error":                 "symbols/danger.png",
-    "warn_emoji":            "symbols/warn.png",
-    "confirmedpayment_emoji":"symbols/success.png",
-    "failpayment_emoji":     "symbols/danger.png",
-    "confirmed_backup_emoji":"symbols/check.png",
-    "information_emoji":     "symbols/info.png",
-    "question_emoji":        "symbols/question.png",
+    "discord/bot.png": "1501804019184828507",
+    "discord/crown.png": "1501803902046048297",
+    "discord/invite.png": "1501804070770573452",
+    "discord/message.png": "1501804039451709441",
+    "discord/report.png": "1501804073744072895",
+    "discord/role.png": "1501804119030235136",
+    "discord/send.png": "1501803923126747178",
+    "discord/slash.png": "1501804027271319582",
+    "discord/trashcan.png": "1501803926180335727",
+    "discord/user.png": "1501803883452825611",
+    "discord/users.png": "1501803896073621706",
 
-    // Economia / pagamentos
-    "store_emoji":           "economy/shop.png",
-    "neworder_emoji":        "economy/bag.png",
-    "deliveredorder_emoji":  "economy/cardbox.png",
-    "completedcart_emoji":   "economy/basket.png",
-    "_cart_emoji":           "economy/cart.png",
-    "config_cart_emoji":     "economy/cart.png",
-    "_carrinhoyands_emoji":  "economy/cart.png",
-    "caminhao_entrega":      "economy/truck.png",
-    "realizou_pagamento":    "economy/receipt.png",
-    "ltc_stamp_emoji":       "economy/receipt.png",
-    "card_stamp_emoji":      "economy/card.png",
-    "stripe_emoji":          "economy/card.png",
-    "pix_stamp_emoji":       "economy/qrcode.png",
-    "_efi_emoji":            "economy/bank.png",
-    "_mp_emoji":             "economy/wallet.png",
-    "_money_emoji":          "economy/dollar.png",
-    "dindin_emoji":          "economy/coin.png",
-    "ltc_emoji":             "economy/coin.png",
-    "_transfer_emoji":       "economy/transfer.png",
+    "economy/bag.png": "1501803951161479208",
+    "economy/card.png": "1501803970337833040",
+    "economy/cardbox.png": "1501803953841504327",
+    "economy/cart.png": "1501803960393269298",
+    "economy/coin.png": "1501803994861932625",
+    "economy/dollar.png": "1501803982849445998",
+    "economy/qrcode.png": "1501803973383028856",
+    "economy/receipt.png": "1501803966806360084",
+    "economy/shop.png": "1501803947898306724",
+    "economy/transfer.png": "1501803997583904810",
+    "economy/truck.png": "1501803963329286245",
+    "economy/wallet.png": "1501803979456122884",
 
-    // Ferramentas / criação
-    "_tool_emoji":           "creation/wrench.png",
-    "_fixe_emoji":           "creation/wrench.png",
-    "_lapis_emoji":          "creation/brush.png",
-    "_pincel_emoji":         "creation/brush.png",
-    "_custom_emoji":         "creation/colorpicker.png",
-    "_folder_emoji":         "creation/folder.png",
-    "_camp_emoji":           "creation/notes.png",
-    "_text_emoji":           "creation/notes.png",
-    "photo_emoji":           "core/upload.png",
+    "symbols/add.png": "1501803905363869769",
+    "symbols/arrowl.png": "1501803908589162537",
+    "symbols/arrowr.png": "1501803917640732722",
+    "symbols/cancel.png": "1501803935453679616",
+    "symbols/check.png": "1501803886283984948",
+    "symbols/danger.png": "1501803938456932494",
+    "symbols/info.png": "1501803944375222392",
+    "symbols/left.png": "1501803911655198742",
+    "symbols/plus.png": "1501803892889878548",
+    "symbols/question.png": "1501803928973476023",
+    "symbols/remove.png": "1501803889362473055",
+    "symbols/rigth.png": "1501803914654257326",
+    "symbols/success.png": "1501803932484108359",
+    "symbols/warn.png": "1501803941112053861",
+});
 
-    // Sistema / bot
-    "system_emoji":          "discord/bot.png",
-    "dreamapps":             "discord/bot.png",
-    "restartbot_emoji":      "dashboard/reload.png",
-    "command_emoji":         "discord/slash.png",
-    "_settings_emoji":       "core/settings.png",
-    "_ghost_emoji":          "discord/invisible.png",
-    "_notify_emoji":         "core/bell.png",
-    "_messages_emoji":       "discord/message.png",
-    "_mail_emoji":           "discord/message.png",
-    "_ticket_emoji":         "creation/key.png",
-    "ecloud_emoji":          "dashboard/cloud.png",
-
-    // Outros
-    "_star_emoji":           "core/star.png",
-    "_diamond_emoji":        "core/fav.png",
-    "date_emoji":            "core/calendar.png",
-    "clock_emoji":           "core/clock.png",
-    "time_emoji":            "core/hourglass.png",
-    "permissions_emoji":     "core/shield.png",
-    "defense_emoji":         "core/shield.png",
-    "_ban_emoji":            "core/block.png",
-    "invite_emoji":          "discord/invite.png",
-    "flag_emoji":            "discord/report.png",
-    "_flag_emoji":           "discord/report.png",
-    "brand_emoji":           "creation/web.png",
-    "dream":                 "core/heart.png",
-    "lupa":                  "symbols/question.png",
-};
-
-function sleep(ms) {
-    return new Promise(r => setTimeout(r, ms));
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function toDataURI(filePath) {
-    const ext = path.extname(filePath).toLowerCase();
-    const mime = ext === ".gif" ? "image/gif" : "image/png";
-    const data = fs.readFileSync(filePath).toString("base64");
-    return `data:${mime};base64,${data}`;
+function readJson(filePath, fallback) {
+    if (!fs.existsSync(filePath)) return fallback;
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
 
-(async () => {
-    try {
-        const app = await rest.get(Routes.oauth2CurrentApplication());
-        const clientId = app.id;
-        console.log(`\nBot ID: ${clientId}`);
+function writeJsonAtomically(filePath, value) {
+    const temporaryPath = `${filePath}.${process.pid}.tmp`;
+    fs.writeFileSync(temporaryPath, `${JSON.stringify(value, null, 4)}\n`, "utf8");
+    fs.renameSync(temporaryPath, filePath);
+}
 
-        // Apagar emojis antigos desta aplicação
-        console.log("\n[1/3] Buscando emojis antigos...");
-        const existing = await rest.get(`/applications/${clientId}/emojis`);
-        const oldEmojis = existing.items || [];
-        console.log(`Encontrados ${oldEmojis.length} emojis antigos.`);
+function collectImageFiles(directory, prefix = "") {
+    return fs.readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
+        const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name;
+        const absolutePath = path.join(directory, entry.name);
+        if (entry.isDirectory()) return collectImageFiles(absolutePath, relativePath);
+        if (!entry.isFile() || !/\.(png|gif)$/i.test(entry.name)) return [];
+        return [{ relativePath, absolutePath }];
+    });
+}
 
-        for (const emoji of oldEmojis) {
-            try {
-                await rest.delete(`/applications/${clientId}/emojis/${emoji.id}`);
-                process.stdout.write(`  Apagado: ${emoji.name}\n`);
-                await sleep(300);
-            } catch (e) {
-                console.warn(`  Erro ao apagar ${emoji.name}: ${e.message}`);
-            }
-        }
+function makeBaseName(relativePath) {
+    const stem = relativePath
+        .replace(/\.(png|gif)$/i, "")
+        .replace(/[\\/]/g, "_")
+        .toLowerCase()
+        .replace(/[^a-z0-9_]/g, "_");
+    return `ip_${stem}`.slice(0, 32);
+}
 
-        // Fazer upload dos novos emojis
-        console.log("\n[2/3] Fazendo upload dos novos emojis...");
-        const newEmojis = {};
-        const uploaded = {};
+function addSuffix(base, number, maxLength = 32) {
+    const suffix = `_${number}`;
+    return `${base.slice(0, maxLength - suffix.length)}${suffix}`;
+}
 
-        for (const [key, iconPath] of Object.entries(mapping)) {
-            const fullPath = path.join(ICON_BASE, iconPath);
-            if (!fs.existsSync(fullPath)) {
-                console.warn(`  ARQUIVO NÃO ENCONTRADO: ${iconPath}`);
-                continue;
-            }
-
-            // Reusar upload se mesmo arquivo já foi feito
-            if (uploaded[iconPath]) {
-                const cached = uploaded[iconPath];
-                const animated = iconPath.endsWith(".gif");
-                newEmojis[key] = animated
-                    ? `<a:${key}:${cached.id}>`
-                    : `<:${key}:${cached.id}>`;
-                console.log(`  Reutilizado: ${key} → ${cached.name} (${cached.id})`);
-                continue;
-            }
-
-            try {
-                const image = toDataURI(fullPath);
-                const result = await rest.post(`/applications/${clientId}/emojis`, {
-                    body: { name: key, image }
-                });
-
-                const animated = iconPath.endsWith(".gif");
-                newEmojis[key] = animated
-                    ? `<a:${key}:${result.id}>`
-                    : `<:${key}:${result.id}>`;
-
-                uploaded[iconPath] = result;
-                console.log(`  ✓ ${key} (${result.id})`);
-                await sleep(500);
-            } catch (e) {
-                console.error(`  ✗ Erro em ${key}: ${e.message}`);
-                await sleep(1000);
-            }
-        }
-
-        // Atualizar Emojis.json
-        console.log("\n[3/3] Atualizando Emojis.json...");
-        const oldJson = JSON.parse(fs.readFileSync(EMOJIS_JSON, "utf8"));
-
-        // Manter chaves não mapeadas intactas
-        const finalJson = { ...oldJson, ...newEmojis };
-        fs.writeFileSync(EMOJIS_JSON, JSON.stringify(finalJson, null, 4), "utf8");
-
-        console.log(`\n✅ Concluído! ${Object.keys(newEmojis).length} emojis atualizados.`);
-        console.log("Reinicie o bot para aplicar as mudanças.\n");
-
-    } catch (error) {
-        console.error("Erro fatal:", error.message);
-        process.exit(1);
+function chooseUnusedName(base, usedNames) {
+    if (!usedNames.has(base)) return base;
+    for (let number = 2; number < 10000; number += 1) {
+        const candidate = addSuffix(base, number);
+        if (!usedNames.has(candidate)) return candidate;
     }
-})();
+    throw new Error(`Não foi possível criar um nome único para ${base}.`);
+}
+
+function chooseAliasKey(base, emojiMap, plannedKeys, mention) {
+    if (!Object.prototype.hasOwnProperty.call(emojiMap, base) && !plannedKeys.has(base)) {
+        return base;
+    }
+    if (emojiMap[base] === mention && !plannedKeys.has(base)) return base;
+    for (let number = 2; number < 10000; number += 1) {
+        const candidate = addSuffix(base, number);
+        if (!Object.prototype.hasOwnProperty.call(emojiMap, candidate) && !plannedKeys.has(candidate)) {
+            return candidate;
+        }
+        if (emojiMap[candidate] === mention && !plannedKeys.has(candidate)) return candidate;
+    }
+    throw new Error(`Não foi possível criar uma chave JSON única para ${base}.`);
+}
+
+async function discordRequest(token, route, options = {}) {
+    for (let attempt = 1; attempt <= 8; attempt += 1) {
+        const response = await fetch(`${API_BASE}${route}`, {
+            ...options,
+            headers: {
+                Authorization: `Bot ${token}`,
+                ...(options.body ? { "Content-Type": "application/json" } : {}),
+                ...options.headers,
+            },
+        });
+        const responseText = await response.text();
+        const body = responseText ? JSON.parse(responseText) : null;
+        if (response.ok) return body;
+
+        if (response.status === 429 && attempt < 8) {
+            const retryAfter = Number(body?.retry_after || 1);
+            await delay(Math.ceil(retryAfter * 1000) + 250);
+            continue;
+        }
+        throw new Error(`${options.method || "GET"} ${route} retornou HTTP ${response.status}: ${body?.message || responseText}`);
+    }
+    throw new Error(`Limite de tentativas excedido em ${route}.`);
+}
+
+function emojiMention(emoji) {
+    return emoji.animated
+        ? `<a:${emoji.name}:${emoji.id}>`
+        : `<:${emoji.name}:${emoji.id}>`;
+}
+
+async function main() {
+    const tokenValue = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_TOKEN;
+    if (!tokenValue) throw new Error("Configure DISCORD_BOT_TOKEN nos Secrets do workspace.");
+    if (!APPLICATION_ID) throw new Error("CLIENT_ID/botid não definido em config.json.");
+    if (!fs.existsSync(SOURCE_DIR)) {
+        throw new Error(`Pasta de imagens não encontrada. Extraia o ZIP e configure ICONPACK_DIR. Atual: ${SOURCE_DIR}`);
+    }
+
+    const token = tokenValue.trim().replace(/^Bot\s+/i, "");
+    const apiRoute = `/applications/${APPLICATION_ID}/emojis`;
+    const [remoteResult, emojiMap, manifest] = await Promise.all([
+        discordRequest(token, apiRoute),
+        Promise.resolve(readJson(EMOJIS_JSON, {})),
+        Promise.resolve(readJson(IMPORT_MANIFEST, { version: 1, files: {} })),
+    ]);
+    const remoteEmojis = remoteResult.items || [];
+    const byId = new Map(remoteEmojis.map(emoji => [emoji.id, emoji]));
+    const byName = new Map(remoteEmojis.map(emoji => [emoji.name, emoji]));
+    const files = collectImageFiles(SOURCE_DIR).sort((a, b) => a.relativePath.localeCompare(b.relativePath));
+    if (files.length === 0) throw new Error(`Nenhuma imagem PNG/GIF encontrada em ${SOURCE_DIR}.`);
+
+    const plan = files.map(file => {
+        const bytes = fs.readFileSync(file.absolutePath);
+        const hash = crypto.createHash("sha256").update(bytes).digest("hex");
+        const saved = manifest.files[file.relativePath];
+        const savedEmoji = saved?.sha256 === hash ? byId.get(saved.id) : null;
+        const verifiedEmoji = byId.get(VERIFIED_IMAGE_MATCHES[file.relativePath]);
+        const reusable = savedEmoji || verifiedEmoji;
+        return {
+            ...file,
+            bytes,
+            hash,
+            saved,
+            savedEmoji,
+            reusable,
+            baseName: makeBaseName(file.relativePath),
+        };
+    });
+
+    const reusableCount = plan.filter(item => item.reusable).length;
+    const uploadCount = plan.length - reusableCount;
+    if (DRY_RUN) {
+        console.log(JSON.stringify({
+            applicationId: APPLICATION_ID,
+            currentApplicationEmojiCount: remoteEmojis.length,
+            archiveImageCount: files.length,
+            imageMatchesAlreadyInDiscord: reusableCount,
+            imagesToUpload: uploadCount,
+            noDeletions: true,
+        }, null, 2));
+        return;
+    }
+
+    const plannedKeys = new Set();
+    const usedNames = new Set(byName.keys());
+    let uploaded = 0;
+    let reused = 0;
+    const failures = [];
+
+    for (let index = 0; index < plan.length; index += 1) {
+        const item = plan[index];
+        let emoji = item.reusable;
+        let origin = item.savedEmoji ? "manifest" : "image-match";
+
+        try {
+            if (!emoji) {
+                const name = chooseUnusedName(item.baseName, usedNames);
+                const extension = path.extname(item.absolutePath).toLowerCase();
+                const mimeType = extension === ".gif" ? "image/gif" : "image/png";
+                emoji = await discordRequest(token, apiRoute, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        name,
+                        image: `data:${mimeType};base64,${item.bytes.toString("base64")}`,
+                    }),
+                });
+                usedNames.add(emoji.name);
+                byId.set(emoji.id, emoji);
+                byName.set(emoji.name, emoji);
+                uploaded += 1;
+                origin = "uploaded";
+                manifest.files[item.relativePath] = {
+                    id: emoji.id,
+                    name: emoji.name,
+                    key: null,
+                    sha256: item.hash,
+                    origin,
+                };
+                writeJsonAtomically(IMPORT_MANIFEST, manifest);
+                await delay(350);
+            } else {
+                reused += 1;
+            }
+
+            const mention = emojiMention(emoji);
+            const saved = manifest.files[item.relativePath] || {};
+            const key = saved.key && (
+                !Object.prototype.hasOwnProperty.call(emojiMap, saved.key) ||
+                emojiMap[saved.key] === mention
+            )
+                ? saved.key
+                : chooseAliasKey(item.baseName, emojiMap, plannedKeys, mention);
+
+            plannedKeys.add(key);
+            if (emojiMap[key] !== mention) emojiMap[key] = mention;
+            manifest.files[item.relativePath] = {
+                id: emoji.id,
+                name: emoji.name,
+                key,
+                sha256: item.hash,
+                origin,
+            };
+            writeJsonAtomically(IMPORT_MANIFEST, manifest);
+
+            if ((index + 1) % 20 === 0 || index + 1 === plan.length) {
+                console.log(`[${index + 1}/${plan.length}] ${item.relativePath}`);
+            }
+        } catch (error) {
+            failures.push({ file: item.relativePath, error: error.message });
+            console.error(`Falha em ${item.relativePath}: ${error.message}`);
+        }
+    }
+
+    writeJsonAtomically(EMOJIS_JSON, emojiMap);
+    console.log(JSON.stringify({
+        applicationId: APPLICATION_ID,
+        currentEmojiCountBeforeImport: remoteEmojis.length,
+        sourceImages: files.length,
+        imageMatchesReused: reused,
+        uploaded,
+        jsonReferencesAddedOrConfirmed: plannedKeys.size,
+        failures,
+        emojisDeleted: 0,
+    }, null, 2));
+
+    if (failures.length > 0) process.exitCode = 1;
+}
+
+main().catch(error => {
+    console.error(`Importação interrompida: ${error.message}`);
+    process.exitCode = 1;
+});
