@@ -33,9 +33,9 @@ async function AcoesRepostAutomatics(interaction, client) {
             `## Repostagem Automática\n` +
             `Seu **${client.user.username}** vai repostar seus produtos periodicamente, apagando a mensagem antiga e enviando-a novamente.\n` +
             `-# O sistema ajustará automaticamente o intervalo e a frequência dos reposts.\n\n` +
-            `**Próxima execução:** ${currentStatus ? `\`${nextExecutionTime.format('DD/MM/YYYY HH:mm:ss')}\`` : '`Função desativada.`'}\n` +
+            `**Próxima execução:** ${currentStatus ? nextExecutionTime.format('DD/MM/YYYY HH:mm:ss') : 'Função desativada.'}\n` +
             `**Tempo até próxima execução:** ${currentStatus ? `<t:${nextExecutionTimestamp}:R>` : '`Função desativada.`'}\n` +
-            `**Produtos existentes:** \`${todosProdutos.length}\`\n` +
+            `**Produtos existentes:** ${todosProdutos.length}\n` +
             `**Status atual:** ${currentStatus ? '`Ativado`' : '`Desativado`'}`
         )
     );

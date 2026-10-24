@@ -219,7 +219,7 @@ module.exports = {
                         tickets.delete(`en.funcoes.${iterator}`);
                     }
                     await interaction.update({
-                        content: `${Emojis.get('confirmed_emoji')} \`${valordelete.length}\` category(ies) removed successfully!`,
+                        content: `${Emojis.get('confirmed_emoji')} ${valordelete.length} category(ies) removed successfully!`,
                         components: [],
                         embeds: []
                     });

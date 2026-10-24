@@ -24,9 +24,9 @@ async function profileuser(interaction, userID = null) {
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
             `## Perfil de ${interaction.user.username}\n` +
-            `**Valor total gasto:** \`R$ ${Number(rendimento.valorTotal).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`\n` +
-            `**Pedidos aprovados:** \`${rendimento.qtdCompraTotal}\`\n` +
-            `**Posição no rank:** \`${rendimento.posicao}\`\n` +
+            `**Valor total gasto:** R$ ${Number(rendimento.valorTotal).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\n` +
+            `**Pedidos aprovados:** ${rendimento.qtdCompraTotal}\n` +
+            `**Posição no rank:** ${rendimento.posicao}\n` +
             `**Primeira compra:** <t:${Math.ceil(PrimeiraCompra.data.data / 1000)}:R>\n` +
             `**Última compra:** <t:${Math.ceil(UltimaCompra.data.data / 1000)}:R>`
         )

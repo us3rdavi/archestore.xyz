@@ -38,7 +38,7 @@ async function CreateTicket(interaction, valor) {
 
     if (statusHorario && (tempoatualtimebr24 < horarioAbertura || tempoatualtimebr24 > horarioFechamento)) {
         return replyEphemeral({
-            content: `${Emojis.get('negative_emoji')} Tickets só podem ser abertos entre \`${horarioAbertura}\` e \`${horarioFechamento}\` (horário de Brasília).`
+            content: `${Emojis.get('negative_emoji')} Tickets só podem ser abertos entre ${horarioAbertura} e ${horarioFechamento} (horário de Brasília).`
         });
     }
 

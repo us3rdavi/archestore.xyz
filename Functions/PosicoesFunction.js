@@ -11,8 +11,8 @@ function getAccentColor() {
 }
 
 function formatPosicao(pos, nome) {
-    if (pos == undefined) return `**${nome}:** \`Não configurado\``;
-    return `**${nome}:** <@&${pos.role}> após gastar \`R$ ${Number(pos.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\``;
+    if (pos == undefined) return `**${nome}:** Não configurado`;
+    return `**${nome}:** <@&${pos.role}> após gastar R$ ${Number(pos.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 function Posicao1(interaction, client) {

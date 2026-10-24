@@ -164,7 +164,7 @@ async function SendLogs(client, channel_logs) {
         .setColor('#5865F2')
         .setFields({
             name: `Informações salvas na nuvem`,
-            value: `- Canais: \`${BackupStorage.get(`Backup_${channel_logs.guild.id}`)[0]?.channels?.length}\` | Cargos: \`${BackupStorage.get(`Backup_${channel_logs.guild.id}`)[0]?.roles?.length}\` | Emojis: \`${BackupStorage.get(`Backup_${channel_logs.guild.id}`)[0]?.emojis?.length}\` | Figurinhas: \`${BackupStorage.get(`Backup_${channel_logs.guild.id}`)[0]?.stickers?.length}\`\n- Permissões, configurações e mensagens também foram salvas.\n-# Esse sistema está em desenvolvimento.`
+            value: `- Canais: ${BackupStorage.get(`Backup_${channel_logs.guild.id}`)[0]?.channels?.length} | Cargos: ${BackupStorage.get(`Backup_${channel_logs.guild.id}`)[0]?.roles?.length} | Emojis: ${BackupStorage.get(`Backup_${channel_logs.guild.id}`)[0]?.emojis?.length} | Figurinhas: ${BackupStorage.get(`Backup_${channel_logs.guild.id}`)[0]?.stickers?.length}\n- Permissões, configurações e mensagens também foram salvas.\n-# Esse sistema está em desenvolvimento.`
         })
         .setFooter({ text: `eCloud Driver - Ease Solutions.`, iconURL: `https://cdn.discordapp.com/emojis/1178328984170287114.webp` })
         .setTimestamp();

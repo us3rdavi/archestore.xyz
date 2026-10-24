@@ -142,8 +142,8 @@ function criarEmbed(produtoInfo, embedColor, embedFooter) {
             embed.addFields({ name: campo.Nome, value: campo.desc.slice(0, 1024), inline: true });
         }
         embed.addFields(
-            { name: 'Valor à vista', value: `\`R$ ${Number(campo.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\``, inline: true },
-            { name: 'Restam', value: `\`${campo.estoque.length}\``, inline: true },
+            { name: 'Valor à vista', value: `R$ ${Number(campo.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, inline: true },
+            { name: 'Restam', value: `${campo.estoque.length}`, inline: true },
         );
     }
 

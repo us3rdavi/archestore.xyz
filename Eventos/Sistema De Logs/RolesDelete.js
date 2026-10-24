@@ -43,8 +43,8 @@ module.exports = {
                     .setColor(configuracao.get('Cores.Principal') || '5865F2')
                     .setTitle(`Cargo Excluído`)
                     .addFields(
-                        { name: `Cargo:`, value: `\`${role.name}\``, inline: true },
-                        { name: `Excluido por:`, value: `\`${executor}\``, inline: true }
+                        { name: `Cargo:`, value: `${role.name}`, inline: true },
+                        { name: `Excluido por:`, value: `${executor}`, inline: true }
                     );
 
                 try {

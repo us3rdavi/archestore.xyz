@@ -289,11 +289,11 @@ module.exports = {
                     .setColor('#57F287')
                     .setThumbnail(interaction.guild.iconURL({ dynamic: true }))
                     .addFields(
-                        { name: 'Opened by',    value: `<@${ticketData.userId}>\n\`${ticketData.username || 'Unknown'}\``, inline: true },
+                        { name: 'Opened by',    value: `<@${ticketData.userId}>\n${ticketData.username || 'Unknown'}`, inline: true },
                         { name: 'Claimed by',   value: ticketData.staffMemberId ? `<@${ticketData.staffMemberId}>` : '`Nobody`', inline: true },
-                        { name: 'Category',     value: `\`${ticketData.funcao || 'Unknown'}\``, inline: true },
+                        { name: 'Category',     value: `${ticketData.funcao || 'Unknown'}`, inline: true },
                         { name: 'Ticket #',     value: `\`#${ticketData.numero}\``, inline: true },
-                        { name: 'Closed by',    value: `${interaction.user}\n\`Resolved\``, inline: true },
+                        { name: 'Closed by',    value: `${interaction.user}\nResolved`, inline: true },
                         { name: 'Closed at',    value: `<t:${closedTs}:F>`, inline: true }
                     )
                     .setFooter({ text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) })

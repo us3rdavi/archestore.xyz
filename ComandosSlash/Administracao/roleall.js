@@ -59,7 +59,7 @@ module.exports = {
 
             const atualizarProgresso = async () => {
                 await interaction.editReply({ 
-                    content: `${Emojis.get('loading_emoji')} Adicionando cargo a todos os membros... \`${sucesso} / ${totalMembros}\` membros processados.` 
+                    content: `${Emojis.get('loading_emoji')} Adicionando cargo a todos os membros... ${sucesso} / ${totalMembros} membros processados.` 
                 });
             };
 

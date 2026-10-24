@@ -116,7 +116,7 @@ async function LockChannels(client, canais) {
     const embed = new EmbedBuilder()
         .setAuthor({ name: 'Canal Fechado Pelo Sistema', iconURL: 'https://cdn.discordapp.com/emojis/1230562904424845322.webp?size=44&quality=lossless' })
         .setColor('#5865F2')
-        .setDescription(`- Este canal foi fechado automaticamente. Ele será reaberto às \`${abertura}\`.`);
+        .setDescription(`- Este canal foi fechado automaticamente. Ele será reaberto às ${abertura}.`);
 
     let ids = [];
     for (const canal of canais) {
@@ -157,7 +157,7 @@ async function SystemNukedChannels(client) {
                 const channel = await client.channels.fetch(canal);
                 await channel.clone({ reason: 'Canal nukado automaticamente pelo sistema.' }).then(async (channel) => {
                     ids.push(channel.id);
-                    await channel.send({ content: `\`Channel Nuked by: System\`` });
+                    await channel.send({ content: `Channel Nuked by: System` });
                 });
                 await channel.delete({ reason: 'Canal nukado automaticamente pelo sistema.' });
             } catch (error) {

@@ -331,7 +331,7 @@ async function RestaurandoServidor(client, interaction, selecionado) {
         } catch (e) { console.log(`Erro ao criar cargo: ${el.name} - ${e.message}`); }
     }));
 
-    await step(`${Emojis.get('confirmed_emoji')} \`${rolescriados.length}\` cargos criados.\n${Emojis.get('loading_emoji')} Criando categorias...`);
+    await step(`${Emojis.get('confirmed_emoji')} ${rolescriados.length} cargos criados.\n${Emojis.get('loading_emoji')} Criando categorias...`);
     const categoriascriadas = [];
     for (const el of BackupStorage.get(selecionado)[0].channels) {
         if (el.type === 4) {
@@ -342,7 +342,7 @@ async function RestaurandoServidor(client, interaction, selecionado) {
         }
     }
 
-    await step(`${Emojis.get('confirmed_emoji')} \`${rolescriados.length}\` cargos · \`${categoriascriadas.length}\` categorias.\n${Emojis.get('loading_emoji')} Criando canais...`);
+    await step(`${Emojis.get('confirmed_emoji')} ${rolescriados.length} cargos · ${categoriascriadas.length} categorias.\n${Emojis.get('loading_emoji')} Criando canais...`);
     const canaiscriados = [];
     const canais = BackupStorage.get(selecionado)[0].channels;
     await Promise.all(canais.map(async el => {
@@ -365,14 +365,14 @@ async function RestaurandoServidor(client, interaction, selecionado) {
         }
     }));
 
-    await step(`${Emojis.get('confirmed_emoji')} \`${canaiscriados.length}\` canais criados.\n${Emojis.get('loading_emoji')} Restaurando emojis...`);
+    await step(`${Emojis.get('confirmed_emoji')} ${canaiscriados.length} canais criados.\n${Emojis.get('loading_emoji')} Restaurando emojis...`);
     const emojisrestaurados = [];
     for (const el of BackupStorage.get(selecionado)[0].emojis) {
         const em = await guild.emojis.create({ attachment: el.url, name: el.name }).catch(() => null);
         if (em) emojisrestaurados.push(em.id);
     }
 
-    await step(`${Emojis.get('confirmed_emoji')} \`${emojisrestaurados.length}\` emojis restaurados.\n${Emojis.get('loading_emoji')} Restaurando stickers...`);
+    await step(`${Emojis.get('confirmed_emoji')} ${emojisrestaurados.length} emojis restaurados.\n${Emojis.get('loading_emoji')} Restaurando stickers...`);
     const stickersrestaurados = [];
     for (const el of BackupStorage.get(selecionado)[0].stickers) {
         const st = await guild.stickers.create({ file: el.url, name: el.name }).catch(() => null);
@@ -380,11 +380,11 @@ async function RestaurandoServidor(client, interaction, selecionado) {
     }
 
     await step(
-        `${Emojis.get('confirmed_emoji')} \`${rolescriados.length}\` Cargos\n` +
-        `${Emojis.get('confirmed_emoji')} \`${categoriascriadas.length}\` Categorias\n` +
-        `${Emojis.get('confirmed_emoji')} \`${canaiscriados.length}\` Canais\n` +
-        `${Emojis.get('confirmed_emoji')} \`${emojisrestaurados.length}\` Emojis\n` +
-        `${Emojis.get('confirmed_emoji')} \`${stickersrestaurados.length}\` Stickers\n` +
+        `${Emojis.get('confirmed_emoji')} ${rolescriados.length} Cargos\n` +
+        `${Emojis.get('confirmed_emoji')} ${categoriascriadas.length} Categorias\n` +
+        `${Emojis.get('confirmed_emoji')} ${canaiscriados.length} Canais\n` +
+        `${Emojis.get('confirmed_emoji')} ${emojisrestaurados.length} Emojis\n` +
+        `${Emojis.get('confirmed_emoji')} ${stickersrestaurados.length} Stickers\n` +
         `${Emojis.get('confirmed_emoji')} Restauração concluída.`
     );
 

@@ -60,10 +60,10 @@ function buildFormEmbedPreviewContainerEN(data, formName, placeholderLabel) {
 }
 
 function buildFormEmbedEditorContainerEN(userId, guildId, slotId, section, data) {
-    const titleVal = data.title       ? `\`${data.title.slice(0, 45)}\``              : '`Não definido`';
-    const descVal  = data.description ? `\`${data.description.slice(0, 35)}...\``     : '`Não definida`';
+    const titleVal = data.title       ? data.title.slice(0, 45)              : 'Não definido';
+    const descVal  = data.description ? `${data.description.slice(0, 35)}...`     : 'Não definida';
     const imgVal   = data.image       ? `${Emojis.get('confirmed_emoji')} Definida`   : `${Emojis.get('negative_emoji')} Nenhuma`;
-    const ftrVal   = data.footer      ? `\`${data.footer.slice(0, 45)}\``             : '`Nenhum`';
+    const ftrVal   = data.footer      ? data.footer.slice(0, 45)             : 'Nenhum';
 
     const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
@@ -164,12 +164,12 @@ function buildFormPanelPayloadEN(guildId, slotId) {
 
     const statusIcon   = form.active ? Emojis.get('confirmed_emoji') : Emojis.get('error');
     const statusText   = form.active ? 'Ativo' : 'Inativo';
-    const chInput      = form.channel_input  ? `<#${form.channel_input}>`  : `\`Não definido\``;
-    const chOutput     = form.channel_output ? `<#${form.channel_output}>` : `\`Não definido\``;
+    const chInput      = form.channel_input  ? `<#${form.channel_input}>`  : `Não definido`;
+    const chOutput     = form.channel_output ? `<#${form.channel_output}>` : `Não definido`;
     const staffRoles   = (form.roles_responsible || []).length > 0
         ? form.roles_responsible.map(r => `<@&${r}>`).join(', ')
-        : `\`Nenhum\``;
-    const roleAprovado = form.role_approved ? `<@&${form.role_approved}>` : `\`Não definido\``;
+        : `Nenhum`;
+    const roleAprovado = form.role_approved ? `<@&${form.role_approved}>` : `Não definido`;
     const timeLimit      = form.time_limit || 120;
     const totalPerguntas = (form.selectOptions || []).reduce((s, o) => s + (o.questions || []).length, 0)
         + (form.questions || []).length;
@@ -184,7 +184,7 @@ function buildFormPanelPayloadEN(guildId, slotId) {
         `${Emojis.get('_folder_emoji')} **Canal de Logs:** ${chOutput}\n` +
         `${Emojis.get('_staff_emoji')} **Staff Responsável:** ${staffRoles}\n` +
         `${Emojis.get('permissions_emoji')} **Cargo ao Aprovar:** ${roleAprovado}\n` +
-        `${Emojis.get('_lapis_emoji')} **Placeholder:** \`${form.button_label || DEFAULT_PLACEHOLDER}\`\n` +
+        `${Emojis.get('_lapis_emoji')} **Placeholder:** ${form.button_label || DEFAULT_PLACEHOLDER}\n` +
         `${Emojis.get('_lapis_emoji')} **Perguntas:** ${totalPerguntas} pergunta(s) em ${numSecoes} seção(ões)\n` +
         `${Emojis.get('clock_emoji')} **Tempo por Pergunta:** ${timeLimit}s\n` +
         `${Emojis.get('_fixe_emoji')} **Limite por Usuário:** ${limite}`
@@ -235,8 +235,8 @@ function buildFormPanelPayloadEN(guildId, slotId) {
 
 function buildChannelConfigPayloadEN(guildId, slotId) {
     const form = getEnSlots(guildId)[slotId] || {};
-    const chInput  = form.channel_input  ? `<#${form.channel_input}>`  : `\`Não definido\``;
-    const chOutput = form.channel_output ? `<#${form.channel_output}>` : `\`Não definido\``;
+    const chInput  = form.channel_input  ? `<#${form.channel_input}>`  : `Não definido`;
+    const chOutput = form.channel_output ? `<#${form.channel_output}>` : `Não definido`;
 
     const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
@@ -758,7 +758,7 @@ module.exports = {
                     delete slots[slotId];
                     setEnSlots(guildId, slots);
                     const { logAction } = require('../../Functions/AuditLog.js');
-                    logAction(client, { action: 'Formulário EN deletado', details: `Nome: \`${formName}\`, Slot: \`${slotId}\``, userId: interaction.user.id, guildId });
+                    logAction(client, { action: 'Formulário EN deletado', details: `Nome: ${formName}, Slot: \`${slotId}\``, userId: interaction.user.id, guildId });
                     await interaction.deferUpdate();
                     await interaction.editReply(buildFormManagePayloadEN(guildId, interaction.user.id));
                     return;
@@ -815,7 +815,7 @@ module.exports = {
                         slots[slotId].active = true;
                         setEnSlots(guildId, slots);
                         const { logAction } = require('../../Functions/AuditLog.js');
-                        logAction(client, { action: 'Formulário EN postado', details: `Nome: \`${form.name}\`, Canal: <#${form.channel_input}>`, userId: interaction.user.id, guildId });
+                        logAction(client, { action: 'Formulário EN postado', details: `Nome: ${form.name}, Canal: <#${form.channel_input}>`, userId: interaction.user.id, guildId });
                         await interaction.reply({
                             content: `${Emojis.get('confirmed_emoji')} Formulário postado em ${channel} com sucesso!`,
                             ephemeral: true,
@@ -978,7 +978,7 @@ module.exports = {
                     setEnSlots(guildId, freshSlots);
                     const { logAction } = require('../../Functions/AuditLog.js');
                     const optLabel = freshSlots[slotId].selectOptions[optionIdx].label || `Seção ${optionIdx + 1}`;
-                    logAction(client, { action: 'Pergunta adicionada ao Formulário EN', details: `Slot \`${slotId}\` · Seção \`${optLabel}\`: \`${text.slice(0, 80)}\``, userId: interaction.user.id, guildId });
+                    logAction(client, { action: 'Pergunta adicionada ao Formulário EN', details: `Slot \`${slotId}\` · Seção ${optLabel}: ${text.slice(0, 80)}`, userId: interaction.user.id, guildId });
                     await interaction.update(buildQuestionsPanelPayloadEN(guildId, slotId, optionIdx));
                 } finally {
                     setTimeout(() => pergLock.delete(lockKey), 2000);
@@ -1043,7 +1043,7 @@ module.exports = {
                     slots[slotId].button_label = interaction.fields.getTextInputValue('button_label').trim() || DEFAULT_PLACEHOLDER;
                     slots[slotId].button_emoji = interaction.fields.getTextInputValue('button_emoji').trim() || null;
                     setEnSlots(guildId, slots);
-                    logAction(client, { action: 'Botão do Formulário EN configurado', details: `Slot \`${slotId}\`: \`${slots[slotId].button_label}\``, userId: interaction.user.id, guildId });
+                    logAction(client, { action: 'Botão do Formulário EN configurado', details: `Slot \`${slotId}\`: ${slots[slotId].button_label}`, userId: interaction.user.id, guildId });
                     await interaction.update(buildFormPanelPayloadEN(guildId, slotId));
 
                 } else if (action === 'limite') {
@@ -1052,7 +1052,7 @@ module.exports = {
                         return interaction.reply({ content: `${Emojis.get('negative_emoji')} Valor inválido. Use um número inteiro positivo.`, ephemeral: true });
                     slots[slotId].limit_per_user = limit === 0 ? null : limit;
                     setEnSlots(guildId, slots);
-                    logAction(client, { action: 'Limite de envios do Formulário EN configurado', details: `Slot \`${slotId}\`: \`${limit === 0 ? 'ilimitado' : limit}\``, userId: interaction.user.id, guildId });
+                    logAction(client, { action: 'Limite de envios do Formulário EN configurado', details: `Slot \`${slotId}\`: ${limit === 0 ? 'ilimitado' : limit}`, userId: interaction.user.id, guildId });
                     await interaction.update(buildFormPanelPayloadEN(guildId, slotId));
 
                 } else if (action === 'timelimit') {
@@ -1061,14 +1061,14 @@ module.exports = {
                     tl = Math.min(Math.max(tl, 30), 600);
                     slots[slotId].time_limit = tl;
                     setEnSlots(guildId, slots);
-                    logAction(client, { action: 'Tempo limite do Formulário EN configurado', details: `Slot \`${slotId}\`: \`${tl}s\``, userId: interaction.user.id, guildId });
+                    logAction(client, { action: 'Tempo limite do Formulário EN configurado', details: `Slot \`${slotId}\`: ${tl}s`, userId: interaction.user.id, guildId });
                     await interaction.update(buildFormPanelPayloadEN(guildId, slotId));
 
                 } else if (action === 'nome') {
                     const nome = interaction.fields.getTextInputValue('nome').trim();
                     if (nome) slots[slotId].name = nome;
                     setEnSlots(guildId, slots);
-                    logAction(client, { action: 'Formulário EN renomeado', details: `Slot \`${slotId}\` → \`${nome}\``, userId: interaction.user.id, guildId });
+                    logAction(client, { action: 'Formulário EN renomeado', details: `Slot \`${slotId}\` → ${nome}`, userId: interaction.user.id, guildId });
                     await interaction.update(buildFormPanelPayloadEN(guildId, slotId));
 
                 } else if (action === 'addperg') {
@@ -1085,7 +1085,7 @@ module.exports = {
                             return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 10 perguntas atingido.`, ephemeral: true });
                         freshSlots[slotId].questions.push({ text });
                         setEnSlots(guildId, freshSlots);
-                        logAction(client, { action: 'Pergunta adicionada ao Formulário EN', details: `Slot \`${slotId}\`: \`${text.slice(0, 80)}\``, userId: interaction.user.id, guildId });
+                        logAction(client, { action: 'Pergunta adicionada ao Formulário EN', details: `Slot \`${slotId}\`: ${text.slice(0, 80)}`, userId: interaction.user.id, guildId });
                         await interaction.update(buildQuestionsPanelPayloadEN(guildId, slotId));
                     } finally {
                         setTimeout(() => pergLock.delete(lockKey), 2000);
@@ -1146,7 +1146,7 @@ module.exports = {
                     opt.questions.pop();
                     setEnSlots(guildId, slotsData);
                     const { logAction } = require('../../Functions/AuditLog.js');
-                    logAction(client, { action: 'Pergunta de seção EN removida', details: `Slot \`${slotId}\` Seção \`${opt.label || optionIdx}\`: \`${removed?.text?.slice(0, 60) || ''}\``, userId: interaction.user.id, guildId });
+                    logAction(client, { action: 'Pergunta de seção EN removida', details: `Slot \`${slotId}\` Seção ${opt.label || optionIdx}: ${removed?.text?.slice(0, 60) || ''}`, userId: interaction.user.id, guildId });
                 }
                 await interaction.deferUpdate();
                 await interaction.editReply(buildQuestionsPanelPayloadEN(guildId, slotId, optionIdx));
@@ -1483,7 +1483,7 @@ function buildStaffConfigPayloadEN(guildId, slotId) {
     const form  = getEnSlots(guildId)[slotId] || {};
     const atual = (form.roles_responsible || []).length > 0
         ? form.roles_responsible.map(r => `<@&${r}>`).join(', ')
-        : `\`Nenhum\``;
+        : `Nenhum`;
 
     const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
@@ -1510,7 +1510,7 @@ function buildStaffConfigPayloadEN(guildId, slotId) {
 
 function buildAprovadoConfigPayloadEN(guildId, slotId) {
     const form  = getEnSlots(guildId)[slotId] || {};
-    const atual = form.role_approved ? `<@&${form.role_approved}>` : `\`Não definido\``;
+    const atual = form.role_approved ? `<@&${form.role_approved}>` : `Não definido`;
 
     const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
@@ -1605,8 +1605,8 @@ function buildOptionEditPanelEN(guildId, slotId, optIdx) {
     const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('_lapis_emoji')} Editar Opção ${optIdx + 1}\n\n` +
-        `${Emojis.get('_text_emoji')} **Nome:** \`${opt.label || 'Sem nome'}\`\n` +
-        `${Emojis.get('_messages_emoji')} **Sub-descrição:** \`${opt.description || 'Nenhuma'}\`\n` +
+        `${Emojis.get('_text_emoji')} **Nome:** ${opt.label || 'Sem nome'}\n` +
+        `${Emojis.get('_messages_emoji')} **Sub-descrição:** ${opt.description || 'Nenhuma'}\n` +
         `${Emojis.get('_ticket_emoji')} **Emoji:** ${emojiStr}`
     ));
     c.addSeparatorComponents(new SeparatorBuilder());

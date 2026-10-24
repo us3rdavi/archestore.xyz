@@ -277,9 +277,9 @@ async function vendasLogsConfig(interaction) {
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('_settings_emoji')} Canais de Log — Vendas\n\n` +
-        `${Emojis.get('neworder_emoji')} **Log de Compras:** ${logCompras ? `${ok} <#${logCompras}>` : `${no} \`Não configurado\``}\n` +
+        `${Emojis.get('neworder_emoji')} **Log de Compras:** ${logCompras ? `${ok} <#${logCompras}>` : `${no} Não configurado`}\n` +
         `-# Enviado ao confirmar pagamento.\n\n` +
-        `${Emojis.get('clock_emoji')} **Log de Pendentes:** ${logPendentes ? `${ok} <#${logPendentes}>` : `${no} \`Não configurado\``}\n` +
+        `${Emojis.get('clock_emoji')} **Log de Pendentes:** ${logPendentes ? `${ok} <#${logPendentes}>` : `${no} Não configurado`}\n` +
         `-# Enviado ao gerar cobrança PIX.`
     ));
     container.addSeparatorComponents(new SeparatorBuilder());
@@ -324,7 +324,7 @@ async function vendasCanalCarrinhoPorPainel(interaction, painelId) {
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('store_emoji')} Canal de Carrinho — ${painel.nome}\n\n` +
-        `**Canal atual:** ${canalAtual ? `${ok} <#${canalAtual}>` : `${no} \`Não configurado\``}\n\n` +
+        `**Canal atual:** ${canalAtual ? `${ok} <#${canalAtual}>` : `${no} Não configurado`}\n\n` +
         `-# Os carrinhos deste painel serão abertos neste canal (threads privadas).\n` +
         `-# Se não configurado, usa o canal global de carrinho.`
     ));
@@ -358,7 +358,7 @@ async function vendasCanalCarrinhoConfig(interaction) {
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('store_emoji')} Canal de Carrinho\n\n` +
-        `**Canal atual:** ${canalCarrinho ? `${ok} <#${canalCarrinho}>` : `${no} \`Não configurado\``}\n\n` +
+        `**Canal atual:** ${canalCarrinho ? `${ok} <#${canalCarrinho}>` : `${no} Não configurado`}\n\n` +
         `-# O bot precisa de permissão para criar threads privadas nesse canal.`
     ));
     container.addSeparatorComponents(new SeparatorBuilder());

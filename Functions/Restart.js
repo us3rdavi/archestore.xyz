@@ -9,7 +9,7 @@ async function restart(client, status) {
         .setColor('#5865F2')
         .setTitle(`${Emojis.get('dream')} — Epro Reiniciado`)
         .addFields(
-            { name: `${Emojis.get(`_tool_emoji`)} **Versão do eOS**`, value: `\`1.0\``, inline: true },
+            { name: `${Emojis.get(`_tool_emoji`)} **Versão do eOS**`, value: `1.0`, inline: true },
             { name: `${Emojis.get(`clock_emoji`)} **Data**`, value: `<t:${Math.ceil(Date.now() / 1000)}:R>`, inline: true },
             { name: `${Emojis.get(`_lapis_emoji`)} **Motivo**`, value: `Reiniciado pelo Sistema`, inline: false }
         )

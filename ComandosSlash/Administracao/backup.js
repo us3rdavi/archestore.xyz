@@ -52,7 +52,7 @@ async function BackupFunction(client, interaction) {
         if (b?.name) {
             backupInfoText +=
                 `> ${Emojis.get('ecloud_emoji')} **${b.name}**\n` +
-                `-# Canais: \`${b.channels?.length ?? 0}\` · Cargos: \`${b.roles?.length ?? 0}\` · Emojis: \`${b.emojis?.length ?? 0}\``;
+                `-# Canais: ${b.channels?.length ?? 0} · Cargos: ${b.roles?.length ?? 0} · Emojis: ${b.emojis?.length ?? 0}`;
         }
     } else {
         backupInfoText =

@@ -18,7 +18,7 @@ async function configrole24(interaction, client) {
             `## Autorização de Carrinho\nGerencie o cargo necessário para abrir carrinhos e o link de verificação.\n\n` +
             `**Cargo necessário:** ${cargoId ? `<@&${cargoId}>` : '`Não definido`'}\n` +
             `**Link de verificação:**\n\`\`\`${link || 'Não definido'}\`\`\`\n` +
-            `**Status:** \`${statusComprar ? 'On' : 'Off'}\``
+            `**Status:** ${statusComprar ? 'On' : 'Off'}`
         )
     );
 

@@ -118,7 +118,7 @@ module.exports = {
                 await interaction.deferUpdate();
                 await refreshCartMessage(interaction, cart);
                 try {
-                    await interaction.followUp({ content: `${Emojis.get('confirmed_emoji')} Cupom **${desconto.codigo}** aplicado! Desconto de \`${valorDesc}\`.`, ephemeral: true });
+                    await interaction.followUp({ content: `${Emojis.get('confirmed_emoji')} Cupom **${desconto.codigo}** aplicado! Desconto de ${valorDesc}.`, ephemeral: true });
                 } catch (e) { /* interação pode ter expirado */ }
                 return;
             }
@@ -181,7 +181,7 @@ module.exports = {
                     console.error('[CarrinhoHandler] Erro ao criar cobrança:', err);
                     const containerErr = new ContainerBuilder();
                     containerErr.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-                        `## ${Emojis.get('negative_emoji')} Erro ao gerar PIX\n\`${err.message}\`\n\n-# Tente novamente ou contate um administrador.`
+                        `## ${Emojis.get('negative_emoji')} Erro ao gerar PIX\n${err.message}\n\n-# Tente novamente ou contate um administrador.`
                     ));
                     containerErr.addSeparatorComponents(new SeparatorBuilder());
                     containerErr.addActionRowComponents(new ActionRowBuilder().addComponents(
@@ -253,9 +253,9 @@ module.exports = {
                 containerPix.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                     `## ${Emojis.get('pix_stamp_emoji')} Pague via PIX\n\n` +
                     `🛒 **Carrinho:** #${cart.cartId} — ${cart.username}\n` +
-                    `${Emojis.get('store_emoji')} **Produto:** \`${cart.secaoNome}\` › \`${cart.subprodutoNome}\`\n` +
-                    `${Emojis.get('_folder_emoji')} **Quantidade:** \`${cart.quantidade}x\`\n` +
-                    `${Emojis.get('pix_stamp_emoji')} **Total:** \`${formatBRL(valorTotal)}\`\n` +
+                    `${Emojis.get('store_emoji')} **Produto:** ${cart.secaoNome} › ${cart.subprodutoNome}\n` +
+                    `${Emojis.get('_folder_emoji')} **Quantidade:** ${cart.quantidade}x\n` +
+                    `${Emojis.get('pix_stamp_emoji')} **Total:** ${formatBRL(valorTotal)}\n` +
                     `${Emojis.get('clock_emoji')} **Expira:** <t:${expiresAt}:R>\n\n` +
                     `-# Escaneie o QR Code abaixo ou use o código Copia e Cola.`
                 ));
@@ -333,9 +333,9 @@ module.exports = {
                                 containerPago.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                                     `## ${Emojis.get('confirmed_emoji')} Pagamento Confirmado!\n\n` +
                                     `Obrigado pela sua compra, <@${cart.userId}>!\n\n` +
-                                    `${Emojis.get('store_emoji')} **Produto:** \`${cart.secaoNome}\` › \`${cart.subprodutoNome}\`\n` +
-                                    `${Emojis.get('_folder_emoji')} **Quantidade:** \`${cart.quantidade}x\`\n` +
-                                    `${Emojis.get('pix_stamp_emoji')} **Total pago:** \`${formatBRL(valorTotal)}\`\n` +
+                                    `${Emojis.get('store_emoji')} **Produto:** ${cart.secaoNome} › ${cart.subprodutoNome}\n` +
+                                    `${Emojis.get('_folder_emoji')} **Quantidade:** ${cart.quantidade}x\n` +
+                                    `${Emojis.get('pix_stamp_emoji')} **Total pago:** ${formatBRL(valorTotal)}\n` +
                                     `${Emojis.get('_settings_emoji')} **TxID:** \`${txid}\`\n\n` +
                                     `-# Sua compra foi registrada. Aguarde a entrega do produto.`
                                 ));
@@ -359,7 +359,7 @@ module.exports = {
                                 const containerExp = new ContainerBuilder();
                                 containerExp.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                                     `## ${Emojis.get('negative_emoji')} PIX Expirado\n` +
-                                    `Seu código PIX de \`${formatBRL(valorTotal)}\` expirou sem pagamento.\n\n` +
+                                    `Seu código PIX de ${formatBRL(valorTotal)} expirou sem pagamento.\n\n` +
                                     `-# Se desejar tentar novamente, use o botão abaixo.`
                                 ));
                                 containerExp.addSeparatorComponents(new SeparatorBuilder());

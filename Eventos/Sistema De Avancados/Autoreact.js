@@ -21,7 +21,7 @@ function buildAutoReactContainer(interaction, mudarstatus) {
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
             `## Auto Reação — Sistema\nSistema de auto reação configurável.\n\n` +
-            `**Status:** \`${autoReactStatus ? 'Ligado' : 'Desligado'}\`\n` +
+            `**Status:** ${autoReactStatus ? 'Ligado' : 'Desligado'}\n` +
             `**Emoji:** ${autoReactEmoji}\n` +
             `**Canais:** \`${autoReactCanais.join(', ')}\``
         )

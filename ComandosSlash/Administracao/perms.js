@@ -44,7 +44,7 @@ async function buildPermsPanel(client, interaction) {
     c.addSeparatorComponents(new SeparatorBuilder());
 
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `${Emojis.get('_silueta_emoji')} **Usuários autorizados:** \`${permIds.length}\`\n\n` +
+        `${Emojis.get('_silueta_emoji')} **Usuários autorizados:** ${permIds.length}\n\n` +
         usersList
     ));
 

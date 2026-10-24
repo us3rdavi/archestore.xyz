@@ -637,7 +637,7 @@ function _buildBoesScreen(pref, userId, data, previewContainer) {
             const styleLabel = BUTTON_STYLE_LABELS[b.style ?? ButtonStyle.Primary] || '?';
             const emojiPart = b.emoji ? ` ${b.emoji}` : '';
             const urlPart = b.url ? ` — ${b.url}` : '';
-            return `\`${i + 1}.\`${emojiPart} **${b.label || 'Sem nome'}** · ${styleLabel}${urlPart}`;
+            return `${i + 1}. ${emojiPart} **${b.label || 'Sem nome'}** · ${styleLabel}${urlPart}`;
         });
         headerText += `-# ${btnCount}/5 botões configurados\n\n${lines.join('\n')}`;
     }

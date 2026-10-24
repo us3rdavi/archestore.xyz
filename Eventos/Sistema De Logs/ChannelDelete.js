@@ -43,8 +43,8 @@ module.exports = {
                     .setColor(configuracao.get('Cores.Principal') || '5865F2')
                     .setTitle(`Canal Excluído`)
                     .addFields(
-                        { name: `Canal:`, value: `\`${channel.name}\``, inline: true },
-                        { name: `Excluido por:`, value: `\`${executor}\``, inline: true }
+                        { name: `Canal:`, value: `${channel.name}`, inline: true },
+                        { name: `Excluido por:`, value: `${executor}`, inline: true }
                     );
 
                 try {

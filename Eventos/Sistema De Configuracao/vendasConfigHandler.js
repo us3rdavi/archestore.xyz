@@ -451,7 +451,7 @@ module.exports = {
                     const painelIdSecao = secao.painelId || null;
                     secoes = secoes.filter(s => s.id !== secaoId);
                     configuracao.set('vendas.secoes', secoes);
-                    logAction(client, { action: 'Seção removida', details: `Seção \`${secao.nome}\` removida.`, userId: interaction.user.id, guildId: interaction.guildId });
+                    logAction(client, { action: 'Seção removida', details: `Seção ${secao.nome} removida.`, userId: interaction.user.id, guildId: interaction.guildId });
                     await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
                     await gerenciarDropdownVendas(interaction, painelIdSecao);
                     return;
@@ -487,7 +487,7 @@ module.exports = {
                     const subNome = (secoes[idx].subprodutos || []).find(sp => sp.id === subId)?.nome || subId;
                     secoes[idx].subprodutos = (secoes[idx].subprodutos || []).filter(sp => sp.id !== subId);
                     configuracao.set('vendas.secoes', secoes);
-                    logAction(client, { action: 'Subproduto removido', details: `\`${subNome}\` da seção \`${secoes[idx].nome}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                    logAction(client, { action: 'Subproduto removido', details: `${subNome} da seção ${secoes[idx].nome}`, userId: interaction.user.id, guildId: interaction.guildId });
                     await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
                     await buildSubprodutosPanel(interaction, secoes[idx]);
                     return;
@@ -502,7 +502,7 @@ module.exports = {
                     if (idx === -1) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
                     secoes[idx].emoji = emojiId;
                     configuracao.set('vendas.secoes', secoes);
-                    logAction(client, { action: 'Emoji da seção configurado', details: `Seção \`${secoes[idx].nome}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                    logAction(client, { action: 'Emoji da seção configurado', details: `Seção ${secoes[idx].nome}`, userId: interaction.user.id, guildId: interaction.guildId });
                     await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
                     await buildSecaoConfigPanel(interaction, secoes[idx]);
                     return;
@@ -559,7 +559,7 @@ module.exports = {
                     const nomeExcluido = paineis.find(p => p.id === painelId)?.nome || 'Painel';
                     paineis = paineis.filter(p => p.id !== painelId);
                     configuracao.set('vendas.paineis', paineis);
-                    logAction(client, { action: 'Painel excluído', details: `\`${nomeExcluido}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                    logAction(client, { action: 'Painel excluído', details: `${nomeExcluido}`, userId: interaction.user.id, guildId: interaction.guildId });
                     await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
                     await vendasGerenciarPaineis(interaction);
                     return;
@@ -788,7 +788,7 @@ module.exports = {
                     const nova = { id: gerarId(), painelId, nome, descricao: descricao || '', emoji: '', mensagem: '', subprodutos: [] };
                     todasSecoes.push(nova);
                     configuracao.set('vendas.secoes', todasSecoes);
-                    logAction(client, { action: 'Seção adicionada', details: `\`${nome}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                    logAction(client, { action: 'Seção adicionada', details: `${nome}`, userId: interaction.user.id, guildId: interaction.guildId });
                     await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
                     await buildSecaoConfigPanel(interaction, nova);
                     return;
@@ -804,7 +804,7 @@ module.exports = {
                     if (idx === -1) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
                     secoes[idx] = { ...secoes[idx], nome, descricao: descricao || '' };
                     configuracao.set('vendas.secoes', secoes);
-                    logAction(client, { action: 'Seção editada', details: `\`${nome}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                    logAction(client, { action: 'Seção editada', details: `${nome}`, userId: interaction.user.id, guildId: interaction.guildId });
                     await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
                     await buildSecaoConfigPanel(interaction, secoes[idx]);
                     return;
@@ -842,7 +842,7 @@ module.exports = {
                     const novo = { id: gerarId(), nome, descricao: descricao || '', emoji: '', valor: Number(valorRaw).toFixed(2) };
                     secoes[idx].subprodutos = [...(secoes[idx].subprodutos || []), novo];
                     configuracao.set('vendas.secoes', secoes);
-                    logAction(client, { action: 'Subproduto adicionado', details: `\`${nome}\` → R$ ${novo.valor} na seção \`${secoes[idx].nome}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                    logAction(client, { action: 'Subproduto adicionado', details: `${nome} → R$ ${novo.valor} na seção ${secoes[idx].nome}`, userId: interaction.user.id, guildId: interaction.guildId });
                     await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
                     await buildSubprodutosPanel(interaction, secoes[idx]);
                     return;
@@ -868,7 +868,7 @@ module.exports = {
                     if (pi === -1) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Subproduto não encontrado.`, ephemeral: true });
                     secoes[si].subprodutos[pi] = { ...secoes[si].subprodutos[pi], nome, descricao: descricao || '', valor: Number(valorRaw).toFixed(2) };
                     configuracao.set('vendas.secoes', secoes);
-                    logAction(client, { action: 'Subproduto editado', details: `\`${nome}\` → R$ ${Number(valorRaw).toFixed(2)}`, userId: interaction.user.id, guildId: interaction.guildId });
+                    logAction(client, { action: 'Subproduto editado', details: `${nome} → R$ ${Number(valorRaw).toFixed(2)}`, userId: interaction.user.id, guildId: interaction.guildId });
                     await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
                     await buildSubprodutosPanel(interaction, secoes[si]);
                     return;

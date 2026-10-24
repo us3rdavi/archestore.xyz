@@ -204,7 +204,7 @@ function buildFuncaoEmojiScreenEN(userId, nomeFuncao) {
 
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('_ticket_emoji')} Category Emoji — \`${nomeFuncao}\`\n` +
+        `## ${Emojis.get('_ticket_emoji')} Category Emoji — ${nomeFuncao}\n` +
         `${emojiLine}`
     ));
     container.addSeparatorComponents(new SeparatorBuilder());

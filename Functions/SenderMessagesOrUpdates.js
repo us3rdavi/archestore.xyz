@@ -137,7 +137,7 @@ async function MessageCreate(interaction, client) {
                 mensagem = "Cor inválida. Por favor, insira uma cor válida."
             }
 
-            await interaction.followUp({ content: `${Emojis.get(`negative_emoji`)}  Ocorreu um erro ao enviar a mensagem.\n\`${mensagem}\``, ephemeral: true })
+            await interaction.followUp({ content: `${Emojis.get(`negative_emoji`)}  Ocorreu um erro ao enviar a mensagem.\n${mensagem}`, ephemeral: true })
         }
     } else {
         const embed = new EmbedBuilder()
@@ -171,8 +171,8 @@ async function MessageCreate(interaction, client) {
         }
 
         embed.addFields(
-            { name: `Valor à vista`, value: `\`R$ ${Number(yyy.Campos[0].valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\``, inline: true },
-            { name: `Restam`, value: `\`${yyy.Campos[0].estoque.length}\``, inline: true },
+            { name: `Valor à vista`, value: `R$ ${Number(yyy.Campos[0].valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, inline: true },
+            { name: `Restam`, value: `${yyy.Campos[0].estoque.length}`, inline: true },
         );
 
         var estilo = 2
@@ -248,7 +248,7 @@ async function MessageCreate(interaction, client) {
                 ? "Emoji inválido. Por favor, insira um emoji válido."
                 : error.message;
 
-            interaction.followUp({ content: `${Emojis.get(`negative_emoji`)}  Ocorreu um erro ao enviar a mensagem.\n\`${mensagemTraduzida}\``, ephemeral: true })
+            interaction.followUp({ content: `${Emojis.get(`negative_emoji`)}  Ocorreu um erro ao enviar a mensagem.\n${mensagemTraduzida}`, ephemeral: true })
         }
     }
 }
@@ -377,8 +377,8 @@ async function UpdateMessageProduto(client, produto) {
 
         if (ghgh.Campos[0] && typeof ghgh.Campos[0].valor === 'number') {
             embed22.addFields(
-                { name: `Valor à vista`, value: `\`R$ ${ghgh.Campos[0].valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\``, inline: true },
-                { name: `Restam`, value: `\`${ghgh.Campos[0].estoque.length}\``, inline: true }
+                { name: `Valor à vista`, value: `R$ ${ghgh.Campos[0].valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, inline: true },
+                { name: `Restam`, value: `${ghgh.Campos[0].estoque.length}`, inline: true }
             );
         }
 

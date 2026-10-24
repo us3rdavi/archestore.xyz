@@ -28,12 +28,12 @@ async function painelTicket(interaction, useEditReply = false, useReply = false)
     container.addSeparatorComponents(new SeparatorBuilder());
 
     let status = '';
-    status += `${Emojis.get('_ticket_emoji')} **Canal de Tickets:** ${canalTickets ? `<#${canalTickets}>` : `\`Não configurado\``}\n`;
-    status += `${Emojis.get('_messages_emoji')} **Canal de Logs:** ${canalLogs ? `<#${canalLogs}>` : `\`Não configurado\``}\n`;
-    status += `${Emojis.get('_staff_emoji')} **Cargos Staff:** ${staffRoles.length > 0 ? staffRoles.map(r => `<@&${r}>`).join(', ') : `\`Nenhum configurado\``}\n`;
-    status += `${Emojis.get('_folder_emoji')} **Funções:** \`${nFuncoes}\`${nFuncoes > 0 ? ` — ${Object.keys(funcoes).slice(0, 3).join(', ')}${nFuncoes > 3 ? ` +${nFuncoes - 3}` : ''}` : ''}\n`;
-    status += `${Emojis.get('information_emoji')} **Total de Tickets:** \`${contador}\` · **Botões extras:** \`${botoesAdic.length}\`\n`;
-    status += `${Emojis.get('clock_emoji')} **Horário de Atendimento:** ${horarioOn && abertura && fechamento ? `\`${abertura} – ${fechamento}\`` : `\`Desativado\``}`;
+    status += `${Emojis.get('_ticket_emoji')} **Canal de Tickets:** ${canalTickets ? `<#${canalTickets}>` : 'Não configurado'}\n`;
+    status += `${Emojis.get('_messages_emoji')} **Canal de Logs:** ${canalLogs ? `<#${canalLogs}>` : 'Não configurado'}\n`;
+    status += `${Emojis.get('_staff_emoji')} **Cargos Staff:** ${staffRoles.length > 0 ? staffRoles.map(r => `<@&${r}>`).join(', ') : 'Nenhum configurado'}\n`;
+    status += `${Emojis.get('_folder_emoji')} **Funções:** ${nFuncoes}${nFuncoes > 0 ? ` — ${Object.keys(funcoes).slice(0, 3).join(', ')}${nFuncoes > 3 ? ` +${nFuncoes - 3}` : ''}` : ''}\n`;
+    status += `${Emojis.get('information_emoji')} **Total de Tickets:** ${contador} · **Botões extras:** ${botoesAdic.length}\n`;
+    status += `${Emojis.get('clock_emoji')} **Horário de Atendimento:** ${horarioOn && abertura && fechamento ? `${abertura} – ${fechamento}` : 'Desativado'}`;
 
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(status));
 
@@ -117,12 +117,12 @@ async function painelConfiguracaoTicket(interaction) {
     const warn = Emojis.get('_flag_emoji');
 
     let info = '';
-    info += `${Emojis.get('_ticket_emoji')} **Canal de Tickets:** ${canalTickets ? `<#${canalTickets}>` : `${warn} \`Não configurado\``}\n`;
-    info += `${Emojis.get('_messages_emoji')} **Canal de Logs:** ${canalLogs ? `<#${canalLogs}>` : `${warn} \`Não configurado\``}\n`;
-    info += `${Emojis.get('_staff_emoji')} **Cargos Staff:** ${staffRoles.length > 0 ? `${tick} ${staffRoles.map(r => `<@&${r}>`).join(', ')}` : `${warn} \`Nenhum configurado\``}\n`;
-    info += `${Emojis.get('_pincel_emoji')} **Msg. Inicial:** ${msgInicial.msgTitulo ? `${tick} \`${msgInicial.msgTitulo}\`` : `${warn} \`Padrão\``}\n`;
-    info += `${Emojis.get('_confirm_emoji')} **Msg. Finalização:** ${msgFinal.titulo ? `${tick} \`${msgFinal.titulo}\`` : `${warn} \`Padrão\``}\n`;
-    info += `${Emojis.get('_add_emoji')} **Botões de Link:** \`${botoesAdic.length}/5\``;
+    info += `${Emojis.get('_ticket_emoji')} **Canal de Tickets:** ${canalTickets ? `<#${canalTickets}>` : `${warn} Não configurado`}\n`;
+    info += `${Emojis.get('_messages_emoji')} **Canal de Logs:** ${canalLogs ? `<#${canalLogs}>` : `${warn} Não configurado`}\n`;
+    info += `${Emojis.get('_staff_emoji')} **Cargos Staff:** ${staffRoles.length > 0 ? `${tick} ${staffRoles.map(r => `<@&${r}>`).join(', ')}` : `${warn} Nenhum configurado`}\n`;
+    info += `${Emojis.get('_pincel_emoji')} **Msg. Inicial:** ${msgInicial.msgTitulo ? `${tick} ${msgInicial.msgTitulo}` : `${warn} Padrão`}\n`;
+    info += `${Emojis.get('_confirm_emoji')} **Msg. Finalização:** ${msgFinal.titulo ? `${tick} ${msgFinal.titulo}` : `${warn} Padrão`}\n`;
+    info += `${Emojis.get('_add_emoji')} **Botões de Link:** ${botoesAdic.length}/5`;
 
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(info));
 

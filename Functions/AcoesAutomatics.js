@@ -95,9 +95,9 @@ async function SistemaAntiFake(interaction, client) {
         `-# Bloqueio de contas suspeitas ou recentes\n\n`;
 
     if (AntiFake) {
-        desc += `${Emojis.get('clock_emoji')} **Dias Mínimos de Conta:** \`${AntiFake?.diasminimos ?? 'Não definido'}\`\n` +
-            `${Emojis.get('_ban_emoji')} **Status Bloqueados:** \`${AntiFake?.status?.length > 0 ? AntiFake.status.join(', ') : 'Nenhum'}\`\n` +
-            `${Emojis.get('negative_emoji')} **Nomes Bloqueados:** \`${AntiFake?.nomes?.length > 0 ? AntiFake.nomes.join(', ') : 'Nenhum'}\``;
+        desc += `${Emojis.get('clock_emoji')} **Dias Mínimos de Conta:** ${AntiFake?.diasminimos ?? 'Não definido'}\n` +
+            `${Emojis.get('_ban_emoji')} **Status Bloqueados:** ${AntiFake?.status?.length > 0 ? AntiFake.status.join(', ') : 'Nenhum'}\n` +
+            `${Emojis.get('negative_emoji')} **Nomes Bloqueados:** ${AntiFake?.nomes?.length > 0 ? AntiFake.nomes.join(', ') : 'Nenhum'}`;
     } else {
         desc += `${Emojis.get('information_emoji')} Nenhuma configuração salva ainda.`;
     }
@@ -149,21 +149,21 @@ async function sistemaAntiRaid(interaction, client) {
     let desc = `## ${Emojis.get('system_emoji')} Anti-Raid — ${AntiRaid?.status ? `HABILITADO` : `DESABILITADO`}\n` +
         `-# Proteção contra ataques de raid no servidor\n\n` +
         `**Canal de Logs:** ${AntiRaid?.canallogs ? `<#${AntiRaid.canallogs}>` : '`Não Definido`'}\n` +
-        `**Proteção de Convite:** \`${AntiRaid?.convitepersonalizado ? `Sua URL está Protegida` : `Sua URL NÃO está Protegida`}\`\n` +
-        `**Método de Punição:** \`${metodopunicao}\``;
+        `**Proteção de Convite:** ${AntiRaid?.convitepersonalizado ? `Sua URL está Protegida` : `Sua URL NÃO está Protegida`}\n` +
+        `**Método de Punição:** ${metodopunicao}`;
 
     if (AntiRaid?.cargos?.length > 0) {
         desc += `\n\n**Cargos Imunes:**\n${AntiRaid.cargos.map(c => `<@&${c}>`).join('\n')}`;
     }
 
-    desc += `\n\n**Proteção de Cargos Deletados [\`${AntiRaid?.ExclusaoCargos?.status ? `ON` : `OFF`}\`]:**\n` +
-        `O usuário poderá excluir \`${AntiRaid?.ExclusaoCargos?.quantidadeporminuto || 0}\` por minuto e \`${AntiRaid?.ExclusaoCargos?.quantidadeporhora || 0}\` por hora.\n` +
-        `**Proteção de Canais Deletados [\`${AntiRaid?.ExclusaoCanais?.status ? `ON` : `OFF`}\`]:**\n` +
-        `O usuário poderá excluir \`${AntiRaid?.ExclusaoCanais?.quantidadeporminuto || 0}\` por minuto e \`${AntiRaid?.ExclusaoCanais?.quantidadeporhora || 0}\` por hora.\n` +
-        `**Proteção de Banimentos [\`${AntiRaid?.Banimento?.status ? `ON` : `OFF`}\`]:**\n` +
-        `O usuário poderá banir \`${AntiRaid?.Banimento?.quantidadeporminuto || 0}\` por minuto e \`${AntiRaid?.Banimento?.quantidadeporhora || 0}\` por hora.\n` +
-        `**Proteção de Expulsões [\`${AntiRaid?.Expulsao?.status ? `ON` : `OFF`}\`]:**\n` +
-        `O usuário poderá expulsar \`${AntiRaid?.Expulsao?.quantidadeporminuto || 0}\` por minuto e \`${AntiRaid?.Expulsao?.quantidadeporhora || 0}\` por hora.`;
+    desc += `\n\n**Proteção de Cargos Deletados [${AntiRaid?.ExclusaoCargos?.status ? `ON` : `OFF`}]:**\n` +
+        `O usuário poderá excluir ${AntiRaid?.ExclusaoCargos?.quantidadeporminuto || 0} por minuto e ${AntiRaid?.ExclusaoCargos?.quantidadeporhora || 0} por hora.\n` +
+        `**Proteção de Canais Deletados [${AntiRaid?.ExclusaoCanais?.status ? `ON` : `OFF`}]:**\n` +
+        `O usuário poderá excluir ${AntiRaid?.ExclusaoCanais?.quantidadeporminuto || 0} por minuto e ${AntiRaid?.ExclusaoCanais?.quantidadeporhora || 0} por hora.\n` +
+        `**Proteção de Banimentos [${AntiRaid?.Banimento?.status ? `ON` : `OFF`}]:**\n` +
+        `O usuário poderá banir ${AntiRaid?.Banimento?.quantidadeporminuto || 0} por minuto e ${AntiRaid?.Banimento?.quantidadeporhora || 0} por hora.\n` +
+        `**Proteção de Expulsões [${AntiRaid?.Expulsao?.status ? `ON` : `OFF`}]:**\n` +
+        `O usuário poderá expulsar ${AntiRaid?.Expulsao?.quantidadeporminuto || 0} por minuto e ${AntiRaid?.Expulsao?.quantidadeporhora || 0} por hora.`;
 
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(desc));
     container.addSeparatorComponents(new SeparatorBuilder());
@@ -271,15 +271,15 @@ async function LimpezaAutomatica(interaction, client) {
         };
         const st = execucoes.status ? Emojis.get('confirmed_emoji') : Emojis.get('negative_emoji');
         desc += `${st} **Status:** ${execucoes.status ? 'Ativo' : 'Inativo'}\n` +
-            `${Emojis.get('clock_emoji')} **Execuções:** \`${execucoes.primeira}\` (próx. <t:${toTimestamp(execucoes.primeira)}:R>) · \`${execucoes.segunda}\` (próx. <t:${toTimestamp(execucoes.segunda)}:R>)\n`;
+            `${Emojis.get('clock_emoji')} **Execuções:** ${execucoes.primeira} (próx. <t:${toTimestamp(execucoes.primeira)}:R>) · ${execucoes.segunda} (próx. <t:${toTimestamp(execucoes.segunda)}:R>)\n`;
     } else {
-        desc += `${Emojis.get('clock_emoji')} **Horários:** \`Não configurados\`\n`;
+        desc += `${Emojis.get('clock_emoji')} **Horários:** Não configurados\n`;
     }
 
     if (canais?.length > 0) {
         desc += `${Emojis.get('_folder_emoji')} **Canais:** ${canais.map(c => `<#${c}>`).join(', ')}`;
     } else {
-        desc += `${Emojis.get('_folder_emoji')} **Canais:** \`Nenhum configurado\``;
+        desc += `${Emojis.get('_folder_emoji')} **Canais:** Nenhum configurado`;
     }
 
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(desc));
@@ -345,16 +345,16 @@ async function GerenciarCanais(interaction, client) {
         };
         const st = execucoes.status ? Emojis.get('confirmed_emoji') : Emojis.get('negative_emoji');
         desc += `${st} **Status:** ${execucoes.status ? 'Ativo' : 'Inativo'}\n` +
-            `${Emojis.get('clock_emoji')} **Abertura:** \`${execucoes.abertura}\` — <t:${toTimestamp(execucoes.abertura)}:R>\n` +
-            `${Emojis.get('clock_emoji')} **Fechamento:** \`${execucoes.fechamento}\` — <t:${toTimestamp(execucoes.fechamento)}:R>\n`;
+            `${Emojis.get('clock_emoji')} **Abertura:** ${execucoes.abertura} — <t:${toTimestamp(execucoes.abertura)}:R>\n` +
+            `${Emojis.get('clock_emoji')} **Fechamento:** ${execucoes.fechamento} — <t:${toTimestamp(execucoes.fechamento)}:R>\n`;
     } else {
-        desc += `${Emojis.get('clock_emoji')} **Horários:** \`Não configurados\`\n`;
+        desc += `${Emojis.get('clock_emoji')} **Horários:** Não configurados\n`;
     }
 
     if (canais?.length > 0) {
         desc += `${Emojis.get('_folder_emoji')} **Canais:** ${canais.map(c => `<#${c}>`).join(', ')}`;
     } else {
-        desc += `${Emojis.get('_folder_emoji')} **Canais:** \`Nenhum configurado\``;
+        desc += `${Emojis.get('_folder_emoji')} **Canais:** Nenhum configurado`;
     }
 
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(desc));
@@ -420,15 +420,15 @@ async function SistemaNukar(interaction, client) {
     let infoLines = `${statusEmoji} **Status:** ${statusText}\n`;
 
     if (execucoes?.horario) {
-        infoLines += `${Emojis.get('clock_emoji')} **Horário:** \`${execucoes.horario}\` — próx. execução <t:${toTimestamp(execucoes.horario)}:R>\n`;
+        infoLines += `${Emojis.get('clock_emoji')} **Horário:** ${execucoes.horario} — próx. execução <t:${toTimestamp(execucoes.horario)}:R>\n`;
     } else {
-        infoLines += `${Emojis.get('clock_emoji')} **Horário:** \`Não definido\`\n`;
+        infoLines += `${Emojis.get('clock_emoji')} **Horário:** Não definido\n`;
     }
 
     if (canais?.length > 0) {
         infoLines += `${Emojis.get('_folder_emoji')} **Canais:** ${canais.map(c => `<#${c}>`).join(', ')}`;
     } else {
-        infoLines += `${Emojis.get('_folder_emoji')} **Canais:** \`Nenhum configurado\``;
+        infoLines += `${Emojis.get('_folder_emoji')} **Canais:** Nenhum configurado`;
     }
 
     const container = new ContainerBuilder();
@@ -498,8 +498,8 @@ async function SistemadeFiltro(interaction, client) {
 
         const st = info?.status ? Emojis.get('confirmed_emoji') : Emojis.get('negative_emoji');
         desc += `${st} **Status:** ${info?.status ? 'Ativo' : 'Inativo'}\n` +
-            `${Emojis.get('_ban_emoji')} **Punição:** \`${info?.punicao ? info.punicao.charAt(0).toUpperCase() + info.punicao.slice(1) : 'Sem punição'}\`\n` +
-            `${Emojis.get('clock_emoji')} **Tempo:** \`${tempo}\`\n`;
+            `${Emojis.get('_ban_emoji')} **Punição:** ${info?.punicao ? info.punicao.charAt(0).toUpperCase() + info.punicao.slice(1) : 'Sem punição'}\n` +
+            `${Emojis.get('clock_emoji')} **Tempo:** ${tempo}\n`;
     } else {
         desc += `${Emojis.get('information_emoji')} Nenhuma configuração salva ainda.\n`;
     }
@@ -513,9 +513,9 @@ async function SistemadeFiltro(interaction, client) {
     }
 
     if (info?.links?.length > 0 || info?.palavras?.length > 0) {
-        let strFiltros = `\n\n**Informações de Filtros:**\nFiltrar Convites: \`${info?.convites ? 'Ativo' : 'Inativo'}\``;
-        if (info.links?.length > 0) strFiltros += `\nLinks: \`${info.links.join(', ')}\``;
-        if (info.palavras?.length > 0) strFiltros += `\nPalavras: \`${info.palavras.join(', ')}\``;
+        let strFiltros = `\n\n**Informações de Filtros:**\nFiltrar Convites: ${info?.convites ? 'Ativo' : 'Inativo'}`;
+        if (info.links?.length > 0) strFiltros += `\nLinks: ${info.links.join(', ')}`;
+        if (info.palavras?.length > 0) strFiltros += `\nPalavras: ${info.palavras.join(', ')}`;
         desc += strFiltros;
     }
 
@@ -578,10 +578,10 @@ async function msgbemvindo(interaction, client) {
     }
 
     let desc = `## ${Emojis.get('_messages_emoji')} Boas Vindas\n-# Mensagem enviada quando novos membros entram no servidor\n\n` +
-        `${Emojis.get('_messages_emoji')} **Mensagem:**\n${msg ? preview : `\`Não definido\``}`;
+        `${Emojis.get('_messages_emoji')} **Mensagem:**\n${msg ? preview : `Não definido`}`;
 
     if (configuracao.get(`Entradas.tempo`)) {
-        desc += `\n${Emojis.get('clock_emoji')} **Tempo de exibição:** \`${configuracao.get(`Entradas.tempo`)} segundos\``;
+        desc += `\n${Emojis.get('clock_emoji')} **Tempo de exibição:** ${configuracao.get(`Entradas.tempo`)} segundos`;
     }
 
     const canais = configuracao.get(`Entradas.canais`) || [];
@@ -635,7 +635,7 @@ async function msgbemvindocanais(interaction, client) {
 
     let desc = `## ${Emojis.get('_messages_emoji')} Canais de Boas Vindas\n` +
         `-# Canais onde as mensagens de boas vindas serão enviadas\n\n` +
-        `${Emojis.get('_folder_emoji')} **Canais configurados:** \`${canais.length}\``;
+        `${Emojis.get('_folder_emoji')} **Canais configurados:** ${canais.length}`;
 
     if (canais.length > 0) {
         desc += `\n${canais.map(c => `<#${c}>`).join('\n')}`;

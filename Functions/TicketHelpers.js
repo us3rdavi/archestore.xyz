@@ -185,7 +185,7 @@ function buildStaffPanelContainer(ticketData) {
 
     const assumidoText = ticketData.assumidoPor
         ? `<@${ticketData.staffMemberId}>`
-        : `\`Aguardando atendimento\``;
+        : `Aguardando atendimento`;
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(

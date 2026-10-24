@@ -90,7 +90,7 @@ async function updateConfigContainer(interaction, client) {
         content += `Nenhuma mensagem automática configurada.`;
     } else {
         for (const data of msgData) {
-            content += `\n**ID:** \`${data.id}\` | **Mensagem:** ${data.message}\n**Chats:** ${data.chatIds.join(', ')} | **Deletar:** \`${data.deleteTime}s\` | **Repostar:** \`${data.repostTime}s\`\n`;
+            content += `\n**ID:** \`${data.id}\` | **Mensagem:** ${data.message}\n**Chats:** ${data.chatIds.join(', ')} | **Deletar:** ${data.deleteTime}s | **Repostar:** ${data.repostTime}s\n`;
         }
     }
 

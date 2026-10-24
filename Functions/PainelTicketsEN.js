@@ -28,12 +28,12 @@ async function painelTicketEN(interaction, useEditReply = false, useReply = fals
     container.addSeparatorComponents(new SeparatorBuilder());
 
     let status = '';
-    status += `${Emojis.get('_ticket_emoji')} **Ticket Channel:** ${canalTickets ? `<#${canalTickets}>` : `\`Not configured\``}\n`;
-    status += `${Emojis.get('_messages_emoji')} **Logs Channel:** ${canalLogs ? `<#${canalLogs}>` : `\`Not configured\``}\n`;
-    status += `${Emojis.get('_staff_emoji')} **Staff Roles:** ${staffRoles.length > 0 ? staffRoles.map(r => `<@&${r}>`).join(', ') : `\`None configured\``}\n`;
-    status += `${Emojis.get('_folder_emoji')} **Categories:** \`${nFuncoes}\`${nFuncoes > 0 ? ` — ${Object.keys(funcoes).slice(0, 3).join(', ')}${nFuncoes > 3 ? ` +${nFuncoes - 3}` : ''}` : ''}\n`;
-    status += `${Emojis.get('information_emoji')} **Total Tickets:** \`${contador}\` · **Extra buttons:** \`${botoesAdic.length}\`\n`;
-    status += `${Emojis.get('clock_emoji')} **Service Hours:** ${horarioOn && abertura && fechamento ? `\`${abertura} – ${fechamento}\`` : `\`Disabled\``}`;
+    status += `${Emojis.get('_ticket_emoji')} **Ticket Channel:** ${canalTickets ? `<#${canalTickets}>` : 'Not configured'}\n`;
+    status += `${Emojis.get('_messages_emoji')} **Logs Channel:** ${canalLogs ? `<#${canalLogs}>` : 'Not configured'}\n`;
+    status += `${Emojis.get('_staff_emoji')} **Staff Roles:** ${staffRoles.length > 0 ? staffRoles.map(r => `<@&${r}>`).join(', ') : 'None configured'}\n`;
+    status += `${Emojis.get('_folder_emoji')} **Categories:** ${nFuncoes}${nFuncoes > 0 ? ` — ${Object.keys(funcoes).slice(0, 3).join(', ')}${nFuncoes > 3 ? ` +${nFuncoes - 3}` : ''}` : ''}\n`;
+    status += `${Emojis.get('information_emoji')} **Total Tickets:** ${contador} · **Extra buttons:** ${botoesAdic.length}\n`;
+    status += `${Emojis.get('clock_emoji')} **Service Hours:** ${horarioOn && abertura && fechamento ? `${abertura} – ${fechamento}` : 'Disabled'}`;
 
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(status));
 
@@ -117,12 +117,12 @@ async function painelConfiguracaoTicketEN(interaction) {
     const warn = Emojis.get('_flag_emoji');
 
     let info = '';
-    info += `${Emojis.get('_ticket_emoji')} **Ticket Channel:** ${canalTickets ? `<#${canalTickets}>` : `${warn} \`Not configured\``}\n`;
-    info += `${Emojis.get('_messages_emoji')} **Logs Channel:** ${canalLogs ? `<#${canalLogs}>` : `${warn} \`Not configured\``}\n`;
-    info += `${Emojis.get('_staff_emoji')} **Staff Roles:** ${staffRoles.length > 0 ? `${tick} ${staffRoles.map(r => `<@&${r}>`).join(', ')}` : `${warn} \`None configured\``}\n`;
-    info += `${Emojis.get('_pincel_emoji')} **Initial Message:** ${msgInicial.msgTitulo ? `${tick} \`${msgInicial.msgTitulo}\`` : `${warn} \`Default\``}\n`;
-    info += `${Emojis.get('_confirm_emoji')} **Closing Message:** ${msgFinal.titulo ? `${tick} \`${msgFinal.titulo}\`` : `${warn} \`Default\``}\n`;
-    info += `${Emojis.get('_add_emoji')} **Link Buttons:** \`${botoesAdic.length}/5\``;
+    info += `${Emojis.get('_ticket_emoji')} **Ticket Channel:** ${canalTickets ? `<#${canalTickets}>` : `${warn} Not configured`}\n`;
+    info += `${Emojis.get('_messages_emoji')} **Logs Channel:** ${canalLogs ? `<#${canalLogs}>` : `${warn} Not configured`}\n`;
+    info += `${Emojis.get('_staff_emoji')} **Staff Roles:** ${staffRoles.length > 0 ? `${tick} ${staffRoles.map(r => `<@&${r}>`).join(', ')}` : `${warn} None configured`}\n`;
+    info += `${Emojis.get('_pincel_emoji')} **Initial Message:** ${msgInicial.msgTitulo ? `${tick} ${msgInicial.msgTitulo}` : `${warn} Default`}\n`;
+    info += `${Emojis.get('_confirm_emoji')} **Closing Message:** ${msgFinal.titulo ? `${tick} ${msgFinal.titulo}` : `${warn} Default`}\n`;
+    info += `${Emojis.get('_add_emoji')} **Link Buttons:** ${botoesAdic.length}/5`;
 
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(info));
 

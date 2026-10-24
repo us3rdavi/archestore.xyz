@@ -28,35 +28,35 @@ module.exports = {
                     if (regexPadrao.test(a1)) {
                         configuracao.set(`Cores.Principal`, a1)
                     } else {
-                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Cor \`${a1}\` inválida (Principal).` })
+                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Cor ${a1} inválida (Principal).` })
                     }
                 }
                 if (a2 !== '') {
                     if (regexPadrao.test(a2)) {
                         configuracao.set(`Cores.Processamento`, a2)
                     } else {
-                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Cor \`${a2}\` inválida (Processamento).` })
+                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Cor ${a2} inválida (Processamento).` })
                     }
                 }
                 if (a3 !== '') {
                     if (regexPadrao.test(a3)) {
                         configuracao.set(`Cores.Sucesso`, a3)
                     } else {
-                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Cor \`${a3}\` inválida (Sucesso).` })
+                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Cor ${a3} inválida (Sucesso).` })
                     }
                 }
                 if (a4 !== '') {
                     if (regexPadrao.test(a4)) {
                         configuracao.set(`Cores.Erro`, a4)
                     } else {
-                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Cor \`${a4}\` inválida (Falha).` })
+                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Cor ${a4} inválida (Falha).` })
                     }
                 }
                 if (a5 !== '') {
                     if (regexPadrao.test(a5)) {
                         configuracao.set(`Cores.Finalizado`, a5)
                     } else {
-                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Cor \`${a5}\` inválida (Finalizado).` })
+                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Cor ${a5} inválida (Finalizado).` })
                     }
                 }
 
@@ -76,14 +76,14 @@ module.exports = {
                     try {
                         await client.user.setUsername(a1)
                     } catch (error) {
-                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Nome inserido \`${a1}\` inválido ou então você alterou mais de 3 vezes o nome em 1 hora!` })
+                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Nome inserido ${a1} inválido ou então você alterou mais de 3 vezes o nome em 1 hora!` })
                     }
                 }
                 if (a2 !== '') {
                     try {
                         await client.user.setAvatar(a2)
                     } catch (error) {
-                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Avatar inserido \`${a2}\` inválido.` })
+                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Avatar inserido ${a2} inválido.` })
                     }
                 }
 
@@ -172,7 +172,7 @@ module.exports = {
             
                 preco = parseFloat(preco.replace(",", "."));
                 if (isNaN(preco)) {
-                    return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Preço inserido \`${preco}\` inválido.` });
+                    return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Preço inserido ${preco} inválido.` });
                 }
             
                 if (ggg.camposelect !== nomecampo) {
@@ -217,14 +217,14 @@ module.exports = {
                 if (valorminimo !== '') {
                     valorminimo = parseInt(valorminimo, 10);
                     if (!Number.isInteger(valorminimo)) {
-                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Quantidade inserida \`${valorminimo}\` inválido. Insira apenas números inteiros.` });
+                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Quantidade inserida ${valorminimo} inválido. Insira apenas números inteiros.` });
                     }
                 }
 
                 if (valormaximo !== '') {
                     valormaximo = parseInt(valormaximo, 10);
                     if (!Number.isInteger(valormaximo)) {
-                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Quantidade inserida \`${valormaximo}\` inválido. Insira apenas números inteiros.` });
+                        return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)} Quantidade inserida ${valormaximo} inválido. Insira apenas números inteiros.` });
                     }
                 }
 
@@ -273,7 +273,7 @@ module.exports = {
 
                 interaction.reply({
                     components: [row4],
-                    content: `Total de \`${linhas.length}\` itens detectados, cada item será adicionado como um produto no estoque de \`${ggg.camposelect}\`, exemplo:\`\`\`${linhasNumeradas.join('\n')}\`\`\`\nEsse valor será entregue como **uma** unidade para o cliente.\n**Deseja adicionar o valor de \`${linhas.length}\` itens ao estoque de \`${ggg.camposelect}\`?**`,
+                    content: `Total de ${linhas.length} itens detectados, cada item será adicionado como um produto no estoque de ${ggg.camposelect}, exemplo:\`\`\`${linhasNumeradas.join('\n')}\`\`\`\nEsse valor será entregue como **uma** unidade para o cliente.\n**Deseja adicionar o valor de ${linhas.length} itens ao estoque de ${ggg.camposelect}?**`,
                     ephemeral: true
                 }).then(async msg222 => {
                     await db.set(`${interaction.user.id}.delimitadorStock`, { estoque: idcargo, delimitador: null, produto: ggg.name, campo: ggg.camposelect });
@@ -346,10 +346,10 @@ module.exports = {
 
                 interaction.update({
                     content: `
-                Seu delimitador agora é \`${delimitador == '' ? `Não Definido` : delimitador}\`, cade item será adicionado como um produto no estoque de \`${ggg22.campo}\`, exemplo:\n\`${arraysSeparados2222}\`
+                Seu delimitador agora é ${delimitador == '' ? `Não Definido` : delimitador}, cada item será adicionado como um produto no estoque de ${ggg22.campo}, exemplo:\n${arraysSeparados2222}
                 
 Esse valor será entregue como **uma** unidade para o cliente.
-**Deseja adicionar o valor de \`${qtdlinhas}\`\ itens ao estoque de \`${ggg22.campo}\`?**
+**Deseja adicionar o valor de ${qtdlinhas} itens ao estoque de ${ggg22.campo}?**
                                     `})
 
             }
@@ -363,7 +363,7 @@ Esse valor será entregue como **uma** unidade para o cliente.
 
                 if (qtd > 100000) return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Não foi possível adicionar esse estoque.`, ephemeral: true })
 
-                if (isNaN(qtd)) return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Esse número não é válido \`${qtd}\`.`, ephemeral: true })
+                if (isNaN(qtd)) return interaction.reply({ content: `${Emojis.get(`negative_emoji`)} Esse número não é válido ${qtd}.`, ephemeral: true })
 
                 const arrayItens = [];
                 if (produto == '') {
@@ -413,7 +413,7 @@ Esse valor será entregue como **uma** unidade para o cliente.
 
                     })
 
-                    await tt.edit({ content: `${Emojis.get(`confirmed_emoji`)} Total de \`${qtd}\` itens fantasma adicionado ao estoque.`, ephemeral: true })
+                    await tt.edit({ content: `${Emojis.get(`confirmed_emoji`)} Total de ${qtd} itens fantasma adicionado ao estoque.`, ephemeral: true })
                 })
 
 
@@ -578,7 +578,7 @@ if (interaction.customId === 'estoquearquivo') {
 
                 await modalInteraction.reply({
                     components: [row4],
-                    content: `Total de \`${lines.length}\` itens detectados. Cada item será adicionado como um produto no estoque de \`${ggg.camposelect}\`. Exemplo:\n\`\`\`${lines[0]}\`\`\`\nEsse valor será entregue como **uma** unidade para o cliente.\n**Deseja adicionar o valor de \`${lines.length}\` itens ao estoque de \`${ggg.camposelect}\`?**`,
+                    content: `Total de ${lines.length} itens detectados. Cada item será adicionado como um produto no estoque de ${ggg.camposelect}. Exemplo:\n\`\`\`${lines[0]}\`\`\`\nEsse valor será entregue como **uma** unidade para o cliente.\n**Deseja adicionar o valor de ${lines.length} itens ao estoque de ${ggg.camposelect}?**`,
                     ephemeral: true
                 });
 
@@ -748,7 +748,7 @@ if (interaction.customId === 'estoquearquivo') {
                             )
 
 
-                        await member.send({ components: [row4], content: `# ${gggaaa.Nome} Foi reeabastecido!\n- Olá <@${element}>, vim lhe anunciar que graças ao \`${interaction.user.username}\`, o produto \`${gggaaa.Nome}\` teve \`${qtd}\` itens reeabastecidos.` })
+                        await member.send({ components: [row4], content: `# ${gggaaa.Nome} Foi reeabastecido!\n- Olá <@${element}>, vim lhe anunciar que graças ao ${interaction.user.username}, o produto ${gggaaa.Nome} teve ${qtd} itens reeabastecidos.` })
                     } catch (error) {
 
                     }
@@ -845,7 +845,7 @@ if (interaction.customId === 'estoquearquivo') {
                                 attachment: fileBuffer,
                                 name: fileName
                             }],
-                            content: `Estoque anexado na mensagem abaixo, total de \`${gggaaa.estoque.length}\` itens. `
+                            content: `Estoque anexado na mensagem abaixo, total de ${gggaaa.estoque.length} itens. `
                         })
 
 

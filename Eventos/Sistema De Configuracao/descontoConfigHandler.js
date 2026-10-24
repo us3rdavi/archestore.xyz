@@ -25,7 +25,7 @@ async function descontoPainel(interaction) {
             const val   = d.tipo === 'percent' ? `${d.valor}%` : formatBRL(d.valor);
             const usos  = d.usosMax ? `${d.usos}/${d.usosMax}` : `${d.usos} (ilimitado)`;
             const status = d.ativo !== false ? Emojis.get('confirmed_emoji') : Emojis.get('negative_emoji');
-            return `**${i + 1}.** ${status} \`${d.codigo}\` — \`${val}\` — usos: \`${usos}\`\n-# ${d.nome}`;
+            return `**${i + 1}.** ${status} \`${d.codigo}\` — ${val} — usos: ${usos}\n-# ${d.nome}`;
         }).join('\n\n');
 
     const container = new ContainerBuilder();
@@ -158,7 +158,7 @@ module.exports = {
                     await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
                     await descontoPainel(interaction);
                     try {
-                        await interaction.followUp({ content: `${Emojis.get('confirmed_emoji')} Cupom \`${novo.codigo}\` criado com sucesso! Desconto: \`${val}\`.`, ephemeral: true });
+                        await interaction.followUp({ content: `${Emojis.get('confirmed_emoji')} Cupom \`${novo.codigo}\` criado com sucesso! Desconto: ${val}.`, ephemeral: true });
                     } catch (e) { }
                 } catch (err) {
                     return interaction.reply({ content: `${Emojis.get('negative_emoji')} ${err.message}`, ephemeral: true });

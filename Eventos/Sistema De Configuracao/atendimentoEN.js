@@ -30,9 +30,9 @@ async function AtendimentohorarioEN(interaction) {
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-            `${statusEmoji} **Status:** \`${statusLabel}\`\n` +
-            `${Emojis.get('_add_emoji')} **Opening:** \`${abertura}\`\n` +
-            `${Emojis.get('_trash_emoji')} **Closing:** \`${fechamento}\`\n\n` +
+            `${statusEmoji} **Status:** ${statusLabel}\n` +
+            `${Emojis.get('_add_emoji')} **Opening:** ${abertura}\n` +
+            `${Emojis.get('_trash_emoji')} **Closing:** ${fechamento}\n\n` +
             `-# When enabled, tickets can only be opened within the configured hours (Brasília time).`
         )
     );

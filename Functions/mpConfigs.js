@@ -16,8 +16,8 @@ async function mpConfigs(interaction) {
 
     const mpAPIValue = configuracao.get('pagamentos.MpAPI');
     const maskedMpAPI = mpAPIValue && mpAPIValue !== ''
-        ? `\`${mpAPIValue.slice(0, 30) + '*****************'}\``
-        : `\`APP_USR-000000000000000-XXXXXXX\``;
+        ? `${mpAPIValue.slice(0, 30) + '*****************'}`
+        : `APP_USR-000000000000000-XXXXXXX`;
 
     const pixStatus = configuracao.get('pagamentos.MpOnOff');
     const siteStatus = configuracao.get('pagamentos.MpSite');
@@ -32,7 +32,7 @@ async function mpConfigs(interaction) {
         `${Emojis.get('card_stamp_emoji')} **Site:** ${siteStatus ? `${Emojis.get('confirmed_emoji')} Ativo` : `${Emojis.get('negative_emoji')} Desabilitado`}\n` +
         `${Emojis.get('brand_emoji')} **Tempo para pagar:** ${Emojis.get('clock_emoji')} ${configuracao.get('ConfigCarrinho.inatividade')} minutos\n` +
         `${Emojis.get('_mp_emoji')} **Access Token:** *Não compartilhe com ninguém*\n${maskedMpAPI}\n` +
-        `${Emojis.get('_fixe_emoji')} **Bancos Bloqueados:** ${blockedBanksArray.length <= 0 ? 'Nenhum' : `\`${BancosBloqueados}\``}`
+        `${Emojis.get('_fixe_emoji')} **Bancos Bloqueados:** ${blockedBanksArray.length <= 0 ? 'Nenhum' : BancosBloqueados}`
     ));
 
     container.addSeparatorComponents(new SeparatorBuilder());

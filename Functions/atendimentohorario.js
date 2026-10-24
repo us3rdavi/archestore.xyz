@@ -27,9 +27,9 @@ async function Atendimentohorario(interaction, client) {
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-            `${statusEmoji} **Status:** \`${statusLabel}\`\n` +
-            `${Emojis.get('_add_emoji')} **Abertura:** \`${abertura}\`\n` +
-            `${Emojis.get('_trash_emoji')} **Fechamento:** \`${fechamento}\`\n\n` +
+            `${statusEmoji} **Status:** ${statusLabel}\n` +
+            `${Emojis.get('_add_emoji')} **Abertura:** ${abertura}\n` +
+            `${Emojis.get('_trash_emoji')} **Fechamento:** ${fechamento}\n\n` +
             `-# Quando ativado, tickets só podem ser abertos dentro do horário configurado (horário de Brasília).`
         )
     );

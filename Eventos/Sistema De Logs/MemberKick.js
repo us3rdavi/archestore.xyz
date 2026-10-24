@@ -43,9 +43,9 @@ module.exports = {
                     .setColor(configuracao.get('Cores.Principal') || '5865F2')
                     .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
                     .addFields(
-                        { name: `Moderador:`, value: `\`${executor}\`\n<@!${logEntry.executor.id}>`, inline: true },
-                        { name: `Usuário:`, value: `\`${member.user.tag}\`\n<@!${member.user.id}>`, inline: true },
-                        { name: `Motivo:`, value: `\`Sistema AntiRaid\``, inline: false },
+                        { name: `Moderador:`, value: `${executor}\n<@!${logEntry.executor.id}>`, inline: true },
+                        { name: `Usuário:`, value: `${member.user.tag}\n<@!${member.user.id}>`, inline: true },
+                        { name: `Motivo:`, value: `Sistema AntiRaid`, inline: false },
                     )
                     .setFooter({ text: `ID do Usuário: ${member.user.id}` })
                     .setTimestamp();

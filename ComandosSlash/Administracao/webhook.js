@@ -45,7 +45,7 @@ async function buildWebhookPanel(interaction, channel) {
 
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `${Emojis.get('_messages_emoji')} **Canal selecionado:** ${ch}\n` +
-        `${Emojis.get('information_emoji')} **Webhooks existentes:** \`${webhookCount}\`` +
+        `${Emojis.get('information_emoji')} **Webhooks existentes:** ${webhookCount}` +
         (webhookCount > 0 ? webhookLines : `\n-# Nenhum webhook neste canal ainda.`)
     ));
 

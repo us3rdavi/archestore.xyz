@@ -71,7 +71,7 @@ module.exports = {
 
                 await definirduvidas(interaction, client)
                 await interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Botão de dúvidas definido com sucesso!`, ephemeral: true });
-                logAction(client, { action: 'Botão de Dúvidas configurado', details: `Emoji: \`${emoji || 'nenhum'}\`, Nome: \`${nomebotao || 'nenhum'}\`, Link: \`${linkbotao || 'nenhum'}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                logAction(client, { action: 'Botão de Dúvidas configurado', details: `Emoji: ${emoji || 'nenhum'}, Nome: ${nomebotao || 'nenhum'}, Link: ${linkbotao || 'nenhum'}`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId == 'definirinstrucoes') {
                 const mensagem = interaction.fields.getTextInputValue('mensagem');
@@ -104,7 +104,7 @@ module.exports = {
                 }
 
                 await interaction.reply({ content: `${Emojis.get(`confirmed_emoji`)} Instruções definidas com sucesso!`, ephemeral: true });
-                logAction(client, { action: 'Instruções configuradas', details: `Mensagem: \`${mensagem || 'nenhuma'}\`, Nome botão: \`${nomebotao || 'nenhum'}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                logAction(client, { action: 'Instruções configuradas', details: `Mensagem: ${mensagem || 'nenhuma'}, Nome botão: ${nomebotao || 'nenhum'}`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId == 'automaticTempo') {
                 const inatividade = interaction.fields.getTextInputValue('inatividade');
@@ -119,7 +119,7 @@ module.exports = {
 
                 await Gerenciar(interaction, client)
                 interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Tempo do carrinho definido com sucesso!`, ephemeral: true });
-                logAction(client, { action: 'Tempo do Carrinho configurado', details: `Inatividade: \`${inatividade}min\`, Pós-pagamento: \`${pospagamento}min\``, userId: interaction.user.id, guildId: interaction.guildId });
+                logAction(client, { action: 'Tempo do Carrinho configurado', details: `Inatividade: ${inatividade}min, Pós-pagamento: ${pospagamento}min`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId == 'sdaju11111231idsj1233js123dua123') {
                 let NOME = interaction.fields.getTextInputValue('tokenMP');
@@ -165,7 +165,7 @@ module.exports = {
                 }
 
                 await interaction.reply({ content: `${Emojis.get('confirmed_emoji')} Função **${NOME}** adicionada com sucesso! Use o botão **Emojis das Funções** no painel para definir o emoji.`, ephemeral: true });
-                logAction(client, { action: 'Função de Ticket criada', details: `Nome: \`${NOME}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                logAction(client, { action: 'Função de Ticket criada', details: `Nome: ${NOME}`, userId: interaction.user.id, guildId: interaction.guildId });
             }
 
 
@@ -207,11 +207,11 @@ module.exports = {
                     tickets.delete(`tickets.funcoes.${iterator}`)
                 }
                 await interaction.update({
-                    content: `${Emojis.get('confirmed_emoji')} \`${valordelete.length}\` função(ões) removida(s) com sucesso!`,
+                    content: `${Emojis.get('confirmed_emoji')} ${valordelete.length} função(ões) removida(s) com sucesso!`,
                     components: [],
                     embeds: []
                 });
-                logAction(client, { action: 'Funções de Ticket removidas', details: `Funções: \`${valordelete.join(', ')}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                logAction(client, { action: 'Funções de Ticket removidas', details: `Funções: ${valordelete.join(', ')}`, userId: interaction.user.id, guildId: interaction.guildId });
             }
 
             if (interaction.customId == 'cancelarremoverfuncao') {
@@ -296,7 +296,7 @@ module.exports = {
                     content: `${Emojis.get('confirmed_emoji')} Status atualizado.\n${Emojis.get(`loading_emoji`)} Mensagens sendo atualizadas...`,
                     ephemeral: true
                 });
-                logAction(client, { action: `Botão de Dúvidas ${!status ? 'ativado' : 'desativado'}`, details: `Status alterado para \`${!status ? 'ativo' : 'inativo'}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                logAction(client, { action: `Botão de Dúvidas ${!status ? 'ativado' : 'desativado'}`, details: `Status alterado para ${!status ? 'ativo' : 'inativo'}`, userId: interaction.user.id, guildId: interaction.guildId });
             }
 
             if (interaction.customId == 'automaticTempo') {
@@ -803,7 +803,7 @@ module.exports = {
                     }
 
                     configuracao.set("autoclear.time", time);
-                    logAction(client, { action: 'Tempo do AutoClear configurado', details: `Tempo: \`${time}s\``, userId: interaction.user.id, guildId: interaction.guildId });
+                    logAction(client, { action: 'Tempo do AutoClear configurado', details: `Tempo: ${time}s`, userId: interaction.user.id, guildId: interaction.guildId });
 
                     timeout = time * 1000;
 
@@ -811,7 +811,7 @@ module.exports = {
                     interaction.editReply({
                         content: ``, embeds: [
                             new Discord.EmbedBuilder()
-                                .setTitle(`Configurando \`AutoClear\``)
+                                .setTitle(`Configurando AutoClear`)
                                 .setDescription(` você acessou a aba de **AutoClear**, suas **informações** mais os **botões de configurações** estão aqui em baixo. **Configure tudo!**`)
                                 .addFields(
                                     {
@@ -1006,7 +1006,7 @@ module.exports = {
                 const atualstatus24 = tickets.get("statusmsg") || false;
                 tickets.set("statusmsg", !atualstatus24);
                 painelTicket(interaction);
-                logAction(client, { action: 'Tipo de postagem de Ticket alterado', details: `Modo: \`${!atualstatus24 ? 'mensagem única' : 'múltiplas mensagens'}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                logAction(client, { action: 'Tipo de postagem de Ticket alterado', details: `Modo: ${!atualstatus24 ? 'mensagem única' : 'múltiplas mensagens'}`, userId: interaction.user.id, guildId: interaction.guildId });
             }
 
             if (interaction.customId.startsWith('painelconfigticket')) {
@@ -1820,7 +1820,7 @@ module.exports = {
 
                 await SistemadeFiltro(interaction, client);
                 await interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Configurações salvas com sucesso!`, ephemeral: true });
-                logAction(client, { action: 'Filtro configurado', details: `Convites: \`${convites}\`, Links: \`${links.length}\`, Palavras: \`${palavras.length}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                logAction(client, { action: 'Filtro configurado', details: `Convites: ${convites}, Links: ${links.length}, Palavras: ${palavras.length}`, userId: interaction.user.id, guildId: interaction.guildId });
             }
 
             if (interaction.customId === 'configuracaoexcecao') {
@@ -1853,7 +1853,7 @@ module.exports = {
 
                 await SistemadeFiltro(interaction, client);
                 interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Configurações salvas com sucesso!`, ephemeral: true });
-                logAction(client, { action: 'Exceções do Filtro configuradas', details: `Cargos: \`${cargosID.length}\`, Categorias: \`${categoriaID.length}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                logAction(client, { action: 'Exceções do Filtro configuradas', details: `Cargos: ${cargosID.length}, Categorias: ${categoriaID.length}`, userId: interaction.user.id, guildId: interaction.guildId });
             }
 
 
@@ -1878,7 +1878,7 @@ module.exports = {
 
                 await SistemadeFiltro(interaction, client)
                 interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Configurações salvas com sucesso!`, ephemeral: true });
-                logAction(client, { action: 'Sistema de Filtro configurado', details: `Status: \`${status}\`, Punição: \`${punicao || 'nenhuma'}\`, Tempo: \`${tempo}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                logAction(client, { action: 'Sistema de Filtro configurado', details: `Status: ${status}, Punição: ${punicao || 'nenhuma'}, Tempo: ${tempo}`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId === 'configurarNukar') {
                 let status = interaction.fields.getTextInputValue('status').toLowerCase()
@@ -1894,7 +1894,7 @@ module.exports = {
 
                 await SistemaNukar(interaction, client)
                 interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Configurações salvas com sucesso!`, ephemeral: true });
-                logAction(client, { action: 'Sistema Nukar configurado', details: `Status: \`${status ? 'on' : 'off'}\`, Horário: \`${horario}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                logAction(client, { action: 'Sistema Nukar configurado', details: `Status: ${status ? 'on' : 'off'}, Horário: ${horario}`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId === 'configurarLimpeza') {
                 let status = interaction.fields.getTextInputValue('status').toLowerCase()
@@ -1913,7 +1913,7 @@ module.exports = {
 
                 await LimpezaAutomatica(interaction, client)
                 interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Configurações salvas com sucesso!`, ephemeral: true });
-                logAction(client, { action: 'Limpeza Automática configurada', details: `Status: \`${status ? 'on' : 'off'}\`, 1ª: \`${primeira}\`, 2ª: \`${segunda}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                logAction(client, { action: 'Limpeza Automática configurada', details: `Status: ${status ? 'on' : 'off'}, 1ª: ${primeira}, 2ª: ${segunda}`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId === 'configurarCanais') {
                 let status = interaction.fields.getTextInputValue('status').toLowerCase()
@@ -1932,7 +1932,7 @@ module.exports = {
 
                 await GerenciarCanais(interaction, client)
                 interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Configurações salvas com sucesso!`, ephemeral: true });
-                logAction(client, { action: 'Gerenciamento de Canais configurado', details: `Status: \`${status ? 'on' : 'off'}\`, Abertura: \`${abertura}\`, Fechamento: \`${fechamento}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                logAction(client, { action: 'Gerenciamento de Canais configurado', details: `Status: ${status ? 'on' : 'off'}, Abertura: ${abertura}, Fechamento: ${fechamento}`, userId: interaction.user.id, guildId: interaction.guildId });
             }
         }
         if (interaction.isStringSelectMenu()) {
@@ -1965,8 +1965,8 @@ module.exports = {
                 if (typeof funcoes[customId] === 'function') {
                     await funcoes[customId](interaction, client);
                 }
-                interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} \`${interaction.values.length}\` canais removidos com sucesso!`, ephemeral: true });
-                logAction(client, { action: `Canais removidos de \`${customId}\``, details: `${interaction.values.length} canal(ais) removido(s)`, userId: interaction.user.id, guildId: interaction.guildId });
+                interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} ${interaction.values.length} canais removidos com sucesso!`, ephemeral: true });
+                logAction(client, { action: `Canais removidos de ${customId}`, details: `${interaction.values.length} canal(ais) removido(s)`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId.startsWith('removercargos_')) {
                 const customId = interaction.customId.split('_')[1];
@@ -1979,8 +1979,8 @@ module.exports = {
                 if (typeof funcoes[customId] === 'function') {
                     await funcoes[customId](interaction, client);
                 }
-                interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} \`${interaction.values.length}\` cargos removidos com sucesso!`, ephemeral: true });
-                logAction(client, { action: `Cargos removidos de \`${customId}\``, details: `${interaction.values.length} cargo(s) removido(s)`, userId: interaction.user.id, guildId: interaction.guildId });
+                interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} ${interaction.values.length} cargos removidos com sucesso!`, ephemeral: true });
+                logAction(client, { action: `Cargos removidos de ${customId}`, details: `${interaction.values.length} cargo(s) removido(s)`, userId: interaction.user.id, guildId: interaction.guildId });
             }
             if (interaction.customId.startsWith('removercanal_')) {
                 const customId = interaction.customId.split('_')[1];
@@ -1993,7 +1993,7 @@ module.exports = {
                 if (typeof funcoes[customId] === 'function') {
                     await funcoes[customId](interaction, client);
                 }
-                interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} \`${interaction.values.length}\` canais removidos com sucesso!`, ephemeral: true });
+                interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} ${interaction.values.length} canais removidos com sucesso!`, ephemeral: true });
             }
             if (interaction.customId === 'removercanalboasvindas') {
                 let canais = configuracao.get(`Entradas.canais`) || [];
@@ -2027,7 +2027,7 @@ module.exports = {
                     configuracao.set(`Entradas.canais`, canais);
 
                     await msgbemvindo(interaction, client);
-                    interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} \`${selecionados.length}\` novo canais adicionado com sucesso!`, ephemeral: true });
+                    interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} ${selecionados.length} novo canais adicionado com sucesso!`, ephemeral: true });
                     logAction(client, { action: 'Canal de boas-vindas adicionado', details: `${selecionados.length} canal(ais): ${selecionados.map(c => `<#${c}>`).join(', ')}`, userId: interaction.user.id, guildId: interaction.guildId });
                 } else {
                     let canais = configuracao.get(`AutomaticSettings.${nomeFunction}.canais`) || [];
@@ -2051,8 +2051,8 @@ module.exports = {
                     if (typeof funcoes[nomeFunction] === 'function') {
                         await funcoes[nomeFunction](interaction, client);
                     }
-                    interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} \`${selecionados.length}\` novo canais adicionado com sucesso!`, ephemeral: true });
-                    logAction(client, { action: `Canais adicionados a \`${nomeFunction}\``, details: `${selecionados.length} canal(ais): ${selecionados.map(c => `<#${c}>`).join(', ')}`, userId: interaction.user.id, guildId: interaction.guildId });
+                    interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} ${selecionados.length} novo canais adicionado com sucesso!`, ephemeral: true });
+                    logAction(client, { action: `Canais adicionados a ${nomeFunction}`, details: `${selecionados.length} canal(ais): ${selecionados.map(c => `<#${c}>`).join(', ')}`, userId: interaction.user.id, guildId: interaction.guildId });
                 }
             }
 
@@ -2081,8 +2081,8 @@ module.exports = {
                 if (typeof funcoes[nomeFunction] === 'function') {
                     await funcoes[nomeFunction](interaction, client);
                 }
-                interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} \`${selecionados.length}\` novo cargos adicionado com sucesso!`, ephemeral: true });
-                logAction(client, { action: `Cargos adicionados a \`${nomeFunction}\``, details: `${selecionados.length} cargo(s): ${selecionados.map(r => `<@&${r}>`).join(', ')}`, userId: interaction.user.id, guildId: interaction.guildId });
+                interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} ${selecionados.length} novo cargos adicionado com sucesso!`, ephemeral: true });
+                logAction(client, { action: `Cargos adicionados a ${nomeFunction}`, details: `${selecionados.length} cargo(s): ${selecionados.map(r => `<@&${r}>`).join(', ')}`, userId: interaction.user.id, guildId: interaction.guildId });
             }
         }
     }

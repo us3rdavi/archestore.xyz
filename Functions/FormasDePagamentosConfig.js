@@ -26,11 +26,11 @@ async function FormasDePagamentos(interaction) {
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
             `## ${Emojis.get('dream')} Formas de Pagamento\nConfigure, habilite e desabilite as formas de pagamento disponíveis.\n\n` +
-            `**Mercado Pago:** ${mpOn ? `${ok} \`Habilitado\`` : `${no} \`Desabilitado\``} | ${mpConfig ? `${ok} \`Configurado\`` : `${no} \`Não configurado\``}\n` +
-            `**Efi Bank:** ${efiOn ? `${ok} \`Habilitado\`` : `${no} \`Desabilitado\``} | ${efiConfig ? `${ok} \`Configurado\`` : `${no} \`Não configurado\``}\n` +
-            `**Litecoin Wallet:** ${no} \`Desabilitado\` | ${no} \`Não configurado\`\n` +
-            `**Stripe:** ${no} \`Desabilitado\` | ${no} \`Não configurado\`\n` +
-            `**Pix Manual:** ${semiOn ? `${ok} \`Habilitado\`` : `${no} \`Desabilitado\``} | ${semiConfig ? `${ok} \`Configurado\`` : `${no} \`Não configurado\``}`
+            `**Mercado Pago:** ${mpOn ? `${ok} Habilitado` : `${no} Desabilitado`} | ${mpConfig ? `${ok} Configurado` : `${no} Não configurado`}\n` +
+            `**Efi Bank:** ${efiOn ? `${ok} Habilitado` : `${no} Desabilitado`} | ${efiConfig ? `${ok} Configurado` : `${no} Não configurado`}\n` +
+            `**Litecoin Wallet:** ${no} Desabilitado | ${no} Não configurado\n` +
+            `**Stripe:** ${no} Desabilitado | ${no} Não configurado\n` +
+            `**Pix Manual:** ${semiOn ? `${ok} Habilitado` : `${no} Desabilitado`} | ${semiConfig ? `${ok} Configurado` : `${no} Não configurado`}`
         )
     );
 
@@ -99,7 +99,7 @@ async function EfiBankConfiguracao(client, interaction, a) {
 
     let desc =
         `## ${Emojis.get('_efi_emoji')} Configurar Efi Bank\n` +
-        `**Status:** \`${isOn ? 'HABILITADO' : 'DESABILITADO'}\`\n\n` +
+        `**Status:** ${isOn ? 'HABILITADO' : 'DESABILITADO'}\n\n` +
         `Aqui você pode configurar tudo referente ao Efi Bank.`;
 
     if (isLinked) {

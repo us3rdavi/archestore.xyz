@@ -264,7 +264,7 @@ module.exports = {
                     }
                     tickets.set('tickets.botoesAdicionais', botoesAdicionais);
                     await interaction.update({
-                        content: `${Emojis.get('confirmed_emoji')} \`${indices.length}\` botão(ões) removido(s) com sucesso!`,
+                        content: `${Emojis.get('confirmed_emoji')} ${indices.length} botão(ões) removido(s) com sucesso!`,
                         components: [],
                         embeds: []
                     });

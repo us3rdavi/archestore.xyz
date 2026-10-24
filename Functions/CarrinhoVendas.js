@@ -36,9 +36,9 @@ function buildCartMessage(cartData) {
     if (desconto) {
         if (desconto.tipo === 'percent') {
             const economizado = Number(valorUnitario) * quantidade * (desconto.valor / 100);
-            descontoInfo = `\n${Emojis.get('confirmed_emoji')} **Cupom:** \`${desconto.codigo}\` — \`-${desconto.valor}%\` (${formatBRL(economizado)})`;
+            descontoInfo = `\n${Emojis.get('confirmed_emoji')} **Cupom:** \`${desconto.codigo}\` — -${desconto.valor}% (${formatBRL(economizado)})`;
         } else {
-            descontoInfo = `\n${Emojis.get('confirmed_emoji')} **Cupom:** \`${desconto.codigo}\` — \`-${formatBRL(desconto.valor)}\``;
+            descontoInfo = `\n${Emojis.get('confirmed_emoji')} **Cupom:** \`${desconto.codigo}\` — -${formatBRL(desconto.valor)}`;
         }
     }
 
@@ -47,11 +47,11 @@ function buildCartMessage(cartData) {
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## 🛒 Carrinho #${cartId} — ${username}\n\n` +
-        `${Emojis.get('store_emoji')} **Produto:** \`${secaoNome}\` › \`${subprodutoNome}\`\n` +
-        `${Emojis.get('dream')} **Valor unitário:** \`${formatBRL(valorUnitario)}\`\n` +
-        `${Emojis.get('_folder_emoji')} **Quantidade:** \`${quantidade}x\`` +
+        `${Emojis.get('store_emoji')} **Produto:** ${secaoNome} › ${subprodutoNome}\n` +
+        `${Emojis.get('dream')} **Valor unitário:** ${formatBRL(valorUnitario)}\n` +
+        `${Emojis.get('_folder_emoji')} **Quantidade:** ${quantidade}x` +
         descontoInfo + '\n\n' +
-        `${Emojis.get('pix_stamp_emoji')} **Total: \`${formatBRL(valorTotal)}\`**\n\n` +
+        `${Emojis.get('pix_stamp_emoji')} **Total: ${formatBRL(valorTotal)}**\n\n` +
         `-# Use os botões abaixo para gerenciar seu pedido.`
     ));
     container.addSeparatorComponents(new SeparatorBuilder());

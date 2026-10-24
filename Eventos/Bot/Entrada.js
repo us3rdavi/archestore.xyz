@@ -32,7 +32,7 @@ module.exports = {
                     info.convidados.push(member.id);
                     Convites.set(user.id, info);
 
-                    convidante = `${user}\`${user.username}\` \n-# ${info.saidas} Saídas, ${info.fakes} Fakes, ${info.total} Total.`;
+                    convidante = `${user}${user.username} \n-# ${info.saidas} Saídas, ${info.fakes} Fakes, ${info.total} Total.`;
                 } catch (error) {
                     console.error('Erro ao buscar o usuário:', error);
                     convidante = 'Erro ao processar o convidante.';
@@ -141,7 +141,7 @@ module.exports = {
             if (blacklistedNames) {
                 const isNameBlacklisted = blacklistedNames.some(name => member.user.username.includes(name));
                 if (isNameBlacklisted) {
-                    await kickMember(member, `ter o nome \`${member.user.username}\` que está na blacklist.`, configuracao.get(`ConfigChannels.boasvindascoole`));
+                    await kickMember(member, `ter o nome ${member.user.username} que está na blacklist.`, configuracao.get(`ConfigChannels.boasvindascoole`));
                 }
             }
 
@@ -156,7 +156,7 @@ module.exports = {
 
                         const isStatusBlacklisted = blacklistedStatuses.some(name => customStatusState && customStatusState.includes(name));
                         if (isStatusBlacklisted) {
-                            await kickMember(member, `ter o status \`${customStatusState}\` na blacklist.`, configuracao.get(`ConfigChannels.boasvindascoole`));
+                            await kickMember(member, `ter o status ${customStatusState} na blacklist.`, configuracao.get(`ConfigChannels.boasvindascoole`));
                         }
                     }
                 } catch (error) {
@@ -168,7 +168,7 @@ module.exports = {
             if (minimumAccountDays !== null) {
                 let daysElapsed = Math.floor((new Date() - member.user.createdAt) / (1000 * 60 * 60 * 24));
                 if (daysElapsed < minimumAccountDays) {
-                    await kickMember(member, `ter uma conta com menos de \`${daysElapsed}\` dias.`, configuracao.get(`ConfigChannels.boasvindascoole`));
+                            await kickMember(member, `ter uma conta com menos de ${daysElapsed} dias.`, configuracao.get(`ConfigChannels.boasvindascoole`));
                 }
             }
         } catch (error) {

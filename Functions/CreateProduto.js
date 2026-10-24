@@ -28,12 +28,12 @@ function GerenciarProduto(interaction, status, produtoname) {
       i--
     ) {
       const campooo = ggg.Campos[i];
-      campos += `- Nome: \`${campooo.Nome}\` Estoque: \`${
+      campos += `- Nome: ${campooo.Nome} Estoque: ${
         campooo.estoque.length
-      }\` Valor: \`R$ ${Number(campooo.valor).toLocaleString("pt-BR", {
+      } Valor: R$ ${Number(campooo.valor).toLocaleString("pt-BR", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-      })}\`\n`;
+      })}\n`;
     }
 
     if (ggg.Campos.length > 5) {
@@ -56,10 +56,10 @@ function GerenciarProduto(interaction, status, produtoname) {
         ? `Possuí o cargo <@&${cupommmm.condicoes?.cargospodeusar}>`
         : "";
       const a2 = cupommmm.condicoes?.precominimo
-        ? `Comprar no mínimo \`${cupommmm.condicoes?.precominimo}\` unidades`
+        ? `Comprar no mínimo ${cupommmm.condicoes?.precominimo} unidades`
         : "";
       const a3 = cupommmm.condicoes?.qtdmaxima
-        ? `Comprar no máximo \`${cupommmm.condicoes?.qtdmaxima}\` unidades`
+        ? `Comprar no máximo ${cupommmm.condicoes?.qtdmaxima} unidades`
         : "";
 
       const a4 =
@@ -70,15 +70,15 @@ function GerenciarProduto(interaction, status, produtoname) {
         a3 && (a2 || a1) ? "," : ""
       }${a3 || ""}`;
 
-      cupom += `- Código: \`${cupommmm.Nome}\` Quantidade: \`${
+      cupom += `- Código: \`${cupommmm.Nome}\` Quantidade: ${
         cupommmm.qtd == undefined ? `Ilimitado` : cupommmm.qtd
-      }\` Desconto: \`${cupommmm.desconto}%\` Max. Usos: \`${
+      } Desconto: ${cupommmm.desconto}% Max. Usos: ${
         cupommmm.maxuse == undefined ? `Ilimitado` : cupommmm.maxuse
-      }\` Validade: \`${
+      } Validade: ${
         cupommmm.diasvalidos2 == undefined
           ? `Não expira`
           : cupommmm.diasvalidos2
-      }\` N. Usos: \`${cupommmm.usos}\` Condições: ${
+      } N. Usos: ${cupommmm.usos} Condições: ${
         a4 ? "Não Definido" : condicaoInfoValue
       }\n`;
     }

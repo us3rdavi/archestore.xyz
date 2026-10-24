@@ -96,7 +96,7 @@ async function definirduvidas(interaction, client) {
             new TextDisplayBuilder().setContent(
                 `## ${Emojis.get('question_emoji')} Botão de Dúvidas\n` +
                 `Senhor(a) **${interaction.user.username}**, configure o botão de dúvidas.\n\n` +
-                `**${Emojis.get('_text_emoji')} Nome do Botão:** \`${infoduvidas?.nomebotao ? infoduvidas.nomebotao : 'Não Definido'}\`\n` +
+                `**${Emojis.get('_text_emoji')} Nome do Botão:** ${infoduvidas?.nomebotao ? infoduvidas.nomebotao : 'Não Definido'}\n` +
                 `**${Emojis.get('_lapis_emoji')} Emoji do Botão:** ${infoduvidas?.emoji ? infoduvidas.emoji : '`Sem Emoji`'}\n` +
                 `**${Emojis.get('_send_emoji')} Link do Botão:** ${infoduvidas?.linkbotao ? infoduvidas.linkbotao : '`Não Definido`'}`
             )

@@ -381,7 +381,7 @@ function buildKeywordPanel(guildId, userId, entryId, returnPage = 0) {
     }
 
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('_flag_emoji')} Gatilho: \`${entry.keyword}\`\n` +
+        `## ${Emojis.get('_flag_emoji')} Gatilho: ${entry.keyword}\n` +
         `**Resposta:** ${hasScriptMessage(entry.message) ? 'Components V2 configurados' : 'Ainda não configurada'}\n\n` +
         `-# A mensagem será enviada nos canais monitorados quando esta palavra ou frase aparecer.`
     ));
@@ -461,7 +461,7 @@ function buildScriptEditorPayload(userId) {
     const preview = buildScriptMessageContainer(session.draft, true);
     const controls = new ContainerBuilder();
     controls.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('_custom_emoji')} Editor da resposta — \`${session.keyword}\`\n` +
+        `## ${Emojis.get('_custom_emoji')} Editor da resposta — ${session.keyword}\n` +
         `-# Pré-visualização ao vivo acima: cada alteração aparece antes de salvar.\n` +
         `**Editando:** ${sectionLabel}`
     ));
@@ -490,7 +490,7 @@ function buildScriptEditorPayload(userId) {
         controls.addTextDisplayComponents(new TextDisplayBuilder().setContent(
             `**Botões de link:** ${links.length}/5\n` +
             (links.length
-                ? links.map((link, index) => `\`${index + 1}.\` **${link.label}** · ${link.url}`).join('\n')
+                ? links.map((link, index) => `${index + 1}. **${link.label}** · ${link.url}`).join('\n')
                 : `-# Nenhum botão configurado.`)
         ));
         const linkButtons = new ActionRowBuilder();

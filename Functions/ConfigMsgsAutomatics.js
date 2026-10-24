@@ -19,7 +19,7 @@ async function AcoesMsgsAutomatics(interaction, client) {
         new TextDisplayBuilder().setContent(
             `## Mensagens Automáticas\n` +
             `Seu **${client.user.username}** enviará mensagens automaticamente nos intervalos e no canal que você pré-definir.\n\n` +
-            `**Tempo para apagar mensagens:** \`${intervalMinutes} minuto(s)\``
+            `**Tempo para apagar mensagens:** ${intervalMinutes} minuto(s)`
         )
     );
 

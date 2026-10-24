@@ -54,7 +54,7 @@ function CloseThreds(client) {
                     const embed = new EmbedBuilder()
                         .setColor(`${configuracao.get(`Cores.Erro`) == null ? `#5865F2` : configuracao.get(`Cores.Erro`)}`)
                         .setTitle(`Carrinho expirado.`)
-                        .setDescription(`O carrinho de <@!${ultimoNumero}> foi fechado por inatividade (\`10 Minutos\`).`)
+                        .setDescription(`O carrinho de <@!${ultimoNumero}> foi fechado por inatividade (10 Minutos).`)
 
 
                     await channela.send({ embeds: [embed] })

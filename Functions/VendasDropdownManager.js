@@ -47,7 +47,7 @@ async function gerenciarDropdownVendas(interaction, painelId) {
         ? `${Emojis.get('negative_emoji')} Nenhuma seção cadastrada ainda.`
         : secoes.map((s, i) => {
             const nSub = (s.subprodutos || []).length;
-            return `**${i + 1}.** ${s.emoji ? `<:e:${s.emoji}> ` : ''}**${s.nome}** — \`${nSub} subproduto(s)\`\n-# ${s.descricao || 'Sem descrição'}`;
+            return `**${i + 1}.** ${s.emoji ? `<:e:${s.emoji}> ` : ''}**${s.nome}** — ${nSub} subproduto(s)\n-# ${s.descricao || 'Sem descrição'}`;
         }).join('\n\n');
 
     const addId = painelId ? `vnd_add_secao_${painelId}` : 'vnd_add_secao';
@@ -147,7 +147,7 @@ async function buildSecaoConfigPanel(interaction, secao) {
     const listaSub = subprodutos.length === 0
         ? `-# Nenhum subproduto cadastrado.`
         : subprodutos.map((sp, i) =>
-            `**${i + 1}.** ${sp.emoji ? `<:e:${sp.emoji}> ` : ''}**${sp.nome}** — \`R$ ${Number(sp.valor).toFixed(2)}\`\n-# ${sp.descricao || 'Sem descrição'}`
+            `**${i + 1}.** ${sp.emoji ? `<:e:${sp.emoji}> ` : ''}**${sp.nome}** — R$ ${Number(sp.valor).toFixed(2)}\n-# ${sp.descricao || 'Sem descrição'}`
           ).join('\n');
 
     const container = new ContainerBuilder();
@@ -155,7 +155,7 @@ async function buildSecaoConfigPanel(interaction, secao) {
         `## ${secao.emoji ? `<:e:${secao.emoji}> ` : ''}${secao.nome}\n` +
         `-# ID: \`${secao.id}\`\n\n` +
         `${Emojis.get('_text_emoji')} **Descrição:** ${secao.descricao || '`Não definida`'}\n` +
-        `${Emojis.get('_lapis_emoji')} **Mensagem do painel:** ${secao.mensagem ? `\`${secao.mensagem.slice(0, 60)}${secao.mensagem.length > 60 ? '...' : ''}\`` : '`Não definida`'}\n` +
+        `${Emojis.get('_lapis_emoji')} **Mensagem do painel:** ${secao.mensagem ? `${secao.mensagem.slice(0, 60)}${secao.mensagem.length > 60 ? '...' : ''}` : 'Não definida'}\n` +
         `${Emojis.get('store_emoji')} **Emoji:** ${secao.emoji ? `<:e:${secao.emoji}>` : '`Não definido`'}\n\n` +
         `**Subprodutos (${subprodutos.length}):**\n${listaSub}`
     ));
@@ -217,7 +217,7 @@ async function buildSubprodutosPanel(interaction, secao) {
     const listaSub = subprodutos.length === 0
         ? `${Emojis.get('negative_emoji')} Nenhum subproduto cadastrado.`
         : subprodutos.map((sp, i) =>
-            `**${i + 1}.** ${sp.emoji ? `<:e:${sp.emoji}> ` : ''}**${sp.nome}** — \`R$ ${Number(sp.valor).toFixed(2)}\`\n-# ${sp.descricao || 'Sem descrição'}`
+            `**${i + 1}.** ${sp.emoji ? `<:e:${sp.emoji}> ` : ''}**${sp.nome}** — R$ ${Number(sp.valor).toFixed(2)}\n-# ${sp.descricao || 'Sem descrição'}`
           ).join('\n\n');
 
     const container = new ContainerBuilder();
@@ -543,7 +543,7 @@ async function buildSubReorderPickPanel(interaction, secaoId) {
     const subs = secao.subprodutos || [];
 
     const lista = subs.map((sp, i) =>
-        `**${i + 1}.** ${sp.emoji ? `<:e:${sp.emoji}> ` : ''}**${sp.nome}** — \`R$ ${Number(sp.valor).toFixed(2)}\``
+        `**${i + 1}.** ${sp.emoji ? `<:e:${sp.emoji}> ` : ''}**${sp.nome}** — R$ ${Number(sp.valor).toFixed(2)}`
     ).join('\n');
 
     const options = subs.slice(0, 25).map((sp, i) => ({

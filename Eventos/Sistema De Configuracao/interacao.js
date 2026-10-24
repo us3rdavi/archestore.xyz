@@ -158,7 +158,7 @@ module.exports = {
                     semiConfigs(interaction, client);
                 }
                 const { logAction: _logOnOff } = require('../../Functions/AuditLog.js');
-                _logOnOff(client, { action: `Pagamento Semi-automático ${statusAtual ? 'ativado' : 'desativado'}`, details: `Status: \`${statusAtual ? 'ativo' : 'inativo'}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                _logOnOff(client, { action: `Pagamento Semi-automático ${statusAtual ? 'ativado' : 'desativado'}`, details: `Status: ${statusAtual ? 'ativo' : 'inativo'}`, userId: interaction.user.id, guildId: interaction.guildId });
             }
 
             if (interaction.customId == 'Voltar4') {
@@ -207,7 +207,7 @@ module.exports = {
 
                     const style2row = new ActionRowBuilder().addComponents(selectMenuBuilder);
                     try {
-                        await interaction.update({ components: [style2row], content: `${interaction.user} Quais campos de \`${gggaa.Config.name}\` deseja gerenciar?`, embeds: [] })
+                        await interaction.update({ components: [style2row], content: `${interaction.user} Quais campos de ${gggaa.Config.name} deseja gerenciar?`, embeds: [] })
                     } catch (error) {
                     }
                 }
@@ -252,7 +252,7 @@ module.exports = {
                 try {
 
 
-                    await interaction.update({ components: [style2row], content: `Quais campos de \`${ggg22.Config.name}\` deseja remover?`, embeds: [] })
+                    await interaction.update({ components: [style2row], content: `Quais campos de ${ggg22.Config.name} deseja remover?`, embeds: [] })
                 } catch (error) {
                 }
             }
@@ -508,7 +508,7 @@ module.exports = {
 
 
                 if (isNaN(precocampo)) 
-                    return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)}  Preço inserido \`${precocampo}\` inválido.` })
+                    return interaction.reply({ ephemeral: true, content: `${Emojis.get(`negative_emoji`)}  Preço inserido ${precocampo} inválido.` })
 
                 const produtoExistente = produtos
                     .filter(produto => produto.data.Campos)
@@ -531,7 +531,7 @@ module.exports = {
                 interaction.followUp({ content: `${Emojis.get(`confirmed_emoji`)} Campo adicionado.`, ephemeral: true })
                 await UpdateMessageProduto(client, ggg.name)
                 const { logAction: _logCampo } = require('../../Functions/AuditLog.js');
-                _logCampo(client, { action: 'Campo de Produto criado', details: `Produto: \`${ggg.name}\`, Campo: \`${nomecampo}\`, Preço: \`${precocampo}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                _logCampo(client, { action: 'Campo de Produto criado', details: `Produto: ${ggg.name}, Campo: ${nomecampo}, Preço: ${precocampo}`, userId: interaction.user.id, guildId: interaction.guildId });
 
 
             }
@@ -576,7 +576,7 @@ module.exports = {
 
                 GerenciarProduto(interaction, 1, ggg.name);
                 const { logAction: _logEdit } = require('../../Functions/AuditLog.js');
-                _logEdit(client, { action: 'Produto editado', details: `Produto: \`${ggg.name}\` → \`${nome}\``, userId: interaction.user.id, guildId: interaction.guildId });
+                _logEdit(client, { action: 'Produto editado', details: `Produto: ${ggg.name} → ${nome}`, userId: interaction.user.id, guildId: interaction.guildId });
             }
 
 

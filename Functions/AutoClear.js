@@ -19,10 +19,10 @@ async function AutoClear(interaction, client) {
 
         container.addTextDisplayComponents(
             new TextDisplayBuilder().setContent(
-                `## Configurando \`AutoClear\`\n` +
+                `## Configurando AutoClear\n` +
                 `Você acessou a aba de **AutoClear**. Suas **informações** e os **botões de configurações** estão abaixo.\n\n` +
                 `**Canal AutoClear:** ${canalautoclear ? `<#${canalautoclear}>` : '`Nenhum canal selecionado`'}\n` +
-                `**Tempo AutoClear:** \`${tempoclear} segundos\``
+                `**Tempo AutoClear:** ${tempoclear} segundos`
             )
         );
 

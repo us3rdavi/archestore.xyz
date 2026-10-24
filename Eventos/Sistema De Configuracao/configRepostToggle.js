@@ -52,8 +52,8 @@ async function createUpdatedEmbed(interaction, client) {
         .setDescription(`Seu ${client.user.username} vai repostar seus produtos periodicamente, apagando a mensagem antiga e enviando-a novamente, para evitar denúncias nas mensagens.  
 **Observação:** O sistema ajustará automaticamente o intervalo e a frequência dos reposts, considerando o fluxo de interações e a quantidade de produtos postados.`)
         .addFields(
-            { name: `Próxima execução`, value: currentStatus ? `\`${nextExecutionTime.format('DD/MM/YYYY HH:mm:ss')}\`` : '`Função desativada.`', inline: true },
-            { name: `Produtos existentes`, value: `\`${todosProdutos.length}\``, inline: true },
+            { name: `Próxima execução`, value: currentStatus ? nextExecutionTime.format('DD/MM/YYYY HH:mm:ss') : 'Função desativada.', inline: true },
+            { name: `Produtos existentes`, value: `${todosProdutos.length}`, inline: true },
             { name: `\u200B`, value: `\u200B`, inline: true }, 
             { name: `Tempo até a próxima execução`, value: currentStatus ? `<t:${nextExecutionTimestamp}:R>` : '`Função desativada.`' },
             { name: `Status atual`, value: currentStatus ? '`Ativado`' : '`Desativado`', inline: true }

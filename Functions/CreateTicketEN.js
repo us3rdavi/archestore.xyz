@@ -34,7 +34,7 @@ async function CreateTicketEN(interaction, valor) {
 
     if (statusHorario && (tempoatual < horarioAbertura || tempoatual > horarioFechamento)) {
         return replyEphemeral({
-            content: `${Emojis.get('negative_emoji')} Tickets can only be opened between \`${horarioAbertura}\` and \`${horarioFechamento}\` (Brasília time).`
+            content: `${Emojis.get('negative_emoji')} Tickets can only be opened between ${horarioAbertura} and ${horarioFechamento} (Brasília time).`
         });
     }
 

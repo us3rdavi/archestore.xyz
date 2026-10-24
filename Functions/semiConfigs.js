@@ -19,7 +19,7 @@ async function semiConfigs(interaction, client) {
 
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-            `## Configurar Pagamento Manual — \`${isEnabled ? 'Habilitado' : 'Desabilitado'}\`\n` +
+            `## Configurar Pagamento Manual — ${isEnabled ? 'Habilitado' : 'Desabilitado'}\n` +
             `Defina uma chave Pix e uma mensagem que o **${client.user.username}** enviará quando o pagamento "Pix" for selecionado.\n` +
             `-# Aviso: Manter esta função habilitada sobrescreverá a função automática do Mercado Pago.\n\n` +
             `**Chave PIX:** \`${chavePix}\`\n` +

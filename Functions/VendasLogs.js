@@ -38,17 +38,17 @@ async function logPagamentoPendente(client, {
         ));
         container.addSeparatorComponents(new SeparatorBuilder());
         container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-            `${Emojis.get('_silueta_emoji')} **Usuário:** <@${userId}> — \`${userTag}\`\n` +
+            `${Emojis.get('_silueta_emoji')} **Usuário:** <@${userId}> — ${userTag}\n` +
             `${Emojis.get('information_emoji')} **ID:** \`${userId}\`\n` +
             (userAvatar ? `${Emojis.get('_pincel_emoji')} **Avatar:** [Ver foto](${userAvatar})\n` : '') +
             `\n` +
-            `${Emojis.get('store_emoji')} **Produto:** \`${sectionNome}\`\n` +
-            `${Emojis.get('_folder_emoji')} **Quantidade:** \`${quantidade}x\`\n` +
-            `${Emojis.get('dream')} **Valor unitário:** \`${formatBRL(valorUnitario)}\`\n` +
-            `${Emojis.get('pix_stamp_emoji')} **Total a pagar:** \`${formatBRL(valorTotal)}\`\n` +
+            `${Emojis.get('store_emoji')} **Produto:** ${sectionNome}\n` +
+            `${Emojis.get('_folder_emoji')} **Quantidade:** ${quantidade}x\n` +
+            `${Emojis.get('dream')} **Valor unitário:** ${formatBRL(valorUnitario)}\n` +
+            `${Emojis.get('pix_stamp_emoji')} **Total a pagar:** ${formatBRL(valorTotal)}\n` +
             `\n` +
             `${Emojis.get('_settings_emoji')} **TxID:** \`${txid}\`\n` +
-            `${Emojis.get('negative_emoji')} **Status:** \`AGUARDANDO PAGAMENTO\`\n` +
+            `${Emojis.get('negative_emoji')} **Status:** AGUARDANDO PAGAMENTO\n` +
             `⏳ **Expira:** <t:${expiresAt}:R> — <t:${expiresAt}:T>`
         ));
 
@@ -81,7 +81,7 @@ async function logCompraConfirmada(client, {
         const ts = unixNow();
 
         const pagadorInfo = pagador
-            ? `\n${Emojis.get('_silueta_emoji')} **Pagador (CPF/CNPJ):** \`${pagador.cpf || pagador.cnpj || 'N/A'}\` — \`${pagador.nome || 'N/A'}\``
+            ? `\n${Emojis.get('_silueta_emoji')} **Pagador (CPF/CNPJ):** \`${pagador.cpf || pagador.cnpj || 'N/A'}\` — ${pagador.nome || 'N/A'}`
             : '';
 
         const container = new ContainerBuilder();
@@ -91,19 +91,19 @@ async function logCompraConfirmada(client, {
         ));
         container.addSeparatorComponents(new SeparatorBuilder());
         container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-            `${Emojis.get('_silueta_emoji')} **Usuário:** <@${userId}> — \`${userTag}\`\n` +
+            `${Emojis.get('_silueta_emoji')} **Usuário:** <@${userId}> — ${userTag}\n` +
             `${Emojis.get('information_emoji')} **ID Discord:** \`${userId}\`\n` +
             (userAvatar ? `${Emojis.get('_pincel_emoji')} **Avatar:** [Ver foto](${userAvatar})\n` : '') +
             pagadorInfo +
             `\n` +
-            `${Emojis.get('store_emoji')} **Produto:** \`${sectionNome}\`\n` +
-            `${Emojis.get('_folder_emoji')} **Quantidade:** \`${quantidade}x\`\n` +
-            `${Emojis.get('dream')} **Valor unitário:** \`${formatBRL(valorUnitario)}\`\n` +
-            `${Emojis.get('pix_stamp_emoji')} **Total pago:** \`${formatBRL(valorTotal)}\`\n` +
+            `${Emojis.get('store_emoji')} **Produto:** ${sectionNome}\n` +
+            `${Emojis.get('_folder_emoji')} **Quantidade:** ${quantidade}x\n` +
+            `${Emojis.get('dream')} **Valor unitário:** ${formatBRL(valorUnitario)}\n` +
+            `${Emojis.get('pix_stamp_emoji')} **Total pago:** ${formatBRL(valorTotal)}\n` +
             `\n` +
             `${Emojis.get('_settings_emoji')} **TxID:** \`${txid}\`\n` +
             `${Emojis.get('confirmed_emoji')} **E2E ID:** \`${e2eid || 'N/A'}\`\n` +
-            `${Emojis.get('confirmed_emoji')} **Status:** \`PAGO ✓\`\n` +
+            `${Emojis.get('confirmed_emoji')} **Status:** PAGO ✓\n` +
             `-# Confirmado em <t:${ts}:R>`
         ));
 

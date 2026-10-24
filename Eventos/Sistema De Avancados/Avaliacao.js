@@ -69,7 +69,7 @@ module.exports = {
                     name: 'Sistema de Avaliação',
                     iconURL: 'https://cdn.discordapp.com/emojis/1253516691636490301.gif?size=2048'
                 })
-                .setDescription('**Os __\`Feedbacks\`__ São essenciais para contribuir com a melhoria contínua da loja**')
+                .setDescription('**Os __Feedbacks__ são essenciais para contribuir com a melhoria contínua da loja**')
                 .setThumbnail('https://cdn.discordapp.com/emojis/1058853531249037464.gif?size=2048')
                 .setColor('#5865F2')
                 .addFields(
@@ -80,7 +80,7 @@ module.exports = {
                     },
                     {
                         name: `${Emojis.get('_messages_emoji')} **Feedback**`,
-                        value: `**\`${feedback}\`**`,
+                        value: `**${feedback}**`,
                         inline: true
                     },
                     {

@@ -344,11 +344,11 @@ module.exports = {
                     .setColor('#57F287')
                     .setThumbnail(interaction.guild.iconURL({ dynamic: true }))
                     .addFields(
-                        { name: 'Aberto por', value: `<@${ticketData.userId}>\n\`${ticketData.username || 'Desconhecido'}\``, inline: true },
+                        { name: 'Aberto por', value: `<@${ticketData.userId}>\n${ticketData.username || 'Desconhecido'}`, inline: true },
                         { name: 'Assumido por', value: ticketData.staffMemberId ? `<@${ticketData.staffMemberId}>` : '`Ninguém`', inline: true },
-                        { name: 'Categoria', value: `\`${ticketData.funcao || 'Desconhecida'}\``, inline: true },
+                        { name: 'Categoria', value: `${ticketData.funcao || 'Desconhecida'}`, inline: true },
                         { name: 'Nº do Ticket', value: `\`#${ticketData.numero}\``, inline: true },
-                        { name: 'Encerrado por', value: `${interaction.user}\n\`Resolvido\``, inline: true },
+                        { name: 'Encerrado por', value: `${interaction.user}\nResolvido`, inline: true },
                         { name: 'Encerrado em', value: `<t:${closedTs}:F>`, inline: true }
                     )
                     .setFooter({ text: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true }) })

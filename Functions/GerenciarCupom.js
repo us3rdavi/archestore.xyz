@@ -21,7 +21,7 @@ async function GerenciarCupom(interaction, produtoname, ggg222) {
     } else {
         for (let i = ggg.Campos.length - 1; i >= Math.max(0, ggg.Campos.length - 5); i--) {
             const campooo = ggg.Campos[i];
-            campos += `- Nome: \`${campooo.Nome}\` Estoque: \`${campooo.estoque.length}\` Valor: \`R$ ${Number(campooo.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`\n`;
+            campos += `- Nome: ${campooo.Nome} Estoque: ${campooo.estoque.length} Valor: R$ ${Number(campooo.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\n`;
         }
         if (ggg.Campos.length > 5) campos += `E mais ${ggg.Campos.length - 5}...`;
     }
@@ -33,11 +33,11 @@ async function GerenciarCupom(interaction, produtoname, ggg222) {
         for (let i = ggg.Cupom.length - 1; i >= Math.max(0, ggg.Cupom.length - 3); i--) {
             const cupommmm = ggg.Cupom[i];
             const a1 = cupommmm.condicoes?.cargospodeusar ? `Possuí o cargo <@&${cupommmm.condicoes?.cargospodeusar}>` : '';
-            const a2 = cupommmm.condicoes?.precominimo ? `Comprar no mínimo \`${cupommmm.condicoes?.precominimo}\` unidades` : '';
-            const a3 = cupommmm.condicoes?.qtdmaxima ? `Comprar no máximo \`${cupommmm.condicoes?.qtdmaxima}\` unidades` : '';
+            const a2 = cupommmm.condicoes?.precominimo ? `Comprar no mínimo ${cupommmm.condicoes?.precominimo} unidades` : '';
+            const a3 = cupommmm.condicoes?.qtdmaxima ? `Comprar no máximo ${cupommmm.condicoes?.qtdmaxima} unidades` : '';
             const a4 = !cupommmm.condicoes?.cargospodeusar && !cupommmm.condicoes?.precominimo && !cupommmm.condicoes?.qtdmaxima;
             const condicaoInfoValue = `${a1}${a2 && (a1 || a3) ? ',' : ''}${a2}${a3 && (a2 || a1) ? ',' : ''}${a3 || ''}`;
-            cupom += `- Código: \`${cupommmm.Nome}\` Qtd: \`${cupommmm.qtd == undefined ? 'Ilimitado' : cupommmm.qtd}\` Desconto: \`${cupommmm.desconto}%\` Max. Usos: \`${cupommmm.maxuse == undefined ? 'Ilimitado' : cupommmm.maxuse}\` Validade: \`${cupommmm.diasvalidos2 == undefined ? 'Não expira' : cupommmm.diasvalidos2}\` N. Usos: \`${cupommmm.usos}\` Condições: ${a4 ? 'Não Definido' : condicaoInfoValue}\n`;
+            cupom += `- Código: \`${cupommmm.Nome}\` Qtd: ${cupommmm.qtd == undefined ? 'Ilimitado' : cupommmm.qtd} Desconto: ${cupommmm.desconto}% Max. Usos: ${cupommmm.maxuse == undefined ? 'Ilimitado' : cupommmm.maxuse} Validade: ${cupommmm.diasvalidos2 == undefined ? 'Não expira' : cupommmm.diasvalidos2} N. Usos: ${cupommmm.usos} Condições: ${a4 ? 'Não Definido' : condicaoInfoValue}\n`;
         }
         if (ggg.Cupom.length > 3) cupom += `E mais ${ggg.Cupom.length - 3}...`;
     }
@@ -48,7 +48,7 @@ async function GerenciarCupom(interaction, produtoname, ggg222) {
     container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
             `## ${ggg.Config.name} — Detalhes\n` +
-            `**Entrega automática:** \`${ggg.Config.entrega}\`\n\n` +
+            `**Entrega automática:** ${ggg.Config.entrega}\n\n` +
             `**Campos:**\n${campos}\n\n` +
             `**Cupons:**\n${cupom}`
         )
