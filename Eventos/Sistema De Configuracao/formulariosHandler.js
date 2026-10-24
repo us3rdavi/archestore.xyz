@@ -6,7 +6,7 @@ const {
     MessageFlags, ChannelType,
 } = require('discord.js');
 const { formularios, Emojis, configuracao } = require('../../Database');
-const { BOT_EMOJI_OPTIONS } = require('../../Functions/TicketAparenciaBuilder');
+const { buildDatabaseEmojiOptions, buildGuildEmojiOptions } = require('../../Functions/EmojiPickerOptions');
 
 // Lock para evitar duplicação de perguntas por double-submit
 const pergLock = new Set();
@@ -1501,7 +1501,7 @@ module.exports = {
                 const guildId = parts[parts.length - 2];
                 const optIdx  = parseInt(parts[parts.length - 3]);
                 await interaction.deferUpdate();
-                await interaction.editReply(buildOptionEmojiPicker(interaction.guild, guildId, slotId, optIdx));
+                await interaction.editReply(await buildOptionEmojiPicker(client, interaction.guild, guildId, slotId, optIdx));
                 return;
             }
 
@@ -1871,7 +1871,7 @@ function buildOptionEditPanel(guildId, slotId, optIdx) {
 // ─────────────────────────────────────────────────────────────────────────────
 // SELETOR DE EMOJI PARA OPÇÃO
 // ─────────────────────────────────────────────────────────────────────────────
-function buildOptionEmojiPicker(guild, guildId, slotId, optIdx) {
+async function buildOptionEmojiPicker(client, guild, guildId, slotId, optIdx) {
     const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('_ticket_emoji')} Escolher Emoji — Opção ${optIdx + 1}\n` +
@@ -1883,22 +1883,16 @@ function buildOptionEmojiPicker(guild, guildId, slotId, optIdx) {
         new StringSelectMenuBuilder()
             .setCustomId(`form_sopts_botoji_${optIdx}_${guildId}_${slotId}`)
             .setPlaceholder('Emojis do bot...')
-            .addOptions(BOT_EMOJI_OPTIONS.slice(0, 25))
+            .addOptions((await buildDatabaseEmojiOptions(client, { guild, includeNoEmoji: true })).slice(0, 25))
     ));
 
-    const serverEmojis = guild?.emojis?.cache
-        ? [...guild.emojis.cache.values()].filter(e => !e.animated).slice(0, 25)
-        : [];
+    const serverEmojis = buildGuildEmojiOptions(guild, { includeAnimated: false, limit: 25 });
     if (serverEmojis.length > 0) {
         c.addActionRowComponents(new ActionRowBuilder().addComponents(
             new StringSelectMenuBuilder()
                 .setCustomId(`form_sopts_svroji_${optIdx}_${guildId}_${slotId}`)
                 .setPlaceholder('Emojis do servidor...')
-                .addOptions(serverEmojis.map(e => ({
-                    label: e.name.slice(0, 100),
-                    value: e.id,
-                    emoji: { id: e.id },
-                })))
+                .addOptions(serverEmojis)
         ));
     }
 

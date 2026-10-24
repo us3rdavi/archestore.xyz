@@ -7,6 +7,9 @@ const {
     SECTION_LABELS
 } = require('../../Functions/TicketAparenciaBuilder');
 const { tickets, Emojis } = require('../../Database');
+const { buildDatabaseEmojiOptions } = require('../../Functions/EmojiPickerOptions');
+
+const getBotEmojiOptions = (client, guild) => buildDatabaseEmojiOptions(client, { guild, includeNoEmoji: true });
 
 module.exports = {
     name: 'interactionCreate',
@@ -33,7 +36,8 @@ module.exports = {
                 if (section === 'main') {
                     await interaction.update(buildAparenciaMain(userId));
                 } else {
-                    await interaction.update(buildAparenciaSection(userId, section));
+                    const emojiOptions = section === 'emoji' ? await getBotEmojiOptions(client, interaction.guild) : undefined;
+                    await interaction.update(buildAparenciaSection(userId, section, emojiOptions));
                 }
                 return;
             }
@@ -46,14 +50,14 @@ module.exports = {
                 } else {
                     tickets.set('tickets.aparencia.emoji', `<:e:${valor}>`);
                 }
-                await interaction.update(buildAparenciaSection(userId, 'emoji'));
+                await interaction.update(buildAparenciaSection(userId, 'emoji', await getBotEmojiOptions(client, interaction.guild)));
                 return;
             }
 
             // ── Select de função para editar emoji ───────────────────────────
             if (interaction.isStringSelectMenu() && customId === `taparel_funcnav_${userId}`) {
                 const nomeFuncao = interaction.values[0];
-                await interaction.update(buildFuncaoEmojiScreen(userId, nomeFuncao));
+                await interaction.update(buildFuncaoEmojiScreen(userId, nomeFuncao, await getBotEmojiOptions(client, interaction.guild)));
                 return;
             }
 
@@ -66,7 +70,7 @@ module.exports = {
                 } else {
                     tickets.set(`tickets.funcoes.${nomeFuncao}.emoji`, `<:e:${valor}>`);
                 }
-                await interaction.update(buildFuncaoEmojiScreen(userId, nomeFuncao));
+                await interaction.update(buildFuncaoEmojiScreen(userId, nomeFuncao, await getBotEmojiOptions(client, interaction.guild)));
                 return;
             }
 

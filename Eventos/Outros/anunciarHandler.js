@@ -430,7 +430,7 @@ module.exports = {
             if (customId.startsWith(`anunciar_botao_emoji_`) && !customId.startsWith(`anunciar_botao_emojisel_`) && !customId.startsWith(`anunciar_botao_removeemoji_`) && !customId.startsWith(`anunciar_botao_emojipage_`) && !customId.startsWith(`anunciar_botao_emojiback_`) && !customId.startsWith(`anunciar_botao_svremoji_`)) {
                 const inner = customId.slice('anunciar_botao_emoji_'.length);
                 const idx = parseInt(inner.slice(0, inner.lastIndexOf('_')), 10);
-                await interaction.update(buildBotaoEmojiScreen(userId, idx, 0, buildBotEmojiOptions(), 'bot'));
+                await interaction.update(buildBotaoEmojiScreen(userId, idx, 0, await buildBotEmojiOptions(client, interaction.guild), 'bot'));
                 return;
             }
 
@@ -448,7 +448,7 @@ module.exports = {
                 const parts2 = inner.split('_');
                 const page = parseInt(parts2[0], 10);
                 const idx = parseInt(parts2[1], 10);
-                await interaction.update(buildBotaoEmojiScreen(userId, idx, page, buildBotEmojiOptions(), 'bot'));
+                await interaction.update(buildBotaoEmojiScreen(userId, idx, page, await buildBotEmojiOptions(client, interaction.guild), 'bot'));
                 return;
             }
 

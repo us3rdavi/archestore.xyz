@@ -113,7 +113,7 @@ function buildAparenciaMainEN(userId) {
     return { components: [previewContainer, controlContainer], ...CV2 };
 }
 
-function buildAparenciaSectionEN(userId, section) {
+function buildAparenciaSectionEN(userId, section, botEmojiOptions = []) {
     const data = tickets.get('en.aparencia') || {};
     const sectionLabel = SECTION_LABELS[section] || section;
     const previewContainer = buildPreviewContainerEN(data);
@@ -131,7 +131,7 @@ function buildAparenciaSectionEN(userId, section) {
             new StringSelectMenuBuilder()
                 .setCustomId(`taparelen_emoji_pick_${userId}`)
                 .setPlaceholder('Choose an emoji for the panel title...')
-                .addOptions(BOT_EMOJI_OPTIONS)
+                .addOptions(botEmojiOptions.slice(0, 25))
         ));
     } else {
         controlContainer.addActionRowComponents(new ActionRowBuilder().addComponents(
@@ -196,7 +196,7 @@ function buildFuncaoNavScreenEN(userId) {
     return { components: [container], ...CV2 };
 }
 
-function buildFuncaoEmojiScreenEN(userId, nomeFuncao) {
+function buildFuncaoEmojiScreenEN(userId, nomeFuncao, botEmojiOptions = []) {
     const funcao = tickets.get(`en.funcoes.${nomeFuncao}`) || {};
     const emojiLine = funcao.emoji
         ? `**Current emoji:** ${funcao.emoji}`
@@ -212,7 +212,7 @@ function buildFuncaoEmojiScreenEN(userId, nomeFuncao) {
         new StringSelectMenuBuilder()
             .setCustomId(`taparelen_feoji_${userId}_${nomeFuncao}`)
             .setPlaceholder('Choose an emoji for this category...')
-            .addOptions(BOT_EMOJI_OPTIONS)
+            .addOptions(botEmojiOptions.slice(0, 25))
     ));
     container.addActionRowComponents(new ActionRowBuilder().addComponents(
         new ButtonBuilder()
@@ -230,6 +230,5 @@ module.exports = {
     buildAparenciaSectionEN,
     buildFuncaoNavScreenEN,
     buildFuncaoEmojiScreenEN,
-    BOT_EMOJI_OPTIONS,
     SECTION_LABELS,
 };

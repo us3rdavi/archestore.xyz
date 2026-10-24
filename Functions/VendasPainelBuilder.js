@@ -16,6 +16,7 @@ const {
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MediaGalleryBuilder,
 } = require('discord.js');
 const { dbembed, Emojis, configuracao } = require('../Database');
+const { buildDatabaseEmojiOptions, buildGuildEmojiOptions } = require('./EmojiPickerOptions');
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 
@@ -96,27 +97,16 @@ function buildButtonRows(buttons) {
     return rows;
 }
 
-function buildBotEmojiOptions() {
-    const allEmojis = Emojis.all();
-    const options = [];
-    for (const val of Object.values(allEmojis)) {
-        const match = val.match(/^<(a?):([^:]+):(\d+)>$/);
-        if (!match) continue;
-        options.push({
-            label: (match[2].replace(/_emoji$/, '').replace(/_/g, ' ') || 'emoji').slice(0, 100),
-            value: val,
-            emoji: { id: match[3], animated: match[1] === 'a' },
-        });
-    }
-    return options;
+function buildBotEmojiOptions(client, guild) {
+    return buildDatabaseEmojiOptions(client, { guild, valueMode: 'mention' });
 }
 
 function buildServerEmojiOptions(guild) {
-    return [...guild.emojis.cache.values()].map(e => ({
-        label: ((e.name || 'emoji').replace(/_/g, ' ')).slice(0, 100),
-        value: `<${e.animated ? 'a' : ''}:${e.name}:${e.id}>`,
-        emoji: { id: e.id, animated: !!e.animated },
-    }));
+    return buildGuildEmojiOptions(guild).map(option => {
+        const emoji = guild?.emojis?.cache?.get(option.value);
+        if (!emoji) return option;
+        return { ...option, value: `<${emoji.animated ? 'a' : ''}:${emoji.name || 'emoji'}:${emoji.id}>` };
+    });
 }
 
 // ── Preview container (idêntico ao AnunciarBuilder) ───────────────────────────
