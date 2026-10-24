@@ -49,6 +49,13 @@ const BOT_EMOJI_OPTIONS = [
 const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
 const EMOJI_PAGE_SIZE = 25;
 
+function isSelectedEmojiOption(option, currentEmoji) {
+    if (!currentEmoji) return option.value === 'sem_emoji';
+    if (option.value === currentEmoji) return true;
+    const currentId = currentEmoji.match(/\d{17,20}/)?.[0];
+    return Boolean(currentId && option.value.match(/\d{17,20}/)?.[0] === currentId);
+}
+
 function buildPreviewContainerEN(data) {
     const c = new ContainerBuilder();
     const titleParts = [data.emoji, data.title].filter(Boolean);
@@ -134,7 +141,9 @@ function buildAparenciaSectionEN(userId, section, botEmojiOptions = [], emojiPag
             new StringSelectMenuBuilder()
                 .setCustomId(`taparelen_emoji_pick_${userId}`)
                 .setPlaceholder(`Bot emojis — page ${safePage + 1}/${totalPages}`)
-                .addOptions(botEmojiOptions.slice(safePage * EMOJI_PAGE_SIZE, (safePage + 1) * EMOJI_PAGE_SIZE))
+                .addOptions(botEmojiOptions
+                    .slice(safePage * EMOJI_PAGE_SIZE, (safePage + 1) * EMOJI_PAGE_SIZE)
+                    .map(option => ({ ...option, default: isSelectedEmojiOption(option, data.emoji) })))
         ));
         if (totalPages > 1) {
             const pageRow = new ActionRowBuilder();
@@ -233,7 +242,9 @@ function buildFuncaoEmojiScreenEN(userId, nomeFuncao, botEmojiOptions = [], emoj
         new StringSelectMenuBuilder()
             .setCustomId(`taparelen_feoji_${userId}_${nomeFuncao}`)
             .setPlaceholder(`Bot emojis — page ${safePage + 1}/${totalPages}`)
-            .addOptions(botEmojiOptions.slice(safePage * EMOJI_PAGE_SIZE, (safePage + 1) * EMOJI_PAGE_SIZE))
+            .addOptions(botEmojiOptions
+                .slice(safePage * EMOJI_PAGE_SIZE, (safePage + 1) * EMOJI_PAGE_SIZE)
+                .map(option => ({ ...option, default: isSelectedEmojiOption(option, funcao.emoji) })))
     ));
     if (totalPages > 1) {
         const pageRow = new ActionRowBuilder();

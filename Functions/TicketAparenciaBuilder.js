@@ -49,6 +49,13 @@ const BOT_EMOJI_OPTIONS = [
 const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
 const EMOJI_PAGE_SIZE = 25;
 
+function isSelectedEmojiOption(option, currentEmoji) {
+    if (!currentEmoji) return option.value === 'sem_emoji';
+    if (option.value === currentEmoji) return true;
+    const currentId = currentEmoji.match(/\d{17,20}/)?.[0];
+    return Boolean(currentId && option.value.match(/\d{17,20}/)?.[0] === currentId);
+}
+
 // Preview visual do embed dentro de CV2 usando heading + MediaGallery para o banner
 function buildPreviewContainer(data) {
     const c = new ContainerBuilder();
@@ -135,7 +142,9 @@ function buildAparenciaSection(userId, section, botEmojiOptions = [], emojiPage 
             new StringSelectMenuBuilder()
                 .setCustomId(`taparel_emoji_pick_${userId}`)
                 .setPlaceholder(`Emojis do bot — página ${safePage + 1}/${totalPages}`)
-                .addOptions(botEmojiOptions.slice(safePage * EMOJI_PAGE_SIZE, (safePage + 1) * EMOJI_PAGE_SIZE))
+                .addOptions(botEmojiOptions
+                    .slice(safePage * EMOJI_PAGE_SIZE, (safePage + 1) * EMOJI_PAGE_SIZE)
+                    .map(option => ({ ...option, default: isSelectedEmojiOption(option, data.emoji) })))
         ));
         if (totalPages > 1) {
             const pageRow = new ActionRowBuilder();
@@ -236,7 +245,9 @@ function buildFuncaoEmojiScreen(userId, nomeFuncao, botEmojiOptions = [], emojiP
         new StringSelectMenuBuilder()
             .setCustomId(`taparel_feoji_${userId}_${nomeFuncao}`)
             .setPlaceholder(`Emojis do bot — página ${safePage + 1}/${totalPages}`)
-            .addOptions(botEmojiOptions.slice(safePage * EMOJI_PAGE_SIZE, (safePage + 1) * EMOJI_PAGE_SIZE))
+            .addOptions(botEmojiOptions
+                .slice(safePage * EMOJI_PAGE_SIZE, (safePage + 1) * EMOJI_PAGE_SIZE)
+                .map(option => ({ ...option, default: isSelectedEmojiOption(option, funcao.emoji) })))
     ));
     if (totalPages > 1) {
         const pageRow = new ActionRowBuilder();

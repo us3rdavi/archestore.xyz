@@ -9,7 +9,11 @@ const {
 const { tickets, Emojis } = require('../../Database');
 const { buildDatabaseEmojiOptions } = require('../../Functions/EmojiPickerOptions');
 
-const getBotEmojiOptions = (client, guild) => buildDatabaseEmojiOptions(client, { guild, includeNoEmoji: true });
+const getBotEmojiOptions = (client, guild) => buildDatabaseEmojiOptions(client, {
+    guild,
+    includeNoEmoji: true,
+    valueMode: 'mention',
+});
 
 module.exports = {
     name: 'interactionCreate',
@@ -47,7 +51,7 @@ module.exports = {
                 if (valor === 'sem_emoji') {
                     tickets.delete('en.aparencia.emoji');
                 } else {
-                    tickets.set('en.aparencia.emoji', `<:e:${valor}>`);
+                    tickets.set('en.aparencia.emoji', valor);
                 }
                 await interaction.update(buildAparenciaSectionEN(userId, 'emoji', await getBotEmojiOptions(client, interaction.guild)));
                 return;
@@ -67,7 +71,7 @@ module.exports = {
                 if (valor === 'sem_emoji') {
                     tickets.delete(`en.funcoes.${nomeFuncao}.emoji`);
                 } else {
-                    tickets.set(`en.funcoes.${nomeFuncao}.emoji`, `<:e:${valor}>`);
+                    tickets.set(`en.funcoes.${nomeFuncao}.emoji`, valor);
                 }
                 await interaction.update(buildFuncaoEmojiScreenEN(userId, nomeFuncao, await getBotEmojiOptions(client, interaction.guild)));
                 return;
