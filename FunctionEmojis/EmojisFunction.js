@@ -73,18 +73,23 @@ async function saveEmojiToDatabase(emojiName, emojiId, animated) {
 
 async function UploadEmojis(client) {
     const emojis = await fetchEmojis(client);
-    const existingNames = new Set(emojis.map(e => e.name));
-    let EmojisSalvos = Emojis.fetchAll();
-    EmojisSalvos = new Set(Object.keys(EmojisSalvos));
-    
-    let uploadDB = emojis.filter(emoji => !EmojisSalvos.has(emoji.name)).map(emoji => saveEmojiToDatabase(emoji.name, emoji.id, emoji.animated));
-    await Promise.all(uploadDB);
-    const uploads = AllEmojis
-        .filter(emoji => !existingNames.has(emoji.name)) 
-        .map(emoji => createEmoji(client, emoji.name, emoji.image));
+    const savedEmojis = Emojis.fetchAll();
+    let synced = 0;
 
-    const results = await Promise.all(uploads);
-    return results;
+    for (const emoji of emojis) {
+        const mention = emoji.animated
+            ? `<a:${emoji.name}:${emoji.id}>`
+            : `<:${emoji.name}:${emoji.id}>`;
+        if (savedEmojis[emoji.name] === mention) continue;
+
+        await saveEmojiToDatabase(emoji.name, emoji.id, emoji.animated);
+        savedEmojis[emoji.name] = mention;
+        synced += 1;
+    }
+
+    // Do not create unrelated emojis during bot startup. New assets are imported
+    // explicitly through the safe icon-pack importer.
+    return { synced, uploaded: 0 };
 }
 
 module.exports = {

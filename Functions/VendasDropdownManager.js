@@ -8,15 +8,42 @@ const {
 const { configuracao, Emojis } = require('../Database');
 
 const PAGE_SIZE = 25;
+const applicationEmojiCache = new WeakMap();
 
 // ── Helpers de emoji ───────────────────────────────────────────────────────────
-function buildBotEmojiOptionsList() {
+async function getUsableEmojiIds(client, guild) {
+    if (!client?.application?.emojis?.fetch) {
+        throw new Error('O cliente Discord ainda não disponibilizou os emojis da aplicação.');
+    }
+
+    const now = Date.now();
+    let cached = applicationEmojiCache.get(client);
+    if (!cached || cached.expiresAt <= now) {
+        const appEmojis = await client.application.emojis.fetch({ force: true });
+        cached = {
+            expiresAt: now + 60_000,
+            ids: new Set(appEmojis.map(emoji => emoji.id)),
+        };
+        applicationEmojiCache.set(client, cached);
+    }
+
+    const usableIds = new Set(cached.ids);
+    for (const emoji of guild?.emojis?.cache?.values() || []) {
+        usableIds.add(emoji.id);
+    }
+    return usableIds;
+}
+
+async function buildBotEmojiOptionsList(client, guild) {
+    const usableIds = await getUsableEmojiIds(client, guild);
     const allEmojis = Emojis.all();
     const options = [];
+    const seenIds = new Set();
     for (const [name, val] of Object.entries(allEmojis)) {
         const match = typeof val === 'string' ? val.match(/^<(a?):([^:]+):(\d+)>$/) : null;
         const eid = match ? match[3] : (typeof val === 'string' && /^\d+$/.test(val.trim()) ? val.trim() : null);
-        if (!eid) continue;
+        if (!eid || !usableIds.has(eid) || seenIds.has(eid)) continue;
+        seenIds.add(eid);
         options.push({
             label: (name.replace(/_emoji$/, '').replace(/_/g, ' ') || 'emoji').slice(0, 100),
             value: eid,
@@ -285,18 +312,19 @@ async function buildSubprodutosPanel(interaction, secao) {
 }
 
 // ── Picker: escolhe subproduto para configurar emoji ───────────────────────────
-async function buildSubEmojiPickerPanel(interaction, secaoId) {
+async function buildSubEmojiPickerPanel(interaction, secaoId, client) {
     const secoes = configuracao.get('vendas.secoes') || [];
     const secao = secoes.find(s => s.id === secaoId);
     if (!secao) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
     const subs = secao.subprodutos || [];
     if (subs.length === 0) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Nenhum subproduto disponível.`, ephemeral: true });
 
+    const usableEmojiIds = await getUsableEmojiIds(client, interaction.guild);
     const options = subs.slice(0, 25).map(sp => ({
         label: sp.nome.slice(0, 100),
         value: sp.id,
         description: (`R$ ${Number(sp.valor).toFixed(2)}${sp.emoji ? ' · tem emoji' : ''}`).slice(0, 100),
-        ...(sp.emoji ? { emoji: { id: sp.emoji } } : {}),
+        ...(sp.emoji && usableEmojiIds.has(sp.emoji) ? { emoji: { id: sp.emoji } } : {}),
     }));
 
     const container = new ContainerBuilder();
@@ -325,14 +353,14 @@ async function buildSubEmojiPickerPanel(interaction, secaoId) {
 }
 
 // ── Painel de emojis do bot ou servidor para subproduto ────────────────────────
-async function buildSubEmojiSourcePanel(interaction, secaoId, subId, source, page) {
+async function buildSubEmojiSourcePanel(interaction, secaoId, subId, source, page, client) {
     const secoes = configuracao.get('vendas.secoes') || [];
     const secao = secoes.find(s => s.id === secaoId);
     const sub = secao && (secao.subprodutos || []).find(sp => sp.id === subId);
 
     const allOptions = source === 'server'
         ? buildServerEmojiOptionsList(interaction.guild)
-        : buildBotEmojiOptionsList();
+        : await buildBotEmojiOptionsList(client, interaction.guild);
 
     const totalPages = Math.max(1, Math.ceil(allOptions.length / PAGE_SIZE));
     const safePage = Math.max(0, Math.min(page, totalPages - 1));
@@ -413,7 +441,7 @@ async function buildEmojiPickerPanel(interaction, client, { tipo, secaoId, subId
     // tipo: 'secao' | 'sub'
     // Usa os mesmos helpers já existentes (que extraem corretamente o snowflake
     // das strings <:name:id> armazenadas no banco de emojis).
-    const botOptions    = buildBotEmojiOptionsList();
+    const botOptions    = await buildBotEmojiOptionsList(client, interaction.guild);
     const serverOptions = buildServerEmojiOptionsList(interaction.guild);
 
     // Mescla sem duplicatas, limitado a 25 opções do Discord
@@ -456,13 +484,13 @@ async function buildEmojiPickerPanel(interaction, client, { tipo, secaoId, subId
 }
 
 // ── Emoji picker paginado para seção (bot/servidor com troca de fonte) ────────────
-async function buildSecaoEmojiSourcePanel(interaction, secaoId, source, page) {
+async function buildSecaoEmojiSourcePanel(interaction, secaoId, source, page, client) {
     const secoes = configuracao.get('vendas.secoes') || [];
     const secao = secoes.find(s => s.id === secaoId);
 
     const allOptions = source === 'server'
         ? buildServerEmojiOptionsList(interaction.guild)
-        : buildBotEmojiOptionsList();
+        : await buildBotEmojiOptionsList(client, interaction.guild);
 
     const totalPages = Math.max(1, Math.ceil(allOptions.length / PAGE_SIZE));
     const safePage = Math.max(0, Math.min(page, totalPages - 1));

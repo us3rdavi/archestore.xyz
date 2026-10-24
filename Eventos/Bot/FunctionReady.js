@@ -45,7 +45,9 @@ module.exports = {
         console.log(`${colors.green(`[LOG]`)} ${client.user.tag} Is ready!`)
         console.log(`${colors.green(`[LOG]`)} Version: v2.0.0`)
         console.log(`${colors.green(`[LOG]`)} I'm not finished, but I'm being done with a lot of hate and stress\n`)
-        await UploadEmojis(client).then(() => console.log('\x1b[36m[Emojis]\x1b[0m Todos os emojis foram carregados com sucesso.')).catch(err => console.error('\x1b[31m[Emojis]\x1b[0m Erro ao carregar os emojis:', err));
+        await UploadEmojis(client)
+            .then(result => console.log(`\x1b[36m[Emojis]\x1b[0m ${result.synced} referências sincronizadas; ${result.uploaded} emojis enviados.`))
+            .catch(err => console.error('\x1b[31m[Emojis]\x1b[0m Erro ao sincronizar referências dos emojis:', err));
 
         console.log(`${colors.blue(`[CREDITS]`)} @odeletefodendoloiras - yands`)
         console.log(`${colors.blue(`[CREDITS]`)} @garotasmentem - sousadelas`)

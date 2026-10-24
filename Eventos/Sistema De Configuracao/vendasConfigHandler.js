@@ -280,7 +280,7 @@ module.exports = {
                     const us = rest.indexOf('_');
                     const page = us !== -1 ? (parseInt(rest.slice(0, us), 10) || 0) : 0;
                     const secaoId = us !== -1 ? rest.slice(us + 1) : rest;
-                    await buildSecaoEmojiSourcePanel(interaction, secaoId, isBot ? 'bot' : 'server', page);
+                    await buildSecaoEmojiSourcePanel(interaction, secaoId, isBot ? 'bot' : 'server', page, client);
                     return;
                 }
 
@@ -293,14 +293,14 @@ module.exports = {
                         secoes[idx].emoji = '';
                         configuracao.set('vendas.secoes', secoes);
                     }
-                    await buildSecaoEmojiSourcePanel(interaction, secaoId, 'bot', 0);
+                    await buildSecaoEmojiSourcePanel(interaction, secaoId, 'bot', 0, client);
                     return;
                 }
 
                 // Configurar emoji da seção — entry point: vnd_secao_emoji_<secaoId>
                 if (customId.startsWith('vnd_secao_emoji_')) {
                     const secaoId = customId.slice('vnd_secao_emoji_'.length);
-                    await buildSecaoEmojiSourcePanel(interaction, secaoId, 'bot', 0);
+                    await buildSecaoEmojiSourcePanel(interaction, secaoId, 'bot', 0, client);
                     return;
                 }
 
@@ -379,7 +379,7 @@ module.exports = {
                 // Picker: escolher subproduto para emoji
                 if (customId.startsWith('vnd_sub_emoji_pick_')) {
                     const secaoId = customId.slice('vnd_sub_emoji_pick_'.length);
-                    await buildSubEmojiPickerPanel(interaction, secaoId);
+                    await buildSubEmojiPickerPanel(interaction, secaoId, client);
                     return;
                 }
 
@@ -393,7 +393,7 @@ module.exports = {
                     const page = parseInt(parts[0], 10) || 0;
                     const secaoId = parts[1];
                     const subId = parts[2];
-                    await buildSubEmojiSourcePanel(interaction, secaoId, subId, isBot ? 'bot' : 'server', page);
+                    await buildSubEmojiSourcePanel(interaction, secaoId, subId, isBot ? 'bot' : 'server', page, client);
                     return;
                 }
 
@@ -569,7 +569,7 @@ module.exports = {
                 if (customId.startsWith('vnd_select_sub_emoji_')) {
                     const secaoId = customId.slice('vnd_select_sub_emoji_'.length);
                     const subId = interaction.values[0];
-                    await buildSubEmojiSourcePanel(interaction, secaoId, subId, 'bot', 0);
+                    await buildSubEmojiSourcePanel(interaction, secaoId, subId, 'bot', 0, client);
                     return;
                 }
 
