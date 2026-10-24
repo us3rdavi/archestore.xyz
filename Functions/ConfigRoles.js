@@ -86,7 +86,8 @@ async function ConfigRoles(interaction, client) {
                     { value: `definircargoadm`, label: `Definir cargo de Administrador`, emoji: `1246954960218886146` },
                     { value: `definircargosup`, label: `Definir cargo de Suporte`, emoji: `1246955036433453259` },
                     { value: `roleclienteease`, label: `Definir cargo de Cliente`, emoji: `1256806658101870684` },
-                    { value: `rolememberok`, label: `Definir cargo de Membro`, emoji: `1246955106944028774` }
+                    { value: `rolememberok`, label: `Definir cargo de Membro`, emoji: `1246955106944028774` },
+                    { value: `removercargomembro`, label: `Remover cargo de Membro` }
                 )
                 .setPlaceholder(`Clique aqui para redefinir algum cargo`)
                 .setMaxValues(1)

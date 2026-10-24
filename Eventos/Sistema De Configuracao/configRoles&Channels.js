@@ -113,6 +113,16 @@ module.exports = {
 
                 interaction.update({ components: [row, row2] })
             }
+            if (option == 'removercargomembro') {
+                configuracao.delete('ConfigRoles.cargomembro');
+                await ConfigRoles(interaction, client);
+                await logAction(client, {
+                    action: 'Cargo Membro removido',
+                    details: 'A configuração do cargo de Membro foi removida.',
+                    userId: interaction.user.id,
+                    guildId: interaction.guildId
+                });
+            }
 
         }
 
