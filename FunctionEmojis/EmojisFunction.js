@@ -3,44 +3,53 @@ const AllEmojis = require('./emojis.json');
 const axios = require('axios');
 
 async function fetchEmojis(client) {
-    const response = await axios.get(`https://discord.com/api/v9/applications/${client.user.id}/emojis`, {
+    const response = await axios.get(`https://discord.com/api/v10/applications/${client.user.id}/emojis`, {
         headers: {
             Authorization: `Bot ${client.token}`
         }
     });
-    return response.data.items;
+    return Array.isArray(response.data?.items) ? response.data.items : [];
 }
 
 async function createEmoji(client, name, image) {
-    let response;
+    const url = `https://discord.com/api/v10/applications/${client.user.id}/emojis`;
+    for (let attempt = 1; attempt <= 5; attempt += 1) {
+        try {
+            const response = await axios.post(url, {
+                name,
+                image,
+            }, {
+                headers: {
+                    Authorization: `Bot ${client.token}`,
+                },
+            });
 
-    try {
-        response = await axios.post(`https://discord.com/api/v9/applications/${client.user.id}/emojis`, {
-            name: name,
-            image: image
-        }, {
-            headers: {
-                Authorization: `Bot ${client.token}`
+            const emoji = response.data;
+            await saveEmojiToDatabase(name, emoji.id, emoji.animated);
+            return emoji.animated
+                ? `<a:${emoji.name}:${emoji.id}>`
+                : `<:${emoji.name}:${emoji.id}>`;
+        } catch (error) {
+            const status = error.response?.status;
+            if (status === 429 && attempt < 5) {
+                const retryAfter = Number(
+                    error.response?.data?.retry_after ??
+                    error.response?.headers?.['retry-after'] ??
+                    1
+                );
+                await new Promise(resolve => setTimeout(resolve, Math.ceil(retryAfter * 1000)));
+                continue;
             }
-        });
+            if (status >= 500 && attempt < 5) {
+                await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+                continue;
+            }
 
-        // console.log(`\x1b[32m[Emojis]\x1b[0m Emoji ${name} adicionado!`);
-        saveEmojiToDatabase(name, response.data.id)
-        return `<:${name}:${response.data.id}>`;
-    } catch (error) {
-        if (error.response && error.response.data && error.response.data.message === 'You are being rate limited.') {
-            const retryAfter = error.response.data.retry_after * 1000; 
-            await new Promise(resolve => setTimeout(resolve, retryAfter)); 
-            return await createEmoji(client, name, image); a
+            console.error(`[Emojis] Erro ao adicionar o emoji ${name}:`, error.message);
+            return null;
         }
-        if (error.response.status === 500) {
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            return await createEmoji(client, name, image); 
-        }
-
-        console.log(`\x1b[31m[Emojis]\x1b[0m Erro ao adicionar o emoji ${name}: ${error.message}`);
-        return null; 
     }
+    return null;
 }
 
 

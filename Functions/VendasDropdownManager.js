@@ -6,34 +6,11 @@ const {
     ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags
 } = require('discord.js');
 const { configuracao, Emojis } = require('../Database');
+const { getUsableEmojiIds, buildGuildEmojiOptions } = require('./EmojiPickerOptions');
 
 const PAGE_SIZE = 25;
-const applicationEmojiCache = new WeakMap();
 
 // ── Helpers de emoji ───────────────────────────────────────────────────────────
-async function getUsableEmojiIds(client, guild) {
-    if (!client?.application?.emojis?.fetch) {
-        throw new Error('O cliente Discord ainda não disponibilizou os emojis da aplicação.');
-    }
-
-    const now = Date.now();
-    let cached = applicationEmojiCache.get(client);
-    if (!cached || cached.expiresAt <= now) {
-        const appEmojis = await client.application.emojis.fetch({ force: true });
-        cached = {
-            expiresAt: now + 60_000,
-            ids: new Set(appEmojis.map(emoji => emoji.id)),
-        };
-        applicationEmojiCache.set(client, cached);
-    }
-
-    const usableIds = new Set(cached.ids);
-    for (const emoji of guild?.emojis?.cache?.values() || []) {
-        usableIds.add(emoji.id);
-    }
-    return usableIds;
-}
-
 async function buildBotEmojiOptionsList(client, guild) {
     const usableIds = await getUsableEmojiIds(client, guild);
     const allEmojis = Emojis.all();
@@ -54,11 +31,7 @@ async function buildBotEmojiOptionsList(client, guild) {
 }
 
 function buildServerEmojiOptionsList(guild) {
-    return [...(guild?.emojis.cache.values() || [])].map(e => ({
-        label: ((e.name || 'emoji').replace(/_/g, ' ')).slice(0, 100),
-        value: e.id,
-        emoji: { id: e.id, animated: !!e.animated },
-    }));
+    return buildGuildEmojiOptions(guild);
 }
 
 function gerarId() {
