@@ -1289,6 +1289,17 @@ module.exports = {
                 return;
             }
 
+            if (interaction.isButton() && customId.startsWith('enform_sopts_botoji_page_')) {
+                const parts = customId.slice('enform_sopts_botoji_page_'.length).split('_');
+                const page = Number.parseInt(parts[0], 10) || 0;
+                const slotId = parts.at(-1);
+                const guildId = parts.at(-2);
+                const optIdx = Number.parseInt(parts.at(-3), 10);
+                await interaction.deferUpdate();
+                await interaction.editReply(await buildOptionEmojiPickerEN(client, interaction.guild, guildId, slotId, optIdx, page));
+                return;
+            }
+
             if (interaction.isStringSelectMenu() && customId.startsWith('enform_sopts_botoji_')) {
                 const withoutPrefix = customId.slice('enform_sopts_botoji_'.length);
                 const parts   = withoutPrefix.split('_');
@@ -1636,20 +1647,41 @@ function buildOptionEditPanelEN(guildId, slotId, optIdx) {
     return { components: [c], flags: MessageFlags.IsComponentsV2 };
 }
 
-async function buildOptionEmojiPickerEN(client, guild, guildId, slotId, optIdx) {
+async function buildOptionEmojiPickerEN(client, guild, guildId, slotId, optIdx, page = 0) {
+    const botEmojiOptions = await buildDatabaseEmojiOptions(client, { guild, includeNoEmoji: true });
+    const pageSize = 25;
+    const totalPages = Math.max(1, Math.ceil(botEmojiOptions.length / pageSize));
+    const safePage = Math.max(0, Math.min(page, totalPages - 1));
     const c = new ContainerBuilder();
     c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `## ${Emojis.get('_ticket_emoji')} Escolher Emoji — Opção ${optIdx + 1}\n` +
-        `-# Selecione um emoji do bot ou do servidor para esta opção.`
+        `## ${Emojis.get('_ticket_emoji')} Choose Emoji — Option ${optIdx + 1}\n` +
+        `-# Select a bot or server emoji for this option. Page ${safePage + 1}/${totalPages}.`
     ));
     c.addSeparatorComponents(new SeparatorBuilder());
 
     c.addActionRowComponents(new ActionRowBuilder().addComponents(
         new StringSelectMenuBuilder()
             .setCustomId(`enform_sopts_botoji_${optIdx}_${guildId}_${slotId}`)
-            .setPlaceholder('Emojis do bot...')
-            .addOptions((await buildDatabaseEmojiOptions(client, { guild, includeNoEmoji: true })).slice(0, 25))
+            .setPlaceholder(`Bot emojis — page ${safePage + 1}/${totalPages}`)
+            .addOptions(botEmojiOptions.slice(safePage * pageSize, (safePage + 1) * pageSize))
     ));
+
+    if (totalPages > 1) {
+        const pageRow = new ActionRowBuilder();
+        if (safePage > 0) {
+            pageRow.addComponents(new ButtonBuilder()
+                .setCustomId(`enform_sopts_botoji_page_${safePage - 1}_${optIdx}_${guildId}_${slotId}`)
+                .setLabel('Previous')
+                .setStyle(ButtonStyle.Secondary));
+        }
+        if (safePage < totalPages - 1) {
+            pageRow.addComponents(new ButtonBuilder()
+                .setCustomId(`enform_sopts_botoji_page_${safePage + 1}_${optIdx}_${guildId}_${slotId}`)
+                .setLabel('Next')
+                .setStyle(ButtonStyle.Secondary));
+        }
+        c.addActionRowComponents(pageRow);
+    }
 
     const serverEmojis = buildGuildEmojiOptions(guild, { includeAnimated: false, limit: 25 });
     if (serverEmojis.length > 0) {

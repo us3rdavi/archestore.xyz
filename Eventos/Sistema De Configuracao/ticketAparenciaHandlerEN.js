@@ -73,6 +73,23 @@ module.exports = {
                 return;
             }
 
+            if (interaction.isButton() && customId.startsWith('taparelen_emojipage_')) {
+                const parts = customId.split('_');
+                const page = Number.parseInt(parts[2], 10) || 0;
+                const options = await getBotEmojiOptions(client, interaction.guild);
+                await interaction.update(buildAparenciaSectionEN(userId, 'emoji', options, page));
+                return;
+            }
+
+            if (interaction.isButton() && customId.startsWith('taparelen_feojipage_')) {
+                const parts = customId.slice('taparelen_feojipage_'.length).split('_');
+                const page = Number.parseInt(parts[0], 10) || 0;
+                const nomeFuncao = parts.slice(1, -1).join('_');
+                const options = await getBotEmojiOptions(client, interaction.guild);
+                await interaction.update(buildFuncaoEmojiScreenEN(userId, nomeFuncao, options, page));
+                return;
+            }
+
             // ── Category emoji back button ───────────────────────────────────
             if (interaction.isButton() && customId === `taparelen_funcback_${userId}`) {
                 await interaction.update(buildFuncaoNavScreenEN(userId));

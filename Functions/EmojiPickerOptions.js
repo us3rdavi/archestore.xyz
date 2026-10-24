@@ -2,61 +2,23 @@
 
 const { Emojis } = require('../Database');
 
-const applicationEmojiCache = new WeakMap();
-const CACHE_TTL_MS = 60_000;
-const RETRY_AFTER_ERROR_MS = 5_000;
+function getConfiguredEmojiIds() {
+    const ids = new Set();
+    for (const value of Object.values(Emojis.all())) {
+        if (typeof value !== 'string') continue;
+        const match = value.match(/^<(?:a)?:[^:]+:(\d+)>$/);
+        const id = match?.[1] || (/^\d+$/.test(value.trim()) ? value.trim() : null);
+        if (id) ids.add(id);
+    }
+    return ids;
+}
 
-async function getUsableEmojiIds(client, guild) {
-    const now = Date.now();
+async function getUsableEmojiIds(_client, guild) {
+    const configuredIds = getConfiguredEmojiIds();
     const guildIds = new Set(
         [...(guild?.emojis?.cache?.values() || [])].map(emoji => emoji.id)
     );
-
-    if (!client || (typeof client !== 'object' && typeof client !== 'function')) {
-        return guildIds;
-    }
-
-    let cached = applicationEmojiCache.get(client);
-    if (cached?.expiresAt > now) {
-        return new Set([...cached.ids, ...guildIds]);
-    }
-
-    if (!cached?.refreshPromise) {
-        const manager = client.application?.emojis;
-        if (!manager?.fetch) {
-            console.warn('[Emojis] O gerenciador de emojis da aplicação ainda não está disponível.');
-            cached = { ids: new Set(), expiresAt: now + RETRY_AFTER_ERROR_MS };
-            applicationEmojiCache.set(client, cached);
-            return guildIds;
-        }
-
-        const refreshPromise = Promise.resolve()
-            .then(() => manager.fetch({ force: true }))
-            .then(emojis => {
-                const ids = new Set([...emojis.values()].map(emoji => emoji.id));
-                applicationEmojiCache.set(client, {
-                    ids,
-                    expiresAt: Date.now() + CACHE_TTL_MS,
-                });
-                return ids;
-            })
-            .catch(error => {
-                console.warn(`[Emojis] Não foi possível atualizar os emojis da aplicação: ${error.message}`);
-                applicationEmojiCache.set(client, {
-                    ids: new Set(),
-                    expiresAt: Date.now() + RETRY_AFTER_ERROR_MS,
-                });
-                return new Set();
-            });
-
-        cached = { ids: new Set(), expiresAt: 0, refreshPromise };
-        applicationEmojiCache.set(client, cached);
-    }
-
-    const applicationIds = cached.refreshPromise
-        ? await cached.refreshPromise
-        : cached.ids;
-    return new Set([...applicationIds, ...guildIds]);
+    return new Set([...configuredIds, ...guildIds]);
 }
 
 async function buildDatabaseEmojiOptions(client, {

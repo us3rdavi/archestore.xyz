@@ -47,6 +47,7 @@ const BOT_EMOJI_OPTIONS = [
 ];
 
 const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+const EMOJI_PAGE_SIZE = 25;
 
 // Preview visual do embed dentro de CV2 usando heading + MediaGallery para o banner
 function buildPreviewContainer(data) {
@@ -114,7 +115,7 @@ function buildAparenciaMain(userId) {
     return { components: [previewContainer, controlContainer], ...CV2 };
 }
 
-function buildAparenciaSection(userId, section, botEmojiOptions = []) {
+function buildAparenciaSection(userId, section, botEmojiOptions = [], emojiPage = 0) {
     const data = tickets.get('tickets.aparencia') || {};
     const sectionLabel = SECTION_LABELS[section] || section;
     const previewContainer = buildPreviewContainer(data);
@@ -128,12 +129,30 @@ function buildAparenciaSection(userId, section, botEmojiOptions = []) {
     controlContainer.addActionRowComponents(buildNavSelectRow(userId, section));
 
     if (section === 'emoji') {
+        const totalPages = Math.max(1, Math.ceil(botEmojiOptions.length / EMOJI_PAGE_SIZE));
+        const safePage = Math.max(0, Math.min(emojiPage, totalPages - 1));
         controlContainer.addActionRowComponents(new ActionRowBuilder().addComponents(
             new StringSelectMenuBuilder()
                 .setCustomId(`taparel_emoji_pick_${userId}`)
-                .setPlaceholder('Escolha um emoji para o título do painel...')
-                .addOptions(botEmojiOptions.slice(0, 25))
+                .setPlaceholder(`Emojis do bot — página ${safePage + 1}/${totalPages}`)
+                .addOptions(botEmojiOptions.slice(safePage * EMOJI_PAGE_SIZE, (safePage + 1) * EMOJI_PAGE_SIZE))
         ));
+        if (totalPages > 1) {
+            const pageRow = new ActionRowBuilder();
+            if (safePage > 0) {
+                pageRow.addComponents(new ButtonBuilder()
+                    .setCustomId(`taparel_emojipage_${safePage - 1}_${userId}`)
+                    .setLabel('Anterior')
+                    .setStyle(ButtonStyle.Secondary));
+            }
+            if (safePage < totalPages - 1) {
+                pageRow.addComponents(new ButtonBuilder()
+                    .setCustomId(`taparel_emojipage_${safePage + 1}_${userId}`)
+                    .setLabel('Próxima')
+                    .setStyle(ButtonStyle.Secondary));
+            }
+            controlContainer.addActionRowComponents(pageRow);
+        }
     } else {
         controlContainer.addActionRowComponents(new ActionRowBuilder().addComponents(
             new ButtonBuilder()
@@ -199,24 +218,42 @@ function buildFuncaoNavScreen(userId) {
     return { components: [container], ...CV2 };
 }
 
-function buildFuncaoEmojiScreen(userId, nomeFuncao, botEmojiOptions = []) {
+function buildFuncaoEmojiScreen(userId, nomeFuncao, botEmojiOptions = [], emojiPage = 0) {
     const funcao = tickets.get(`tickets.funcoes.${nomeFuncao}`) || {};
     const emojiLine = funcao.emoji
         ? `**Emoji atual:** ${funcao.emoji}`
         : `-# Nenhum emoji definido para esta função.`;
+    const totalPages = Math.max(1, Math.ceil(botEmojiOptions.length / EMOJI_PAGE_SIZE));
+    const safePage = Math.max(0, Math.min(emojiPage, totalPages - 1));
 
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('_ticket_emoji')} Emoji da Função — ${nomeFuncao}\n` +
-        `${emojiLine}`
+        `${emojiLine}\n-# Página de emojis do bot ${safePage + 1}/${totalPages}`
     ));
     container.addSeparatorComponents(new SeparatorBuilder());
     container.addActionRowComponents(new ActionRowBuilder().addComponents(
         new StringSelectMenuBuilder()
             .setCustomId(`taparel_feoji_${userId}_${nomeFuncao}`)
-            .setPlaceholder('Escolha um emoji para esta função...')
-            .addOptions(botEmojiOptions.slice(0, 25))
+            .setPlaceholder(`Emojis do bot — página ${safePage + 1}/${totalPages}`)
+            .addOptions(botEmojiOptions.slice(safePage * EMOJI_PAGE_SIZE, (safePage + 1) * EMOJI_PAGE_SIZE))
     ));
+    if (totalPages > 1) {
+        const pageRow = new ActionRowBuilder();
+        if (safePage > 0) {
+            pageRow.addComponents(new ButtonBuilder()
+                .setCustomId(`taparel_feojipage_${safePage - 1}_${nomeFuncao}_${userId}`)
+                .setLabel('Anterior')
+                .setStyle(ButtonStyle.Secondary));
+        }
+        if (safePage < totalPages - 1) {
+            pageRow.addComponents(new ButtonBuilder()
+                .setCustomId(`taparel_feojipage_${safePage + 1}_${nomeFuncao}_${userId}`)
+                .setLabel('Próxima')
+                .setStyle(ButtonStyle.Secondary));
+        }
+        container.addActionRowComponents(pageRow);
+    }
     container.addActionRowComponents(new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId(`taparel_funcback_${userId}`)

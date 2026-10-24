@@ -74,6 +74,23 @@ module.exports = {
                 return;
             }
 
+            if (interaction.isButton() && customId.startsWith('taparel_emojipage_')) {
+                const parts = customId.split('_');
+                const page = Number.parseInt(parts[2], 10) || 0;
+                const options = await getBotEmojiOptions(client, interaction.guild);
+                await interaction.update(buildAparenciaSection(userId, 'emoji', options, page));
+                return;
+            }
+
+            if (interaction.isButton() && customId.startsWith('taparel_feojipage_')) {
+                const parts = customId.slice('taparel_feojipage_'.length).split('_');
+                const page = Number.parseInt(parts[0], 10) || 0;
+                const nomeFuncao = parts.slice(1, -1).join('_');
+                const options = await getBotEmojiOptions(client, interaction.guild);
+                await interaction.update(buildFuncaoEmojiScreen(userId, nomeFuncao, options, page));
+                return;
+            }
+
             // ── Botão Voltar da tela de emoji de função ──────────────────────
             if (interaction.isButton() && customId === `taparel_funcback_${userId}`) {
                 await interaction.update(buildFuncaoNavScreen(userId));

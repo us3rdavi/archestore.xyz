@@ -47,6 +47,7 @@ const BOT_EMOJI_OPTIONS = [
 ];
 
 const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+const EMOJI_PAGE_SIZE = 25;
 
 function buildPreviewContainerEN(data) {
     const c = new ContainerBuilder();
@@ -113,7 +114,7 @@ function buildAparenciaMainEN(userId) {
     return { components: [previewContainer, controlContainer], ...CV2 };
 }
 
-function buildAparenciaSectionEN(userId, section, botEmojiOptions = []) {
+function buildAparenciaSectionEN(userId, section, botEmojiOptions = [], emojiPage = 0) {
     const data = tickets.get('en.aparencia') || {};
     const sectionLabel = SECTION_LABELS[section] || section;
     const previewContainer = buildPreviewContainerEN(data);
@@ -127,12 +128,30 @@ function buildAparenciaSectionEN(userId, section, botEmojiOptions = []) {
     controlContainer.addActionRowComponents(buildNavSelectRowEN(userId, section));
 
     if (section === 'emoji') {
+        const totalPages = Math.max(1, Math.ceil(botEmojiOptions.length / EMOJI_PAGE_SIZE));
+        const safePage = Math.max(0, Math.min(emojiPage, totalPages - 1));
         controlContainer.addActionRowComponents(new ActionRowBuilder().addComponents(
             new StringSelectMenuBuilder()
                 .setCustomId(`taparelen_emoji_pick_${userId}`)
-                .setPlaceholder('Choose an emoji for the panel title...')
-                .addOptions(botEmojiOptions.slice(0, 25))
+                .setPlaceholder(`Bot emojis — page ${safePage + 1}/${totalPages}`)
+                .addOptions(botEmojiOptions.slice(safePage * EMOJI_PAGE_SIZE, (safePage + 1) * EMOJI_PAGE_SIZE))
         ));
+        if (totalPages > 1) {
+            const pageRow = new ActionRowBuilder();
+            if (safePage > 0) {
+                pageRow.addComponents(new ButtonBuilder()
+                    .setCustomId(`taparelen_emojipage_${safePage - 1}_${userId}`)
+                    .setLabel('Previous')
+                    .setStyle(ButtonStyle.Secondary));
+            }
+            if (safePage < totalPages - 1) {
+                pageRow.addComponents(new ButtonBuilder()
+                    .setCustomId(`taparelen_emojipage_${safePage + 1}_${userId}`)
+                    .setLabel('Next')
+                    .setStyle(ButtonStyle.Secondary));
+            }
+            controlContainer.addActionRowComponents(pageRow);
+        }
     } else {
         controlContainer.addActionRowComponents(new ActionRowBuilder().addComponents(
             new ButtonBuilder()
@@ -196,24 +215,42 @@ function buildFuncaoNavScreenEN(userId) {
     return { components: [container], ...CV2 };
 }
 
-function buildFuncaoEmojiScreenEN(userId, nomeFuncao, botEmojiOptions = []) {
+function buildFuncaoEmojiScreenEN(userId, nomeFuncao, botEmojiOptions = [], emojiPage = 0) {
     const funcao = tickets.get(`en.funcoes.${nomeFuncao}`) || {};
     const emojiLine = funcao.emoji
         ? `**Current emoji:** ${funcao.emoji}`
         : `-# No emoji set for this category.`;
+    const totalPages = Math.max(1, Math.ceil(botEmojiOptions.length / EMOJI_PAGE_SIZE));
+    const safePage = Math.max(0, Math.min(emojiPage, totalPages - 1));
 
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('_ticket_emoji')} Category Emoji — ${nomeFuncao}\n` +
-        `${emojiLine}`
+        `${emojiLine}\n-# Bot emoji page ${safePage + 1}/${totalPages}`
     ));
     container.addSeparatorComponents(new SeparatorBuilder());
     container.addActionRowComponents(new ActionRowBuilder().addComponents(
         new StringSelectMenuBuilder()
             .setCustomId(`taparelen_feoji_${userId}_${nomeFuncao}`)
-            .setPlaceholder('Choose an emoji for this category...')
-            .addOptions(botEmojiOptions.slice(0, 25))
+            .setPlaceholder(`Bot emojis — page ${safePage + 1}/${totalPages}`)
+            .addOptions(botEmojiOptions.slice(safePage * EMOJI_PAGE_SIZE, (safePage + 1) * EMOJI_PAGE_SIZE))
     ));
+    if (totalPages > 1) {
+        const pageRow = new ActionRowBuilder();
+        if (safePage > 0) {
+            pageRow.addComponents(new ButtonBuilder()
+                .setCustomId(`taparelen_feojipage_${safePage - 1}_${nomeFuncao}_${userId}`)
+                .setLabel('Previous')
+                .setStyle(ButtonStyle.Secondary));
+        }
+        if (safePage < totalPages - 1) {
+            pageRow.addComponents(new ButtonBuilder()
+                .setCustomId(`taparelen_feojipage_${safePage + 1}_${nomeFuncao}_${userId}`)
+                .setLabel('Next')
+                .setStyle(ButtonStyle.Secondary));
+        }
+        container.addActionRowComponents(pageRow);
+    }
     container.addActionRowComponents(new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId(`taparelen_funcback_${userId}`)
