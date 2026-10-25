@@ -65,9 +65,7 @@ async function Painel(interaction, client) {
 
         await interaction.editReply({
             components: [container],
-            flags: MessageFlags.IsComponentsV2,
-            content: '',
-            embeds: []
+            flags: MessageFlags.IsComponentsV2
         });
 
     } catch (error) {
@@ -130,9 +128,7 @@ async function definirduvidas(interaction, client) {
 
         const payload = {
             components: [container],
-            flags: MessageFlags.IsComponentsV2,
-            content: '',
-            embeds: []
+            flags: MessageFlags.IsComponentsV2
         };
 
         if (interaction.deferred || interaction.replied) {

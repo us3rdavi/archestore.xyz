@@ -117,7 +117,7 @@ function buildFormEmbedEditorContainerEN(userId, guildId, slotId, section, data)
     return c;
 }
 
-const EMB_CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+const EMB_CV2 = { flags: MessageFlags.IsComponentsV2 };
 
 function buildFormEmbedMainMenuEN(userId, guildId, slotId) {
     const sess     = formEmbedSessions.get(userId) || { data: {} };
@@ -1393,7 +1393,7 @@ module.exports = {
                     `A aparência do formulário foi atualizada com sucesso.\n\n` +
                     `-# Feche esta mensagem ou reabra o editor para continuar editando.`
                 ));
-                await interaction.update({ components: [savedC], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+            await interaction.update({ components: [savedC], flags: MessageFlags.IsComponentsV2 });
                 return;
             }
 

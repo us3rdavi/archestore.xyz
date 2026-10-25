@@ -48,7 +48,6 @@ module.exports = {
                 await safeReply({
                     components: [buildCommandPanel('Configuração de Ban & Unban', 'Você está configurando o comando **Ban & Unban**. Selecione o canal e o cargo abaixo:', makeRows('selecionar_cargo_banunban', 'selecionar_canal_banunban'))],
                     flags: MessageFlags.IsComponentsV2,
-                    embeds: [],
                     ephemeral: true
                 });
             }
@@ -65,7 +64,6 @@ module.exports = {
                 await safeReply({
                     components: [buildCommandPanel('Configuração de Unlock & Lock', 'Você está configurando o comando **Unlock & Lock**. Selecione o canal e o cargo abaixo:', makeRows('selecionar_cargo_unlocklock', 'selecionar_canal_unlocklock'))],
                     flags: MessageFlags.IsComponentsV2,
-                    embeds: [],
                     ephemeral: true
                 });
             }
@@ -82,7 +80,6 @@ module.exports = {
                 await safeReply({
                     components: [buildCommandPanel('Configuração de Clear & Nuke', 'Você está configurando o comando **Clear & Nuke**. Selecione o canal e o cargo abaixo:', makeRows('selecionar_cargo_clearnuke', 'selecionar_canal_clearnuke'))],
                     flags: MessageFlags.IsComponentsV2,
-                    embeds: [],
                     ephemeral: true
                 });
             }

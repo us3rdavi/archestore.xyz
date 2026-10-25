@@ -106,7 +106,7 @@ module.exports = {
                         .setStyle(2),
                 ));
 
-                await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+        await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2 });
                 return;
             }
 

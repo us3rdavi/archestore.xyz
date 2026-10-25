@@ -1,5 +1,6 @@
 const { EmbedBuilder } = require("discord.js");
 const { carrinhos, pagamentos, configuracao } = require("../Database");
+const { releaseThreadMemberMessaging } = require("./ThreadPermissions");
 
 function CloseThreds(client) {
     client.guilds.cache.forEach((guild) => {
@@ -22,16 +23,18 @@ function CloseThreds(client) {
             if (cart && (cart.status === 'aguardando_pagamento' || cart.status === 'pago')) return;
 
             if (Date.now() > novoTimestamp) {
-                element.delete().then(() => {
-                }).catch((error) => {
-                });
-
+                const parentChannel = element.parent
+                    || guild.channels.cache.get(cart?.parentChannelId || element.parentId);
+                if (parentChannel && cart?.userId) {
+                    await releaseThreadMemberMessaging(parentChannel, element.id, cart.userId).catch(() => {});
+                }
+                await element.delete().catch(() => {});
+                pagamentos.delete(element.id);
+                carrinhos.delete(element.id);
 
                 const texto = element.name;
                 const partes = texto.split("・");
                 const ultimoNumero = partes[partes.length - 1];
-                pagamentos.delete(element.id)
-                carrinhos.delete(element.id)
 
                 try {
 

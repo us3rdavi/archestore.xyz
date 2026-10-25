@@ -69,8 +69,6 @@ async function Avançados(interaction, client) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 
@@ -131,8 +129,6 @@ async function Configcomandos24(interaction, client) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 
@@ -177,8 +173,6 @@ async function Emojis24(interaction, client) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 
@@ -228,8 +222,6 @@ async function Perms24(interaction, client) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 

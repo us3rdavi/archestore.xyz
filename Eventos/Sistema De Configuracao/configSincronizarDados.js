@@ -23,7 +23,7 @@ try {
     BackupStorage = require("../../Database").BackupStorage;
 } catch (_) {}
 
-const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+const CV2 = { flags: MessageFlags.IsComponentsV2 };
 
 function loadingContainer(msg) {
     const c = new ContainerBuilder();

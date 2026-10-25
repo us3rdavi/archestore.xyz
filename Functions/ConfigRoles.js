@@ -67,8 +67,6 @@ async function ConfigChannels(interaction, client) {
     interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 
@@ -124,8 +122,6 @@ async function ConfigRoles(interaction, client) {
     interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 

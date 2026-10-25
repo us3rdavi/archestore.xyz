@@ -62,8 +62,6 @@ async function AtendimentohorarioEN(interaction) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 

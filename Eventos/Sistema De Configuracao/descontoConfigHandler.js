@@ -60,7 +60,7 @@ async function descontoPainel(interaction) {
     container.addActionRowComponents(row1);
     container.addActionRowComponents(row2);
 
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (interaction.deferred || interaction.replied) {
         await interaction.editReply(payload);
     } else {
@@ -155,7 +155,7 @@ module.exports = {
                 try {
                     const novo = criarDesconto({ codigo, nome, tipo, valor, usosMax: usosMax || null });
                     const val = novo.tipo === 'percent' ? `${novo.valor}%` : formatBRL(novo.valor);
-                    await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
+                    await interaction.deferUpdate();
                     await descontoPainel(interaction);
                     try {
                         await interaction.followUp({ content: `${Emojis.get('confirmed_emoji')} Cupom \`${novo.codigo}\` criado com sucesso! Desconto: ${val}.`, ephemeral: true });
@@ -189,7 +189,7 @@ module.exports = {
                     new ButtonBuilder().setCustomId('vnd_gerenciar_descontos').setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
                 ));
 
-                await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+                await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
                 return;
             }
 
@@ -200,7 +200,7 @@ module.exports = {
                 const desconto = descontos.find(d => d.id === id);
                 if (!desconto) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Cupom não encontrado.`, ephemeral: true });
                 removerDesconto(id);
-                await interaction.update({ content: `${Emojis.get('loading_emoji')} Carregando...`, components: [], embeds: [], flags: MessageFlags.IsComponentsV2 });
+                await interaction.deferUpdate();
                 await descontoPainel(interaction);
                 try {
                     await interaction.followUp({ content: `${Emojis.get('confirmed_emoji')} Cupom \`${desconto.codigo}\` removido.`, ephemeral: true });

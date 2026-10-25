@@ -88,7 +88,7 @@ async function painelTicket(interaction, useEditReply = false, useReply = false)
     container.addActionRowComponents(row1);
     container.addActionRowComponents(row2);
 
-    const payload = { content: '', embeds: [], components: [container], flags: MessageFlags.IsComponentsV2 };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (useReply)     await interaction.reply(payload);
     else if (useEditReply) await interaction.editReply(payload);
     else               await interaction.update(payload);
@@ -191,7 +191,6 @@ async function painelConfiguracaoTicket(interaction) {
     );
 
     await interaction.update({
-        content: '', embeds: [],
         components: [container],
         flags: MessageFlags.IsComponentsV2
     });

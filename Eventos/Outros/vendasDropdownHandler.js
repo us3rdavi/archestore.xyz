@@ -55,8 +55,6 @@ module.exports = {
                 await interaction.reply({
                     components: [container],
                     flags: MessageFlags.IsComponentsV2,
-                    embeds: [],
-                    content: '',
                     ephemeral: true
                 });
                 return;

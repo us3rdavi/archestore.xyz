@@ -6,6 +6,7 @@ const {
     ChannelType
 } = require('discord.js');
 const { configuracao, carrinhos, Emojis } = require('../Database');
+const { ensureThreadMemberCanMessage } = require('./ThreadPermissions');
 
 function formatBRL(valor) {
     return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -94,9 +95,7 @@ function buildCartMessage(cartData) {
 
     return {
         components: [container],
-        flags: MessageFlags.IsComponentsV2,
-        embeds: [],
-        content: ''
+        flags: MessageFlags.IsComponentsV2
     };
 }
 
@@ -137,7 +136,17 @@ async function criarCarrinhoThread(interaction, client, secao, subproduto) {
             type: ChannelType.PrivateThread,
             invitable: false,
         });
-        await thread.members.add(interaction.user.id);
+        try {
+            await ensureThreadMemberCanMessage(
+                canal,
+                thread,
+                interaction.member,
+                `Permitir que ${interaction.user.tag} converse no próprio carrinho`
+            );
+        } catch (error) {
+            await thread.delete('Não foi possível habilitar a participação do cliente').catch(() => {});
+            throw error;
+        }
     } catch (err) {
         console.error('[CarrinhoVendas] Erro ao criar thread:', err);
         return interaction.editReply({
@@ -151,6 +160,7 @@ async function criarCarrinhoThread(interaction, client, secao, subproduto) {
         username,
         guildId: interaction.guildId,
         threadId: thread.id,
+        parentChannelId: canal.id,
         secaoId: secao.id,
         secaoNome: secao.nome,
         subprodutoId: subproduto.id,

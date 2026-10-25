@@ -59,8 +59,6 @@ async function semiConfigs(interaction, client) {
     interaction.editReply({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 

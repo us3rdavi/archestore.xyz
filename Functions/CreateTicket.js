@@ -13,6 +13,7 @@ const {
 const { tickets, estatisticas } = require("../Database");
 const emojis = require("../Database/emojis.json");
 const { buildTicketContainer } = require("./TicketHelpers");
+const { ensureThreadMemberCanMessage } = require("./ThreadPermissions");
 const moment = require('moment-timezone');
 
 const Emojis = { get: (name) => emojis[name] || "" };
@@ -126,8 +127,17 @@ async function CreateTicket(interaction, valor) {
             reason: `Ticket #${contador} aberto por ${interaction.user.tag}`
         });
 
-        // Adicionar o usuário que abriu o ticket ao tópico privado
-        await thread.members.add(interaction.user.id).catch(() => {});
+        try {
+            await ensureThreadMemberCanMessage(
+                ticketChannel,
+                thread,
+                interaction.member,
+                `Permitir que ${interaction.user.tag} converse no próprio ticket`
+            );
+        } catch (error) {
+            await thread.delete('Não foi possível habilitar a participação do cliente').catch(() => {});
+            throw error;
+        }
 
         // Adicionar todos os membros com cargos staff ao tópico privado
         const allStaffRoleIds = tickets.get('tickets.staffRoles') || [];
@@ -153,6 +163,7 @@ async function CreateTicket(interaction, valor) {
             abertoPor: interaction.user.id,
             username: interaction.user.globalName || interaction.user.username,
             guildId: interaction.guild.id,
+            parentChannelId: ticketChannel.id,
             messageId: null
         };
         tickets.set(`tickets.abertos.${interaction.user.id}`, ticketData);
@@ -292,7 +303,7 @@ async function CreateTicket(interaction, valor) {
         tickets.set('tickets.contador', contador - 1);
         await editLoading(new ContainerBuilder().addTextDisplayComponents(
             new TextDisplayBuilder().setContent(
-                `${Emojis.get('negative_emoji')} Ocorreu um erro ao criar o ticket. Verifique se o canal de tickets está configurado corretamente.`
+                `${Emojis.get('negative_emoji')} Ocorreu um erro ao criar o ticket. Verifique as permissões do canal configurado.\n-# ${String(error.message || 'Erro desconhecido').slice(0, 250)}`
             )
         ));
     }

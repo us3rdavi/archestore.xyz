@@ -64,9 +64,7 @@ async function PermsAvançados24(interaction, client) {
 
     await interaction.update({
         components: [container],
-        flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
+        flags: MessageFlags.IsComponentsV2
     });
 }
 

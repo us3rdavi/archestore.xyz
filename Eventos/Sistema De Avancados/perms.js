@@ -80,7 +80,6 @@ module.exports = {
             return interaction.reply({
                 components: [container],
                 flags: MessageFlags.IsComponentsV2,
-                embeds: [],
                 ephemeral: true
             });
         }

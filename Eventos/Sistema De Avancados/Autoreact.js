@@ -57,8 +57,7 @@ module.exports = {
 
             await interaction.update({
                 components: [buildAutoReactContainer(interaction)],
-                flags: MessageFlags.IsComponentsV2,
-                embeds: []
+                flags: MessageFlags.IsComponentsV2
             });
         }
 
@@ -85,16 +84,14 @@ module.exports = {
 
             await interaction.update({
                 components: [buildAutoReactContainer(interaction)],
-                flags: MessageFlags.IsComponentsV2,
-                embeds: []
+                flags: MessageFlags.IsComponentsV2
             });
         }
 
         if (customId === "atualizarembed24") {
             await interaction.update({
                 components: [buildAutoReactContainer(interaction)],
-                flags: MessageFlags.IsComponentsV2,
-                embeds: []
+                flags: MessageFlags.IsComponentsV2
             });
         }
 
@@ -131,7 +128,6 @@ module.exports = {
                     return await interaction.reply({
                         components: [errContainer],
                         flags: MessageFlags.IsComponentsV2,
-                        embeds: [],
                         ephemeral: true
                     });
                 }

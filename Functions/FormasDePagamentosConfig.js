@@ -83,9 +83,7 @@ async function FormasDePagamentos(interaction) {
 
     await interaction.update({
         components: [container],
-        flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
+            flags: MessageFlags.IsComponentsV2
     });
 }
 
@@ -144,9 +142,7 @@ async function EfiBankConfiguracao(client, interaction, a) {
 
     const payload = {
         components: [container],
-        flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
+        flags: MessageFlags.IsComponentsV2
     };
 
     if (a != 1) {

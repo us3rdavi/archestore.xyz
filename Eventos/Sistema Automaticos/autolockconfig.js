@@ -88,10 +88,8 @@ module.exports = {
                     ]);
 
                     await interaction.update({
-                        content: '',
                         components: [container],
                         flags: MessageFlags.IsComponentsV2,
-                        embeds: [],
                         ephemeral: true
                     });
                 }
@@ -162,10 +160,8 @@ module.exports = {
                     ]);
 
                     await interaction.update({
-                        content: '',
                         components: [container],
                         flags: MessageFlags.IsComponentsV2,
-                        embeds: [],
                         ephemeral: true
                     });
                 }

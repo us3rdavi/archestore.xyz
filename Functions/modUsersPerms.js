@@ -54,10 +54,8 @@ async function gerenciarPerms(interaction, client) {
     container.addActionRowComponents(rowConfigUsers2);
 
     await interaction.editReply({
-        content: '',
         components: [container],
-        flags: MessageFlags.IsComponentsV2,
-        embeds: []
+        flags: MessageFlags.IsComponentsV2
     });
 }
 

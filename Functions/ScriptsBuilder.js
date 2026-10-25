@@ -38,7 +38,7 @@ const EDITOR_FIELDS = {
     footer: { label: 'Rodapé', maxLength: 500, style: 'short' },
 };
 
-const V2 = { flags: MessageFlags.IsComponentsV2, content: '', embeds: [] };
+const V2 = { flags: MessageFlags.IsComponentsV2 };
 
 function copy(value) {
     return JSON.parse(JSON.stringify(value ?? {}));

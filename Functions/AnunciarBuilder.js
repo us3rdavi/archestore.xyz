@@ -62,7 +62,7 @@ function clearEmbedData(userId) {
     dbembed.delete(`builder.${userId}`);
 }
 
-const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+const CV2 = { flags: MessageFlags.IsComponentsV2 };
 
 // Parse a stored emoji string like "<:name:id>" or "<a:name:id>" into a ButtonBuilder-compatible object
 function parseEmojiForButton(emojiStr) {

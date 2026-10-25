@@ -56,7 +56,7 @@ const BUTTON_STYLE_LABELS = {
 };
 
 const PAGE_SIZE = 25;
-const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+const CV2 = { flags: MessageFlags.IsComponentsV2 };
 
 // ── Helpers compartilhados ────────────────────────────────────────────────────
 

@@ -82,8 +82,6 @@ async function AcoesAutomaticsConfigs(interaction, client) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 
@@ -130,8 +128,6 @@ async function SistemaAntiFake(interaction, client) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 
@@ -246,8 +242,6 @@ async function sistemaAntiRaid(interaction, client) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 
@@ -320,8 +314,6 @@ async function LimpezaAutomatica(interaction, client) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 
@@ -396,8 +388,6 @@ async function GerenciarCanais(interaction, client) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 
@@ -475,8 +465,6 @@ async function SistemaNukar(interaction, client) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 
@@ -557,8 +545,6 @@ async function SistemadeFiltro(interaction, client) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 
@@ -622,8 +608,6 @@ async function msgbemvindo(interaction, client) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 
@@ -675,8 +659,6 @@ async function msgbemvindocanais(interaction, client) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 

@@ -74,7 +74,7 @@ async function GerenciarCampos2(interaction, campo, produtoname, update, reply) 
     container.addActionRowComponents(row3);
     container.addActionRowComponents(row5);
 
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
 
     if (produtoname == undefined) {
         await interaction.update(payload);
@@ -178,7 +178,7 @@ async function GerenciarCampos(interaction, produtoname) {
         container.addActionRowComponents(row4);
     }
 
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] };
+        const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
 
     if (selectMenuBuilder.options == 0) {
         try {

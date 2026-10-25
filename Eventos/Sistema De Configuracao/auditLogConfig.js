@@ -57,8 +57,6 @@ async function showAuditLogPanel(interaction, client) {
     const payload = {
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        embeds: [],
-        content: ''
     };
 
     if (interaction.deferred || interaction.replied) {

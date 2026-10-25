@@ -64,8 +64,6 @@ async function AutoClear(interaction, client) {
         interaction.update({
             components: [container],
             flags: MessageFlags.IsComponentsV2,
-            content: '',
-            embeds: []
         });
     } catch (error) {
         console.error("Erro ao obter dados do banco:", error);

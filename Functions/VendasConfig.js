@@ -71,7 +71,7 @@ async function abrirGerenciadorSecoes(interaction) {
     container.addActionRowComponents(new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId('vnd_voltar_config').setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
     ));
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
     else await interaction.update(payload);
 }
@@ -143,7 +143,7 @@ async function vendasConfig(interaction) {
             .setStyle(2),
     ));
 
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (interaction.deferred || interaction.replied) {
         await interaction.editReply(payload);
     } else {
@@ -216,7 +216,7 @@ async function vendasGerenciarPaineis(interaction) {
             .setStyle(2),
     ));
 
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
     else await interaction.update(payload);
 }
@@ -261,7 +261,7 @@ async function vendasPostarPainelEspecifico(interaction, painelId) {
             .setStyle(2),
     ));
 
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
     else await interaction.update(payload);
 }
@@ -303,7 +303,7 @@ async function vendasLogsConfig(interaction) {
             .setStyle(2),
     ));
 
-    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
 }
 
 // ── Canal de carrinho por painel ──────────────────────────────────────────────
@@ -343,7 +343,7 @@ async function vendasCanalCarrinhoPorPainel(interaction, painelId) {
             .setStyle(2),
     ));
 
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
     else await interaction.update(payload);
 }
@@ -376,7 +376,7 @@ async function vendasCanalCarrinhoConfig(interaction) {
             .setStyle(2),
     ));
 
-    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
 }
 
 // ── Postar painel (legado — mantido para compatibilidade) ─────────────────────

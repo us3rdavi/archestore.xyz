@@ -244,8 +244,6 @@ module.exports = {
                 await interaction.update({
                     components: [buildSubPanel(userId, 'scripts')],
                     flags: MessageFlags.IsComponentsV2,
-                    content: '',
-                    embeds: [],
                 });
                 return;
             }

@@ -52,8 +52,6 @@ async function configrole24(interaction, client) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 

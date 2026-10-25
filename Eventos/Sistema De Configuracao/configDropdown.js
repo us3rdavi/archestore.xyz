@@ -20,8 +20,6 @@ module.exports = {
                 await interaction.update({
                     components: [buildSubPanel(userId, category)],
                     flags: MessageFlags.IsComponentsV2,
-                    embeds: [],
-                    content: ''
                 });
                 return;
             }
@@ -35,8 +33,6 @@ module.exports = {
                     await interaction.update({
                         components: [buildMainPanel(userId, interaction)],
                         flags: MessageFlags.IsComponentsV2,
-                        embeds: [],
-                        content: ''
                     });
                     return;
                 }
@@ -83,7 +79,7 @@ module.exports = {
                                 .setEmoji({ id: '1501803908589162537' })
                                 .setStyle(2)
                         ));
-                        await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] });
+                await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
                         return;
                     }
                     const { ChannelSelectMenuBuilder, ChannelType } = require('discord.js');
@@ -106,7 +102,7 @@ module.exports = {
                             .setEmoji({ id: '1501803908589162537' })
                             .setStyle(2)
                     ));
-                    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] });
+                await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
                     return;
                 }
 
@@ -128,7 +124,7 @@ module.exports = {
                                 .setEmoji({ id: '1501803908589162537' })
                                 .setStyle(2)
                         ));
-                        await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] });
+                await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
                         return;
                     }
                     const container = new ContainerBuilder();
@@ -151,7 +147,7 @@ module.exports = {
                             .setEmoji({ id: '1501803908589162537' })
                             .setStyle(2)
                     ));
-                    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] });
+                await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
                     return;
                 }
 
@@ -200,7 +196,7 @@ module.exports = {
                             .setEmoji({ id: '1501803908589162537' })
                             .setStyle(2)
                     ));
-                    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] });
+                await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
                     return;
                 }
 

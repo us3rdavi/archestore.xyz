@@ -333,7 +333,7 @@ module.exports = {
                         .setDisabled(true),
                 ));
 
-                await interaction.editReply({ content: '', components: [lc], flags: MessageFlags.IsComponentsV2 }).catch(() => {});
+                await interaction.editReply({ components: [lc], flags: MessageFlags.IsComponentsV2 }).catch(() => {});
                 return;
             }
 
@@ -428,7 +428,7 @@ module.exports = {
                         .setDisabled(true),
                 ));
 
-                await interaction.editReply({ content: '', components: [lc], flags: MessageFlags.IsComponentsV2 }).catch(() => {});
+                await interaction.editReply({ components: [lc], flags: MessageFlags.IsComponentsV2 }).catch(() => {});
                 return;
             }
 

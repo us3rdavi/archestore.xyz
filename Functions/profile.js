@@ -34,9 +34,7 @@ async function profileuser(interaction, userID = null) {
 
     interaction.reply({
         components: [container],
-        flags: MessageFlags.IsComponentsV2,
-        embeds: [],
-        ephemeral: true
+        flags: [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral]
     });
 }
 

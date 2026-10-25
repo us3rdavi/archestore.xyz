@@ -12,7 +12,7 @@ const { getPermissions, addPermission, removePermission } = require('../../Funct
 const { buildPermsPanel } = require('../../ComandosSlash/Administracao/perms.js');
 const config = require('../../config.json');
 
-const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+const CV2 = { flags: MessageFlags.IsComponentsV2 };
 
 module.exports = {
     name: 'interactionCreate',

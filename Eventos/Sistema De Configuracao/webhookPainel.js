@@ -13,7 +13,7 @@ const {
 const { Emojis } = require('../../Database');
 const { buildWebhookPanel } = require('../../ComandosSlash/Administracao/webhook.js');
 
-const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+const CV2 = { flags: MessageFlags.IsComponentsV2 };
 
 module.exports = {
     name: 'interactionCreate',

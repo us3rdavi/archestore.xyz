@@ -11,6 +11,7 @@ const {
     MessageFlags, AttachmentBuilder
 } = require('discord.js');
 const { carrinhos, Emojis, configuracao, pagamentos } = require('../../Database');
+const { releaseThreadMemberMessaging } = require('../../Functions/ThreadPermissions');
 const { buildCartMessage, formatBRL, calcTotal } = require('../../Functions/CarrinhoVendas');
 const { buscarDesconto, incrementarUso } = require('../../Functions/DescontoVendas');
 const { criarCobrancaPix, iniciarPolling } = require('../../Functions/EfiPixVendas');
@@ -139,11 +140,16 @@ module.exports = {
                     `Carrinho **#${cart.cartId}** foi cancelado por <@${interaction.user.id}>.\n\n` +
                     `-# Este canal será fechado em instantes.`
                 ));
-                await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+                await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
 
                 const thread = interaction.channel;
                 setTimeout(async () => {
                     try { await thread.setArchived(true); } catch (e) { }
+                    const parentChannel = thread.parent
+                        || interaction.guild.channels.cache.get(cart.parentChannelId || thread.parentId);
+                    if (parentChannel) {
+                        await releaseThreadMemberMessaging(parentChannel, thread.id, cart.userId).catch(() => {});
+                    }
                 }, 5000);
                 return;
             }
@@ -169,7 +175,7 @@ module.exports = {
                     `## ${Emojis.get('loading_emoji')} Gerando cobrança PIX...\n` +
                     `-# Aguarde enquanto processamos seu pedido.`
                 ));
-                await interaction.message.edit({ components: [containerLoad], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+                await interaction.message.edit({ components: [containerLoad], flags: MessageFlags.IsComponentsV2 });
 
                 const valorTotal = calcTotal(cart);
                 const descricaoPix = `${cart.subprodutoNome} x${cart.quantidade}`.slice(0, 140);
@@ -195,7 +201,7 @@ module.exports = {
                             .setLabel('Cancelar')
                             .setStyle(4)
                     ));
-                    await interaction.message.edit({ components: [containerErr], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+                    await interaction.message.edit({ components: [containerErr], flags: MessageFlags.IsComponentsV2 });
                     return;
                 }
 
@@ -274,7 +280,7 @@ module.exports = {
                         .setStyle(2),
                 ));
 
-                const payPayload = { components: [containerPix], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+                const payPayload = { components: [containerPix], flags: MessageFlags.IsComponentsV2 };
                 if (files.length > 0) payPayload.files = files;
                 await interaction.message.edit(payPayload);
                 // Guarda ID da mensagem PIX (container) para deletar após confirmação

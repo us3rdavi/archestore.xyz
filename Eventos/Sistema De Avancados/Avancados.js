@@ -57,7 +57,6 @@ module.exports = {
             await interaction.update({
                 components: [container],
                 flags: MessageFlags.IsComponentsV2,
-                embeds: [],
                 ephemeral: true
             });
         }
@@ -83,7 +82,6 @@ module.exports = {
             await interaction.update({
                 components: [container],
                 flags: MessageFlags.IsComponentsV2,
-                embeds: [],
                 ephemeral: true
             });
         }
@@ -109,7 +107,6 @@ module.exports = {
             await interaction.update({
                 components: [container],
                 flags: MessageFlags.IsComponentsV2,
-                embeds: [],
                 ephemeral: true
             });
         }

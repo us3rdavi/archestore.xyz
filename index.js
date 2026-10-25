@@ -34,6 +34,7 @@ process.on('SIGINT',  gracefulShutdown);
     const { GatewayIntentBits, Client, Collection } = require("discord.js");
     const { AtivarIntents } = require("./Functions/StartIntents");
     const { configuracao, carrinhos } = require("./Database");
+    const { releaseClosedThreadAccess } = require('./Functions/ThreadPermissions');
     const { handleDeletedMessage, handleUpdatedMessage } = require('./Functions/MsgsLogs');
     const { handleVoiceStateUpdate } = require('./Functions/VoiceLogs');
     const { handleProfileUpdate } = require('./Functions/ProfileLog');
@@ -81,6 +82,10 @@ process.on('SIGINT',  gracefulShutdown);
     client.once('ready', async () => {
         console.log(`Bot ${client.user.tag} está online!`);
         agendarRepostagem(client);
+        const { repairOpenThreadAccess } = require('./Functions/ThreadPermissions');
+        repairOpenThreadAccess(client).catch((error) => {
+            console.warn('[ThreadPermissions] Falha ao restaurar acesso em tópicos existentes:', error.message);
+        });
     });
 
     // Log de mensagens/voz/perfil — IDs lidos depois que o banco foi carregado
@@ -94,6 +99,20 @@ process.on('SIGINT',  gracefulShutdown);
 
     client.on('messageUpdate', (oldMessage, newMessage) => {
         if (messageLogChannelId) handleUpdatedMessage(oldMessage, newMessage, messageLogChannelId, client);
+    });
+
+    client.on('threadUpdate', (oldThread, newThread) => {
+        if (!oldThread.archived && newThread.archived) {
+            releaseClosedThreadAccess(newThread).catch((error) => {
+                console.warn('[ThreadPermissions] Falha ao restaurar permissões do tópico:', error.message);
+            });
+        }
+    });
+
+    client.on('threadDelete', (thread) => {
+        releaseClosedThreadAccess(thread).catch((error) => {
+            console.warn('[ThreadPermissions] Falha ao restaurar permissões do tópico:', error.message);
+        });
     });
 
     client.on('voiceStateUpdate', (oldState, newState) => {

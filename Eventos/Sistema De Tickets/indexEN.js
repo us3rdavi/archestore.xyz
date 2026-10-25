@@ -19,6 +19,7 @@ const {
     buildFinalizacaoContainerEN,
     buildStaffPanelContainerEN
 } = require("../../Functions/TicketHelpersEN");
+const { releaseThreadMemberMessaging } = require("../../Functions/ThreadPermissions");
 
 const Emojis = { get: (name) => emojis[name] || "" };
 
@@ -319,6 +320,12 @@ module.exports = {
 
             tickets.delete(`en.abertos.${ticketData.userId}`);
             tickets.delete(`en.threads.${interaction.channel.id}`);
+
+            const ticketParent = interaction.channel.parent
+                || interaction.guild.channels.cache.get(ticketData.parentChannelId || interaction.channel.parentId);
+            if (ticketParent) {
+                await releaseThreadMemberMessaging(ticketParent, interaction.channel.id, ticketData.userId).catch(() => {});
+            }
 
             await new Promise(resolve => setTimeout(resolve, 4000));
 

@@ -279,7 +279,7 @@ module.exports = {
                 container.addActionRowComponents(new ActionRowBuilder().addComponents(
                     new ButtonBuilder().setCustomId(`vndp_reopen_${userId}`).setLabel('Continuar editando').setEmoji({ id: '1501804003850322052' }).setStyle(2),
                 ));
-                await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+                await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
                 return;
             }
 
@@ -307,7 +307,7 @@ module.exports = {
                     new ButtonBuilder().setCustomId(`vndps_reopen_${_secaoId}_${userId}`).setLabel('Continuar editando').setEmoji({ id: '1501804003850322052' }).setStyle(2),
                     new ButtonBuilder().setCustomId(`vnd_secao_cfg_${_secaoId}`).setLabel('Voltar à seção').setEmoji({ id: '1501803908589162537' }).setStyle(2),
                 ));
-                await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+                await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
                 return;
             }
 

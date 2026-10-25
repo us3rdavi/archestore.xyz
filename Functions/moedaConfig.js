@@ -48,8 +48,6 @@ async function moedaConfig(interaction, client) {
     await interaction.editReply({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 

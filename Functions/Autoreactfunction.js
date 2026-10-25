@@ -66,8 +66,6 @@ async function autoreact24(interaction, client) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        content: '',
-        embeds: []
     });
 }
 

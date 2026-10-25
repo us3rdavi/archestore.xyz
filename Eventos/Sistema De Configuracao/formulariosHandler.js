@@ -113,7 +113,7 @@ function buildFormEmbedEditorContainer(userId, guildId, slotId, section, data) {
     return c;
 }
 
-const EMB_CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+const EMB_CV2 = { flags: MessageFlags.IsComponentsV2 };
 
 function buildFormEmbedMainMenu(userId, guildId, slotId) {
     const sess        = formEmbedSessions.get(userId) || { data: {} };
@@ -1615,8 +1615,6 @@ module.exports = {
                 await interaction.update({
                     components: [savedC],
                     flags: MessageFlags.IsComponentsV2,
-                    embeds: [],
-                    content: '',
                 });
                 return;
             }

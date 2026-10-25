@@ -46,7 +46,7 @@ const BOT_EMOJI_OPTIONS = [
     { label: 'System',        value: '1501804019184828507', description: 'System icon',       emoji: { id: '1501804019184828507' } },
 ];
 
-const CV2 = { flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+const CV2 = { flags: MessageFlags.IsComponentsV2 };
 const EMOJI_PAGE_SIZE = 25;
 
 function isSelectedEmojiOption(option, currentEmoji) {

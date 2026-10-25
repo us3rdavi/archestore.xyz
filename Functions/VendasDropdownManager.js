@@ -103,7 +103,7 @@ async function gerenciarDropdownVendas(interaction, painelId) {
     container.addActionRowComponents(row1);
     container.addActionRowComponents(new ActionRowBuilder().addComponents(...row2Btns));
 
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (interaction.deferred || interaction.replied) {
         await interaction.editReply(payload);
     } else {
@@ -138,7 +138,7 @@ async function handlePickConfigSecao(interaction, painelId) {
         new ButtonBuilder().setCustomId(backId).setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
     ));
 
-    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
 }
 
 // ── Painel de configuração da seção ────────────────────────────────────────────
@@ -203,7 +203,7 @@ async function buildSecaoConfigPanel(interaction, secao) {
     container.addActionRowComponents(row2);
     container.addActionRowComponents(row3);
 
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (interaction.deferred || interaction.replied) {
         await interaction.editReply(payload);
     } else {
@@ -276,7 +276,7 @@ async function buildSubprodutosPanel(interaction, secao) {
     container.addActionRowComponents(row1);
     container.addActionRowComponents(new ActionRowBuilder().addComponents(...row2Btns));
 
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (interaction.deferred || interaction.replied) {
         await interaction.editReply(payload);
     } else {
@@ -320,7 +320,7 @@ async function buildSubEmojiPickerPanel(interaction, secaoId, client) {
             .setStyle(2)
     ));
 
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
     else await interaction.update(payload);
 }
@@ -404,7 +404,7 @@ async function buildSubEmojiSourcePanel(interaction, secaoId, subId, source, pag
         container.addActionRowComponents(navRow);
     }
 
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
     else await interaction.update(payload);
 }
@@ -448,7 +448,7 @@ async function buildEmojiPickerPanel(interaction, client, { tipo, secaoId, subId
         new ButtonBuilder().setCustomId(backId).setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
     ));
 
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (interaction.deferred || interaction.replied) {
         await interaction.editReply(payload);
     } else {
@@ -531,7 +531,7 @@ async function buildSecaoEmojiSourcePanel(interaction, secaoId, source, page, cl
         container.addActionRowComponents(navRow);
     }
 
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
     else await interaction.update(payload);
 }
@@ -575,7 +575,7 @@ async function buildSubReorderPickPanel(interaction, secaoId) {
             .setStyle(2)
     ));
 
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
     else await interaction.update(payload);
 }
@@ -646,7 +646,7 @@ async function buildSubReorderMovePanel(interaction, secaoId, subId) {
             .setStyle(3),
     ));
 
-    const payload = { components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' };
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
     else await interaction.update(payload);
 }
@@ -765,7 +765,7 @@ async function handlePickEditSub(interaction, secaoId) {
         new ButtonBuilder().setCustomId(`vnd_sub_panel_${secaoId}`).setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
     ));
 
-    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
 }
 
 // ── Picker: remover subproduto ──────────────────────────────────────────────────
@@ -793,7 +793,7 @@ async function handlePickDelSub(interaction, secaoId) {
         new ButtonBuilder().setCustomId(`vnd_sub_panel_${secaoId}`).setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
     ));
 
-    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
 }
 
 // ── Picker: editar seção (info básica) ─────────────────────────────────────────
@@ -821,7 +821,7 @@ async function handlePickEditSecao(interaction, painelId) {
         new ButtonBuilder().setCustomId(backId).setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
     ));
 
-    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
 }
 
 // ── Picker: remover seção ───────────────────────────────────────────────────────
@@ -849,7 +849,7 @@ async function handlePickRemoverSecao(interaction, painelId) {
         new ButtonBuilder().setCustomId(backId).setLabel('Cancelar').setEmoji({ id: '1501803908589162537' }).setStyle(2)
     ));
 
-    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], content: '' });
+    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
 }
 
 module.exports = {

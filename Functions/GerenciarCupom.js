@@ -84,8 +84,6 @@ async function GerenciarCupom(interaction, produtoname, ggg222) {
         await interaction.update({
             components: [container],
             flags: MessageFlags.IsComponentsV2,
-            content: '',
-            embeds: [],
             fetchReply: true
         });
     } else {

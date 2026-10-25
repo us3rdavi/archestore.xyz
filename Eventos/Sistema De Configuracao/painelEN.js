@@ -59,8 +59,6 @@ module.exports = {
                     await interaction.update({
                         components: [buildMainPanel(interaction.user.id, interaction)],
                         flags: MessageFlags.IsComponentsV2,
-                        embeds: [],
-                        content: ''
                     });
                     return;
                 }
@@ -192,7 +190,7 @@ module.exports = {
                             .setEmoji({ id: '1501803908589162537' })
                             .setStyle(2)
                     ));
-                    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, content: '', embeds: [] });
+                    await interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
                     return;
                 }
 

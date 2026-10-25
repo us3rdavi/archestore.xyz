@@ -79,8 +79,6 @@ async function mpConfigs(interaction) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        embeds: [],
-        content: ''
     });
 }
 
@@ -120,8 +118,6 @@ async function BloquearConta(client, interaction) {
     await interaction.update({
         components: [container],
         flags: MessageFlags.IsComponentsV2,
-        embeds: [],
-        content: ''
     });
 }
 

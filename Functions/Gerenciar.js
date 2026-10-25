@@ -57,9 +57,7 @@ async function Gerenciar(interaction, client) {
 
         const payload = {
             components: [container],
-            flags: MessageFlags.IsComponentsV2,
-            embeds: [],
-            content: ''
+            flags: MessageFlags.IsComponentsV2
         };
 
         if (!interaction.message) {

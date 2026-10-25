@@ -234,7 +234,7 @@ module.exports = {
 
             if (option == "permsConfig") {
 
-                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
+                await interaction.update({ components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 })
 
                 gerenciarPerms(interaction, client);
 
@@ -489,7 +489,7 @@ module.exports = {
                         assumirContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(
                             `${Emojis.get('_staff_emoji')} Olá <@!${ultimosNumeros}>, Seu Ticket foi Assumido Pelo Staff ${staffMember}.${dmInfo}`
                         ));
-                        await interaction.reply({ components: [assumirContainer], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
+                        await interaction.reply({ components: [assumirContainer], flags: [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral] });
                     }
                 } catch (error) {
                     if (interaction.replied || interaction.deferred) {
@@ -882,7 +882,7 @@ module.exports = {
                     const acClearContainer = new ContainerBuilder();
                     { const _c = configuracao.get('Cores.Principal') || '5865F2'; acClearContainer; }
                     acClearContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('confirmed_emoji')} Seu AutoClear foi iniciado corretamente no canal <#${canalAutoClear}>`));
-                    await interaction.reply({ content: `${interaction.user}`, components: [acClearContainer], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
+                    await interaction.reply({ components: [acClearContainer], flags: [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral] });
                 }
             }
 
@@ -899,14 +899,14 @@ module.exports = {
                         const acStopContainer = new ContainerBuilder();
                         { const _c = configuracao.get('Cores.Principal') || '5865F2'; acStopContainer; }
                         acStopContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('confirmed_emoji')} Seu AutoClear foi parado e as configurações foram resetadas.`));
-                        await interaction.reply({ content: `${interaction.user}`, components: [acStopContainer], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
+                        await interaction.reply({ components: [acStopContainer], flags: [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral] });
                     }
                 } catch (error) {
                     {
                         const acErrContainer = new ContainerBuilder();
                         acErrContainer;
                         acErrContainer.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('negative_emoji')} Ocorreu um erro ao parar o AutoClear.`));
-                        await interaction.reply({ content: `${interaction.user}`, components: [acErrContainer], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
+                        await interaction.reply({ components: [acErrContainer], flags: [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral] });
                     }
                 }
             }
@@ -918,9 +918,7 @@ module.exports = {
                 const { buildMainPanel } = require('../../Functions/ConfigPainelBuilder');
                 await interaction.update({
                     components: [buildMainPanel(interaction.user.id, interaction)],
-                    flags: MessageFlags.IsComponentsV2,
-                    embeds: [],
-                    content: ''
+                    flags: MessageFlags.IsComponentsV2
                 });
             }
 
@@ -1156,7 +1154,7 @@ module.exports = {
 
             if (interaction.customId == "altMoeda") {
 
-                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 });
+                await interaction.update({ components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 });
 
                 moedaConfig(interaction, client);
 
@@ -1164,7 +1162,7 @@ module.exports = {
 
             if (interaction.customId == "protecaoBot") {
 
-                await interaction.update({ content: '', embeds: [], components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 });
+                await interaction.update({ components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`${Emojis.get('loading_emoji')} Carregando...`))], flags: MessageFlags.IsComponentsV2 });
 
                 const owners = owner.map(rs => `<@${rs}>`).join(', ')
 
@@ -1255,9 +1253,7 @@ module.exports = {
 
                 await interaction.update({
                     components: [_cont],
-                    flags: MessageFlags.IsComponentsV2,
-                    content: '',
-                    embeds: []
+                    flags: MessageFlags.IsComponentsV2
                 });
             }
             if (interaction.customId.startsWith('painelconfigbv')) {
@@ -1294,9 +1290,7 @@ module.exports = {
                 const { buildMainPanel } = require('../../Functions/ConfigPainelBuilder');
                 await interaction.update({
                     components: [buildMainPanel(interaction.user.id, interaction)],
-                    flags: MessageFlags.IsComponentsV2,
-                    embeds: [],
-                    content: ''
+                    flags: MessageFlags.IsComponentsV2
                 });
             }
             if (interaction.customId == "botaoduvidas") {
@@ -1383,9 +1377,7 @@ module.exports = {
                 const { buildMainPanel } = require('../../Functions/ConfigPainelBuilder');
                 await interaction.update({
                     components: [buildMainPanel(interaction.user.id, interaction)],
-                    flags: MessageFlags.IsComponentsV2,
-                    embeds: [],
-                    content: ''
+                    flags: MessageFlags.IsComponentsV2
                 });
             }
             if (interaction.customId == "addcanalboasvindas") {

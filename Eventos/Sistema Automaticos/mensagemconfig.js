@@ -116,10 +116,8 @@ async function updateConfigContainer(interaction, client) {
 
     try {
         await interaction.update({
-            content: '',
             components: [container],
             flags: MessageFlags.IsComponentsV2,
-            embeds: [],
             ephemeral: true
         });
     } catch (error) {

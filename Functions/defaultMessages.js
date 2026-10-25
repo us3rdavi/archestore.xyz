@@ -23,22 +23,22 @@ function getEmoji(type) {
 
 async function replyMessage({ interaction, type, message, components }) {
     const container = buildContainer(`${getEmoji(type)} ${message}`, components || null);
-    return interaction.reply({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
+    return interaction.reply({ components: [container], flags: MessageFlags.IsComponentsV2, ephemeral: true });
 }
 
 async function editReplyMessage({ interaction, type, message, components }) {
     const container = buildContainer(`${getEmoji(type)} ${message}`, components || null);
-    return interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
+    return interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2, ephemeral: true });
 }
 
 async function updateMessage({ interaction, type, message, components }) {
     const container = buildContainer(`${getEmoji(type)} ${message}`, components || null);
-    return interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
+    return interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2, ephemeral: true });
 }
 
 async function followUpMessage({ interaction, type, message, components }) {
     const container = buildContainer(`${getEmoji(type)} ${message}`, components || null);
-    return interaction.followUp({ components: [container], flags: MessageFlags.IsComponentsV2, embeds: [], ephemeral: true });
+    return interaction.followUp({ components: [container], flags: MessageFlags.IsComponentsV2, ephemeral: true });
 }
 
 module.exports = {

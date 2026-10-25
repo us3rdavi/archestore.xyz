@@ -10,6 +10,7 @@ const {
 const { tickets, estatisticas } = require("../Database");
 const emojis = require("../Database/emojis.json");
 const { buildTicketContainerEN } = require("./TicketHelpersEN");
+const { ensureThreadMemberCanMessage } = require("./ThreadPermissions");
 const moment = require('moment-timezone');
 
 const Emojis = { get: (name) => emojis[name] || "" };
@@ -103,7 +104,17 @@ async function CreateTicketEN(interaction, valor) {
             reason: `Ticket #${contador} opened by ${interaction.user.tag}`
         });
 
-        await thread.members.add(interaction.user.id).catch(() => {});
+        try {
+            await ensureThreadMemberCanMessage(
+                ticketChannel,
+                thread,
+                interaction.member,
+                `Allow ${interaction.user.tag} to participate in their ticket`
+            );
+        } catch (error) {
+            await thread.delete('Could not enable customer participation').catch(() => {});
+            throw error;
+        }
 
         const allStaffRoleIds = tickets.get('en.staffRoles') || [];
 
@@ -128,6 +139,7 @@ async function CreateTicketEN(interaction, valor) {
             abertoPor: interaction.user.id,
             username: interaction.user.globalName || interaction.user.username,
             guildId: interaction.guild.id,
+            parentChannelId: ticketChannel.id,
             messageId: null,
             isEN: true
         };
@@ -265,7 +277,7 @@ async function CreateTicketEN(interaction, valor) {
         console.error('[TicketEN] Error creating ticket:', error);
         tickets.set('en.contador', contador - 1);
         await editLoading({
-            content: `${Emojis.get('negative_emoji')} An error occurred while creating the ticket. Please check that the ticket channel is configured correctly.`
+            content: `${Emojis.get('negative_emoji')} An error occurred while creating the ticket. Check the configured channel permissions.\n-# ${String(error.message || 'Unknown error').slice(0, 250)}`
         });
     }
 }
