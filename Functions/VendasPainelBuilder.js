@@ -190,7 +190,8 @@ function buildPainelPreviewContainer(data) {
     const content = buildPreviewContainer(data);
     const todasSecoes = configuracao.get('vendas.secoes') || [];
     const painelIdPreview = data && data._painelId;
-    const secoes = painelIdPreview ? todasSecoes.filter(s => s.painelId === painelIdPreview) : todasSecoes;
+    const secoes = (painelIdPreview ? todasSecoes.filter(s => s.painelId === painelIdPreview) : todasSecoes)
+        .filter(s => !s.parentId);
 
     // Adiciona o dropdown de seções no preview (mostra exatamente como vai ficar)
     if (secoes.length > 0) {
@@ -211,12 +212,29 @@ function buildPainelPreviewContainer(data) {
     return content;
 }
 
-// ── Preview de seção (preview + dropdown de subprodutos) ─────────────────────
+// ── Preview de seção (preview + dropdowns de sub-seções e produtos) ────────────
 
 function buildSecaoPreviewContainer(data, secao) {
     const content = buildPreviewContainer(data);
     const subprodutos = (secao && secao.subprodutos) || [];
+    const secoesFilhas = secao
+        ? (configuracao.get('vendas.secoes') || []).filter(s => s.parentId === secao.id)
+        : [];
 
+    if (secoesFilhas.length > 0) {
+        content.addSeparatorComponents(new SeparatorBuilder());
+        content.addActionRowComponents(new ActionRowBuilder().addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId('vndps_preview_children_ignore')
+                .setPlaceholder('Escolha uma sub-seção...')
+                .addOptions(secoesFilhas.slice(0, 25).map(child => ({
+                    label: child.nome.slice(0, 100),
+                    value: `vndps_preview_${child.id}`,
+                    description: (child.descricao || '').slice(0, 100) || undefined,
+                    ...(child.emoji ? { emoji: { id: child.emoji } } : {}),
+                })))
+        ));
+    }
     if (subprodutos.length > 0) {
         content.addSeparatorComponents(new SeparatorBuilder());
         const options = subprodutos.slice(0, 25).map(sp => ({
@@ -497,7 +515,7 @@ function buildSecaoBotaoEmojiScreen(userId, idx, page, allOptions, source, secao
 }
 
 /** Container final mostrado ao cliente quando seleciona a seção */
-function buildFinalSecaoContainer(data, secao, subprodutos) {
+function buildFinalSecaoContainer(data, secao, subprodutos, secoesFilhas = []) {
     const c = new ContainerBuilder();
 
     const headerLines = [];
@@ -544,19 +562,49 @@ function buildFinalSecaoContainer(data, secao, subprodutos) {
         for (const row of rows) c.addActionRowComponents(row);
     }
 
-    // Dropdown de subprodutos (sempre presente)
-    c.addSeparatorComponents(new SeparatorBuilder());
-    const options = subprodutos.slice(0, 25).map(sp => ({
-        label: sp.nome.slice(0, 100),
-        value: `vndsub_${secao.id}_${sp.id}`,
-        description: ((sp.descricao ? `${sp.descricao} — ` : '') + `R$ ${Number(sp.valor).toFixed(2)}`).slice(0, 100),
-        ...(sp.emoji ? { emoji: { id: sp.emoji } } : {}),
-    }));
+    if (secoesFilhas.length) {
+        c.addSeparatorComponents(new SeparatorBuilder());
+        c.addTextDisplayComponents(new TextDisplayBuilder().setContent('**Seções disponíveis:**'));
+        const options = secoesFilhas.slice(0, 25).map(child => ({
+            label: child.nome.slice(0, 100),
+            value: child.id,
+            description: (child.descricao || '').slice(0, 100) || undefined,
+            ...(child.emoji ? { emoji: { id: child.emoji } } : {}),
+        }));
+        c.addActionRowComponents(new ActionRowBuilder().addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId(`vnd_subsection_select_${secao.id}`)
+                .setPlaceholder('Escolha uma sub-seção...')
+                .addOptions(options)
+        ));
+    }
+
+    if (subprodutos.length) {
+        c.addSeparatorComponents(new SeparatorBuilder());
+        const options = subprodutos.slice(0, 25).map(sp => ({
+            label: sp.nome.slice(0, 100),
+            value: `vndsub_${secao.id}_${sp.id}`,
+            description: ((sp.descricao ? `${sp.descricao} — ` : '') + `R$ ${Number(sp.valor).toFixed(2)}`).slice(0, 100),
+            ...(sp.emoji ? { emoji: { id: sp.emoji } } : {}),
+        }));
+        c.addActionRowComponents(new ActionRowBuilder().addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId('vnd_sub_select')
+                .setPlaceholder('Selecione um produto...')
+                .addOptions(options)
+        ));
+    } else if (!secoesFilhas.length) {
+        c.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+            `${Emojis.get('negative_emoji')} Esta seção não possui produtos disponíveis no momento.`
+        ));
+    }
+
     c.addActionRowComponents(new ActionRowBuilder().addComponents(
-        new StringSelectMenuBuilder()
-            .setCustomId('vnd_sub_select')
-            .setPlaceholder('Selecione um produto...')
-            .addOptions(options)
+        new ButtonBuilder()
+            .setCustomId(`vnd_secao_back_${secao.id}`)
+            .setLabel(secao.parentId ? 'Voltar à Seção Anterior' : 'Voltar às Categorias')
+            .setEmoji({ id: '1501803908589162537' })
+            .setStyle(ButtonStyle.Secondary)
     ));
 
     return c;

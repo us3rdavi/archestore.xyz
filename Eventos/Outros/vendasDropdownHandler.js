@@ -12,6 +12,24 @@ const {
 const { configuracao, Emojis } = require('../../Database');
 const { criarCarrinhoThread } = require('../../Functions/CarrinhoVendas');
 
+function buildSecaoContainer(secao, secoes) {
+    const children = secoes.filter(s => s.parentId === secao.id);
+    const { buildFinalSecaoContainer } = require('../../Functions/VendasPainelBuilder');
+    return buildFinalSecaoContainer(secao.builderData || null, secao, secao.subprodutos || [], children);
+}
+
+function buildPreviousScreen(secao, secoes) {
+    const parent = secao.parentId && secoes.find(s => s.id === secao.parentId);
+    if (parent) return buildSecaoContainer(parent, secoes);
+
+    const roots = secoes.filter(s => !s.parentId && (!secao.painelId || s.painelId === secao.painelId));
+    const paineis = configuracao.get('vendas.paineis') || [];
+    const painel = paineis.find(p => p.id === secao.painelId);
+    const data = painel?.data || configuracao.get('vendas.painelData') || null;
+    const { buildFinalPainelContainer } = require('../../Functions/VendasPainelBuilder');
+    return buildFinalPainelContainer(data, roots);
+}
+
 module.exports = {
     name: 'interactionCreate',
 
@@ -20,42 +38,37 @@ module.exports = {
             const { customId } = interaction;
             if (!customId) return;
 
-            // ── Usuário seleciona uma seção no dropdown público ───────────────────
-            if (interaction.isStringSelectMenu() && customId === 'vnd_comprar_select') {
-                const rawValue = interaction.values[0]; // formato: vnd_[secaoId]
-                const secaoId = rawValue.replace(/^vnd_/, '');
+            // ── Usuário navega pelas seções do painel público ──────────────────────
+            if (interaction.isStringSelectMenu() &&
+                (customId === 'vnd_comprar_select' || customId.startsWith('vnd_subsection_select_'))) {
+                const parentId = customId.startsWith('vnd_subsection_select_')
+                    ? customId.slice('vnd_subsection_select_'.length)
+                    : null;
+                const secaoId = customId === 'vnd_comprar_select'
+                    ? interaction.values[0].replace(/^vnd_/, '')
+                    : interaction.values[0];
                 const secoes = configuracao.get('vendas.secoes') || [];
                 const secao = secoes.find(s => s.id === secaoId);
 
-                if (!secao) {
-                    return interaction.reply({ content: `${Emojis.get('negative_emoji')} Produto não encontrado. Tente novamente.`, ephemeral: true });
+                if (!secao || (parentId ? secao.parentId !== parentId : !!secao.parentId)) {
+                    return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada. Tente novamente.`, ephemeral: true });
                 }
 
-                const subprodutos = secao.subprodutos || [];
-                if (subprodutos.length === 0) {
-                    return interaction.reply({
-                        content: `${Emojis.get('negative_emoji')} Esta seção não possui produtos disponíveis no momento. Contate um administrador.`,
-                        ephemeral: true
-                    });
-                }
+                const container = buildSecaoContainer(secao, secoes);
+                const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
+                if (parentId) await interaction.update(payload);
+                else await interaction.reply({ ...payload, ephemeral: true });
+                return;
+            }
 
-                const efiAtivo = configuracao.get('pagamentos.EfiOnOff') === true;
-                const efiConfig = !!configuracao.get('pagamentos.EfiAPI.client_id');
-                if (!efiAtivo || !efiConfig) {
-                    return interaction.reply({
-                        content: `${Emojis.get('negative_emoji')} O sistema de pagamento PIX não está habilitado no momento. Contate um administrador.`,
-                        ephemeral: true
-                    });
-                }
-
-                // Usa builderData da seção se existir, senão exibe o layout padrão
-                const { buildFinalSecaoContainer } = require('../../Functions/VendasPainelBuilder');
-                const container = buildFinalSecaoContainer(secao.builderData || null, secao, subprodutos);
-
-                await interaction.reply({
-                    components: [container],
+            if (interaction.isButton() && customId.startsWith('vnd_secao_back_')) {
+                const secaoId = customId.slice('vnd_secao_back_'.length);
+                const secoes = configuracao.get('vendas.secoes') || [];
+                const secao = secoes.find(s => s.id === secaoId);
+                if (!secao) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
+                await interaction.update({
+                    components: [buildPreviousScreen(secao, secoes)],
                     flags: MessageFlags.IsComponentsV2,
-                    ephemeral: true
                 });
                 return;
             }
@@ -72,6 +85,15 @@ module.exports = {
                 const secoes = configuracao.get('vendas.secoes') || [];
                 const secao = secoes.find(s => s.id === secaoId);
                 if (!secao) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
+
+                const efiAtivo = configuracao.get('pagamentos.EfiOnOff') === true;
+                const efiConfig = !!configuracao.get('pagamentos.EfiAPI.client_id');
+                if (!efiAtivo || !efiConfig) {
+                    return interaction.reply({
+                        content: `${Emojis.get('negative_emoji')} O sistema de pagamento PIX não está habilitado no momento. Contate um administrador.`,
+                        ephemeral: true
+                    });
+                }
 
                 const subprodutos = secao.subprodutos || [];
                 const subproduto = subprodutos.find(sp => sp.id === subId);

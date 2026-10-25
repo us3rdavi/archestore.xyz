@@ -15,6 +15,7 @@ const {
     gerenciarDropdownVendas,
     handlePickConfigSecao,
     buildSecaoConfigPanel,
+    buildSubsecoesPanel,
     buildSubprodutosPanel,
     buildEmojiPickerPanel,
     buildSubEmojiPickerPanel,
@@ -30,6 +31,7 @@ const {
     handlePickEditSecao,
     handlePickRemoverSecao,
     gerarId,
+    getIdsDescendentes,
 } = require('../../Functions/VendasDropdownManager');
 const { logAction } = require('../../Functions/AuditLog');
 const { formatInteractionError } = require('../../Functions/InteractionErrorDetails');
@@ -37,7 +39,8 @@ const { formatInteractionError } = require('../../Functions/InteractionErrorDeta
 // Posta um painel específico no canal selecionado
 async function postarPainelNoCanal(channel, painelData, painelId) {
     const todasSecoes = configuracao.get('vendas.secoes') || [];
-    const secoes = painelId ? todasSecoes.filter(s => s.painelId === painelId) : todasSecoes;
+    const secoes = (painelId ? todasSecoes.filter(s => s.painelId === painelId) : todasSecoes)
+        .filter(s => !s.parentId);
     if (secoes.length === 0) return;
     const { buildFinalPainelContainer } = require('../../Functions/VendasPainelBuilder');
     const container = buildFinalPainelContainer(painelData || null, secoes);
@@ -255,6 +258,12 @@ module.exports = {
                     return;
                 }
 
+                if (customId.startsWith('vnd_subsec_panel_')) {
+                    const parentId = customId.slice('vnd_subsec_panel_'.length);
+                    await buildSubsecoesPanel(interaction, parentId);
+                    return;
+                }
+
                 // Editar info da seção (nome + descrição)
                 if (customId.startsWith('vnd_secao_info_')) {
                     const secaoId = customId.slice('vnd_secao_info_'.length);
@@ -318,6 +327,14 @@ module.exports = {
                 if (customId.startsWith('vnd_add_sub_')) {
                     const secaoId = customId.slice('vnd_add_sub_'.length);
                     await interaction.showModal(buildModalAddSub(secaoId));
+                    return;
+                }
+
+                if (customId.startsWith('vnd_add_subsec_')) {
+                    const parentId = customId.slice('vnd_add_subsec_'.length);
+                    const parent = (configuracao.get('vendas.secoes') || []).find(s => s.id === parentId);
+                    if (!parent) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
+                    await interaction.showModal(buildModalAddSecao(null, null, parentId));
                     return;
                 }
 
@@ -450,11 +467,37 @@ module.exports = {
                     const secao = secoes.find(s => s.id === secaoId);
                     if (!secao) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
                     const painelIdSecao = secao.painelId || null;
-                    secoes = secoes.filter(s => s.id !== secaoId);
+                    const idsParaRemover = getIdsDescendentes(secoes, secaoId);
+                    secoes = secoes.filter(s => !idsParaRemover.has(s.id));
                     configuracao.set('vendas.secoes', secoes);
                     logAction(client, { action: 'Seção removida', details: `Seção ${secao.nome} removida.`, userId: interaction.user.id, guildId: interaction.guildId });
                     await interaction.deferUpdate();
                     await gerenciarDropdownVendas(interaction, painelIdSecao);
+                    return;
+                }
+
+                if (customId.startsWith('vnd_select_subsec_config_')) {
+                    const parentId = customId.slice('vnd_select_subsec_config_'.length);
+                    const childId = interaction.values[0];
+                    const secoes = configuracao.get('vendas.secoes') || [];
+                    const child = secoes.find(s => s.id === childId && s.parentId === parentId);
+                    if (!child) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sub-seção não encontrada.`, ephemeral: true });
+                    await buildSecaoConfigPanel(interaction, child);
+                    return;
+                }
+
+                if (customId.startsWith('vnd_select_subsec_remove_')) {
+                    const parentId = customId.slice('vnd_select_subsec_remove_'.length);
+                    const childId = interaction.values[0];
+                    let secoes = configuracao.get('vendas.secoes') || [];
+                    const child = secoes.find(s => s.id === childId && s.parentId === parentId);
+                    if (!child) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sub-seção não encontrada.`, ephemeral: true });
+                    const idsParaRemover = getIdsDescendentes(secoes, childId);
+                    secoes = secoes.filter(s => !idsParaRemover.has(s.id));
+                    configuracao.set('vendas.secoes', secoes);
+                    logAction(client, { action: 'Sub-seção removida', details: `${child.nome} e suas sub-seções`, userId: interaction.user.id, guildId: interaction.guildId });
+                    await interaction.deferUpdate();
+                    await buildSubsecoesPanel(interaction, parentId);
                     return;
                 }
 
@@ -768,6 +811,33 @@ module.exports = {
                     return;
                 }
 
+                if (customId.startsWith('vnd_modal_add_subsec_')) {
+                    const parentId = customId.slice('vnd_modal_add_subsec_'.length);
+                    const nome = interaction.fields.getTextInputValue('nome').trim();
+                    const descricao = interaction.fields.getTextInputValue('descricao').trim();
+                    const todasSecoes = configuracao.get('vendas.secoes') || [];
+                    const parent = todasSecoes.find(s => s.id === parentId);
+                    if (!parent) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção-pai não encontrada.`, ephemeral: true });
+                    const irmas = todasSecoes.filter(s => s.parentId === parentId);
+                    if (irmas.length >= 25) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 25 sub-seções por seção atingido.`, ephemeral: true });
+                    const nova = {
+                        id: gerarId(),
+                        painelId: parent.painelId,
+                        parentId,
+                        nome,
+                        descricao: descricao || '',
+                        emoji: '',
+                        mensagem: '',
+                        subprodutos: [],
+                    };
+                    todasSecoes.push(nova);
+                    configuracao.set('vendas.secoes', todasSecoes);
+                    logAction(client, { action: 'Sub-seção adicionada', details: `${nome} dentro de ${parent.nome}`, userId: interaction.user.id, guildId: interaction.guildId });
+                    await interaction.deferUpdate();
+                    await buildSecaoConfigPanel(interaction, nova);
+                    return;
+                }
+
                 // Adicionar nova seção (customId: vnd_modal_add_secao_<painelId>)
                 // O customId sem painelId (legado) só chega aqui se vnd_add_secao foi acionado
                 // sem painelId — nesse caso atribuímos ao primeiro painel para garantir vínculo.
@@ -784,9 +854,9 @@ module.exports = {
                     const nome     = interaction.fields.getTextInputValue('nome').trim();
                     const descricao = interaction.fields.getTextInputValue('descricao').trim();
                     const todasSecoes = configuracao.get('vendas.secoes') || [];
-                    const secoesDoPanel = todasSecoes.filter(s => s.painelId === painelId);
-                    if (secoesDoPanel.length >= 25) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 25 seções por painel atingido.`, ephemeral: true });
-                    const nova = { id: gerarId(), painelId, nome, descricao: descricao || '', emoji: '', mensagem: '', subprodutos: [] };
+                    const secoesDoPanel = todasSecoes.filter(s => s.painelId === painelId && !s.parentId);
+                    if (secoesDoPanel.length >= 25) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 25 seções principais por painel atingido.`, ephemeral: true });
+                    const nova = { id: gerarId(), painelId, parentId: null, nome, descricao: descricao || '', emoji: '', mensagem: '', subprodutos: [] };
                     todasSecoes.push(nova);
                     configuracao.set('vendas.secoes', todasSecoes);
                     logAction(client, { action: 'Seção adicionada', details: `${nome}`, userId: interaction.user.id, guildId: interaction.guildId });

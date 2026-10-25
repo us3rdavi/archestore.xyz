@@ -38,16 +38,48 @@ function gerarId() {
     return Math.random().toString(36).slice(2, 10);
 }
 
+function getSecoesFilhas(secoes, parentId) {
+    return secoes.filter(s => s.parentId === parentId);
+}
+
+function getCaminhoSecao(secoes, secao) {
+    const nomes = [secao.nome];
+    let atual = secao;
+    while (atual.parentId) {
+        atual = secoes.find(s => s.id === atual.parentId);
+        if (!atual) break;
+        nomes.unshift(atual.nome);
+    }
+    return nomes.join(' › ');
+}
+
+function getIdsDescendentes(secoes, secaoId) {
+    const ids = new Set([secaoId]);
+    let mudou = true;
+    while (mudou) {
+        mudou = false;
+        for (const secao of secoes) {
+            if (secao.parentId && ids.has(secao.parentId) && !ids.has(secao.id)) {
+                ids.add(secao.id);
+                mudou = true;
+            }
+        }
+    }
+    return ids;
+}
+
 // ── Painel principal: lista de seções (filtrado por painel) ───────────────────
 async function gerenciarDropdownVendas(interaction, painelId) {
     const todasSecoes = configuracao.get('vendas.secoes') || [];
-    const secoes = painelId ? todasSecoes.filter(s => s.painelId === painelId) : todasSecoes;
+    const secoes = (painelId ? todasSecoes.filter(s => s.painelId === painelId) : todasSecoes)
+        .filter(s => !s.parentId);
 
     const listaSecoes = secoes.length === 0
         ? `${Emojis.get('negative_emoji')} Nenhuma seção cadastrada ainda.`
         : secoes.map((s, i) => {
             const nSub = (s.subprodutos || []).length;
-            return `**${i + 1}.** ${s.emoji ? `<:e:${s.emoji}> ` : ''}**${s.nome}** — ${nSub} subproduto(s)\n-# ${s.descricao || 'Sem descrição'}`;
+            const nFilhas = getSecoesFilhas(todasSecoes, s.id).length;
+            return `**${i + 1}.** ${s.emoji ? `<:e:${s.emoji}> ` : ''}**${s.nome}** — ${nFilhas} sub-seção(ões), ${nSub} produto(s)\n-# ${s.descricao || 'Sem descrição'}`;
         }).join('\n\n');
 
     const addId = painelId ? `vnd_add_secao_${painelId}` : 'vnd_add_secao';
@@ -58,7 +90,7 @@ async function gerenciarDropdownVendas(interaction, painelId) {
     const container = new ContainerBuilder();
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `## ${Emojis.get('store_emoji')} Seções do Painel de Vendas\n` +
-        `Gerencie as seções exibidas no dropdown. Cada seção contém subprodutos selecionáveis. Máx. **25 seções**.\n\n` +
+        `Gerencie as categorias e produtos do painel. Cada seção pode conter outras seções. Máx. **25 seções principais**.\n\n` +
         listaSecoes
     ));
     container.addSeparatorComponents(new SeparatorBuilder());
@@ -114,7 +146,8 @@ async function gerenciarDropdownVendas(interaction, painelId) {
 // ── Picker: escolhe qual seção configurar ───────────────────────────────────────
 async function handlePickConfigSecao(interaction, painelId) {
     const todasSecoes = configuracao.get('vendas.secoes') || [];
-    const secoes = painelId ? todasSecoes.filter(s => s.painelId === painelId) : todasSecoes;
+    const secoes = (painelId ? todasSecoes.filter(s => s.painelId === painelId) : todasSecoes)
+        .filter(s => !s.parentId);
     if (secoes.length === 0) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Nenhuma seção disponível.`, ephemeral: true });
 
     const options = secoes.slice(0, 25).map(s => ({
@@ -144,6 +177,8 @@ async function handlePickConfigSecao(interaction, painelId) {
 // ── Painel de configuração da seção ────────────────────────────────────────────
 async function buildSecaoConfigPanel(interaction, secao) {
     const subprodutos = secao.subprodutos || [];
+    const todasSecoes = configuracao.get('vendas.secoes') || [];
+    const secoesFilhas = getSecoesFilhas(todasSecoes, secao.id);
     const listaSub = subprodutos.length === 0
         ? `-# Nenhum subproduto cadastrado.`
         : subprodutos.map((sp, i) =>
@@ -157,7 +192,7 @@ async function buildSecaoConfigPanel(interaction, secao) {
         `${Emojis.get('_text_emoji')} **Descrição:** ${secao.descricao || '`Não definida`'}\n` +
         `${Emojis.get('_lapis_emoji')} **Mensagem do painel:** ${secao.mensagem ? `${secao.mensagem.slice(0, 60)}${secao.mensagem.length > 60 ? '...' : ''}` : 'Não definida'}\n` +
         `${Emojis.get('store_emoji')} **Emoji:** ${secao.emoji ? `<:e:${secao.emoji}>` : '`Não definido`'}\n\n` +
-        `**Subprodutos (${subprodutos.length}):**\n${listaSub}`
+        `**Sub-seções: ${secoesFilhas.length} · Produtos: ${subprodutos.length}**\n${listaSub}`
     ));
     container.addSeparatorComponents(new SeparatorBuilder());
 
@@ -185,6 +220,11 @@ async function buildSecaoConfigPanel(interaction, secao) {
             .setEmoji({ id: '1501803947898306724' })
             .setStyle(1),
         new ButtonBuilder()
+            .setCustomId(`vnd_subsec_panel_${secao.id}`)
+            .setLabel('Gerenciar Sub-seções')
+            .setEmoji({ id: '1501804003850322052' })
+            .setStyle(1),
+        new ButtonBuilder()
             .setCustomId(`vnd_secao_builder_${secao.id}`)
             .setLabel('Editar Visual (Realtime)')
             .setEmoji({ id: '1501803923126747178' })
@@ -209,6 +249,62 @@ async function buildSecaoConfigPanel(interaction, secao) {
     } else {
         await interaction.update(payload);
     }
+}
+
+async function buildSubsecoesPanel(interaction, parentId) {
+    const secoes = configuracao.get('vendas.secoes') || [];
+    const parent = secoes.find(s => s.id === parentId);
+    if (!parent) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
+    const children = getSecoesFilhas(secoes, parentId);
+    const childList = children.length
+        ? children.map((child, i) => `**${i + 1}.** ${child.emoji ? `<:e:${child.emoji}> ` : ''}**${child.nome}** — ${(child.subprodutos || []).length} produto(s)`).join('\n')
+        : `${Emojis.get('negative_emoji')} Nenhuma sub-seção cadastrada.`;
+
+    const container = new ContainerBuilder();
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('store_emoji')} Sub-seções — ${parent.nome}\n` +
+        `Crie categorias dentro desta seção ou escolha uma para configurar.\n\n${childList}`
+    ));
+    container.addSeparatorComponents(new SeparatorBuilder());
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`vnd_add_subsec_${parentId}`)
+            .setLabel('Adicionar Sub-seção')
+            .setEmoji({ id: '1501803905363869769' })
+            .setStyle(3)
+            .setDisabled(children.length >= 25),
+    ));
+    if (children.length) {
+        const options = children.slice(0, 25).map(child => ({
+            label: child.nome.slice(0, 100),
+            value: child.id,
+            description: `${getSecoesFilhas(secoes, child.id).length} sub-seção(ões) · ${(child.subprodutos || []).length} produto(s)`.slice(0, 100),
+            ...(child.emoji ? { emoji: { id: child.emoji } } : {}),
+        }));
+        container.addActionRowComponents(new ActionRowBuilder().addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId(`vnd_select_subsec_config_${parentId}`)
+                .setPlaceholder('Selecione a sub-seção para configurar...')
+                .addOptions(options)
+        ));
+        container.addActionRowComponents(new ActionRowBuilder().addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId(`vnd_select_subsec_remove_${parentId}`)
+                .setPlaceholder('Selecione a sub-seção para remover...')
+                .addOptions(options)
+        ));
+    }
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`vnd_secao_cfg_${parentId}`)
+            .setLabel('Voltar à Seção')
+            .setEmoji({ id: '1501803908589162537' })
+            .setStyle(2)
+    ));
+
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
+    if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
+    else await interaction.update(payload);
 }
 
 // ── Painel de subprodutos ───────────────────────────────────────────────────────
@@ -652,11 +748,13 @@ async function buildSubReorderMovePanel(interaction, secaoId, subId) {
 }
 
 // ── Modal: adicionar/editar seção ───────────────────────────────────────────────
-function buildModalAddSecao(secao = null, painelId = null) {
-    const newCustomId = painelId ? `vnd_modal_add_secao_${painelId}` : 'vnd_modal_add_secao';
+function buildModalAddSecao(secao = null, painelId = null, parentId = null) {
+    const newCustomId = parentId
+        ? `vnd_modal_add_subsec_${parentId}`
+        : painelId ? `vnd_modal_add_secao_${painelId}` : 'vnd_modal_add_secao';
     const modal = new ModalBuilder()
         .setCustomId(secao ? `vnd_modal_edit_secao_${secao.id}` : newCustomId)
-        .setTitle(secao ? 'Editar Seção' : 'Adicionar Seção');
+        .setTitle(secao ? 'Editar Seção' : parentId ? 'Adicionar Sub-seção' : 'Adicionar Seção');
 
     modal.addComponents(
         new ActionRowBuilder().addComponents(
@@ -799,7 +897,8 @@ async function handlePickDelSub(interaction, secaoId) {
 // ── Picker: editar seção (info básica) ─────────────────────────────────────────
 async function handlePickEditSecao(interaction, painelId) {
     const todasSecoes = configuracao.get('vendas.secoes') || [];
-    const secoes = painelId ? todasSecoes.filter(s => s.painelId === painelId) : todasSecoes;
+    const secoes = (painelId ? todasSecoes.filter(s => s.painelId === painelId) : todasSecoes)
+        .filter(s => !s.parentId);
     if (secoes.length === 0) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Nenhuma seção para editar.`, ephemeral: true });
 
     const options = secoes.slice(0, 25).map(s => ({
@@ -827,7 +926,8 @@ async function handlePickEditSecao(interaction, painelId) {
 // ── Picker: remover seção ───────────────────────────────────────────────────────
 async function handlePickRemoverSecao(interaction, painelId) {
     const todasSecoes = configuracao.get('vendas.secoes') || [];
-    const secoes = painelId ? todasSecoes.filter(s => s.painelId === painelId) : todasSecoes;
+    const secoes = (painelId ? todasSecoes.filter(s => s.painelId === painelId) : todasSecoes)
+        .filter(s => !s.parentId);
     if (secoes.length === 0) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Nenhuma seção para remover.`, ephemeral: true });
 
     const options = secoes.slice(0, 25).map(s => ({
@@ -856,6 +956,7 @@ module.exports = {
     gerenciarDropdownVendas,
     handlePickConfigSecao,
     buildSecaoConfigPanel,
+    buildSubsecoesPanel,
     buildSubprodutosPanel,
     buildEmojiPickerPanel,
     buildSubEmojiPickerPanel,
@@ -871,4 +972,5 @@ module.exports = {
     handlePickEditSecao,
     handlePickRemoverSecao,
     gerarId,
+    getIdsDescendentes,
 };
