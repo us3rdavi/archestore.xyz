@@ -1,0 +1,1 @@
+- [Hosting diagnostics](hosting-diagnostics.md) — the bot host does not expose console logs; surface sanitized runtime diagnostics in Discord.

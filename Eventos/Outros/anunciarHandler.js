@@ -12,6 +12,7 @@ const {
     styleFromString,
 } = require('../../Functions/AnunciarBuilder');
 const { Emojis } = require('../../Database');
+const { formatInteractionError } = require('../../Functions/InteractionErrorDetails');
 
 module.exports = {
     name: 'interactionCreate',
@@ -547,7 +548,11 @@ module.exports = {
             console.error('[AnunciarHandler] Erro:', err);
             try {
                 if (!interaction.replied && !interaction.deferred) {
-                    await interaction.reply({ content: `${Emojis.get('negative_emoji')} Ocorreu um erro. Tente novamente.`, ephemeral: true });
+                    await interaction.reply({
+                        content: `${Emojis.get('negative_emoji')} Ocorreu um erro. Tente novamente.\n-# Detalhe técnico: \`${formatInteractionError(err)}\``,
+                        ephemeral: true,
+                        allowedMentions: { parse: [] },
+                    });
                 }
             } catch (e) { if (e.code !== 10062) console.error('[AnunciarHandler] Erro ao responder:', e.message); }
         }

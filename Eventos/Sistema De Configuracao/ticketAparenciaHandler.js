@@ -8,6 +8,7 @@ const {
 } = require('../../Functions/TicketAparenciaBuilder');
 const { tickets, Emojis } = require('../../Database');
 const { buildDatabaseEmojiOptions } = require('../../Functions/EmojiPickerOptions');
+const { formatInteractionError } = require('../../Functions/InteractionErrorDetails');
 
 const getBotEmojiOptions = (client, guild) => buildDatabaseEmojiOptions(client, {
     guild,
@@ -184,7 +185,11 @@ module.exports = {
             console.error('[TicketAparenciaHandler] Erro:', err);
             try {
                 if (!interaction.replied && !interaction.deferred) {
-                    await interaction.reply({ content: `${Emojis.get('negative_emoji')} Ocorreu um erro. Tente novamente.`, ephemeral: true });
+                    await interaction.reply({
+                        content: `${Emojis.get('negative_emoji')} Ocorreu um erro. Tente novamente.\n-# Detalhe técnico: \`${formatInteractionError(err)}\``,
+                        ephemeral: true,
+                        allowedMentions: { parse: [] },
+                    });
                 }
             } catch (e) { if (e.code !== 10062) console.error('[TicketAparenciaHandler] Erro ao responder:', e.message); }
         }
