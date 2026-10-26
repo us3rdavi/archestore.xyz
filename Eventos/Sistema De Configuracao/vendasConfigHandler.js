@@ -16,6 +16,8 @@ const {
     handlePickConfigSecao,
     buildSecaoConfigPanel,
     buildSubsecoesPanel,
+    buildSubsecReorderPickPanel,
+    buildSubsecReorderMovePanel,
     buildSubprodutosPanel,
     buildEmojiPickerPanel,
     buildSubEmojiPickerPanel,
@@ -32,6 +34,8 @@ const {
     handlePickRemoverSecao,
     gerarId,
     getIdsDescendentes,
+    normalizarOrdemSubsecoes,
+    moveSubsec,
 } = require('../../Functions/VendasDropdownManager');
 const { logAction } = require('../../Functions/AuditLog');
 const { formatInteractionError } = require('../../Functions/InteractionErrorDetails');
@@ -264,6 +268,29 @@ module.exports = {
                     return;
                 }
 
+                if (customId.startsWith('vnd_subsec_reorder_')) {
+                    const parentId = customId.slice('vnd_subsec_reorder_'.length);
+                    await buildSubsecReorderPickPanel(interaction, parentId);
+                    return;
+                }
+
+                if (customId.startsWith('vnd_subsec_mv_')) {
+                    const rest = customId.slice('vnd_subsec_mv_'.length);
+                    const firstSeparator = rest.indexOf('_');
+                    const direction = rest.slice(0, firstSeparator);
+                    const ids = rest.slice(firstSeparator + 1);
+                    const secondSeparator = ids.indexOf('_');
+                    const parentId = ids.slice(0, secondSeparator);
+                    const childId = ids.slice(secondSeparator + 1);
+                    const secoes = configuracao.get('vendas.secoes') || [];
+                    if (!moveSubsec(secoes, parentId, childId, direction)) {
+                        return interaction.reply({ content: `${Emojis.get('negative_emoji')} Não foi possível mover esta sub-seção.`, ephemeral: true });
+                    }
+                    configuracao.set('vendas.secoes', secoes);
+                    await buildSubsecReorderMovePanel(interaction, parentId, childId);
+                    return;
+                }
+
                 // Editar info da seção (nome + descrição)
                 if (customId.startsWith('vnd_secao_info_')) {
                     const secaoId = customId.slice('vnd_secao_info_'.length);
@@ -483,6 +510,13 @@ module.exports = {
                     const child = secoes.find(s => s.id === childId && s.parentId === parentId);
                     if (!child) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sub-seção não encontrada.`, ephemeral: true });
                     await buildSecaoConfigPanel(interaction, child);
+                    return;
+                }
+
+                if (customId.startsWith('vnd_subsec_reorder_sel_')) {
+                    const parentId = customId.slice('vnd_subsec_reorder_sel_'.length);
+                    const childId = interaction.values[0];
+                    await buildSubsecReorderMovePanel(interaction, parentId, childId);
                     return;
                 }
 
@@ -818,12 +852,13 @@ module.exports = {
                     const todasSecoes = configuracao.get('vendas.secoes') || [];
                     const parent = todasSecoes.find(s => s.id === parentId);
                     if (!parent) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção-pai não encontrada.`, ephemeral: true });
-                    const irmas = todasSecoes.filter(s => s.parentId === parentId);
+                    const irmas = normalizarOrdemSubsecoes(todasSecoes, parentId);
                     if (irmas.length >= 25) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Limite de 25 sub-seções por seção atingido.`, ephemeral: true });
                     const nova = {
                         id: gerarId(),
                         painelId: parent.painelId,
                         parentId,
+                        ordem: irmas.length,
                         nome,
                         descricao: descricao || '',
                         emoji: '',

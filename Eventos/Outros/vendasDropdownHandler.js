@@ -11,9 +11,10 @@ const {
 } = require('discord.js');
 const { configuracao, Emojis } = require('../../Database');
 const { criarCarrinhoThread } = require('../../Functions/CarrinhoVendas');
+const { getSecoesFilhas } = require('../../Functions/VendasDropdownManager');
 
 function buildSecaoContainer(secao, secoes) {
-    const children = secoes.filter(s => s.parentId === secao.id);
+    const children = getSecoesFilhas(secoes, secao.id);
     const { buildFinalSecaoContainer } = require('../../Functions/VendasPainelBuilder');
     return buildFinalSecaoContainer(secao.builderData || null, secao, secao.subprodutos || [], children);
 }

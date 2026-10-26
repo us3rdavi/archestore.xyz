@@ -17,6 +17,7 @@ const {
 } = require('discord.js');
 const { dbembed, Emojis, configuracao } = require('../Database');
 const { buildDatabaseEmojiOptions, buildGuildEmojiOptions } = require('./EmojiPickerOptions');
+const { getSecoesFilhas } = require('./VendasDropdownManager');
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 
@@ -218,7 +219,7 @@ function buildSecaoPreviewContainer(data, secao) {
     const content = buildPreviewContainer(data);
     const subprodutos = (secao && secao.subprodutos) || [];
     const secoesFilhas = secao
-        ? (configuracao.get('vendas.secoes') || []).filter(s => s.parentId === secao.id)
+        ? getSecoesFilhas(configuracao.get('vendas.secoes') || [], secao.id)
         : [];
 
     if (secoesFilhas.length > 0) {

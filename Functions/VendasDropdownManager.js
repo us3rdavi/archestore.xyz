@@ -39,7 +39,22 @@ function gerarId() {
 }
 
 function getSecoesFilhas(secoes, parentId) {
-    return secoes.filter(s => s.parentId === parentId);
+    return secoes
+        .map((secao, index) => ({ secao, index }))
+        .filter(({ secao }) => secao.parentId === parentId)
+        .sort((a, b) => {
+            const ordemA = Number.isInteger(a.secao.ordem) ? a.secao.ordem : a.index;
+            const ordemB = Number.isInteger(b.secao.ordem) ? b.secao.ordem : b.index;
+            return ordemA - ordemB || a.index - b.index;
+        })
+        .map(({ secao }) => secao);
+}
+
+function normalizarOrdemSubsecoes(secoes, parentId) {
+    getSecoesFilhas(secoes, parentId).forEach((secao, index) => {
+        secao.ordem = index;
+    });
+    return getSecoesFilhas(secoes, parentId);
 }
 
 function getCaminhoSecao(secoes, secao) {
@@ -273,6 +288,12 @@ async function buildSubsecoesPanel(interaction, parentId) {
             .setEmoji({ id: '1501803905363869769' })
             .setStyle(3)
             .setDisabled(children.length >= 25),
+        new ButtonBuilder()
+            .setCustomId(`vnd_subsec_reorder_${parentId}`)
+            .setLabel('Reordenar')
+            .setEmoji({ id: '1501803947898306724' })
+            .setStyle(2)
+            .setDisabled(children.length < 2),
     ));
     if (children.length) {
         const options = children.slice(0, 25).map(child => ({
@@ -305,6 +326,124 @@ async function buildSubsecoesPanel(interaction, parentId) {
     const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
     if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
     else await interaction.update(payload);
+}
+
+async function buildSubsecReorderPickPanel(interaction, parentId) {
+    const secoes = configuracao.get('vendas.secoes') || [];
+    const parent = secoes.find(s => s.id === parentId);
+    if (!parent) return interaction.reply({ content: `${Emojis.get('negative_emoji')} Seção não encontrada.`, ephemeral: true });
+    const children = getSecoesFilhas(secoes, parentId);
+    if (children.length < 2) {
+        return interaction.reply({ content: `${Emojis.get('negative_emoji')} Adicione pelo menos duas sub-seções para reordenar.`, ephemeral: true });
+    }
+
+    const options = children.slice(0, 25).map((child, index) => ({
+        label: `${index + 1}. ${child.nome}`.slice(0, 100),
+        value: child.id,
+        description: `${index + 1} de ${children.length}`,
+        ...(child.emoji ? { emoji: { id: child.emoji } } : {}),
+    }));
+    const container = new ContainerBuilder();
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('store_emoji')} Reordenar Sub-seções — ${parent.nome}\n` +
+        `Selecione a sub-seção que deseja mover.\n\n` +
+        children.map((child, index) => `**${index + 1}.** ${child.nome}`).join('\n')
+    ));
+    container.addSeparatorComponents(new SeparatorBuilder());
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new StringSelectMenuBuilder()
+            .setCustomId(`vnd_subsec_reorder_sel_${parentId}`)
+            .setPlaceholder('Selecione a sub-seção...')
+            .addOptions(options)
+    ));
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`vnd_subsec_panel_${parentId}`)
+            .setLabel('Voltar')
+            .setEmoji({ id: '1501803908589162537' })
+            .setStyle(2)
+    ));
+
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
+    if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
+    else await interaction.update(payload);
+}
+
+async function buildSubsecReorderMovePanel(interaction, parentId, childId) {
+    const secoes = configuracao.get('vendas.secoes') || [];
+    const parent = secoes.find(s => s.id === parentId);
+    const children = getSecoesFilhas(secoes, parentId);
+    const index = children.findIndex(s => s.id === childId);
+    if (!parent || index === -1) {
+        return interaction.reply({ content: `${Emojis.get('negative_emoji')} Sub-seção não encontrada.`, ephemeral: true });
+    }
+    const total = children.length;
+    const child = children[index];
+    const container = new ContainerBuilder();
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `## ${Emojis.get('store_emoji')} Movendo: **${child.nome}**\n` +
+        `-# Posição atual: **${index + 1}** de **${total}** em ${parent.nome}\n\n` +
+        children.map((item, position) => `${item.id === childId ? '▶ ' : `${position + 1}. `}**${item.nome}**`).join('\n')
+    ));
+    container.addSeparatorComponents(new SeparatorBuilder());
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`vnd_subsec_mv_top_${parentId}_${childId}`)
+            .setLabel('Início')
+            .setEmoji({ id: '1501803914654257326' })
+            .setStyle(2)
+            .setDisabled(index === 0),
+        new ButtonBuilder()
+            .setCustomId(`vnd_subsec_mv_up_${parentId}_${childId}`)
+            .setLabel('Subir')
+            .setEmoji({ id: '1501803911655198742' })
+            .setStyle(2)
+            .setDisabled(index === 0),
+        new ButtonBuilder()
+            .setCustomId(`vnd_subsec_mv_down_${parentId}_${childId}`)
+            .setLabel('Descer')
+            .setEmoji({ id: '1501803914654257326' })
+            .setStyle(2)
+            .setDisabled(index === total - 1),
+        new ButtonBuilder()
+            .setCustomId(`vnd_subsec_mv_bot_${parentId}_${childId}`)
+            .setLabel('Fim')
+            .setEmoji({ id: '1501803911655198742' })
+            .setStyle(2)
+            .setDisabled(index === total - 1),
+    ));
+    container.addActionRowComponents(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`vnd_subsec_reorder_${parentId}`)
+            .setLabel('Escolher outra')
+            .setEmoji({ id: '1501803947898306724' })
+            .setStyle(2),
+        new ButtonBuilder()
+            .setCustomId(`vnd_subsec_panel_${parentId}`)
+            .setLabel('Concluído')
+            .setEmoji({ id: '1501803917640732722' })
+            .setStyle(3),
+    ));
+
+    const payload = { components: [container], flags: MessageFlags.IsComponentsV2 };
+    if (interaction.deferred || interaction.replied) await interaction.editReply(payload);
+    else await interaction.update(payload);
+}
+
+function moveSubsec(secoes, parentId, childId, direction) {
+    const children = normalizarOrdemSubsecoes(secoes, parentId);
+    const index = children.findIndex(s => s.id === childId);
+    if (index === -1) return false;
+
+    const [item] = children.splice(index, 1);
+    if (direction === 'top') children.unshift(item);
+    else if (direction === 'up') children.splice(Math.max(0, index - 1), 0, item);
+    else if (direction === 'down') children.splice(Math.min(children.length, index + 1), 0, item);
+    else if (direction === 'bot') children.push(item);
+    else return false;
+
+    children.forEach((child, position) => { child.ordem = position; });
+    return true;
 }
 
 // ── Painel de subprodutos ───────────────────────────────────────────────────────
@@ -957,6 +1096,8 @@ module.exports = {
     handlePickConfigSecao,
     buildSecaoConfigPanel,
     buildSubsecoesPanel,
+    buildSubsecReorderPickPanel,
+    buildSubsecReorderMovePanel,
     buildSubprodutosPanel,
     buildEmojiPickerPanel,
     buildSubEmojiPickerPanel,
@@ -973,4 +1114,7 @@ module.exports = {
     handlePickRemoverSecao,
     gerarId,
     getIdsDescendentes,
+    getSecoesFilhas,
+    normalizarOrdemSubsecoes,
+    moveSubsec,
 };
